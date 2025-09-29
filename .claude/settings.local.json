@@ -1,0 +1,36 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mvn clean:*)",
+      "Read(//d/code7/facetest/**)",
+      "Bash(node_modules.binvite)",
+      "Bash(./node_modules/.bin/vite)",
+      "Bash(curl:*)",
+      "Bash(findstr:*)",
+      "Bash(mvn:*)",
+      "Bash(cp:*)",
+      "Bash(npm run dev:*)",
+      "Bash(node:*)",
+      "Bash(for i in {1..3})",
+      "Read(//d/code7/logs/**)",
+      "Bash(\"C:\\Program Files\\nodejs\\node.exe\" --version)",
+      "Bash(\"C:\\Program Files\\nodejs\\npm.cmd\" run dev)",
+      "Bash(set PATH=%PATH%)",
+      "Bash(\"C:\\Program Files\\nodejs\")",
+      "Bash(npm version:*)",
+      "Bash(npx:*)",
+      "Bash(java:*)",
+      "Bash(dir)",
+      "Bash(\"C:\\Program Files\\nodejs\\npm.cmd\" list --depth=0)",
+      "Bash(\"C:\\Program Files\\nodejs\\node.exe\" node_modules/vite/bin/vite.js)",
+      "Bash(\"C:\\Program Files\\nodejs\\node.exe\" test-frontend.js)",
+      "Bash(\"C:\\Program Files\\nodejs\\node.exe\" scripts/check-services.js)",
+      "Bash(\"C:\\Program Files\\nodejs\\node.exe\" mock-server.js)",
+      "Bash(dir D:code7logs)",
+      "Bash(dir:*)",
+      "Bash(docker-compose:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

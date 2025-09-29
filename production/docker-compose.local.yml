@@ -1,0 +1,72 @@
+# 本地环境 Docker Compose 配置 (使用本地镜像)
+
+services:
+  # MySQL 数据库服务
+  mysql:
+    image: mysql:8.0
+    container_name: interview-mysql-local
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root123456
+      MYSQL_DATABASE: interview_system
+      MYSQL_USER: interview
+      MYSQL_PASSWORD: interview123
+      TZ: Asia/Shanghai
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ../init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    ports:
+      - "3306:3306"
+    command: --default-authentication-plugin=mysql_native_password
+    networks:
+      - interview-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+
+  # Mock 后端服务 (使用Node.js)
+  backend-mock:
+    image: node:18-alpine
+    container_name: interview-backend-mock
+    restart: unless-stopped
+    working_dir: /app
+    volumes:
+      - ../frontend:/app
+    ports:
+      - "8080:3001"
+    command: node mock-server.js
+    environment:
+      - PORT=3001
+    networks:
+      - interview-network
+    depends_on:
+      - mysql
+
+  # 前端服务 (直接运行)
+  frontend-dev:
+    image: node:18-alpine
+    container_name: interview-frontend-dev
+    restart: unless-stopped
+    working_dir: /app
+    volumes:
+      - ../frontend:/app
+      - /app/node_modules
+    ports:
+      - "5174:5174"
+    command: sh -c "npm install && npm run dev"
+    environment:
+      - VITE_API_BASE_URL=http://localhost:8080/api
+      - HOST=0.0.0.0
+    networks:
+      - interview-network
+    depends_on:
+      - backend-mock
+
+volumes:
+  mysql_data:
+    driver: local
+
+networks:
+  interview-network:
+    driver: bridge

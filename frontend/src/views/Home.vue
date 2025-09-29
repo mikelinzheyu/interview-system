@@ -1,0 +1,563 @@
+<template>
+  <div class="home-container">
+    <!-- 顶部导航 -->
+    <el-header class="header">
+      <div class="header-content">
+        <div class="logo-section">
+          <el-icon :size="32" color="#409eff">
+            <ChatRound />
+          </el-icon>
+          <span class="logo-text">智能面试系统</span>
+        </div>
+        
+        <div class="header-actions">
+          <el-button type="text" @click="$router.push('/interview/new')">
+            <el-icon><Plus /></el-icon>
+            开始面试
+          </el-button>
+          
+          <el-dropdown @command="handleUserAction">
+            <div class="user-info">
+              <el-avatar :src="user?.avatar" :size="36">
+                {{ user?.real_name?.[0] || 'U' }}
+              </el-avatar>
+              <span class="username">{{ user?.real_name || user?.username }}</span>
+              <el-icon><ArrowDown /></el-icon>
+            </div>
+            <template #dropdown>
+              <el-dropdown-menu>
+                <el-dropdown-item command="profile">个人信息</el-dropdown-item>
+                <el-dropdown-item command="settings">系统设置</el-dropdown-item>
+                <el-dropdown-item divided command="logout">退出登录</el-dropdown-item>
+              </el-dropdown-menu>
+            </template>
+          </el-dropdown>
+        </div>
+      </div>
+    </el-header>
+
+    <!-- 主要内容区域 -->
+    <el-main class="main-content">
+      <div class="content-wrapper">
+        <!-- 欢迎区域 -->
+        <div class="welcome-section">
+          <h1 class="welcome-title">
+            欢迎回来{{ user?.real_name || user?.username }}！
+          </h1>
+          <p class="welcome-subtitle">
+            准备好开始您的下一次面试了吗？
+          </p>
+        </div>
+
+        <!-- 统计卡片区域 -->
+        <div class="stats-grid">
+          <EnhancedStatsCard
+            type="interviews"
+            label="面试次数"
+            :value="formattedStats.interviewCount.value"
+            :value-unit="'次'"
+            icon="VideoCamera"
+            icon-color="#409eff"
+            :loading="loading"
+            :show-trend="true"
+            :trend-data="formattedStats.interviewCount"
+            :clickable="true"
+            @click="handleStatsClick('interviews')"
+          />
+
+          <EnhancedStatsCard
+            type="time"
+            label="总练习时长"
+            :value="formattedStats.practiceTime.formatted"
+            icon="Clock"
+            icon-color="#67c23a"
+            :loading="loading"
+            :show-trend="true"
+            :trend-data="formattedStats.practiceTime"
+            :clickable="true"
+            @click="handleStatsClick('time')"
+          />
+
+          <EnhancedStatsCard
+            type="score"
+            label="平均分数"
+            :value="formattedStats.averageScore.value"
+            :value-unit="'分'"
+            icon="Trophy"
+            icon-color="#e6a23c"
+            :loading="loading"
+            :show-trend="true"
+            :trend-data="formattedStats.averageScore"
+            :clickable="true"
+            @click="handleStatsClick('score')"
+          />
+
+          <EnhancedStatsCard
+            type="rank"
+            label="当前排名"
+            :value="formattedStats.rank.level"
+            :subtitle="formattedStats.rank.formatted"
+            icon="Star"
+            icon-color="#f56c6c"
+            :loading="loading"
+            :show-trend="false"
+            :clickable="true"
+            @click="handleStatsClick('rank')"
+          />
+        </div>
+
+        <!-- 功能入口区域 -->
+        <div class="feature-section">
+          <h2 class="section-title">功能入口</h2>
+          <div class="feature-grid">
+            <el-card 
+              class="feature-card" 
+              v-for="feature in features" 
+              :key="feature.key"
+              @click="handleFeatureClick(feature)"
+            >
+              <div class="feature-content">
+                <div class="feature-icon">
+                  <el-icon :size="48" :color="feature.color">
+                    <component :is="feature.icon" />
+                  </el-icon>
+                </div>
+                <h3 class="feature-title">{{ feature.title }}</h3>
+                <p class="feature-description">{{ feature.description }}</p>
+                <el-button type="primary" size="small" plain>
+                  {{ feature.buttonText }}
+                </el-button>
+              </div>
+            </el-card>
+          </div>
+        </div>
+
+        <!-- 趋势分析和推荐 -->
+        <div class="trend-section">
+          <h2 class="section-title">数据洞察</h2>
+          <TrendAnalysis />
+        </div>
+
+        <!-- 最近活动 -->
+        <div class="activity-section">
+          <h2 class="section-title">最近活动</h2>
+          <el-card class="activity-card">
+            <el-timeline>
+              <el-timeline-item
+                v-for="activity in activities"
+                :key="activity.id"
+                :timestamp="activity.timestamp"
+                :color="activity.color"
+              >
+                <div class="activity-content">
+                  <h4>{{ activity.title }}</h4>
+                  <p>{{ activity.description }}</p>
+                </div>
+              </el-timeline-item>
+            </el-timeline>
+          </el-card>
+        </div>
+      </div>
+    </el-main>
+  </div>
+</template>
+
+<script setup>
+import { ref, computed, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+import { useUserStore } from '@/stores/user'
+import { useStatisticsStore } from '@/stores/statistics'
+import { ElMessage, ElMessageBox } from 'element-plus'
+import {
+  ChatRound, Plus, ArrowDown,
+  TrendCharts, Clock, Trophy, Star,
+  VideoCamera, Document, DataAnalysis, Setting
+} from '@element-plus/icons-vue'
+import EnhancedStatsCard from '@/components/statistics/EnhancedStatsCard.vue'
+import TrendAnalysis from '@/components/statistics/TrendAnalysis.vue'
+
+const router = useRouter()
+const userStore = useUserStore()
+const statisticsStore = useStatisticsStore()
+
+const user = computed(() => userStore.user)
+const { formattedStats, loading } = statisticsStore
+
+// 处理统计卡片点击
+const handleStatsClick = (type) => {
+  switch (type) {
+    case 'interviews':
+      router.push('/interview/history')
+      break
+    case 'time':
+      router.push('/analysis/time')
+      break
+    case 'score':
+      router.push('/analysis/score')
+      break
+    case 'rank':
+      router.push('/achievements')
+      break
+    default:
+      ElMessage.info('详细统计功能正在开发中...')
+  }
+}
+
+// 功能入口
+const features = ref([
+  {
+    key: 'ai-interview',
+    title: 'AI模拟面试',
+    description: '与AI进行真实的面试对话，提升面试技能',
+    buttonText: '开始面试',
+    icon: 'VideoCamera',
+    color: '#409eff',
+    route: '/interview/new'
+  },
+  {
+    key: 'questions',
+    title: '题库练习',
+    description: '海量面试题目，分类练习提升专业能力',
+    buttonText: '开始练习',
+    icon: 'Document',
+    color: '#67c23a',
+    route: '/questions'
+  },
+  {
+    key: 'analysis',
+    title: '数据分析',
+    description: '详细的面试数据分析，了解自己的优劣势',
+    buttonText: '查看分析',
+    icon: 'DataAnalysis',
+    color: '#e6a23c',
+    route: '/analysis'
+  },
+  {
+    key: 'settings',
+    title: '个人设置',
+    description: '个性化设置，优化您的使用体验',
+    buttonText: '进入设置',
+    icon: 'Setting',
+    color: '#909399',
+    route: '/settings'
+  }
+])
+
+// 最近活动
+const activities = ref([
+  {
+    id: 1,
+    title: '完成Java工程师面试',
+    description: '面试时长: 45分钟，得分: 88分',
+    timestamp: '2025-09-21 14:30',
+    color: '#409eff'
+  },
+  {
+    id: 2,
+    title: '练习算法题目',
+    description: '完成了5道数据结构相关题目',
+    timestamp: '2025-09-20 16:45',
+    color: '#67c23a'
+  },
+  {
+    id: 3,
+    title: '更新个人信息',
+    description: '完善了个人简历和技能标签',
+    timestamp: '2025-09-19 10:20',
+    color: '#e6a23c'
+  }
+])
+
+// 处理功能卡片点击
+const handleFeatureClick = (feature) => {
+  if (feature.route) {
+    router.push(feature.route)
+  } else {
+    ElMessage.info(`${feature.title}功能正在开发中...`)
+  }
+}
+
+// 处理用户操作
+const handleUserAction = (command) => {
+  switch (command) {
+    case 'profile':
+      ElMessage.info('个人信息功能正在开发中...')
+      break
+    case 'settings':
+      ElMessage.info('系统设置功能正在开发中...')
+      break
+    case 'logout':
+      handleLogout()
+      break
+  }
+}
+
+// 退出登录
+const handleLogout = async () => {
+  try {
+    await ElMessageBox.confirm('确定要退出登录吗？', '退出确认', {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning'
+    })
+    
+    await userStore.logout()
+    router.push('/login')
+  } catch {
+    // 用户取消操作
+  }
+}
+
+// 初始化统计数据
+const initializeStatistics = async () => {
+  try {
+    await statisticsStore.initialize()
+  } catch (error) {
+    console.error('Failed to initialize statistics:', error)
+    ElMessage.error('统计数据加载失败')
+  }
+}
+
+onMounted(() => {
+  initializeStatistics()
+})
+</script>
+
+<style scoped>
+.home-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.header {
+  background: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: 0;
+  height: 60px;
+  line-height: 60px;
+}
+
+.header-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 100%;
+}
+
+.logo-section {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.logo-text {
+  font-size: 20px;
+  font-weight: 600;
+  color: #303133;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 8px;
+  transition: background-color 0.3s;
+}
+
+.user-info:hover {
+  background-color: #f5f7fa;
+}
+
+.username {
+  font-size: 14px;
+  color: #606266;
+  max-width: 100px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.main-content {
+  padding: 0;
+}
+
+.content-wrapper {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 40px 20px;
+}
+
+.welcome-section {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.welcome-title {
+  font-size: 32px;
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 8px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.welcome-subtitle {
+  font-size: 16px;
+  color: rgba(255, 255, 255, 0.8);
+  margin: 0;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+  margin-bottom: 40px;
+}
+
+/* Enhanced stats cards are now self-styled */
+
+.section-title {
+  font-size: 24px;
+  font-weight: 600;
+  color: #ffffff;
+  margin-bottom: 24px;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.feature-section {
+  margin-bottom: 40px;
+}
+
+.feature-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.feature-card {
+  border-radius: 12px;
+  border: none;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+}
+
+.feature-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.25);
+  background: rgba(255, 255, 255, 1);
+}
+
+.feature-content {
+  text-align: center;
+  padding: 20px;
+}
+
+.feature-icon {
+  margin-bottom: 16px;
+}
+
+.feature-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #303133;
+  margin-bottom: 12px;
+}
+
+.feature-description {
+  font-size: 14px;
+  color: #909399;
+  margin-bottom: 20px;
+  line-height: 1.6;
+}
+
+.trend-section {
+  margin-bottom: 40px;
+}
+
+.activity-section {
+  margin-bottom: 40px;
+}
+
+.activity-card {
+  border-radius: 12px;
+  border: none;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+}
+
+.activity-content h4 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #303133;
+  margin-bottom: 4px;
+}
+
+.activity-content p {
+  font-size: 14px;
+  color: #909399;
+  margin: 0;
+}
+
+:deep(.el-card__body) {
+  padding: 24px;
+}
+
+:deep(.el-timeline-item__timestamp) {
+  font-size: 13px;
+  color: #c0c4cc;
+}
+
+@media (max-width: 768px) {
+  .content-wrapper {
+    padding: 20px 12px;
+  }
+
+  .welcome-title {
+    font-size: 24px;
+  }
+
+  .welcome-subtitle {
+    color: rgba(255, 255, 255, 0.9);
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .feature-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .header-content {
+    padding: 0 12px;
+  }
+
+  .logo-text {
+    display: none;
+  }
+
+  .username {
+    display: none;
+  }
+
+  .feature-card {
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+  }
+}
+</style>

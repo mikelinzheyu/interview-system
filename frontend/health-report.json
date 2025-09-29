@@ -1,0 +1,124 @@
+{
+  "timestamp": "2025-09-25T03:43:10.637Z",
+  "version": "1.0.0",
+  "results": {
+    "environment": {
+      "node": {
+        "version": "v22.19.0",
+        "status": "ok"
+      },
+      "npm": {
+        "status": "error",
+        "error": "Command failed: npm --version\n'npm' �����ڲ����ⲿ���Ҳ���ǿ����еĳ���\r\n���������ļ���\r\n"
+      },
+      "os": {
+        "platform": "win32",
+        "arch": "x64",
+        "status": "ok"
+      },
+      "java": {
+        "status": "warning",
+        "error": "Java not found - 后端需要Java运行环境"
+      }
+    },
+    "dependencies": {
+      "packageJson": {
+        "status": "ok",
+        "dependencies": 9,
+        "devDependencies": 10
+      },
+      "nodeModules": {
+        "exists": true,
+        "status": "ok"
+      },
+      "critical": {
+        "vue": {
+          "exists": true,
+          "status": "ok"
+        },
+        "axios": {
+          "exists": true,
+          "status": "ok"
+        },
+        "element-plus": {
+          "exists": true,
+          "status": "ok"
+        }
+      }
+    },
+    "services": {
+      "results": [
+        {
+          "name": "Backend API",
+          "url": "http://localhost:8080/api/actuator/health",
+          "status": "unhealthy",
+          "statusCode": 404,
+          "critical": true,
+          "responseTime": 15
+        },
+        {
+          "name": "Frontend Dev Server",
+          "url": "http://localhost:5174",
+          "status": "error",
+          "error": "",
+          "critical": false,
+          "responseTime": 5
+        }
+      ],
+      "healthy": 0,
+      "total": 2,
+      "status": "error"
+    },
+    "configuration": {
+      "files": {
+        ".env.development": {
+          "exists": true,
+          "status": "ok"
+        },
+        ".env.production": {
+          "exists": true,
+          "status": "ok"
+        },
+        "vite.config.js": {
+          "exists": true,
+          "status": "ok"
+        }
+      },
+      "env": {
+        "NODE_ENV": "development",
+        "MODE": "development",
+        "status": "ok"
+      }
+    },
+    "system": {
+      "memory": {
+        "used": 5,
+        "total": 7,
+        "status": "ok"
+      },
+      "ports": {
+        "3306": {
+          "inUse": false,
+          "status": "ok",
+          "process": ""
+        },
+        "5174": {
+          "inUse": false,
+          "status": "ok",
+          "process": ""
+        },
+        "8080": {
+          "inUse": false,
+          "status": "ok",
+          "process": ""
+        }
+      }
+    },
+    "overall": "fair",
+    "score": {
+      "current": 51,
+      "max": 100,
+      "percentage": 51
+    }
+  }
+}

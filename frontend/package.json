@@ -1,0 +1,49 @@
+{
+  "name": "interview-system-frontend",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs --fix --ignore-path .gitignore",
+    "dev:full": "concurrently \"npm run backend:start\" \"npm run dev\"",
+    "dev:check": "node scripts/check-services.js && npm run dev",
+    "dev:debug": "cross-env DEBUG=1 vite --mode development",
+    "backend:start": "cd ../backend && mvn spring-boot:run",
+    "backend:stop": "taskkill /f /im java.exe 2>nul || true",
+    "health:check": "node scripts/health-check.js",
+    "health:frontend": "curl -f http://localhost:5174 || echo 'Frontend not running'",
+    "health:backend": "curl -f http://localhost:8080/api/actuator/health || echo 'Backend not running'",
+    "start:prod": "npm run build && npm run preview",
+    "start:with-backend": "concurrently \"npm run backend:start\" \"npm run start:prod\"",
+    "clean": "rimraf dist node_modules/.vite",
+    "clean:all": "npm run clean && rimraf node_modules",
+    "reset": "npm run clean:all && npm install",
+    "test:e2e": "echo 'E2E tests not configured yet'",
+    "test:unit": "echo 'Unit tests not configured yet'"
+  },
+  "dependencies": {
+    "@element-plus/icons-vue": "^2.1.0",
+    "axios": "^1.5.0",
+    "dayjs": "^1.11.9",
+    "element-plus": "^2.3.14",
+    "highlight.js": "^11.8.0",
+    "marked": "^9.0.3",
+    "pinia": "^2.1.6",
+    "vue": "^3.3.4",
+    "vue-router": "^4.2.4"
+  },
+  "devDependencies": {
+    "@rushstack/eslint-patch": "^1.3.3",
+    "@vitejs/plugin-vue": "^4.3.4",
+    "concurrently": "^8.2.0",
+    "cross-env": "^7.0.3",
+    "eslint": "^8.49.0",
+    "eslint-plugin-vue": "^9.17.0",
+    "rimraf": "^5.0.0",
+    "unplugin-auto-import": "^0.16.6",
+    "unplugin-vue-components": "^0.25.2",
+    "vite": "^4.4.9"
+  }
+}

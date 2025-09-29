@@ -1,0 +1,134 @@
+# Docker Compose 配置文件
+
+services:
+  # PostgreSQL 数据库服务
+  mysql:
+    image: postgres:15-alpine
+    container_name: interview-mysql
+    restart: always
+    environment:
+      POSTGRES_DB: ${MYSQL_DATABASE:-interview_system}
+      POSTGRES_USER: ${MYSQL_USER:-interview}
+      POSTGRES_PASSWORD: ${MYSQL_PASSWORD:-interview123}
+      TZ: Asia/Shanghai
+    volumes:
+      - mysql_data:/var/lib/postgresql/data
+    ports:
+      - "${MYSQL_PORT:-5432}:5432"
+    networks:
+      - interview-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${MYSQL_USER:-interview}"]
+      timeout: 20s
+      retries: 10
+
+  # 后端 Spring Boot 服务
+  backend:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+    container_name: interview-backend
+    restart: always
+    environment:
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-prod}
+      SPRING_DATASOURCE_URL: jdbc:postgresql://mysql:5432/${MYSQL_DATABASE:-interview_system}
+      SPRING_DATASOURCE_USERNAME: ${MYSQL_USER:-interview}
+      SPRING_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD:-interview123}
+      SERVER_PORT: 8080
+      LOGGING_LEVEL_ROOT: ${LOG_LEVEL:-INFO}
+      JWT_SECRET: ${JWT_SECRET:-your-secret-key-here-please-change-in-production}
+      JWT_EXPIRATION: ${JWT_EXPIRATION:-86400000}
+    ports:
+      - "${BACKEND_PORT:-8080}:8080"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    volumes:
+      - ./logs:/app/logs
+    networks:
+      - interview-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/api/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # 前端 Nginx 服务
+  frontend:
+    build:
+      context: ../frontend
+      dockerfile: Dockerfile
+      args:
+        VITE_API_BASE_URL: ${VITE_API_BASE_URL:-http://localhost:8080/api}
+    container_name: interview-frontend
+    restart: always
+    ports:
+      - "${FRONTEND_PORT:-80}:80"
+      - "${FRONTEND_HTTPS_PORT:-443}:443"
+    depends_on:
+      - backend
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+      - ./logs/nginx:/var/log/nginx
+    networks:
+      - interview-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # Redis 缓存服务 (可选)
+  redis:
+    image: redis:7-alpine
+    container_name: interview-redis
+    restart: always
+    environment:
+      TZ: Asia/Shanghai
+    volumes:
+      - redis_data:/data
+      - ./redis/redis.conf:/etc/redis/redis.conf:ro
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    command: redis-server /etc/redis/redis.conf
+    networks:
+      - interview-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # Nginx 反向代理 (生产环境推荐)
+  nginx-proxy:
+    image: nginx:alpine
+    container_name: interview-proxy
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/proxy.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+      - ./logs/proxy:/var/log/nginx
+    depends_on:
+      - frontend
+      - backend
+    networks:
+      - interview-network
+    profiles:
+      - proxy
+
+volumes:
+  mysql_data:
+    driver: local
+  redis_data:
+    driver: local
+
+networks:
+  interview-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.21.0.0/16

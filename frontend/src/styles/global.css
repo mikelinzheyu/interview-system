@@ -1,0 +1,462 @@
+/* 全局样式 */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  background-color: #f5f7fa;
+  color: #333;
+  line-height: 1.6;
+}
+
+/* 主要颜色变量 */
+:root {
+  --primary-color: #409eff;
+  --success-color: #67c23a;
+  --warning-color: #e6a23c;
+  --danger-color: #f56c6c;
+  --info-color: #909399;
+  --text-primary: #303133;
+  --text-regular: #606266;
+  --text-secondary: #909399;
+  --text-placeholder: #c0c4cc;
+  --border-light: #ebeef5;
+  --border-lighter: #f2f6fc;
+  --background-base: #f5f7fa;
+}
+
+/* 页面容器 */
+.page-container {
+  min-height: 100vh;
+  padding: 20px;
+}
+
+.content-wrapper {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* 卡片样式 */
+.card {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+  padding: 24px;
+  margin-bottom: 20px;
+}
+
+/* 表单样式 */
+.form-container {
+  max-width: 400px;
+  margin: 0 auto;
+  padding: 40px 20px;
+}
+
+.form-title {
+  text-align: center;
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 32px;
+}
+
+/* 按钮样式 */
+.btn-full-width {
+  width: 100%;
+}
+
+/* 统计卡片 */
+.stats-card {
+  text-align: center;
+  padding: 24px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  margin-bottom: 20px;
+}
+
+.stats-number {
+  font-size: 32px;
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+
+.stats-label {
+  font-size: 14px;
+  opacity: 0.9;
+}
+
+/* 聊天界面样式 */
+.chat-container {
+  height: calc(100vh - 200px);
+  display: flex;
+  flex-direction: column;
+}
+
+.chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+  background: #f8f9fa;
+}
+
+.message {
+  margin-bottom: 16px;
+  display: flex;
+  align-items: flex-start;
+}
+
+.message-user {
+  justify-content: flex-end;
+}
+
+.message-ai {
+  justify-content: flex-start;
+}
+
+.message-content {
+  max-width: 70%;
+  padding: 12px 16px;
+  border-radius: 12px;
+  line-height: 1.5;
+}
+
+.message-user .message-content {
+  background: var(--primary-color);
+  color: white;
+  border-bottom-right-radius: 4px;
+}
+
+.message-ai .message-content {
+  background: white;
+  color: var(--text-primary);
+  border: 1px solid var(--border-light);
+  border-bottom-left-radius: 4px;
+}
+
+.chat-input {
+  padding: 20px;
+  background: white;
+  border-top: 1px solid var(--border-light);
+}
+
+/* 动画效果 */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+/* 加载动画 */
+.loading-spinner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100px;
+}
+
+.loading-text {
+  margin-left: 12px;
+  color: var(--text-secondary);
+}
+
+/* 空状态 */
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--text-secondary);
+}
+
+.empty-state .empty-icon {
+  font-size: 64px;
+  color: var(--border-light);
+  margin-bottom: 16px;
+}
+
+.empty-state .empty-text {
+  font-size: 16px;
+  margin-bottom: 8px;
+}
+
+.empty-state .empty-description {
+  font-size: 14px;
+  color: var(--text-placeholder);
+}
+
+/* 错误状态 */
+.error-boundary {
+  padding: 40px 20px;
+  text-align: center;
+  background: #fff;
+  border-radius: 8px;
+  margin: 20px;
+}
+
+.error-boundary .error-icon {
+  font-size: 48px;
+  color: var(--danger-color);
+  margin-bottom: 16px;
+}
+
+.error-boundary .error-title {
+  font-size: 18px;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+
+.error-boundary .error-message {
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin-bottom: 20px;
+}
+
+/* 标签样式 */
+.tag {
+  display: inline-block;
+  padding: 4px 8px;
+  font-size: 12px;
+  border-radius: 4px;
+  background: var(--info-color);
+  color: white;
+  margin: 2px;
+}
+
+.tag-primary {
+  background: var(--primary-color);
+}
+
+.tag-success {
+  background: var(--success-color);
+}
+
+.tag-warning {
+  background: var(--warning-color);
+}
+
+.tag-danger {
+  background: var(--danger-color);
+}
+
+/* 面试会话专用样式 */
+.interview-container {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #f5f7fa;
+}
+
+.interview-header {
+  background: white;
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--border-light);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.interview-progress {
+  flex: 1;
+  max-width: 300px;
+  margin: 0 20px;
+}
+
+.interview-timer {
+  font-family: 'Monaco', 'Consolas', monospace;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.interview-body {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+}
+
+.interview-sidebar {
+  width: 280px;
+  background: white;
+  border-right: 1px solid var(--border-light);
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.interview-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 工具提示 */
+.tooltip-content {
+  max-width: 200px;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+/* 表格样式 */
+.data-table {
+  width: 100%;
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* 分页器样式 */
+.pagination-container {
+  display: flex;
+  justify-content: center;
+  padding: 20px 0;
+}
+
+/* 搜索框样式 */
+.search-container {
+  margin-bottom: 20px;
+}
+
+.search-input {
+  max-width: 400px;
+}
+
+/* 操作按钮组 */
+.action-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.action-buttons .el-button {
+  margin-left: 0;
+}
+
+/* 状态指示器 */
+.status-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.status-online .status-dot {
+  background: var(--success-color);
+}
+
+.status-offline .status-dot {
+  background: var(--info-color);
+}
+
+.status-error .status-dot {
+  background: var(--danger-color);
+}
+
+/* 面试评分卡片 */
+.score-card {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  text-align: center;
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 20px;
+}
+
+.score-number {
+  font-size: 48px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.score-label {
+  font-size: 16px;
+  opacity: 0.9;
+}
+
+.score-detail {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* 技能标签云 */
+.skill-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 16px 0;
+}
+
+.skill-tag {
+  background: var(--primary-color);
+  color: white;
+  padding: 6px 12px;
+  border-radius: 16px;
+  font-size: 12px;
+  white-space: nowrap;
+  transition: all 0.3s ease;
+}
+
+.skill-tag:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(64, 158, 255, 0.3);
+}
+
+/* 响应式设计 */
+@media (max-width: 1024px) {
+  .interview-sidebar {
+    width: 240px;
+  }
+}
+
+@media (max-width: 768px) {
+  .page-container {
+    padding: 12px;
+  }
+
+  .form-container {
+    padding: 20px 12px;
+  }
+
+  .content-wrapper {
+    padding: 0 12px;
+  }
+
+  .message-content {
+    max-width: 85%;
+  }
+
+  .interview-header {
+    padding: 12px 16px;
+  }
+
+  .interview-sidebar {
+    display: none;
+  }
+
+  .interview-timer {
+    font-size: 16px;
+  }
+
+  .action-buttons {
+    flex-direction: column;
+  }
+
+  .search-input {
+    max-width: 100%;
+  }
+
+  .skill-tags {
+    justify-content: center;
+  }
+}
