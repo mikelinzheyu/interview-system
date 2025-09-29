@@ -1,0 +1,19 @@
+{
+  "name": "interview-system-backend",
+  "version": "1.0.0",
+  "description": "AI面试系统 Mock API 后端服务",
+  "main": "mock-server.js",
+  "scripts": {
+    "start": "node mock-server.js",
+    "dev": "node mock-server.js",
+    "health": "curl -f http://localhost:3001/api/health || exit 1"
+  },
+  "dependencies": {},
+  "devDependencies": {},
+  "keywords": ["nodejs", "mock-api", "interview", "ai"],
+  "author": "Interview System Team",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
