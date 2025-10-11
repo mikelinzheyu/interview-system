@@ -30,15 +30,6 @@
             />
           </el-form-item>
 
-          <el-form-item prop="email">
-            <el-input
-              v-model="registerForm.email"
-              placeholder="请输入邮箱地址"
-              prefix-icon="Message"
-              clearable
-            />
-          </el-form-item>
-
           <el-form-item prop="real_name">
             <el-input
               v-model="registerForm.real_name"
@@ -65,9 +56,68 @@
               placeholder="请确认密码"
               prefix-icon="Lock"
               show-password
-              @keyup.enter="handleRegister"
             />
           </el-form-item>
+
+          <el-form-item prop="phone">
+            <el-input
+              v-model="registerForm.phone"
+              placeholder="请输入手机号"
+              prefix-icon="Iphone"
+              maxlength="11"
+              clearable
+            />
+          </el-form-item>
+
+          <!-- 步骤0: 显示"点击按钮进行验证" -->
+          <el-form-item v-if="verificationStep === 0">
+            <el-button
+              type="primary"
+              @click="handleShowSlider"
+              :disabled="!registerForm.phone"
+              class="verify-button"
+            >
+              <el-icon><Lock /></el-icon>
+              点击按钮进行验证
+            </el-button>
+            <div v-if="!registerForm.phone" class="hint-text">请先输入手机号</div>
+          </el-form-item>
+
+          <!-- 步骤1: 显示验证码输入框 -->
+          <el-form-item v-else-if="verificationStep === 1" prop="code">
+            <div class="code-input-wrapper">
+              <el-input
+                v-model="registerForm.code"
+                placeholder="请输入验证码"
+                prefix-icon="Message"
+                maxlength="6"
+                clearable
+                @keyup.enter="handleRegister"
+              />
+              <el-button
+                class="code-button"
+                :disabled="codeButtonDisabled"
+                @click="handleSendCode"
+              >
+                {{ codeButtonText }}
+              </el-button>
+            </div>
+          </el-form-item>
+
+          <!-- 滑块验证弹窗 -->
+          <el-dialog
+            v-model="showSliderDialog"
+            title="安全验证"
+            width="400px"
+            :close-on-click-modal="false"
+            class="slider-dialog"
+          >
+            <Vcode
+              :show="showSliderDialog"
+              @success="onSliderSuccess"
+              @close="onSliderClose"
+            />
+          </el-dialog>
 
           <el-form-item>
             <el-checkbox v-model="agreeTerms">
@@ -110,7 +160,8 @@ import { ref, reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/user'
 import { ElMessage } from 'element-plus'
-import { ChatRound } from '@element-plus/icons-vue'
+import { ChatRound, Lock, CircleCheck } from '@element-plus/icons-vue'
+import Vcode from 'vue3-puzzle-vcode'
 
 const router = useRouter()
 const userStore = useUserStore()
@@ -121,11 +172,27 @@ const agreeTerms = ref(false)
 
 const registerForm = reactive({
   username: '',
-  email: '',
+  phone: '',
+  code: '',
   real_name: '',
   password: '',
   confirmPassword: ''
 })
+
+// 验证流程步骤
+const verificationStep = ref(0) // 0: 初始状态, 1: 验证通过显示验证码框
+
+// 滑块验证
+const showSliderDialog = ref(false)
+const captchaVerified = ref(false)
+const captchaToken = ref('')
+
+// 验证码倒计时
+const countdown = ref(0)
+const codeButtonDisabled = ref(false)
+const codeButtonText = ref('发送验证码')
+
+let timer = null
 
 const validatePass2 = (rule, value, callback) => {
   if (value === '') {
@@ -143,9 +210,13 @@ const registerRules = {
     { min: 3, max: 20, message: '用户名长度在 3 到 20 个字符', trigger: 'blur' },
     { pattern: /^[a-zA-Z0-9_]+$/, message: '用户名只能包含字母、数字和下划线', trigger: 'blur' }
   ],
-  email: [
-    { required: true, message: '请输入邮箱地址', trigger: 'blur' },
-    { type: 'email', message: '请输入正确的邮箱地址', trigger: 'blur' }
+  phone: [
+    { required: true, message: '请输入手机号', trigger: 'blur' },
+    { pattern: /^1[3-9]\d{9}$/, message: '请输入正确的手机号', trigger: 'blur' }
+  ],
+  code: [
+    { required: true, message: '请输入验证码', trigger: 'blur' },
+    { len: 6, message: '验证码为6位数字', trigger: 'blur' }
   ],
   real_name: [
     { required: true, message: '请输入真实姓名', trigger: 'blur' },
@@ -162,43 +233,155 @@ const registerRules = {
   ]
 }
 
+// 显示滑块验证弹窗（先验证手机号）
+const handleShowSlider = () => {
+  // 验证手机号
+  if (!registerForm.phone) {
+    ElMessage.warning('请先输入手机号')
+    return
+  }
+
+  const phonePattern = /^1[3-9]\d{9}$/
+  if (!phonePattern.test(registerForm.phone)) {
+    ElMessage.warning('请输入正确的手机号格式')
+    return
+  }
+
+  // 验证通过，显示滑块弹窗
+  showSliderDialog.value = true
+}
+
+// 滑块验证成功回调
+const onSliderSuccess = async (msg) => {
+  console.log('滑块验证成功', msg)
+
+  // 标记验证通过
+  captchaVerified.value = true
+  captchaToken.value = 'verified_' + Date.now()
+
+  // 关闭弹窗
+  showSliderDialog.value = false
+
+  // 切换到步骤1 - 显示验证码输入框
+  verificationStep.value = 1
+
+  ElMessage.success('验证成功！正在发送验证码...')
+
+  // 自动发送验证码
+  await handleSendCode()
+}
+
+// 滑块验证关闭回调
+const onSliderClose = () => {
+  showSliderDialog.value = false
+}
+
+// 发送验证码
+const handleSendCode = async () => {
+  // 验证手机号
+  if (!registerForm.phone) {
+    ElMessage.warning('请先输入手机号')
+    return
+  }
+
+  const phonePattern = /^1[3-9]\d{9}$/
+  if (!phonePattern.test(registerForm.phone)) {
+    ElMessage.warning('请输入正确的手机号')
+    return
+  }
+
+  try {
+    codeButtonDisabled.value = true
+
+    // 调用发送验证码API
+    const response = await fetch('/api/auth/sms/send', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ phone: registerForm.phone })
+    })
+
+    const result = await response.json()
+
+    if (result.code === 200) {
+      ElMessage.success('验证码已发送，请查收')
+
+      // 开始倒计时
+      countdown.value = 60
+      codeButtonText.value = `${countdown.value}秒后重试`
+
+      timer = setInterval(() => {
+        countdown.value--
+        if (countdown.value > 0) {
+          codeButtonText.value = `${countdown.value}秒后重试`
+        } else {
+          clearInterval(timer)
+          codeButtonText.value = '重新发送'
+          codeButtonDisabled.value = false
+        }
+      }, 1000)
+    } else if (result.code === 429) {
+      ElMessage.warning(result.message || '发送过于频繁，请稍后再试')
+      codeButtonDisabled.value = false
+    } else {
+      ElMessage.error(result.message || '验证码发送失败')
+      codeButtonDisabled.value = false
+    }
+  } catch (error) {
+    ElMessage.error('网络错误，请稍后重试')
+    codeButtonDisabled.value = false
+  }
+}
+
 const handleRegister = async () => {
   if (!registerFormRef.value) return
-  
+
   try {
     const valid = await registerFormRef.value.validate()
     if (!valid) return
-    
+
+    if (!captchaVerified.value) {
+      ElMessage.warning('请先完成滑块验证')
+      return
+    }
+
     if (!agreeTerms.value) {
       ElMessage.warning('请先同意用户协议和隐私政策')
       return
     }
-    
+
     loading.value = true
-    
-    // 模拟注册（后端未开发时使用）
-    await new Promise(resolve => setTimeout(resolve, 2000))
-    
-    // 模拟成功响应
-    const mockUser = {
-      id: Date.now(),
-      username: registerForm.username,
-      email: registerForm.email,
-      real_name: registerForm.real_name,
-      avatar: 'https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png'
+
+    // 调用注册API
+    const response = await fetch('/api/auth/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        username: registerForm.username,
+        phone: registerForm.phone,
+        code: registerForm.code,
+        real_name: registerForm.real_name,
+        password: registerForm.password,
+        captchaToken: captchaToken.value
+      })
+    })
+
+    const result = await response.json()
+
+    if (result.code === 200) {
+      // 保存用户信息和token
+      userStore.user = result.data.user
+      userStore.token = result.data.token
+      localStorage.setItem('token', result.data.token)
+      localStorage.setItem('user', JSON.stringify(result.data.user))
+
+      ElMessage.success('注册成功，欢迎使用智能面试系统！')
+      router.push('/home')
+    } else {
+      ElMessage.error(result.message || '注册失败，请稍后重试')
     }
-    
-    // 保存用户信息到store
-    userStore.user = mockUser
-    userStore.token = 'mock-token-' + Date.now()
-    localStorage.setItem('token', userStore.token)
-    localStorage.setItem('user', JSON.stringify(mockUser))
-    
-    ElMessage.success('注册成功，欢迎使用智能面试系统！')
-    router.push('/home')
-    
+
   } catch (error) {
-    ElMessage.error('注册失败，请稍后重试')
+    ElMessage.error('网络错误，请稍后重试')
   } finally {
     loading.value = false
   }
@@ -332,6 +515,78 @@ const handleRegister = async () => {
 :deep(.el-checkbox__label) {
   font-size: 13px;
   color: #666;
+}
+
+.code-input-wrapper {
+  display: flex;
+  gap: 10px;
+}
+
+.code-input-wrapper :deep(.el-input) {
+  flex: 1;
+}
+
+.code-button {
+  min-width: 110px;
+  height: 48px;
+  font-size: 14px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+}
+
+.code-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background: #909399;
+}
+
+.slider-captcha-wrapper {
+  width: 100%;
+}
+
+.verify-button {
+  width: 100%;
+  height: 48px;
+  font-size: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.verified-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  background: #f0f9ff;
+  border: 2px solid #67C23A;
+  border-radius: 8px;
+  color: #67C23A;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+:deep(.slider-dialog .el-dialog__header) {
+  padding: 20px 20px 10px;
+  border-bottom: 1px solid #eee;
+}
+
+:deep(.slider-dialog .el-dialog__body) {
+  padding: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 200px;
+}
+
+.hint-text {
+  margin-top: 8px;
+  font-size: 13px;
+  color: #909399;
+  text-align: center;
 }
 
 @media (max-width: 480px) {

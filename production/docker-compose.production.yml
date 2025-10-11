@@ -1,0 +1,181 @@
+# AI面试系统 - 完整生产环境 Docker Compose 配置
+# 包含前端、后端、Redis会话存储服务、存储API
+
+version: '3.8'
+
+services:
+  # ==================== 核心服务 ====================
+
+  # Redis 缓存和会话存储
+  redis:
+    image: redis:7-alpine
+    container_name: interview-redis
+    restart: always
+    environment:
+      TZ: Asia/Shanghai
+    command: >
+      redis-server
+      --appendonly yes
+      --requirepass ${REDIS_PASSWORD}
+      --maxmemory 512mb
+      --maxmemory-policy allkeys-lru
+    volumes:
+      - redis_data:/data
+      - ./logs/redis:/var/log/redis
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    networks:
+      - interview-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+      start_period: 10s
+
+  # 存储服务 API (Spring Boot + Redis)
+  storage-api:
+    build:
+      context: ../storage-service
+      dockerfile: Dockerfile
+    container_name: interview-storage-api
+    restart: always
+    environment:
+      TZ: Asia/Shanghai
+      API_KEY: ${STORAGE_API_KEY}
+      spring.data.redis.host: redis
+      spring.data.redis.port: 6379
+      spring.data.redis.password: ${REDIS_PASSWORD}
+      server.port: 8080
+      JAVA_OPTS: "-Xms256m -Xmx512m"
+    ports:
+      - "${STORAGE_API_PORT:-8090}:8080"
+    depends_on:
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./logs/storage-api:/app/logs
+    networks:
+      - interview-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
+  # 后端 API 服务 (Node.js Mock Server)
+  backend:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+    container_name: interview-backend
+    restart: always
+    environment:
+      NODE_ENV: production
+      PORT: 3001
+      TZ: Asia/Shanghai
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+      STORAGE_API_URL: http://storage-api:8080/api/sessions
+      STORAGE_API_KEY: ${STORAGE_API_KEY}
+    ports:
+      - "${BACKEND_PORT:-3001}:3001"
+    depends_on:
+      redis:
+        condition: service_healthy
+      storage-api:
+        condition: service_healthy
+    volumes:
+      - ./logs/backend:/app/logs
+    networks:
+      - interview-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3001/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
+  # 前端 Web 服务 (Vue.js + Nginx)
+  frontend:
+    build:
+      context: ../frontend
+      dockerfile: Dockerfile
+      args:
+        VITE_API_BASE_URL: ${VITE_API_BASE_URL:-/api}
+    container_name: interview-frontend
+    restart: always
+    environment:
+      TZ: Asia/Shanghai
+    ports:
+      - "${FRONTEND_PORT:-80}:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./logs/nginx:/var/log/nginx
+    networks:
+      - interview-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 20s
+
+  # ==================== 可选服务 ====================
+
+  # Nginx 反向代理 (生产环境推荐，用于SSL和负载均衡)
+  nginx-proxy:
+    image: nginx:alpine
+    container_name: interview-proxy
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/proxy.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+      - ./logs/proxy:/var/log/nginx
+    depends_on:
+      frontend:
+        condition: service_healthy
+      backend:
+        condition: service_healthy
+      storage-api:
+        condition: service_healthy
+    networks:
+      - interview-network
+    environment:
+      TZ: Asia/Shanghai
+    profiles:
+      - with-proxy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+# ==================== 数据卷 ====================
+volumes:
+  redis_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./data/redis
+
+# ==================== 网络配置 ====================
+networks:
+  interview-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.22.0.0/16
+          gateway: 172.22.0.1
+    driver_opts:
+      com.docker.network.bridge.name: interview-prod-br0
+      com.docker.network.driver.mtu: 1500

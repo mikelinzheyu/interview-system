@@ -1,0 +1,18 @@
+{
+  "mcpServers": {
+    "dify-interview-workflow": {
+      "url": "https://api.dify.ai/mcp/server/sUb5skskelb6Nkm1/mcp",
+      "headers": {
+        "Authorization": "Bearer app-vZlc0w5Dio2gnrTkdlblcPXG"
+      },
+      "metadata": {
+        "description": "Dify AI面试官工作流 - 智能专业题目生成与评分",
+        "capabilities": [
+          "generate_interview_questions",
+          "analyze_answers",
+          "provide_feedback"
+        ]
+      }
+    }
+  }
+}

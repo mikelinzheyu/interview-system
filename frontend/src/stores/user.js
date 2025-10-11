@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { authAPI } from '@/api/auth'
+import { userAPI } from '@/api/user'
 import { ElMessage } from 'element-plus'
 
 export const useUserStore = defineStore('user', () => {
@@ -61,7 +62,7 @@ export const useUserStore = defineStore('user', () => {
   const fetchUserInfo = async () => {
     try {
       if (!token.value) return
-      const response = await authAPI.getUserInfo()
+      const response = await userAPI.getUserInfo()
       if (response.code === 200) {
         user.value = response.data
       }
@@ -72,6 +73,20 @@ export const useUserStore = defineStore('user', () => {
     }
   }
 
+  // 更新用户信息
+  const updateUserInfo = async (data) => {
+    try {
+      const response = await userAPI.updateProfile(data)
+      if (response.code === 200) {
+        await fetchUserInfo()
+        return true
+      }
+    } catch (error) {
+      console.error('Failed to update user info:', error)
+      return false
+    }
+  }
+
   return {
     user,
     token,
@@ -79,6 +94,7 @@ export const useUserStore = defineStore('user', () => {
     login,
     register,
     logout,
-    fetchUserInfo
+    fetchUserInfo,
+    updateUserInfo
   }
 })

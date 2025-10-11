@@ -1,6 +1,8 @@
 #!/bin/bash
 
-# 面试系统部署脚本
+# ====================================================
+# AI面试系统 - 生产环境部署脚本
+# ====================================================
 
 set -e
 
@@ -28,150 +30,155 @@ log_error() {
     echo -e "${RED}[ERROR]${NC} $1"
 }
 
-# 检查 Docker 和 Docker Compose
-check_dependencies() {
-    log_info "检查依赖..."
-
+# 检查Docker是否安装
+check_docker() {
+    log_info "检查Docker环境..."
     if ! command -v docker &> /dev/null; then
-        log_error "Docker 未安装，请先安装 Docker"
+        log_error "Docker未安装，请先安装Docker"
         exit 1
     fi
 
+    if ! docker info &> /dev/null; then
+        log_error "Docker未运行，请启动Docker"
+        exit 1
+    fi
+
+    log_success "Docker环境检查通过"
+}
+
+# 检查Docker Compose是否安装
+check_docker_compose() {
+    log_info "检查Docker Compose..."
     if ! command -v docker-compose &> /dev/null; then
-        log_error "Docker Compose 未安装，请先安装 Docker Compose"
+        log_error "Docker Compose未安装"
         exit 1
     fi
+    log_success "Docker Compose检查通过"
+}
 
-    log_success "依赖检查完成"
+# 检查环境变量文件
+check_env() {
+    log_info "检查环境配置..."
+    if [ ! -f .env.production ]; then
+        log_warning ".env.production 不存在，从示例文件复制..."
+        cp .env.example .env.production
+        log_warning "请编辑 .env.production 并设置正确的密码和密钥"
+        exit 1
+    fi
+    log_success "环境配置检查通过"
+}
+
+# 创建必要的目录
+create_directories() {
+    log_info "创建必要的目录..."
+    mkdir -p data/redis
+    mkdir -p logs/redis
+    mkdir -p logs/storage-api
+    mkdir -p logs/backend
+    mkdir -p logs/nginx
+    mkdir -p logs/proxy
+    mkdir -p nginx/ssl
+    log_success "目录创建完成"
 }
 
 # 构建镜像
 build_images() {
-    log_info "构建镜像..."
-
-    # 构建后端镜像
-    log_info "构建后端镜像..."
-    docker-compose build backend
-
-    # 构建前端镜像
-    log_info "构建前端镜像..."
-    docker-compose build frontend
-
+    log_info "构建Docker镜像..."
+    docker-compose -f docker-compose.production.yml build --no-cache
     log_success "镜像构建完成"
 }
 
 # 启动服务
 start_services() {
     log_info "启动服务..."
-
-    # 启动所有服务
-    docker-compose up -d
-
+    docker-compose -f docker-compose.production.yml up -d
     log_success "服务启动完成"
 }
 
-# 检查服务状态
-check_services() {
-    log_info "检查服务状态..."
-
-    # 等待服务启动
+# 等待服务健康检查
+wait_for_health() {
+    log_info "等待服务启动..."
     sleep 10
 
-    # 检查数据库
-    if docker-compose exec mysql mysqladmin ping -h localhost --silent; then
-        log_success "MySQL 服务正常"
-    else
-        log_error "MySQL 服务异常"
-    fi
+    local max_attempts=30
+    local attempt=0
 
-    # 检查后端
-    if curl -f http://localhost:8080/api/actuator/health > /dev/null 2>&1; then
-        log_success "后端服务正常"
-    else
-        log_warning "后端服务可能未就绪，请稍后检查"
-    fi
+    while [ $attempt -lt $max_attempts ]; do
+        local unhealthy=$(docker-compose -f docker-compose.production.yml ps | grep -c "unhealthy" || true)
+        local starting=$(docker-compose -f docker-compose.production.yml ps | grep -c "starting" || true)
 
-    # 检查前端
-    if curl -f http://localhost > /dev/null 2>&1; then
-        log_success "前端服务正常"
-    else
-        log_warning "前端服务可能未就绪，请稍后检查"
-    fi
+        if [ $unhealthy -eq 0 ] && [ $starting -eq 0 ]; then
+            log_success "所有服务已健康运行"
+            return 0
+        fi
+
+        attempt=$((attempt + 1))
+        log_info "等待服务健康检查... ($attempt/$max_attempts)"
+        sleep 10
+    done
+
+    log_error "服务启动超时"
+    return 1
 }
 
-# 显示服务信息
-show_info() {
-    log_info "服务信息:"
-    echo "前端地址: http://localhost"
-    echo "后端地址: http://localhost:8080"
-    echo "数据库地址: localhost:3306"
-    echo "Redis地址: localhost:6379"
+# 显示服务状态
+show_status() {
+    log_info "服务状态："
+    docker-compose -f docker-compose.production.yml ps
+}
+
+# 显示访问信息
+show_access_info() {
     echo ""
-    log_info "管理命令:"
-    echo "查看日志: docker-compose logs -f [service]"
-    echo "停止服务: docker-compose down"
-    echo "重启服务: docker-compose restart [service]"
-    echo "查看状态: docker-compose ps"
+    echo "=========================================="
+    echo -e "${GREEN}部署完成！${NC}"
+    echo "=========================================="
+    echo ""
+    echo "服务访问地址："
+    echo "  前端: http://localhost:80"
+    echo "  后端API: http://localhost:3001"
+    echo "  存储API: http://localhost:8090"
+    echo "  Redis: localhost:6379"
+    echo ""
+    echo "常用命令："
+    echo "  查看日志: docker-compose -f docker-compose.production.yml logs -f"
+    echo "  停止服务: docker-compose -f docker-compose.production.yml down"
+    echo "  重启服务: docker-compose -f docker-compose.production.yml restart"
+    echo ""
+    echo "配置文件："
+    echo "  环境变量: production/.env.production"
+    echo "  Docker配置: production/docker-compose.production.yml"
+    echo ""
 }
 
 # 主函数
 main() {
-    log_info "开始部署面试系统..."
+    cd "$(dirname "$0")"
 
-    check_dependencies
+    echo "=========================================="
+    echo "  AI面试系统 - 生产环境部署"
+    echo "=========================================="
+    echo ""
+
+    check_docker
+    check_docker_compose
+    check_env
+    create_directories
+
+    log_info "开始部署..."
+
     build_images
     start_services
-    check_services
-    show_info
 
-    log_success "部署完成!"
+    if wait_for_health; then
+        show_status
+        show_access_info
+    else
+        log_error "部署失败，请查看日志"
+        docker-compose -f docker-compose.production.yml logs
+        exit 1
+    fi
 }
 
-# 处理命令行参数
-case "${1:-deploy}" in
-    "deploy")
-        main
-        ;;
-    "build")
-        check_dependencies
-        build_images
-        ;;
-    "start")
-        start_services
-        ;;
-    "check")
-        check_services
-        ;;
-    "stop")
-        log_info "停止所有服务..."
-        docker-compose down
-        log_success "服务已停止"
-        ;;
-    "restart")
-        log_info "重启服务..."
-        docker-compose restart
-        log_success "服务已重启"
-        ;;
-    "logs")
-        docker-compose logs -f
-        ;;
-    "clean")
-        log_warning "清理所有数据..."
-        docker-compose down -v
-        docker system prune -f
-        log_success "清理完成"
-        ;;
-    *)
-        echo "用法: $0 {deploy|build|start|stop|restart|check|logs|clean}"
-        echo ""
-        echo "deploy  - 完整部署 (默认)"
-        echo "build   - 只构建镜像"
-        echo "start   - 启动服务"
-        echo "stop    - 停止服务"
-        echo "restart - 重启服务"
-        echo "check   - 检查服务状态"
-        echo "logs    - 查看日志"
-        echo "clean   - 清理所有数据"
-        exit 1
-        ;;
-esac
+# 运行主函数
+main "$@"

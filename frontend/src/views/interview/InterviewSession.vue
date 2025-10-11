@@ -61,7 +61,7 @@
             <!-- AI消息的操作按钮 -->
             <div class="message-actions" v-if="message.role === 'ai'">
               <el-button size="small" type="text" @click="likeMessage(message.id)">
-                <el-icon><Like /></el-icon>
+                <el-icon><CircleCheck /></el-icon>
                 有用
               </el-button>
               <el-button size="small" type="text" @click="regenerateResponse(message.id)">
@@ -204,8 +204,8 @@ import { useRouter, useRoute } from 'vue-router'
 import { useUserStore } from '@/stores/user'
 import { mockAI } from '@/api/interview'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { 
-  Close, Timer, Robot, Like, Refresh, Microphone, DocumentAdd,
+import {
+  Close, Timer, Robot, CircleCheck, Refresh, Microphone, DocumentAdd,
   WarningFilled
 } from '@element-plus/icons-vue'
 

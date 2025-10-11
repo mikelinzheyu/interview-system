@@ -11,8 +11,9 @@ export default defineConfig({
     }
   },
   server: {
+    host: '0.0.0.0', // 监听所有网络接口
     port: 5174, // 修正为日志中显示的端口
-    open: true,
+    open: false,
     proxy: {
       '/api': {
         target: 'http://localhost:3001', // Mock服务器地址

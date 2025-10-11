@@ -1,0 +1,35 @@
+# docker-compose.yml (Java version)
+
+version: '3.8'
+
+services:
+  redis:
+    image: redis:7-alpine
+    container_name: interview-redis
+    volumes:
+      - redis-data:/data
+    command: redis-server --appendonly yes
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+
+  api:
+    build: .
+    container_name: interview-api-java
+    ports:
+      - "8080:8080"  # Spring Boot 默认端口
+    environment:
+      - API_KEY=${API_KEY}
+      # Spring Boot 自动识别 redis 服务
+      - spring.data.redis.host=redis
+      - spring.data.redis.port=6379
+    depends_on:
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  redis-data:

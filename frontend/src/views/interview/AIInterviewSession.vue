@@ -92,27 +92,30 @@
             </template>
             <div class="profession-search-content">
               <div class="search-input-group">
-                <el-select
+                <el-autocomplete
                   v-model="selectedProfession"
-                  placeholder="选择专业领域"
-                  filterable
-                  allow-create
+                  :fetch-suggestions="queryProfessionSuggestions"
+                  placeholder="输入任意专业名称，如：前端开发工程师"
+                  clearable
                   class="profession-select"
-                  @change="handleProfessionChange"
+                  @select="handleProfessionChange"
+                  size="large"
                 >
-                  <el-option
-                    v-for="profession in recommendedProfessions"
-                    :key="profession.value"
-                    :label="profession.label"
-                    :value="profession.value"
-                  >
-                    <span>{{ profession.icon }} {{ profession.label }}</span>
-                  </el-option>
-                </el-select>
+                  <template #prefix>
+                    <el-icon><Search /></el-icon>
+                  </template>
+                  <template #default="{ item }">
+                    <div class="suggestion-item">
+                      <span class="icon">{{ item.icon }}</span>
+                      <span class="label">{{ item.label }}</span>
+                    </div>
+                  </template>
+                </el-autocomplete>
                 <el-select
                   v-model="selectedDifficulty"
                   placeholder="难度"
                   class="difficulty-select"
+                  size="large"
                 >
                   <el-option label="初级" value="初级"></el-option>
                   <el-option label="中级" value="中级"></el-option>
@@ -122,14 +125,32 @@
                   type="primary"
                   @click="generateSmartQuestion"
                   :loading="smartQuestionLoading"
-                  :disabled="!selectedProfession"
+                  :disabled="!selectedProfession || !selectedProfession.trim()"
                   class="generate-btn"
+                  size="large"
                 >
                   <el-icon><MagicStick /></el-icon>
                   智能生成题目
                 </el-button>
               </div>
-              <div v-if="selectedProfession" class="profession-info">
+
+              <!-- 快速选择标签 -->
+              <div class="quick-profession-tags">
+                <span class="tags-label">快速选择：</span>
+                <el-tag
+                  v-for="prof in popularProfessions"
+                  :key="prof.value"
+                  :type="selectedProfession === prof.value ? 'primary' : 'info'"
+                  class="quick-tag"
+                  @click="selectQuickProfession(prof.value)"
+                  effect="plain"
+                  size="default"
+                >
+                  {{ prof.icon }} {{ prof.label }}
+                </el-tag>
+              </div>
+
+              <div v-if="selectedProfession && selectedProfession.trim()" class="profession-info">
                 <el-tag size="small" type="info">
                   将为 <strong>{{ selectedProfession }}</strong> 专业生成 <strong>{{ selectedDifficulty }}</strong> 难度的面试题目
                 </el-tag>
@@ -384,7 +405,8 @@ import {
   WarningFilled, // 替代 Warning
   Loading,       // Loading 应该存在
   MagicStick,    // 魔法棒图标
-  Star           // 星星图标
+  Star,          // 星星图标
+  Search         // 搜索图标
 } from '@element-plus/icons-vue'
 import MediaUtils from '@/utils/mediaUtils'
 import SpeechUtils from '@/utils/speechUtils'
@@ -418,6 +440,33 @@ export default {
     const selectedProfession = ref('')
     const selectedDifficulty = ref('中级')
     const recommendedProfessions = ref(difyService.getRecommendedProfessions())
+
+    // 常用专业（用于快速选择）
+    const popularProfessions = ref([
+      { value: '前端开发工程师', label: '前端开发', icon: '🌐' },
+      { value: 'Python后端开发工程师', label: 'Python后端', icon: '🐍' },
+      { value: 'Java开发工程师', label: 'Java开发', icon: '☕' },
+      { value: '数据分析师', label: '数据分析', icon: '📊' },
+      { value: 'UI/UX设计师', label: 'UI设计', icon: '🎨' },
+      { value: '产品经理', label: '产品经理', icon: '📋' },
+      { value: 'DevOps工程师', label: 'DevOps', icon: '🔄' },
+      { value: '算法工程师', label: '算法工程', icon: '🤖' }
+    ])
+
+    // 所有专业建议（用于自动完成）
+    const allProfessionsSuggestions = ref([
+      ...popularProfessions.value,
+      { value: '全栈开发工程师', label: '全栈开发', icon: '🔧' },
+      { value: 'iOS开发工程师', label: 'iOS开发', icon: '📱' },
+      { value: 'Android开发工程师', label: 'Android开发', icon: '🤖' },
+      { value: '机器学习工程师', label: '机器学习', icon: '🧠' },
+      { value: '深度学习工程师', label: '深度学习', icon: '🔬' },
+      { value: '云计算工程师', label: '云计算', icon: '☁️' },
+      { value: '网络安全工程师', label: '网络安全', icon: '🔒' },
+      { value: '区块链工程师', label: '区块链', icon: '⛓️' },
+      { value: '测试工程师', label: '测试工程', icon: '🧪' },
+      { value: '运维工程师', label: '运维', icon: '⚙️' }
+    ])
 
     // 媒体相关
     const videoElement = ref(null)
@@ -841,10 +890,30 @@ export default {
       }
     }
 
+    // 自动完成查询
+    const queryProfessionSuggestions = (queryString, cb) => {
+      const results = queryString
+        ? allProfessionsSuggestions.value.filter(item =>
+            item.value.toLowerCase().includes(queryString.toLowerCase()) ||
+            item.label.toLowerCase().includes(queryString.toLowerCase())
+          )
+        : allProfessionsSuggestions.value
+
+      cb(results)
+    }
+
+    // 快速选择专业
+    const selectQuickProfession = (profession) => {
+      selectedProfession.value = profession
+      ElMessage.info(`已选择: ${profession}`)
+    }
+
     // 处理专业选择变化
-    const handleProfessionChange = (profession) => {
-      console.log('选择专业:', profession)
-      // 可以在这里添加一些专业相关的逻辑，比如调整默认难度等
+    const handleProfessionChange = (item) => {
+      if (item && item.value) {
+        selectedProfession.value = item.value
+        console.log('选择专业:', item.value)
+      }
     }
 
     // 设备权限检查
@@ -1303,6 +1372,10 @@ export default {
       selectedProfession,
       selectedDifficulty,
       recommendedProfessions,
+      popularProfessions,
+      allProfessionsSuggestions,
+      queryProfessionSuggestions,
+      selectQuickProfession,
 
       // 元素引用
       videoElement,
@@ -1364,7 +1437,8 @@ export default {
       WarningFilled, // 替代 Warning
       Loading,
       MagicStick,    // 魔法棒图标
-      Star           // 星星图标
+      Star,          // 星星图标
+      Search         // 搜索图标
     }
   }
 }
@@ -1820,6 +1894,53 @@ export default {
   background: #f5f7fa;
   padding: 2px 8px;
   border-radius: 4px;
+}
+
+/* 自动完成建议项样式 */
+.suggestion-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.suggestion-item .icon {
+  font-size: 18px;
+}
+
+.suggestion-item .label {
+  font-size: 14px;
+}
+
+/* 快速选择标签区域 */
+.quick-profession-tags {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 16px;
+  padding: 12px 16px;
+  background: #f9fafb;
+  border-radius: 8px;
+  border: 1px dashed #d1d5db;
+}
+
+.tags-label {
+  font-size: 14px;
+  color: #6b7280;
+  font-weight: 500;
+  margin-right: 8px;
+}
+
+.quick-tag {
+  cursor: pointer;
+  transition: all 0.3s ease;
+  padding: 6px 12px;
+  font-size: 13px;
+}
+
+.quick-tag:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 /* 专业搜索框样式 */

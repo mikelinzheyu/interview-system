@@ -15,7 +15,10 @@
             <el-icon><Plus /></el-icon>
             开始面试
           </el-button>
-          
+
+          <!-- 通知中心 -->
+          <NotificationCenter />
+
           <el-dropdown @command="handleUserAction">
             <div class="user-info">
               <el-avatar :src="user?.avatar" :size="36">
@@ -26,8 +29,8 @@
             </div>
             <template #dropdown>
               <el-dropdown-menu>
-                <el-dropdown-item command="profile">个人信息</el-dropdown-item>
-                <el-dropdown-item command="settings">系统设置</el-dropdown-item>
+                <el-dropdown-item command="settings">个人设置</el-dropdown-item>
+                <el-dropdown-item command="system">系统设置</el-dropdown-item>
                 <el-dropdown-item divided command="logout">退出登录</el-dropdown-item>
               </el-dropdown-menu>
             </template>
@@ -138,6 +141,11 @@
           <TrendAnalysis />
         </div>
 
+        <!-- 推荐内容 -->
+        <div class="recommendation-section">
+          <RecommendationFeed />
+        </div>
+
         <!-- 最近活动 -->
         <div class="activity-section">
           <h2 class="section-title">最近活动</h2>
@@ -171,10 +179,13 @@ import { ElMessage, ElMessageBox } from 'element-plus'
 import {
   ChatRound, Plus, ArrowDown,
   TrendCharts, Clock, Trophy, Star,
-  VideoCamera, Document, DataAnalysis, Setting
+  VideoCamera, Document, DataAnalysis, User,
+  Edit, PieChart, MagicStick
 } from '@element-plus/icons-vue'
 import EnhancedStatsCard from '@/components/statistics/EnhancedStatsCard.vue'
 import TrendAnalysis from '@/components/statistics/TrendAnalysis.vue'
+import NotificationCenter from '@/components/NotificationCenter.vue'
+import RecommendationFeed from '@/components/RecommendationFeed.vue'
 
 const router = useRouter()
 const userStore = useUserStore()
@@ -224,22 +235,31 @@ const features = ref([
     route: '/questions'
   },
   {
-    key: 'analysis',
-    title: '数据分析',
-    description: '详细的面试数据分析，了解自己的优劣势',
-    buttonText: '查看分析',
-    icon: 'DataAnalysis',
-    color: '#e6a23c',
-    route: '/analysis'
+    key: 'community',
+    title: '社区中心',
+    description: '统一的社区功能入口，包含贡献、审核、排行榜、徽章等',
+    buttonText: '进入社区',
+    icon: 'User',
+    color: '#9b59b6',
+    route: '/community'
   },
   {
-    key: 'settings',
-    title: '个人设置',
-    description: '个性化设置，优化您的使用体验',
-    buttonText: '进入设置',
-    icon: 'Setting',
-    color: '#909399',
-    route: '/settings'
+    key: 'ability',
+    title: '能力画像',
+    description: '查看跨专业能力分析，了解您的T型指数和发展建议',
+    buttonText: '查看画像',
+    icon: 'PieChart',
+    color: '#e6a23c',
+    route: '/ability/profile'
+  },
+  {
+    key: 'ai-generate',
+    title: 'AI生成题目',
+    description: '使用AI自动生成题目，快速扩充题库内容',
+    buttonText: '开始生成',
+    icon: 'MagicStick',
+    color: '#3498db',
+    route: '/ai/generate'
   }
 ])
 
@@ -280,10 +300,10 @@ const handleFeatureClick = (feature) => {
 // 处理用户操作
 const handleUserAction = (command) => {
   switch (command) {
-    case 'profile':
-      ElMessage.info('个人信息功能正在开发中...')
-      break
     case 'settings':
+      router.push('/settings')
+      break
+    case 'system':
       ElMessage.info('系统设置功能正在开发中...')
       break
     case 'logout':
@@ -484,6 +504,10 @@ onMounted(() => {
 }
 
 .trend-section {
+  margin-bottom: 40px;
+}
+
+.recommendation-section {
   margin-bottom: 40px;
 }
 

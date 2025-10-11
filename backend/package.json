@@ -8,9 +8,18 @@
     "dev": "node mock-server.js",
     "health": "curl -f http://localhost:3001/api/health || exit 1"
   },
-  "dependencies": {},
-  "devDependencies": {},
-  "keywords": ["nodejs", "mock-api", "interview", "ai"],
+  "dependencies": {
+    "dotenv": "^17.2.3",
+    "qrcode": "^1.5.4",
+    "redis": "^5.8.3",
+    "socket.io": "^4.8.1"
+  },
+  "keywords": [
+    "nodejs",
+    "mock-api",
+    "interview",
+    "ai"
+  ],
   "author": "Interview System Team",
   "license": "MIT",
   "engines": {

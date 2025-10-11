@@ -1,0 +1,970 @@
+app:
+  description: 从生成面试问题到评估候选人回答的完整工作流，包含条件分支与会话状态存储。
+  icon: woman-pouting
+  icon_background: '#D3F8DF'
+  mode: workflow
+  name: AI 面试官 - 全流程定制与评分 (RAG)
+  use_icon_as_answer_icon: false
+dependencies:
+- current_identifier: null
+  type: marketplace
+  value:
+    marketplace_plugin_unique_identifier: langgenius/google:0.0.9@d360bbc433f39be1b11909cb9c32e6be4a17ea06af083f9e1c7613bb802bf517
+    version: null
+- current_identifier: null
+  type: marketplace
+  value:
+    marketplace_plugin_unique_identifier: langgenius/gemini:0.5.6@6937ac6c3f88d0ef5021881b00eab58e0722e1b3cc186087b023688679abd074
+    version: null
+kind: app
+version: 0.4.0
+workflow:
+  conversation_variables: []
+  environment_variables:
+  - description: 后端 API 地址 (开发环境: http://localhost:3000, Docker环境: http://backend:3000,
+      生产环境: https://your-domain.com)
+    name: BACKEND_API_URL
+    value: http://localhost:3000
+    value_type: string
+  features:
+    file_upload:
+      allowed_file_extensions:
+      - .JPG
+      - .JPEG
+      - .PNG
+      - .GIF
+      - .WEBP
+      - .SVG
+      allowed_file_types:
+      - image
+      allowed_file_upload_methods:
+      - local_file
+      - remote_url
+      enabled: false
+      fileUploadConfig:
+        audio_file_size_limit: 50
+        batch_count_limit: 5
+        file_size_limit: 15
+        image_file_size_limit: 10
+        video_file_size_limit: 100
+        workflow_file_upload_limit: 10
+      image:
+        enabled: false
+        number_limits: 3
+        transfer_methods:
+        - local_file
+        - remote_url
+      number_limits: 3
+    opening_statement: ''
+    retriever_resource:
+      enabled: true
+    sensitive_word_avoidance:
+      enabled: false
+    speech_to_text:
+      enabled: false
+    suggested_questions: []
+    suggested_questions_after_answer:
+      enabled: false
+    text_to_speech:
+      enabled: false
+      language: ''
+      voice: ''
+  graph:
+    edges:
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: start
+        targetType: if-else
+      id: start-branch
+      source: start
+      sourceHandle: source
+      target: branch
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: llm
+        targetType: llm
+      id: extract-generate
+      selected: false
+      source: extract_skills
+      sourceHandle: source
+      target: gen_questions
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: true
+        isInLoop: false
+        sourceType: iteration-start
+        targetType: tool
+      id: iterstart-search
+      source: iterationstart
+      sourceHandle: source
+      target: search_answer
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: true
+        isInLoop: false
+        sourceType: tool
+        targetType: llm
+      id: search-genstd
+      source: search_answer
+      sourceHandle: source
+      target: gen_std_answer
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: true
+        isInLoop: false
+        sourceType: llm
+        targetType: template-transform
+      id: genstd-assemble
+      source: gen_std_answer
+      sourceHandle: source
+      target: assemble_qa
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: iteration
+        targetType: code
+      id: iteration-save
+      source: iteration
+      sourceHandle: source
+      target: save_session
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: code
+        targetType: end
+      id: save-end1
+      selected: false
+      source: save_session
+      sourceHandle: source
+      target: end_generate
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: if-else
+        targetType: code
+      id: branch-load-false
+      selected: false
+      source: branch
+      sourceHandle: 'false'
+      target: load_session
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: code
+        targetType: llm
+      id: load-eval
+      source: load_session
+      sourceHandle: source
+      target: evaluation
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: llm
+        targetType: code
+      id: eval-parse
+      source: evaluation
+      sourceHandle: source
+      target: parse_score
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: code
+        targetType: end
+      id: parse-end2
+      source: parse_score
+      sourceHandle: source
+      target: end_score
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: if-else
+        targetType: tool
+      id: branch-true-search_job-target
+      source: branch
+      sourceHandle: 'true'
+      target: search_job
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: llm
+        targetType: iteration
+      id: gen_questions-source-iteration-target
+      source: gen_questions
+      sourceHandle: source
+      target: iteration
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: tool
+        targetType: llm
+      id: search_job-source-extract_skills-target
+      source: search_job
+      sourceHandle: source
+      target: extract_skills
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    nodes:
+    - data:
+        selected: false
+        title: 开始
+        type: start
+        variables:
+        - default: ''
+          hint: 例如:Python后端开发工程师
+          label: 职位名称
+          max_length: 200
+          options: []
+          placeholder: ''
+          required: false
+          type: text-input
+          variable: jobTitle
+        - hint: 选择:generate_questions 或 score_answer
+          label: 请求类型
+          max_length: 50
+          options: []
+          placeholder: ''
+          required: true
+          type: text-input
+          variable: request_type
+        - default: ''
+          hint: 评分时必填
+          label: 面试问题
+          max_length: 256
+          options: []
+          placeholder: ''
+          required: false
+          type: text-input
+          variable: question
+        - default: ''
+          hint: 评分时必填
+          label: 候选人回答
+          max_length: 2000
+          options: []
+          placeholder: ''
+          required: false
+          type: paragraph
+          variable: candidate_answer
+        - hint: 评分时必填,从问题生成阶段获取
+          label: 会话ID
+          max_length: 128
+          options: []
+          placeholder: ''
+          required: false
+          type: text-input
+          variable: session_id
+      height: 191
+      id: start
+      position:
+        x: -123.55831378208019
+        y: 664.5
+      positionAbsolute:
+        x: -123.55831378208019
+        y: 664.5
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 241
+    - data:
+        cases:
+        - case_id: 'true'
+          conditions:
+          - comparison_operator: is
+            id: cond1
+            value: generate_questions
+            variable_selector:
+            - start
+            - request_type
+          id: 'true'
+          logical_operator: and
+        logical_operator: and
+        selected: false
+        title: 请求类型判断
+        type: if-else
+      height: 123
+      id: branch
+      position:
+        x: 363.2861132631342
+        y: 664.5
+      positionAbsolute:
+        x: 363.2861132631342
+        y: 664.5
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 241
+    - data:
+        desc: ' 调用搜索引擎搜索与 job_title 相关的信息。'
+        is_team_authorization: false
+        provider_id: langgenius/google/google
+        provider_name: langgenius/google/google
+        provider_type: builtin
+        retry_config:
+          max_retries: 10
+          retry_enabled: true
+          retry_interval: 1000
+        selected: false
+        title: 职位信息搜索
+        tool_configurations: {}
+        tool_label: Google搜索
+        tool_name: google_search
+        tool_node_version: '2'
+        tool_parameters:
+          gl:
+            type: mixed
+            value: cn
+          hl:
+            type: mixed
+            value: zh-cn
+          location:
+            type: mixed
+            value: ''
+          query:
+            type: mixed
+            value: '{{#start.jobTitle#}} 面试问题,岗位要求,技能职责,最新趋势'
+        type: tool
+      height: 124
+      id: search_job
+      position:
+        x: 909.5131051217463
+        y: 424.718268403769
+      positionAbsolute:
+        x: 909.5131051217463
+        y: 424.718268403769
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 241
+    - data:
+        context:
+          enabled: false
+          variable_selector: []
+        model:
+          completion_params:
+            temperature: 0.3
+          mode: chat
+          name: gemini-2.5-pro-preview-06-05
+          provider: langgenius/gemini/google
+        prompt_template:
+        - id: prompt1
+          role: system
+          text: 你是一名经验丰富的招聘专家,负责分析职位要求。
+        - id: prompt2
+          role: user
+          text: text 用户请求关于 {{#start.jobTitle#}} 的核心技能和职责。 请结合以下搜索结果： {{职位信息搜索.text}}
+            <-- 直接引用上一个工具节点（名为`职位信息搜索`）的`text`输出 提炼出该职位最重要的5-8项核心技能和职责，用清晰的列表形式输出。
+        retry_config:
+          max_retries: 3
+          retry_enabled: true
+          retry_interval: 1000
+        selected: false
+        structured_output_enabled: false
+        title: 提取核心技能
+        type: llm
+        vision:
+          enabled: false
+      height: 116
+      id: extract_skills
+      position:
+        x: 1485.334359749654
+        y: 424.718268403769
+      positionAbsolute:
+        x: 1485.334359749654
+        y: 424.718268403769
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 241
+    - data:
+        context:
+          enabled: true
+          variable_selector:
+          - extract_skills
+          - text
+        model:
+          completion_params:
+            temperature: 0.7
+          mode: chat
+          name: gemini-2.5-pro-preview-06-05
+          provider: langgenius/gemini/google
+        prompt_template:
+        - id: prompt3
+          role: system
+          text: 你是一名专业的面试官,善于根据职位要求设计开放性问题。
+        - id: prompt4
+          role: user
+          text: "根据以下关于 {{#start.jobTitle#}} 职位的核心技能和职责：\n{{#extract_skills.text#}}\n\
+            \n请生成5个针对该职位，能够考察候选人实际能力和深度的面试问题。\n问题应是开放性的，能引导候选人深入阐述，避免简单的是非题。\n\n请严格按照以下JSON格式输出：\n\
+            {\n  \"questions\": [\n    \"问题1\",\n    \"问题2\",\n    \"问题3\",\n    \"\
+            问题4\",\n    \"问题5\"\n  ]\n}\n\n重要：只输出JSON，不要有任何其他文字。"
+        retry_config:
+          max_retries: 3
+          retry_enabled: true
+          retry_interval: 1000
+        selected: false
+        structured_output:
+          schema:
+            additionalProperties: false
+            properties:
+              questions:
+                description: 面试问题列表
+                items:
+                  type: string
+                type: array
+            required:
+            - questions
+            type: object
+        structured_output_enabled: true
+        title: 生成面试问题
+        type: llm
+        vision:
+          enabled: false
+      height: 116
+      id: gen_questions
+      position:
+        x: 1952.6919732464341
+        y: 408.79180711541625
+      positionAbsolute:
+        x: 1952.6919732464341
+        y: 408.79180711541625
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 241
+    - data:
+        desc: ''
+        error_handle_mode: terminated
+        height: 419
+        is_parallel: false
+        iterator_input_type: object
+        iterator_selector:
+        - gen_questions
+        - structured_output
+        - questions
+        output_selector:
+        - assemble_qa
+        - output
+        output_type: array[string]
+        parallel_nums: 10
+        selected: false
+        start_node_id: iterationstart
+        title: ' 为每个问题生成标准答案'
+        type: iteration
+        width: 498
+      height: 419
+      id: iteration
+      position:
+        x: 2770.243273915755
+        y: 400.1301518747185
+      positionAbsolute:
+        x: 2770.243273915755
+        y: 400.1301518747185
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 498
+      zIndex: 1
+    - data:
+        desc: ''
+        isInIteration: true
+        selected: false
+        title: ''
+        type: iteration-start
+      draggable: false
+      height: 48
+      id: iterationstart
+      parentId: iteration
+      position:
+        x: 70
+        y: 106
+      positionAbsolute:
+        x: 2840.243273915755
+        y: 506.1301518747185
+      selectable: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom-iteration-start
+      width: 44
+      zIndex: 1002
+    - data:
+        isInIteration: true
+        is_team_authorization: false
+        provider_id: langgenius/google/google
+        provider_name: langgenius/google/google
+        provider_type: builtin
+        retry_config:
+          max_retries: 3
+          retry_enabled: true
+          retry_interval: 1000
+        selected: false
+        title: 问题答案搜索
+        tool_configurations: {}
+        tool_label: Google搜索
+        tool_name: google_search
+        tool_node_version: '2'
+        tool_parameters:
+          gl:
+            type: mixed
+            value: ''
+          hl:
+            type: mixed
+            value: zh-CN
+          location:
+            type: mixed
+            value: ''
+          query:
+            type: mixed
+            value: '{{#start.jobTitle#}} {{#iteration.item#}}  标准答案'
+        type: tool
+      height: 80
+      id: search_answer
+      parentId: iteration
+      position:
+        x: 155.99632173021928
+        y: 85.91460260927568
+      positionAbsolute:
+        x: 2926.239595645974
+        y: 486.04475448399415
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 241
+      zIndex: 1002
+    - data:
+        context:
+          enabled: true
+          variable_selector:
+          - search_answer
+          - text
+        isInIteration: true
+        model:
+          completion_params:
+            temperature: 0.5
+          mode: chat
+          name: gemini-2.5-pro-preview-06-05
+          provider: langgenius/gemini/google
+        prompt_template:
+        - id: prompt5
+          role: system
+          text: 你是一名招聘专家专家,负责为面试问题编写详细且准确的标准答案。
+        - id: prompt6
+          role: user
+          text: 对于面试问题{{#iteration.item#}}，请结合以下搜索结果：{{#search_answer.text#}} <--
+            引用循环内部`问题答案搜索`节点的`text`输出 生成一个详细、全面且具有参考价值的标准答案。答案应包含核心知识点、关键概念以及可能的扩展思考。
+        selected: false
+        structured_output_enabled: false
+        title: 生成标准答案
+        type: llm
+        vision:
+          enabled: false
+      height: 87
+      id: gen_std_answer
+      parentId: iteration
+      position:
+        x: 59.30236513286491
+        y: 206.3693224919224
+      positionAbsolute:
+        x: 2829.5456390486197
+        y: 606.4994743666409
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 241
+      zIndex: 1002
+    - data:
+        isInIteration: true
+        selected: false
+        template: "{\r\n  \"question\": \"{{ question }}\",\r\n  \"answer\": \"{{\
+          \ answer }}\"\r\n}"
+        title: 组装问答对
+        type: template-transform
+        variables:
+        - value_selector:
+          - iteration
+          - item
+          value_type: string
+          variable: question
+        - value_selector:
+          - gen_std_answer
+          - text
+          variable: answer
+      height: 51
+      id: assemble_qa
+      parentId: iteration
+      position:
+        x: 97.76011742623905
+        y: 341.6831355748771
+      positionAbsolute:
+        x: 2868.003391341994
+        y: 741.8132874495956
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 241
+      zIndex: 1002
+    - data:
+        code: "import json\nimport uuid\nimport os\n\ndef main(qa_data: str) -> dict:\n\
+          \    \"\"\"\n    将问答对数据保存到后端 Redis 会话存储\n    调用 POST /api/interview/sessions\n\
+          \    \"\"\"\n    try:\n        # 导入 requests 库\n        import requests\n \
+          \       \n        # 解析问答数据\n        if isinstance(qa_data, str):\n      \
+          \      qa_list = json.loads(qa_data)\n        else:\n            qa_list =\
+          \ qa_data\n        \n        # 生成会话ID\n        session_id = str(uuid.uuid4())\n\
+          \        \n        # 获取后端 API URL\n        backend_url = os.getenv(\"BACKEND_API_URL\"\
+          , \"http://localhost:3000\")\n        api_url = f\"{backend_url}/api/interview/sessions\"\
+          \n        \n        # 准备会话数据\n        from datetime import datetime\n \
+          \       session_data = {\n            \"qa_pairs\": qa_list,\n            \"\
+          createdAt\": datetime.now().isoformat(),\n            \"type\": \"interview_questions\"\
+          \n        }\n        \n        # 发送 POST 请求保存到 Redis\n        response =\
+          \ requests.post(\n            api_url,\n            json={\n                \"\
+          sessionId\": session_id,\n                \"sessionData\": session_data\n \
+          \           },\n            headers={\"Content-Type\": \"application/json\"\
+          },\n            timeout=10\n        )\n        \n        # 检查响应\n        if\
+          \ response.status_code == 200:\n            result = response.json()\n   \
+          \         return {\n                \"session_id\": result.get(\"data\", {}).get(\"\
+          sessionId\", session_id),\n                \"save_status\": \"success\"\n \
+          \           }\n        else:\n            # API 调用失败,但仍返回 session_id\n     \
+          \       return {\n                \"session_id\": session_id,\n           \
+          \     \"save_status\": f\"failed_http_{response.status_code}\"\n          \
+          \  }\n    \n    except ImportError:\n        # requests 库不可用,返回 session_id 但标记为未保存\n\
+          \        fallback_id = str(uuid.uuid4())\n        return {\n            \"\
+          session_id\": fallback_id,\n            \"save_status\": \"error_no_requests_lib\"\
+          \n        }\n    except Exception as e:\n        # 其他错误,返回 session_id 但标记错误\n\
+          \        fallback_id = str(uuid.uuid4())\n        return {\n            \"\
+          session_id\": fallback_id,\n            \"save_status\": f\"error_{str(e)[:50]}\"\
+          \n        }\n"
+        code_language: python3
+        desc: ' 将问答对数据保存到后端 Redis 会话存储 (POST /api/interview/sessions)'
+        outputs:
+          session_id:
+            type: string
+          save_status:
+            type: string
+        selected: false
+        title: 保存会话
+        type: code
+        variables:
+        - value_selector:
+          - iteration
+          - output
+          value_type: array[string]
+          variable: qa_data
+      height: 95
+      id: save_session
+      position:
+        x: 3756.678371674445
+        y: 394.84749780805777
+      positionAbsolute:
+        x: 3756.678371674445
+        y: 394.84749780805777
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 241
+    - data:
+        outputs:
+        - value_selector:
+          - iteration
+          - output
+          value_type: array[string]
+          variable: generated_questions
+        - value_selector:
+          - save_session
+          - session_id
+          value_type: string
+          variable: session_id
+        selected: false
+        title: 生成问题结束
+        type: end
+      height: 113
+      id: end_generate
+      position:
+        x: 4394.789747518128
+        y: 381.99442002836844
+      positionAbsolute:
+        x: 4394.789747518128
+        y: 381.99442002836844
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 241
+    - data:
+        code: "import json\nimport os\n\ndef main(session_id: str, question: str) -> dict:\n\
+          \    \"\"\"\n    从后端 Redis 加载会话数据并查找标准答案\n    调用 GET /api/interview/sessions/:sessionId\n\
+          \    \"\"\"\n    try:\n        # 导入 requests 库\n        import requests\n \
+          \       \n        # 验证输入\n        if not session_id:\n            return\
+          \ {\n                \"loaded_standard_answer\": \"错误: 缺少会话ID\",\n         \
+          \       \"load_status\": \"failed\"\n            }\n        \n        # 获取后端\
+          \ API URL\n        backend_url = os.getenv(\"BACKEND_API_URL\", \"http://localhost:3000\"\
+          )\n        api_url = f\"{backend_url}/api/interview/sessions/{session_id}\"\
+          \n        \n        # 发送 GET 请求\n        response = requests.get(api_url,\
+          \ timeout=10)\n        \n        if response.status_code == 200:\n        \
+          \    result = response.json()\n            session_data = result.get(\"data\"\
+          , {}).get(\"sessionData\", {})\n            qa_pairs = session_data.get(\"\
+          qa_pairs\", [])\n            \n            # 查找匹配的标准答案\n            standard_answer\
+          \ = \"\"\n            for qa in qa_pairs:\n                if isinstance(qa,\
+          \ dict):\n                    # 尝试解析 JSON 字符串\n                    if\
+          \ isinstance(qa, str):\n                        try:\n                   \
+          \         qa = json.loads(qa)\n                        except:\n         \
+          \                   pass\n                    \n                    qa_question\
+          \ = qa.get(\"question\", \"\")\n                    # 精确匹配或包含匹配\n        \
+          \            if qa_question == question or question in qa_question:\n    \
+          \                    standard_answer = qa.get(\"answer\", \"\")\n        \
+          \                break\n            \n            if standard_answer:\n  \
+          \              return {\n                    \"loaded_standard_answer\": standard_answer,\n\
+          \                    \"load_status\": \"success\"\n                }\n   \
+          \         else:\n                return {\n                    \"loaded_standard_answer\"\
+          : f\"未找到问题的标准答案\",\n                    \"load_status\": \"not_found\"\n\
+          \                }\n        \n        elif response.status_code == 404:\n \
+          \           return {\n                \"loaded_standard_answer\": f\"会话不存在或已过期\"\
+          ,\n                \"load_status\": \"session_not_found\"\n            }\n\
+          \        else:\n            return {\n                \"loaded_standard_answer\"\
+          : f\"加载失败: HTTP {response.status_code}\",\n                \"load_status\"\
+          : \"api_error\"\n            }\n    \n    except ImportError:\n        return\
+          \ {\n            \"loaded_standard_answer\": \"错误: requests库不可用\",\n    \
+          \        \"load_status\": \"error_no_requests_lib\"\n        }\n    except\
+          \ Exception as e:\n        return {\n            \"loaded_standard_answer\"\
+          : f\"加载标准答案失败: {str(e)}\",\n            \"load_status\": \"error\"\n   \
+          \     }\n"
+        code_language: python3
+        outputs:
+          loaded_standard_answer:
+            type: string
+          load_status:
+            type: string
+        selected: false
+        title: 加载标准答案
+        type: code
+        variables:
+        - value_selector:
+          - start
+          - session_id
+          variable: session_id
+        - value_selector:
+          - start
+          - question
+          variable: question
+      height: 51
+      id: load_session
+      position:
+        x: 775.4483745954846
+        y: 1083.829014838538
+      positionAbsolute:
+        x: 775.4483745954846
+        y: 1083.829014838538
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 241
+    - data:
+        context:
+          enabled: false
+          variable_selector: []
+        model:
+          completion_params:
+            temperature: 0.6
+          mode: chat
+          name: gemini-2.5-pro-preview-06-05
+          provider: langgenius/gemini/google
+        prompt_template:
+        - id: prompt7
+          role: system
+          text: 你是一名资深的面试官,将对候选人的回答进行专业且富有建设性的评估。
+        - id: prompt8
+          role: user
+          text: '你正在评估一位候选人对面试问题"{{#start.question#}}"的回答。
+
+
+            以下是该问题的标准答案:
+
+            "{{#load_session.loaded_standard_answer#}}" <-- 引用加载会话节点的`standard_answer_content`
+            输出
+
+
+            以下是候选人的回答:
+
+            "{{#start.candidate_answer#}}"
+
+
+            请你作为一位资深面试官,根据标准答案和候选人的回答,提供一段**不少于200字,不超过500字**的综合性、叙述式评价。同时,请为本次回答给出一个**总分(0-100分)**。
+
+
+            你的评价应该包含以下几个方面:
+
+            1. **整体表现概括:** 对回答的整体印象,例如回答的完整性、逻辑性、切题度。
+
+            2. **优点阐述:** 具体指出回答中表现优秀、值得肯定的部分,可以结合技术点深度、表达流畅度、思路清晰度等。
+
+            3. **改进建议:** 明确指出回答中可以提升的方面,并提供具体的改进方向、补充信息或更优的表达方式。
+
+            4. **重要提示:** 请保持语气专业、积极向上,旨在帮助候选人提升。
+
+
+            请严格按照以下JSON格式输出： { "comprehensive_evaluation": "评价内容...", "overall_score":
+            85 }
+
+            重要：只输出JSON，不要有任何其他文字
+
+            '
+        selected: false
+        structured_output:
+          schema:
+            additionalProperties: false
+            properties:
+              comprehensive_evaluation:
+                description: 综合评价文本
+                type: string
+              overall_score:
+                description: 总分(0-100)
+                type: integer
+            required:
+            - comprehensive_evaluation
+            - overall_score
+            type: object
+        structured_output_enabled: true
+        title: 综合评价与打分
+        type: llm
+        vision:
+          enabled: false
+      height: 87
+      id: evaluation
+      position:
+        x: 1407.7787508860197
+        y: 1098.7387947637744
+      positionAbsolute:
+        x: 1407.7787508860197
+        y: 1098.7387947637744
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 241
+    - data:
+        code: "import json\nimport re\n\ndef main(evaluation_json: str) -> dict:\n\
+          \    \"\"\"\n    解析评价结果，提取综合评价和总分\n    \n    由于使用了结构化输出，LLM应该直接返回JSON格式\n\
+          \    但为了健壮性，仍然保留多种解析方式\n    \"\"\"\n    try:\n        # 方法1：尝试直接解析（结构化输出应该是纯JSON）\n\
+          \        try:\n            data = json.loads(evaluation_json)\n        \
+          \    if \"comprehensive_evaluation\" in data and \"overall_score\" in data:\n\
+          \                return {\n                    \"comprehensive_evaluation\"\
+          : data[\"comprehensive_evaluation\"],\n                    \"overall_score\"\
+          : int(data[\"overall_score\"])\n                }\n        except json.JSONDecodeError:\n\
+          \            pass\n        \n        # 方法2：提取JSON代码块\n        json_match\
+          \ = re.search(r'```json\\s*(\\{.*?\\})\\s*```', evaluation_json, re.DOTALL)\n\
+          \        if json_match:\n            data = json.loads(json_match.group(1))\n\
+          \            return {\n                \"comprehensive_evaluation\": data.get(\"\
+          comprehensive_evaluation\", \"\"),\n                \"overall_score\": int(data.get(\"\
+          overall_score\", 0))\n            }\n        \n        # 方法3：提取花括号内容\n \
+          \       json_match = re.search(r'\\{.*\\}', evaluation_json, re.DOTALL)\n\
+          \        if json_match:\n            data = json.loads(json_match.group(0))\n\
+          \            return {\n                \"comprehensive_evaluation\": data.get(\"\
+          comprehensive_evaluation\", \"\"),\n                \"overall_score\": int(data.get(\"\
+          overall_score\", 0))\n            }\n        \n        # 如果都失败，返回原始内容\n\
+          \        return {\n            \"comprehensive_evaluation\": f\"JSON解析失败，原始输出：\\\
+          n{evaluation_json}\",\n            \"overall_score\": 0\n        }\n   \
+          \     \n    except Exception as e:\n        return {\n            \"comprehensive_evaluation\"\
+          : f\"解析失败: {str(e)}\\n\\n原始输出:\\n{evaluation_json}\",\n            \"overall_score\"\
+          : 0\n        }"
+        code_language: python3
+        outputs:
+          comprehensive_evaluation:
+            type: string
+          overall_score:
+            type: number
+        selected: false
+        title: 解析评分结果
+        type: code
+        variables:
+        - value_selector:
+          - evaluation
+          - text
+          variable: evaluation_json
+      height: 51
+      id: parse_score
+      position:
+        x: 1974.784935339006
+        y: 1112.6478762724294
+      positionAbsolute:
+        x: 1974.784935339006
+        y: 1112.6478762724294
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 241
+    - data:
+        outputs:
+        - value_selector:
+          - parse_score
+          - comprehensive_evaluation
+          variable: comprehensive_evaluation
+        - value_selector:
+          - parse_score
+          - overall_score
+          variable: overall_score
+        selected: true
+        title: 输出-评分结果
+        type: end
+      height: 113
+      id: end_score
+      position:
+        x: 2659.854004588883
+        y: 1112.6478762724294
+      positionAbsolute:
+        x: 2659.854004588883
+        y: 1112.6478762724294
+      selected: true
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 241
+    viewport:
+      x: -1049.1948516686148
+      y: -384.249071512933
+      zoom: 0.5892624739817606
+  rag_pipeline_variables: []

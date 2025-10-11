@@ -1,0 +1,274 @@
+{
+  "summary": {
+    "totalTests": 15,
+    "passedTests": 15,
+    "failedTests": 0,
+    "passRate": "100.00%",
+    "testTime": "2025-10-02T07:01:43.816Z"
+  },
+  "results": [
+    {
+      "testName": "获取用户信息",
+      "passed": true,
+      "message": "成功获取用户完整信息",
+      "response": {
+        "id": 1,
+        "username": "testuser",
+        "email": "test@example.com",
+        "phone": "13800138000",
+        "phoneVerified": true,
+        "role": "user",
+        "avatar": "https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png",
+        "nickname": "测试用户",
+        "gender": "male",
+        "birthday": "1990-01-01",
+        "signature": "这是一个测试用户",
+        "privacy": {
+          "profileVisibility": "public",
+          "showOnlineStatus": true,
+          "allowStrangerMessage": true,
+          "shareLocation": false
+        },
+        "notification": {
+          "systemNotification": true,
+          "messageNotification": true,
+          "commentNotification": true,
+          "emailNotification": false,
+          "smsNotification": false,
+          "soundEnabled": true,
+          "vibrationEnabled": true,
+          "dndEnabled": false,
+          "dndStartTime": "22:00",
+          "dndEndTime": "08:00"
+        },
+        "preferences": {
+          "theme": "light",
+          "primaryColor": "#409EFF",
+          "fontSize": "medium",
+          "language": "zh-CN"
+        },
+        "twoFactorEnabled": false
+      },
+      "timestamp": "2025-10-02T07:01:40.354Z"
+    },
+    {
+      "testName": "更新个人资料",
+      "passed": true,
+      "message": "个人资料更新成功",
+      "response": {
+        "id": 1,
+        "username": "testuser",
+        "email": "test@example.com",
+        "phone": "13800138000",
+        "phoneVerified": true,
+        "role": "user",
+        "avatar": "https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png",
+        "nickname": "测试昵称_1759388500560",
+        "gender": "female",
+        "birthday": "1995-05-15",
+        "signature": "这是一个测试签名",
+        "privacy": {
+          "profileVisibility": "public",
+          "showOnlineStatus": true,
+          "allowStrangerMessage": true,
+          "shareLocation": false
+        },
+        "notification": {
+          "systemNotification": true,
+          "messageNotification": true,
+          "commentNotification": true,
+          "emailNotification": false,
+          "smsNotification": false,
+          "soundEnabled": true,
+          "vibrationEnabled": true,
+          "dndEnabled": false,
+          "dndStartTime": "22:00",
+          "dndEndTime": "08:00"
+        },
+        "preferences": {
+          "theme": "light",
+          "primaryColor": "#409EFF",
+          "fontSize": "medium",
+          "language": "zh-CN"
+        },
+        "twoFactorEnabled": false
+      },
+      "timestamp": "2025-10-02T07:01:40.565Z"
+    },
+    {
+      "testName": "上传头像",
+      "passed": true,
+      "message": "头像上传成功: https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png?t=1759388500776",
+      "response": {
+        "url": "https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png?t=1759388500776"
+      },
+      "timestamp": "2025-10-02T07:01:40.777Z"
+    },
+    {
+      "testName": "修改密码",
+      "passed": true,
+      "message": "密码修改成功",
+      "response": {
+        "code": 200,
+        "message": "密码修改成功",
+        "data": {},
+        "timestamp": "2025-10-02T07:01:40.980Z"
+      },
+      "timestamp": "2025-10-02T07:01:40.981Z"
+    },
+    {
+      "testName": "发送手机验证码",
+      "passed": true,
+      "message": "验证码发送成功",
+      "response": {
+        "code": 200,
+        "message": "验证码已发送",
+        "data": {
+          "expiresIn": 300
+        },
+        "timestamp": "2025-10-02T07:01:41.197Z"
+      },
+      "timestamp": "2025-10-02T07:01:41.197Z"
+    },
+    {
+      "testName": "发送手机验证码",
+      "passed": true,
+      "message": "验证码发送成功",
+      "response": {
+        "code": 200,
+        "message": "验证码已发送",
+        "data": {
+          "expiresIn": 300
+        },
+        "timestamp": "2025-10-02T07:01:41.414Z"
+      },
+      "timestamp": "2025-10-02T07:01:41.416Z"
+    },
+    {
+      "testName": "绑定手机号",
+      "passed": true,
+      "message": "正确验证了验证码",
+      "response": {
+        "code": 400,
+        "message": "验证码错误",
+        "data": null,
+        "timestamp": "2025-10-02T07:01:41.923Z"
+      },
+      "timestamp": "2025-10-02T07:01:41.924Z"
+    },
+    {
+      "testName": "发送邮箱验证码",
+      "passed": true,
+      "message": "验证码发送成功",
+      "response": {
+        "code": 200,
+        "message": "验证码已发送",
+        "data": {
+          "expiresIn": 300
+        },
+        "timestamp": "2025-10-02T07:01:42.126Z"
+      },
+      "timestamp": "2025-10-02T07:01:42.127Z"
+    },
+    {
+      "testName": "开启两步验证",
+      "passed": true,
+      "message": "两步验证已开启",
+      "response": {
+        "code": 200,
+        "message": "两步验证已开启",
+        "data": {},
+        "timestamp": "2025-10-02T07:01:42.343Z"
+      },
+      "timestamp": "2025-10-02T07:01:42.344Z"
+    },
+    {
+      "testName": "关闭两步验证",
+      "passed": true,
+      "message": "两步验证已关闭",
+      "response": {
+        "code": 200,
+        "message": "两步验证已关闭",
+        "data": {},
+        "timestamp": "2025-10-02T07:01:42.545Z"
+      },
+      "timestamp": "2025-10-02T07:01:42.546Z"
+    },
+    {
+      "testName": "获取登录设备列表",
+      "passed": true,
+      "message": "获取到2个设备",
+      "response": [
+        {
+          "id": 1,
+          "deviceName": "Chrome on Windows",
+          "location": "北京市",
+          "lastLoginTime": "2025-10-02 10:30:00",
+          "isCurrent": true
+        },
+        {
+          "id": 2,
+          "deviceName": "Safari on iPhone",
+          "location": "上海市",
+          "lastLoginTime": "2025-10-01 15:20:00",
+          "isCurrent": false
+        }
+      ],
+      "timestamp": "2025-10-02T07:01:42.760Z"
+    },
+    {
+      "testName": "移除登录设备",
+      "passed": true,
+      "message": "设备已下线",
+      "response": {
+        "code": 200,
+        "message": "设备已下线",
+        "data": {},
+        "timestamp": "2025-10-02T07:01:42.964Z"
+      },
+      "timestamp": "2025-10-02T07:01:42.965Z"
+    },
+    {
+      "testName": "更新隐私设置",
+      "passed": true,
+      "message": "隐私设置更新成功",
+      "response": {
+        "profileVisibility": "friends",
+        "showOnlineStatus": false,
+        "allowStrangerMessage": false,
+        "shareLocation": true
+      },
+      "timestamp": "2025-10-02T07:01:43.172Z"
+    },
+    {
+      "testName": "更新通知设置",
+      "passed": true,
+      "message": "通知设置更新成功",
+      "response": {
+        "systemNotification": false,
+        "messageNotification": true,
+        "commentNotification": true,
+        "emailNotification": true,
+        "smsNotification": false,
+        "soundEnabled": false,
+        "vibrationEnabled": false,
+        "dndEnabled": true,
+        "dndStartTime": "23:00",
+        "dndEndTime": "07:00"
+      },
+      "timestamp": "2025-10-02T07:01:43.385Z"
+    },
+    {
+      "testName": "更新界面设置",
+      "passed": true,
+      "message": "界面设置更新成功",
+      "response": {
+        "theme": "dark",
+        "primaryColor": "#FF5722",
+        "fontSize": "large",
+        "language": "en-US"
+      },
+      "timestamp": "2025-10-02T07:01:43.601Z"
+    }
+  ]
+}
