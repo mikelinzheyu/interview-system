@@ -7738,6 +7738,53 @@ const payload = { ...paginatedResult, items }
     }, '文件已删除')
   },
 
+  // 聊天 API - 编辑消息
+  'PUT:/api/chat/conversations/:conversationId/messages/:messageId': (req, res) => {
+    let bodyStr = ''
+    req.on('data', chunk => {
+      bodyStr += chunk.toString()
+    })
+
+    req.on('end', () => {
+      try {
+        const body = JSON.parse(bodyStr)
+        const conversationId = url.parse(req.url, true).pathname.split('/')[4]
+        const messageId = url.parse(req.url, true).pathname.split('/')[6]
+
+        sendResponse(res, 200, {
+          id: messageId,
+          conversationId,
+          content: body.content,
+          edited: true,
+          editedAt: new Date().toISOString(),
+          editCount: 1,
+          history: [{
+            version: 1,
+            content: body.content,
+            editedAt: new Date().toISOString()
+          }]
+        }, '消息已编辑')
+      } catch (error) {
+        sendResponse(res, 400, null, '编辑消息失败')
+      }
+    })
+  },
+
+  // 聊天 API - 撤回消息
+  'POST:/api/chat/conversations/:conversationId/messages/:messageId/recall': (req, res) => {
+    const conversationId = url.parse(req.url, true).pathname.split('/')[4]
+    const messageId = url.parse(req.url, true).pathname.split('/')[6]
+
+    sendResponse(res, 200, {
+      id: messageId,
+      conversationId,
+      recalled: true,
+      recalledAt: new Date().toISOString(),
+      recallReason: '用户撤回了这条消息',
+      originalContent: '[消息已撤回]'
+    }, '消息已撤回')
+  },
+
   // 默认404处理
   'default': (req, res) => {
     sendResponse(res, 404, null, 'API接口不存在')
