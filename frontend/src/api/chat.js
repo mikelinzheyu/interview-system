@@ -172,3 +172,55 @@ export function deleteConversation(conversationId) {
     method: 'delete'
   })
 }
+
+/**
+ * 上传文件到聊天
+ * @param {FormData} formData - 包含文件的FormData对象
+ * @param {Function} onUploadProgress - 进度回调函数
+ */
+export function uploadFile(formData, onUploadProgress) {
+  return api({
+    url: '/chat/uploads',
+    method: 'post',
+    data: formData,
+    headers: { 'Content-Type': 'multipart/form-data' },
+    onUploadProgress
+  })
+}
+
+/**
+ * 删除已上传的文件
+ * @param {string} fileId - 文件ID
+ */
+export function deleteUploadedFile(fileId) {
+  return api({
+    url: `/chat/uploads/${fileId}`,
+    method: 'delete'
+  })
+}
+
+/**
+ * 编辑消息
+ * @param {string} conversationId - 会话ID
+ * @param {string} messageId - 消息ID
+ * @param {Object} data - 编辑数据
+ */
+export function editMessage(conversationId, messageId, data) {
+  return api({
+    url: `/chat/conversations/${conversationId}/messages/${messageId}`,
+    method: 'put',
+    data
+  })
+}
+
+/**
+ * 撤回消息
+ * @param {string} conversationId - 会话ID
+ * @param {string} messageId - 消息ID
+ */
+export function recallMessage(conversationId, messageId) {
+  return api({
+    url: `/chat/conversations/${conversationId}/messages/${messageId}/recall`,
+    method: 'post'
+  })
+}

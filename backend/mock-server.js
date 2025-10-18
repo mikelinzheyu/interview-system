@@ -7688,6 +7688,56 @@ const payload = { ...paginatedResult, items }
     }, '会话已删除')
   },
 
+  // 聊天 API - 文件上传
+  'POST:/api/chat/uploads': (req, res) => {
+    // 模拟文件上传，实际应用中应处理multipart/form-data
+    let bodyStr = ''
+    req.on('data', chunk => {
+      bodyStr += chunk.toString()
+    })
+
+    req.on('end', () => {
+      try {
+        // 生成模拟的文件上传响应
+        const uploadId = `upload-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+
+        sendResponse(res, 200, {
+          id: uploadId,
+          url: `/api/chat/uploads/${uploadId}`,
+          size: Math.floor(Math.random() * 10000000),
+          mimeType: 'application/octet-stream',
+          uploadedAt: new Date().toISOString()
+        }, '文件上传成功')
+      } catch (error) {
+        sendResponse(res, 400, null, '文件上传失败')
+      }
+    })
+  },
+
+  // 聊天 API - 获取上传文件
+  'GET:/api/chat/uploads/:id': (req, res) => {
+    const fileId = url.parse(req.url, true).pathname.split('/')[4]
+
+    sendResponse(res, 200, {
+      id: fileId,
+      url: `/files/${fileId}`,
+      size: Math.floor(Math.random() * 10000000),
+      mimeType: 'application/octet-stream',
+      uploadedAt: new Date().toISOString()
+    }, '获取文件信息成功')
+  },
+
+  // 聊天 API - 删除上传文件
+  'DELETE:/api/chat/uploads/:id': (req, res) => {
+    const fileId = url.parse(req.url, true).pathname.split('/')[4]
+
+    sendResponse(res, 200, {
+      id: fileId,
+      deleted: true,
+      deletedAt: new Date().toISOString()
+    }, '文件已删除')
+  },
+
   // 默认404处理
   'default': (req, res) => {
     sendResponse(res, 404, null, 'API接口不存在')
