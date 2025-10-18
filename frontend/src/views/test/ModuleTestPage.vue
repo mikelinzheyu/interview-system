@@ -12,9 +12,9 @@
         <el-button
           type="primary"
           size="large"
-          @click="runAllTests"
           :loading="testing"
-          :icon="Play"
+          :icon="VideoPlay"
+          @click="runAllTests"
         >
           {{ testing ? '测试进行中...' : '🚀 开始全面测试' }}
         </el-button>
@@ -23,8 +23,8 @@
           v-if="testResults"
           type="success"
           size="large"
-          @click="showDetailedResults"
           :icon="Document"
+          @click="showDetailedResults"
         >
           📋 查看详细报告
         </el-button>
@@ -32,8 +32,8 @@
         <el-button
           type="info"
           size="large"
-          @click="clearResults"
           :icon="Refresh"
+          @click="clearResults"
         >
           🔄 清除结果
         </el-button>
@@ -61,7 +61,7 @@
           :show-text="true"
         />
 
-        <div class="test-logs" v-if="testLogs.length > 0">
+        <div v-if="testLogs.length > 0" class="test-logs">
           <div
             v-for="(log, index) in testLogs.slice(-5)"
             :key="index"
@@ -183,8 +183,8 @@
           <div class="module-actions">
             <el-button
               size="small"
-              @click="testSingleModule(module.id)"
               :loading="testingModule === module.id"
+              @click="testSingleModule(module.id)"
             >
               {{ testingModule === module.id ? '测试中...' : '单独测试' }}
             </el-button>
@@ -279,12 +279,12 @@
 <script>
 import { ref, reactive, computed, onMounted } from 'vue'
 import {
-  Play,
+  VideoPlay,
   Document,
   Refresh,
-  Success,
+  SuccessFilled,
   Warning,
-  Info,
+  InfoFilled,
   Setting,
   Connection,
   PieChart,
@@ -295,12 +295,12 @@ import { ElMessage, ElMessageBox } from 'element-plus'
 export default {
   name: 'ModuleTestPage',
   components: {
-    Play,
+    VideoPlay,
     Document,
     Refresh,
-    Success,
+    SuccessFilled,
     Warning,
-    Info,
+    InfoFilled,
     Setting,
     Connection,
     PieChart,
@@ -507,12 +507,12 @@ export default {
 
     const getLogIcon = (type) => {
       const icons = {
-        info: Info,
-        success: Success,
+        info: InfoFilled,
+        success: SuccessFilled,
         error: Warning,
         warning: Warning
       }
-      return icons[type] || Info
+      return icons[type] || InfoFilled
     }
 
     const getFilteredResults = () => {
@@ -621,12 +621,12 @@ export default {
       getModuleTestStatus,
 
       // 图标
-      Play,
+      VideoPlay,
       Document,
       Refresh,
-      Success,
+      SuccessFilled,
       Warning,
-      Info
+      InfoFilled
     }
   }
 }

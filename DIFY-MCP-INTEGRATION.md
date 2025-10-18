@@ -1,75 +1,75 @@
-# Dify MCP 服务集成文档
+﻿# Dify MCP 鏈嶅姟闆嗘垚鏂囨。
 
-## 📋 概述
+## 馃搵 姒傝堪
 
-本文档介绍如何在 Claude Code 中集成 Dify MCP (Model Context Protocol) 服务器，使得可以直接调用 Dify AI 面试官工作流。
+鏈枃妗ｄ粙缁嶅浣曞湪 Claude Code 涓泦鎴?Dify MCP (Model Context Protocol) 鏈嶅姟鍣紝浣垮緱鍙互鐩存帴璋冪敤 Dify AI 闈㈣瘯瀹樺伐浣滄祦銆?
 
-## 🎯 集成完成状态
+## 馃幆 闆嗘垚瀹屾垚鐘舵€?
 
-- ✅ MCP 服务器配置完成
-- ✅ API 密钥已配置
-- ✅ 连接测试通过
-- ✅ 工具发现成功
+- 鉁?MCP 鏈嶅姟鍣ㄩ厤缃畬鎴?
+- 鉁?API 瀵嗛挜宸查厤缃?
+- 鉁?杩炴帴娴嬭瘯閫氳繃
+- 鉁?宸ュ叿鍙戠幇鎴愬姛
 
-## 🔧 MCP 服务器信息
+## 馃敡 MCP 鏈嶅姟鍣ㄤ俊鎭?
 
-### 基本信息
-- **MCP URL**: `https://api.dify.ai/mcp/server/sUb5skskelb6Nkm1/mcp`
-- **服务器名称**: Dify
-- **版本**: 1.9.1
-- **协议版本**: 2024-11-05
-- **API Key**: `app-vZlc0w5Dio2gnrTkdlblcPXG`
+### 鍩烘湰淇℃伅
+- **MCP URL**: `https://api.dify.ai/mcp/server/sQFDstpnlPUJ5MeX/mcp`
+- **鏈嶅姟鍣ㄥ悕绉?*: Dify
+- **鐗堟湰**: 1.9.1
+- **鍗忚鐗堟湰**: 2024-11-05
+- **API Key**: `app-aROZ5FjseJWUtmRzzjlb6b5E`
 
-### 工作流工具
+### 宸ヤ綔娴佸伐鍏?
 
-#### 工具名称
-`AI 面试官 - 全流程定制与评分 (RAG)`
+#### 宸ュ叿鍚嶇О
+`AI 闈㈣瘯瀹?- 鍏ㄦ祦绋嬪畾鍒朵笌璇勫垎 (RAG)`
 
-#### 工具描述
-从生成面试问题到评估候选人回答的完整工作流，包含条件分支与会话状态存储。
+#### 宸ュ叿鎻忚堪
+浠庣敓鎴愰潰璇曢棶棰樺埌璇勪及鍊欓€変汉鍥炵瓟鐨勫畬鏁村伐浣滄祦锛屽寘鍚潯浠跺垎鏀笌浼氳瘽鐘舵€佸瓨鍌ㄣ€?
 
-#### 输入参数
+#### 杈撳叆鍙傛暟
 
-| 参数名 | 类型 | 必填 | 说明 |
+| 鍙傛暟鍚?| 绫诲瀷 | 蹇呭～ | 璇存槑 |
 |--------|------|------|------|
-| `request_type` | string | ✅ 是 | 请求类型（必填参数） |
-| `job_title` | string | ❌ 否 | 职位名称（如：前端开发工程师） |
-| `question` | string | ❌ 否 | 面试问题 |
-| `candidate_answer` | string | ❌ 否 | 候选人答案 |
-| `session_id` | string | ❌ 否 | 会话 ID（用于保持上下文） |
+| `request_type` | string | 鉁?鏄?| 璇锋眰绫诲瀷锛堝繀濉弬鏁帮級 |
+| `job_title` | string | 鉂?鍚?| 鑱屼綅鍚嶇О锛堝锛氬墠绔紑鍙戝伐绋嬪笀锛?|
+| `question` | string | 鉂?鍚?| 闈㈣瘯闂 |
+| `candidate_answer` | string | 鉂?鍚?| 鍊欓€変汉绛旀 |
+| `session_id` | string | 鉂?鍚?| 浼氳瘽 ID锛堢敤浜庝繚鎸佷笂涓嬫枃锛?|
 
-#### 请求类型说明
+#### 璇锋眰绫诲瀷璇存槑
 
-根据现有的应用程序实现，`request_type` 支持以下值：
+鏍规嵁鐜版湁鐨勫簲鐢ㄧ▼搴忓疄鐜帮紝`request_type` 鏀寔浠ヤ笅鍊硷細
 
-1. **`generate_questions`** - 生成面试问题
-   - 需要参数: `job_title`
-   - 返回: 生成的面试问题列表
+1. **`generate_questions`** - 鐢熸垚闈㈣瘯闂
+   - 闇€瑕佸弬鏁? `job_title`
+   - 杩斿洖: 鐢熸垚鐨勯潰璇曢棶棰樺垪琛?
 
-2. **`analyze_answer`** - 分析候选人答案
-   - 需要参数: `question`, `candidate_answer`, `session_id`
-   - 返回: 答案评分和反馈
+2. **`analyze_answer`** - 鍒嗘瀽鍊欓€変汉绛旀
+   - 闇€瑕佸弬鏁? `question`, `candidate_answer`, `session_id`
+   - 杩斿洖: 绛旀璇勫垎鍜屽弽棣?
 
-3. **`continue_interview`** - 继续面试
-   - 需要参数: `session_id`
-   - 返回: 下一个面试问题
+3. **`continue_interview`** - 缁х画闈㈣瘯
+   - 闇€瑕佸弬鏁? `session_id`
+   - 杩斿洖: 涓嬩竴涓潰璇曢棶棰?
 
-## 📁 配置文件
+## 馃搧 閰嶇疆鏂囦欢
 
-### MCP 配置文件位置
+### MCP 閰嶇疆鏂囦欢浣嶇疆
 `.claude/mcp.json`
 
-### 配置内容
+### 閰嶇疆鍐呭
 ```json
 {
   "mcpServers": {
     "dify-interview-workflow": {
-      "url": "https://api.dify.ai/mcp/server/sUb5skskelb6Nkm1/mcp",
+      "url": "https://api.dify.ai/mcp/server/sQFDstpnlPUJ5MeX/mcp",
       "headers": {
-        "Authorization": "Bearer app-vZlc0w5Dio2gnrTkdlblcPXG"
+        "Authorization": "Bearer app-aROZ5FjseJWUtmRzzjlb6b5E"
       },
       "metadata": {
-        "description": "Dify AI面试官工作流 - 智能专业题目生成与评分",
+        "description": "Dify AI闈㈣瘯瀹樺伐浣滄祦 - 鏅鸿兘涓撲笟棰樼洰鐢熸垚涓庤瘎鍒?,
         "capabilities": [
           "generate_interview_questions",
           "analyze_answers",
@@ -81,60 +81,60 @@
 }
 ```
 
-## 🚀 使用方法
+## 馃殌 浣跨敤鏂规硶
 
-### 方式 1：在 Claude Code 对话中使用
+### 鏂瑰紡 1锛氬湪 Claude Code 瀵硅瘽涓娇鐢?
 
-一旦配置完成，Claude Code 会自动发现这个 MCP 工具。您可以直接在对话中请求：
+涓€鏃﹂厤缃畬鎴愶紝Claude Code 浼氳嚜鍔ㄥ彂鐜拌繖涓?MCP 宸ュ叿銆傛偍鍙互鐩存帴鍦ㄥ璇濅腑璇锋眰锛?
 
-#### 示例 1：生成面试题目
+#### 绀轰緥 1锛氱敓鎴愰潰璇曢鐩?
 ```
-请使用 Dify MCP 工具为 "前端开发工程师" 职位生成面试问题
+璇蜂娇鐢?Dify MCP 宸ュ叿涓?"鍓嶇寮€鍙戝伐绋嬪笀" 鑱屼綅鐢熸垚闈㈣瘯闂
 ```
 
-Claude Code 会自动调用：
+Claude Code 浼氳嚜鍔ㄨ皟鐢細
 ```json
 {
-  "tool": "AI 面试官 - 全流程定制与评分 (RAG)",
+  "tool": "AI 闈㈣瘯瀹?- 鍏ㄦ祦绋嬪畾鍒朵笌璇勫垎 (RAG)",
   "parameters": {
     "request_type": "generate_questions",
-    "job_title": "前端开发工程师"
+    "job_title": "鍓嶇寮€鍙戝伐绋嬪笀"
   }
 }
 ```
 
-#### 示例 2：评估候选人答案
+#### 绀轰緥 2锛氳瘎浼板€欓€変汉绛旀
 ```
-使用 Dify MCP 评估以下答案：
-问题：什么是闭包？
-答案：闭包是函数和其词法环境的组合...
-会话 ID：session-123
+浣跨敤 Dify MCP 璇勪及浠ヤ笅绛旀锛?
+闂锛氫粈涔堟槸闂寘锛?
+绛旀锛氶棴鍖呮槸鍑芥暟鍜屽叾璇嶆硶鐜鐨勭粍鍚?..
+浼氳瘽 ID锛歴ession-123
 ```
 
-Claude Code 会调用：
+Claude Code 浼氳皟鐢細
 ```json
 {
-  "tool": "AI 面试官 - 全流程定制与评分 (RAG)",
+  "tool": "AI 闈㈣瘯瀹?- 鍏ㄦ祦绋嬪畾鍒朵笌璇勫垎 (RAG)",
   "parameters": {
     "request_type": "analyze_answer",
-    "question": "什么是闭包？",
-    "candidate_answer": "闭包是函数和其词法环境的组合...",
+    "question": "浠€涔堟槸闂寘锛?,
+    "candidate_answer": "闂寘鏄嚱鏁板拰鍏惰瘝娉曠幆澧冪殑缁勫悎...",
     "session_id": "session-123"
   }
 }
 ```
 
-### 方式 2：通过 Node.js 脚本调用
+### 鏂瑰紡 2锛氶€氳繃 Node.js 鑴氭湰璋冪敤
 
-使用提供的测试脚本 `test-dify-mcp.js` 作为参考：
+浣跨敤鎻愪緵鐨勬祴璇曡剼鏈?`test-dify-mcp.js` 浣滀负鍙傝€冿細
 
 ```javascript
 const https = require('https');
 
-const MCP_URL = 'https://api.dify.ai/mcp/server/sUb5skskelb6Nkm1/mcp';
-const API_KEY = 'app-vZlc0w5Dio2gnrTkdlblcPXG';
+const MCP_URL = 'https://api.dify.ai/mcp/server/sQFDstpnlPUJ5MeX/mcp';
+const API_KEY = 'app-aROZ5FjseJWUtmRzzjlb6b5E';
 
-// 调用工具
+// 璋冪敤宸ュ叿
 function callDifyTool(params) {
   const url = new URL(MCP_URL);
 
@@ -143,7 +143,7 @@ function callDifyTool(params) {
     id: Date.now(),
     method: 'tools/call',
     params: {
-      name: 'AI 面试官 - 全流程定制与评分 (RAG)',
+      name: 'AI 闈㈣瘯瀹?- 鍏ㄦ祦绋嬪畾鍒朵笌璇勫垎 (RAG)',
       arguments: params
     }
   });
@@ -179,147 +179,147 @@ function callDifyTool(params) {
   });
 }
 
-// 示例：生成面试问题
+// 绀轰緥锛氱敓鎴愰潰璇曢棶棰?
 callDifyTool({
   request_type: 'generate_questions',
-  job_title: 'Python后端开发工程师'
+  job_title: 'Python鍚庣寮€鍙戝伐绋嬪笀'
 }).then(result => {
-  console.log('生成的题目:', result);
+  console.log('鐢熸垚鐨勯鐩?', result);
 }).catch(error => {
-  console.error('错误:', error);
+  console.error('閿欒:', error);
 });
 ```
 
-## 🧪 测试验证
+## 馃И 娴嬭瘯楠岃瘉
 
-### 运行测试脚本
+### 杩愯娴嬭瘯鑴氭湰
 ```bash
 node test-dify-mcp.js
 ```
 
-### 预期输出
+### 棰勬湡杈撳嚭
 ```
-🔍 测试 Dify MCP 服务器连接...
+馃攳 娴嬭瘯 Dify MCP 鏈嶅姟鍣ㄨ繛鎺?..
 ...
-✅ 所有测试完成！
+鉁?鎵€鏈夋祴璇曞畬鎴愶紒
 
-💡 如果看到成功的响应，说明 MCP 服务器配置正确。
-   您可以在 Claude Code 中使用这个 MCP 服务器了。
+馃挕 濡傛灉鐪嬪埌鎴愬姛鐨勫搷搴旓紝璇存槑 MCP 鏈嶅姟鍣ㄩ厤缃纭€?
+   鎮ㄥ彲浠ュ湪 Claude Code 涓娇鐢ㄨ繖涓?MCP 鏈嶅姟鍣ㄤ簡銆?
 ```
 
-### 测试结果解读
+### 娴嬭瘯缁撴灉瑙ｈ
 
-#### ✅ 成功标志
-- 状态码: 200
-- 收到工具列表
-- 包含 "AI 面试官" 工具
+#### 鉁?鎴愬姛鏍囧織
+- 鐘舵€佺爜: 200
+- 鏀跺埌宸ュ叿鍒楄〃
+- 鍖呭惈 "AI 闈㈣瘯瀹? 宸ュ叿
 
-#### ❌ 失败可能原因
-1. **API Key 错误** - 检查 `app-vZlc0w5Dio2gnrTkdlblcPXG` 是否正确
-2. **网络问题** - 确保可以访问 `api.dify.ai`
-3. **MCP URL 错误** - 确认 URL 格式正确
-4. **Dify 服务不可用** - 检查 Dify 平台状态
+#### 鉂?澶辫触鍙兘鍘熷洜
+1. **API Key 閿欒** - 妫€鏌?`app-aROZ5FjseJWUtmRzzjlb6b5E` 鏄惁姝ｇ‘
+2. **缃戠粶闂** - 纭繚鍙互璁块棶 `api.dify.ai`
+3. **MCP URL 閿欒** - 纭 URL 鏍煎紡姝ｇ‘
+4. **Dify 鏈嶅姟涓嶅彲鐢?* - 妫€鏌?Dify 骞冲彴鐘舵€?
 
-## 📊 与现有系统的关系
+## 馃搳 涓庣幇鏈夌郴缁熺殑鍏崇郴
 
-### 当前实现方式
+### 褰撳墠瀹炵幇鏂瑰紡
 
-**REST API 调用**:
+**REST API 璋冪敤**:
 ```
-应用程序 → backend/mock-server.js → Dify REST API
-```
-
-文件位置：
-- `backend/mock-server.js` - 后端 API 路由（`/api/ai/dify-workflow`）
-- `frontend/src/services/difyService.js` - 前端服务封装
-- `frontend/src/api/ai.js` - API 调用方法
-
-### MCP 集成方式
-
-**MCP 协议调用**:
-```
-Claude Code → MCP Protocol → Dify MCP Server
+搴旂敤绋嬪簭 鈫?backend/mock-server.js 鈫?Dify REST API
 ```
 
-文件位置：
-- `.claude/mcp.json` - MCP 服务器配置
-- `test-dify-mcp.js` - MCP 测试脚本
+鏂囦欢浣嶇疆锛?
+- `backend/mock-server.js` - 鍚庣 API 璺敱锛坄/api/ai/dify-workflow`锛?
+- `frontend/src/services/difyService.js` - 鍓嶇鏈嶅姟灏佽
+- `frontend/src/api/ai.js` - API 璋冪敤鏂规硶
 
-### 使用场景对比
+### MCP 闆嗘垚鏂瑰紡
 
-| 场景 | 使用方式 | 优势 |
+**MCP 鍗忚璋冪敤**:
+```
+Claude Code 鈫?MCP Protocol 鈫?Dify MCP Server
+```
+
+鏂囦欢浣嶇疆锛?
+- `.claude/mcp.json` - MCP 鏈嶅姟鍣ㄩ厤缃?
+- `test-dify-mcp.js` - MCP 娴嬭瘯鑴氭湰
+
+### 浣跨敤鍦烘櫙瀵规瘮
+
+| 鍦烘櫙 | 浣跨敤鏂瑰紡 | 浼樺娍 |
 |------|----------|------|
-| **应用程序内部** | REST API | 稳定、可控、易于监控 |
-| **开发测试** | MCP 协议 | 快速、直接、无需启动后端 |
-| **Claude Code 辅助开发** | MCP 协议 | 智能、上下文感知、自动化 |
+| **搴旂敤绋嬪簭鍐呴儴** | REST API | 绋冲畾銆佸彲鎺с€佹槗浜庣洃鎺?|
+| **寮€鍙戞祴璇?* | MCP 鍗忚 | 蹇€熴€佺洿鎺ャ€佹棤闇€鍚姩鍚庣 |
+| **Claude Code 杈呭姪寮€鍙?* | MCP 鍗忚 | 鏅鸿兘銆佷笂涓嬫枃鎰熺煡銆佽嚜鍔ㄥ寲 |
 
-## 💡 最佳实践
+## 馃挕 鏈€浣冲疄璺?
 
-### 1. 双轨并行
-- ✅ **保留 REST API**：用于生产环境的应用程序调用
-- ✅ **添加 MCP 集成**：用于开发、测试和 AI 辅助
+### 1. 鍙岃建骞惰
+- 鉁?**淇濈暀 REST API**锛氱敤浜庣敓浜х幆澧冪殑搴旂敤绋嬪簭璋冪敤
+- 鉁?**娣诲姞 MCP 闆嗘垚**锛氱敤浜庡紑鍙戙€佹祴璇曞拰 AI 杈呭姪
 
-### 2. 安全性
-- 🔒 **API Key 保护**：不要将 API Key 提交到版本控制系统
-- 🔒 **环境变量**：使用环境变量存储敏感信息
-- 🔒 **访问控制**：限制 MCP 服务器的访问权限
+### 2. 瀹夊叏鎬?
+- 馃敀 **API Key 淇濇姢**锛氫笉瑕佸皢 API Key 鎻愪氦鍒扮増鏈帶鍒剁郴缁?
+- 馃敀 **鐜鍙橀噺**锛氫娇鐢ㄧ幆澧冨彉閲忓瓨鍌ㄦ晱鎰熶俊鎭?
+- 馃敀 **璁块棶鎺у埗**锛氶檺鍒?MCP 鏈嶅姟鍣ㄧ殑璁块棶鏉冮檺
 
-### 3. 开发工作流
+### 3. 寮€鍙戝伐浣滄祦
 
-#### 开发阶段
+#### 寮€鍙戦樁娈?
 ```
-Claude Code (MCP) → 快速测试和原型开发
-```
-
-#### 集成阶段
-```
-应用程序 (REST API) → 稳定的生产环境集成
+Claude Code (MCP) 鈫?蹇€熸祴璇曞拰鍘熷瀷寮€鍙?
 ```
 
-## 🔄 工作流程示例
+#### 闆嗘垚闃舵
+```
+搴旂敤绋嬪簭 (REST API) 鈫?绋冲畾鐨勭敓浜х幆澧冮泦鎴?
+```
 
-### 完整的面试流程
+## 馃攧 宸ヤ綔娴佺▼绀轰緥
 
-#### 1. 生成面试问题
+### 瀹屾暣鐨勯潰璇曟祦绋?
+
+#### 1. 鐢熸垚闈㈣瘯闂
 ```json
 {
   "request_type": "generate_questions",
-  "job_title": "前端开发工程师"
+  "job_title": "鍓嶇寮€鍙戝伐绋嬪笀"
 }
 ```
 
-**返回**:
+**杩斿洖**:
 ```json
 {
   "session_id": "sess-abc123",
   "questions": [
-    "请解释 JavaScript 的事件循环机制",
-    "React Hooks 的原理是什么？",
+    "璇疯В閲?JavaScript 鐨勪簨浠跺惊鐜満鍒?,
+    "React Hooks 鐨勫師鐞嗘槸浠€涔堬紵",
     ...
   ]
 }
 ```
 
-#### 2. 评估第一个答案
+#### 2. 璇勪及绗竴涓瓟妗?
 ```json
 {
   "request_type": "analyze_answer",
   "session_id": "sess-abc123",
-  "question": "请解释 JavaScript 的事件循环机制",
-  "candidate_answer": "事件循环是 JavaScript 的执行模型..."
+  "question": "璇疯В閲?JavaScript 鐨勪簨浠跺惊鐜満鍒?,
+  "candidate_answer": "浜嬩欢寰幆鏄?JavaScript 鐨勬墽琛屾ā鍨?.."
 }
 ```
 
-**返回**:
+**杩斿洖**:
 ```json
 {
   "score": 8.5,
-  "feedback": "回答全面，理解深入...",
-  "suggestions": "可以补充 microtask 和 macrotask 的区别"
+  "feedback": "鍥炵瓟鍏ㄩ潰锛岀悊瑙ｆ繁鍏?..",
+  "suggestions": "鍙互琛ュ厖 microtask 鍜?macrotask 鐨勫尯鍒?
 }
 ```
 
-#### 3. 继续下一个问题
+#### 3. 缁х画涓嬩竴涓棶棰?
 ```json
 {
   "request_type": "continue_interview",
@@ -327,70 +327,70 @@ Claude Code (MCP) → 快速测试和原型开发
 }
 ```
 
-## 📚 相关文件
+## 馃摎 鐩稿叧鏂囦欢
 
-### 配置文件
-- `.claude/mcp.json` - MCP 服务器配置
-- `backend/.env.example` - 环境变量模板
+### 閰嶇疆鏂囦欢
+- `.claude/mcp.json` - MCP 鏈嶅姟鍣ㄩ厤缃?
+- `backend/.env.example` - 鐜鍙橀噺妯℃澘
 
-### 测试文件
-- `test-dify-mcp.js` - MCP 连接测试脚本
+### 娴嬭瘯鏂囦欢
+- `test-dify-mcp.js` - MCP 杩炴帴娴嬭瘯鑴氭湰
 
-### 应用程序文件
-- `backend/mock-server.js` - 后端 Dify API 集成
-- `frontend/src/services/difyService.js` - 前端 Dify 服务
-- `frontend/src/views/interview/AIInterviewSession.vue` - AI 面试页面
+### 搴旂敤绋嬪簭鏂囦欢
+- `backend/mock-server.js` - 鍚庣 Dify API 闆嗘垚
+- `frontend/src/services/difyService.js` - 鍓嶇 Dify 鏈嶅姟
+- `frontend/src/views/interview/AIInterviewSession.vue` - AI 闈㈣瘯椤甸潰
 
-### 文档文件
-- `DIFY-INTEGRATION-GUIDE.md` - Dify REST API 集成指南
-- `SMART-PROFESSION-INPUT-UPDATE.md` - 智能专业输入功能文档
+### 鏂囨。鏂囦欢
+- `DIFY-INTEGRATION-GUIDE.md` - Dify REST API 闆嗘垚鎸囧崡
+- `SMART-PROFESSION-INPUT-UPDATE.md` - 鏅鸿兘涓撲笟杈撳叆鍔熻兘鏂囨。
 
-## 🎓 常见问题 (FAQ)
+## 馃帗 甯歌闂 (FAQ)
 
-### Q1: MCP 和 REST API 有什么区别？
+### Q1: MCP 鍜?REST API 鏈変粈涔堝尯鍒紵
 
 **MCP (Model Context Protocol)**:
-- 标准化的协议，专为 AI 模型上下文共享设计
-- 支持工具发现、双向通信、流式响应
-- 适合 AI 助手直接调用
+- 鏍囧噯鍖栫殑鍗忚锛屼笓涓?AI 妯″瀷涓婁笅鏂囧叡浜璁?
+- 鏀寔宸ュ叿鍙戠幇銆佸弻鍚戦€氫俊銆佹祦寮忓搷搴?
+- 閫傚悎 AI 鍔╂墜鐩存帴璋冪敤
 
 **REST API**:
-- 传统的 HTTP API
-- 适合应用程序集成
-- 更稳定、更可控
+- 浼犵粺鐨?HTTP API
+- 閫傚悎搴旂敤绋嬪簭闆嗘垚
+- 鏇寸ǔ瀹氥€佹洿鍙帶
 
-### Q2: 我需要同时使用两种方式吗？
+### Q2: 鎴戦渶瑕佸悓鏃朵娇鐢ㄤ袱绉嶆柟寮忓悧锛?
 
-**建议**:
-- **开发时**：使用 MCP 快速测试 Dify 工作流
-- **生产环境**：使用 REST API 确保稳定性
+**寤鸿**:
+- **寮€鍙戞椂**锛氫娇鐢?MCP 蹇€熸祴璇?Dify 宸ヤ綔娴?
+- **鐢熶骇鐜**锛氫娇鐢?REST API 纭繚绋冲畾鎬?
 
-### Q3: 如何更新 API Key？
+### Q3: 濡備綍鏇存柊 API Key锛?
 
-编辑 `.claude/mcp.json` 文件，更新 `Authorization` 头：
+缂栬緫 `.claude/mcp.json` 鏂囦欢锛屾洿鏂?`Authorization` 澶达細
 ```json
 {
   "mcpServers": {
     "dify-interview-workflow": {
       "headers": {
-        "Authorization": "Bearer 新的API-KEY"
+        "Authorization": "Bearer 鏂扮殑API-KEY"
       }
     }
   }
 }
 ```
 
-### Q4: MCP 服务器不可用怎么办？
+### Q4: MCP 鏈嶅姟鍣ㄤ笉鍙敤鎬庝箞鍔烇紵
 
-检查步骤：
-1. 运行 `node test-dify-mcp.js` 测试连接
-2. 确认 API Key 正确
-3. 检查网络连接
-4. 访问 Dify 平台确认服务状态
+妫€鏌ユ楠わ細
+1. 杩愯 `node test-dify-mcp.js` 娴嬭瘯杩炴帴
+2. 纭 API Key 姝ｇ‘
+3. 妫€鏌ョ綉缁滆繛鎺?
+4. 璁块棶 Dify 骞冲彴纭鏈嶅姟鐘舵€?
 
-### Q5: 可以添加多个 Dify 工作流吗？
+### Q5: 鍙互娣诲姞澶氫釜 Dify 宸ヤ綔娴佸悧锛?
 
-可以！在 `.claude/mcp.json` 中添加多个 MCP 服务器：
+鍙互锛佸湪 `.claude/mcp.json` 涓坊鍔犲涓?MCP 鏈嶅姟鍣細
 ```json
 {
   "mcpServers": {
@@ -406,66 +406,67 @@ Claude Code (MCP) → 快速测试和原型开发
 }
 ```
 
-## 🎯 下一步行动
+## 馃幆 涓嬩竴姝ヨ鍔?
 
-### 立即可以做的事情
+### 绔嬪嵆鍙互鍋氱殑浜嬫儏
 
-1. **在 Claude Code 中测试**
+1. **鍦?Claude Code 涓祴璇?*
    ```
-   请使用 Dify MCP 为 "数据分析师" 生成面试问题
-   ```
-
-2. **查看工作流详情**
-   ```
-   显示 Dify MCP 工具的所有参数和用法
+   璇蜂娇鐢?Dify MCP 涓?"鏁版嵁鍒嗘瀽甯? 鐢熸垚闈㈣瘯闂
    ```
 
-3. **集成到开发流程**
-   - 使用 MCP 快速验证面试问题质量
-   - 测试不同职位的题目生成
-   - 优化工作流参数
+2. **鏌ョ湅宸ヤ綔娴佽鎯?*
+   ```
+   鏄剧ず Dify MCP 宸ュ叿鐨勬墍鏈夊弬鏁板拰鐢ㄦ硶
+   ```
 
-### 未来优化方向
+3. **闆嗘垚鍒板紑鍙戞祦绋?*
+   - 浣跨敤 MCP 蹇€熼獙璇侀潰璇曢棶棰樿川閲?
+   - 娴嬭瘯涓嶅悓鑱屼綅鐨勯鐩敓鎴?
+   - 浼樺寲宸ヤ綔娴佸弬鏁?
 
-1. **增强 MCP 集成**
-   - 添加更多 Dify 工作流
-   - 实现流式响应
-   - 添加缓存机制
+### 鏈潵浼樺寲鏂瑰悜
 
-2. **改进应用程序**
-   - 统一 MCP 和 REST API 的接口
-   - 添加工作流版本管理
-   - 实现 A/B 测试
+1. **澧炲己 MCP 闆嗘垚**
+   - 娣诲姞鏇村 Dify 宸ヤ綔娴?
+   - 瀹炵幇娴佸紡鍝嶅簲
+   - 娣诲姞缂撳瓨鏈哄埗
 
-3. **监控和分析**
-   - 记录 MCP 调用日志
-   - 分析工作流性能
-   - 优化响应时间
+2. **鏀硅繘搴旂敤绋嬪簭**
+   - 缁熶竴 MCP 鍜?REST API 鐨勬帴鍙?
+   - 娣诲姞宸ヤ綔娴佺増鏈鐞?
+   - 瀹炵幇 A/B 娴嬭瘯
 
-## ✅ 验证清单
+3. **鐩戞帶鍜屽垎鏋?*
+   - 璁板綍 MCP 璋冪敤鏃ュ織
+   - 鍒嗘瀽宸ヤ綔娴佹€ц兘
+   - 浼樺寲鍝嶅簲鏃堕棿
 
-- [x] MCP 配置文件已创建 (`.claude/mcp.json`)
-- [x] API Key 已正确配置
-- [x] MCP 连接测试通过
-- [x] 工具发现成功
-- [x] 了解工具参数和用法
-- [ ] 在 Claude Code 中成功调用工具
-- [ ] 验证工作流返回结果
+## 鉁?楠岃瘉娓呭崟
 
-## 🎉 总结
+- [x] MCP 閰嶇疆鏂囦欢宸插垱寤?(`.claude/mcp.json`)
+- [x] API Key 宸叉纭厤缃?
+- [x] MCP 杩炴帴娴嬭瘯閫氳繃
+- [x] 宸ュ叿鍙戠幇鎴愬姛
+- [x] 浜嗚В宸ュ叿鍙傛暟鍜岀敤娉?
+- [ ] 鍦?Claude Code 涓垚鍔熻皟鐢ㄥ伐鍏?
+- [ ] 楠岃瘉宸ヤ綔娴佽繑鍥炵粨鏋?
 
-Dify MCP 服务集成已成功完成！现在您可以：
+## 馃帀 鎬荤粨
 
-1. ✅ 在 Claude Code 中直接调用 Dify AI 面试官工作流
-2. ✅ 快速测试不同职位的面试题目生成
-3. ✅ 使用 AI 辅助开发和调试
-4. ✅ 保持应用程序使用稳定的 REST API
+Dify MCP 鏈嶅姟闆嗘垚宸叉垚鍔熷畬鎴愶紒鐜板湪鎮ㄥ彲浠ワ細
 
-这种双轨并行的方式既保证了生产环境的稳定性，又提升了开发效率！
+1. 鉁?鍦?Claude Code 涓洿鎺ヨ皟鐢?Dify AI 闈㈣瘯瀹樺伐浣滄祦
+2. 鉁?蹇€熸祴璇曚笉鍚岃亴浣嶇殑闈㈣瘯棰樼洰鐢熸垚
+3. 鉁?浣跨敤 AI 杈呭姪寮€鍙戝拰璋冭瘯
+4. 鉁?淇濇寔搴旂敤绋嬪簭浣跨敤绋冲畾鐨?REST API
+
+杩欑鍙岃建骞惰鐨勬柟寮忔棦淇濊瘉浜嗙敓浜х幆澧冪殑绋冲畾鎬э紝鍙堟彁鍗囦簡寮€鍙戞晥鐜囷紒
 
 ---
 
-**创建时间**: 2025-10-10 15:40
-**文档版本**: 1.0
-**作者**: Claude Code
-**状态**: ✅ 集成完成并测试通过
+**鍒涘缓鏃堕棿**: 2025-10-10 15:40
+**鏂囨。鐗堟湰**: 1.0
+**浣滆€?*: Claude Code
+**鐘舵€?*: 鉁?闆嗘垚瀹屾垚骞舵祴璇曢€氳繃
+

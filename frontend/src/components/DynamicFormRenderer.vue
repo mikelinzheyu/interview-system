@@ -39,8 +39,8 @@
             v-for="tag in (formData[field.name] || [])"
             :key="tag"
             closable
-            @close="removeTag(field.name, tag)"
             class="tag-item"
+            @close="removeTag(field.name, tag)"
           >
             {{ tag }}
           </el-tag>

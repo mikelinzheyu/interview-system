@@ -4,7 +4,7 @@
       <template #header>
         <div class="header">
           <h2>🏆 社区贡献排行榜</h2>
-          <el-select v-model="timeRange" @change="fetchData" style="width: 150px">
+          <el-select v-model="timeRange" style="width: 150px" @change="fetchData">
             <el-option label="本周" value="week" />
             <el-option label="本月" value="month" />
             <el-option label="全部时间" value="all" />
@@ -13,8 +13,8 @@
       </template>
 
       <el-table
-        :data="store.leaderboard"
         v-loading="store.leaderboardLoading"
+        :data="store.leaderboard"
         :row-class-name="tableRowClassName"
       >
         <el-table-column label="排名" width="80" align="center">
@@ -99,7 +99,7 @@
       </el-table>
 
       <!-- 我的排名 -->
-      <div class="my-rank-section" v-if="myRank">
+      <div v-if="myRank" class="my-rank-section">
         <el-divider />
         <div class="my-rank-card">
           <div class="my-rank-label">我的排名</div>

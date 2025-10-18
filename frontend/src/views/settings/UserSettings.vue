@@ -64,7 +64,7 @@
             </el-form-item>
 
             <el-form-item>
-              <el-button type="primary" @click="saveProfile" :loading="loading.profile">
+              <el-button type="primary" :loading="loading.profile" @click="saveProfile">
                 保存修改
               </el-button>
             </el-form-item>
@@ -149,7 +149,7 @@
             </el-form-item>
 
             <el-form-item>
-              <el-button type="primary" @click="savePrivacy" :loading="loading.privacy">
+              <el-button type="primary" :loading="loading.privacy" @click="savePrivacy">
                 保存设置
               </el-button>
             </el-form-item>
@@ -209,7 +209,7 @@
             </el-form-item>
 
             <el-form-item>
-              <el-button type="primary" @click="saveNotification" :loading="loading.notification">
+              <el-button type="primary" :loading="loading.notification" @click="saveNotification">
                 保存设置
               </el-button>
             </el-form-item>
@@ -247,7 +247,7 @@
             </el-form-item>
 
             <el-form-item>
-              <el-button type="primary" @click="savePreferences" :loading="loading.preferences">
+              <el-button type="primary" :loading="loading.preferences" @click="savePreferences">
                 保存设置
               </el-button>
             </el-form-item>
@@ -283,7 +283,7 @@
         show-icon
         style="margin-bottom: 20px;"
       />
-      <el-form :model="passwordForm" :rules="passwordRules" ref="passwordFormRef" label-width="100px">
+      <el-form ref="passwordFormRef" :model="passwordForm" :rules="passwordRules" label-width="100px">
         <el-form-item label="原密码" prop="oldPassword">
           <el-input v-model="passwordForm.oldPassword" type="password" show-password />
         </el-form-item>
@@ -310,7 +310,7 @@
       </el-form>
       <template #footer>
         <el-button @click="showPasswordDialog = false">取消</el-button>
-        <el-button type="primary" @click="changePassword" :loading="loading.password">
+        <el-button type="primary" :loading="loading.password" @click="changePassword">
           确认修改
         </el-button>
       </template>
@@ -318,7 +318,7 @@
 
     <!-- 绑定手机对话框 -->
     <el-dialog v-model="showPhoneDialog" title="绑定手机号" width="500px">
-      <el-form :model="phoneForm" ref="phoneFormRef" label-width="100px">
+      <el-form ref="phoneFormRef" :model="phoneForm" label-width="100px">
         <el-form-item label="手机号" prop="phone">
           <el-input v-model="phoneForm.phone" placeholder="请输入手机号" />
         </el-form-item>
@@ -336,7 +336,7 @@
       </el-form>
       <template #footer>
         <el-button @click="showPhoneDialog = false">取消</el-button>
-        <el-button type="primary" @click="bindPhone" :loading="loading.phone">
+        <el-button type="primary" :loading="loading.phone" @click="bindPhone">
           确认绑定
         </el-button>
       </template>
@@ -344,7 +344,7 @@
 
     <!-- 绑定邮箱对话框 -->
     <el-dialog v-model="showEmailDialog" title="绑定邮箱" width="500px">
-      <el-form :model="emailForm" ref="emailFormRef" label-width="100px">
+      <el-form ref="emailFormRef" :model="emailForm" label-width="100px">
         <el-form-item label="邮箱" prop="email">
           <el-input v-model="emailForm.email" placeholder="请输入邮箱" />
         </el-form-item>
@@ -362,7 +362,7 @@
       </el-form>
       <template #footer>
         <el-button @click="showEmailDialog = false">取消</el-button>
-        <el-button type="primary" @click="bindEmail" :loading="loading.email">
+        <el-button type="primary" :loading="loading.email" @click="bindEmail">
           确认绑定
         </el-button>
       </template>
@@ -418,9 +418,9 @@
         <el-button @click="showDeleteAccountDialog = false">取消</el-button>
         <el-button
           type="danger"
-          @click="deleteAccount"
           :disabled="deleteAccountForm.confirmText !== '删除账户'"
           :loading="loading.delete"
+          @click="deleteAccount"
         >
           确认注销
         </el-button>

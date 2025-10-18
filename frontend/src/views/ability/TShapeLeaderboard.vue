@@ -20,8 +20,8 @@
       </el-alert>
 
       <el-table
-        :data="store.tShapeLeaderboard"
         v-loading="store.leaderboardLoading"
+        :data="store.tShapeLeaderboard"
         :row-class-name="tableRowClassName"
       >
         <el-table-column label="排名" width="80" align="center">
@@ -126,7 +126,7 @@
       </el-table>
 
       <!-- 我的排名 -->
-      <div class="my-rank-section" v-if="myRank">
+      <div v-if="myRank" class="my-rank-section">
         <el-divider />
         <div class="my-rank-card">
           <div class="my-rank-header">

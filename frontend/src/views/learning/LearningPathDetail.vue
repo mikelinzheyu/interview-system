@@ -5,7 +5,7 @@
     <div v-else-if="path" class="path-content">
       <!-- 页头 -->
       <div class="path-hero">
-        <el-button link @click="goBack" class="back-btn">
+        <el-button link class="back-btn" @click="goBack">
           <el-icon><ArrowLeft /></el-icon>
           返回列表
         </el-button>
@@ -55,7 +55,7 @@
                     <span class="stat-label">完成率</span>
                   </div>
                 </div>
-                <el-button type="primary" size="large" @click="handleEnroll" :loading="enrolling">
+                <el-button type="primary" size="large" :loading="enrolling" @click="handleEnroll">
                   立即报名学习
                 </el-button>
               </template>
@@ -114,7 +114,7 @@
               </div>
             </div>
 
-            <div class="module-actions" v-if="isEnrolled">
+            <div v-if="isEnrolled" class="module-actions">
               <el-button
                 v-if="!isModuleCompleted(module.id)"
                 type="primary"

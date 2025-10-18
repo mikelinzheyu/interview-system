@@ -1,8 +1,7 @@
-/**
- * 增强统计数据服务 - 支持多维度分析、缓存、防作弊检测
+﻿/**
+ * 澧炲己缁熻鏁版嵁鏈嶅姟 - 鏀寔澶氱淮搴﹀垎鏋愩€佺紦瀛樸€侀槻浣滃紛妫€娴?
  */
 import axios from 'axios'
-import { ElMessage } from 'element-plus'
 
 class StatisticsService {
   constructor() {
@@ -15,8 +14,8 @@ class StatisticsService {
     })
 
     this.setupInterceptors()
-    this.cache = new Map() // 简单内存缓存
-    this.cacheTimeout = 5 * 60 * 1000 // 5分钟
+    this.cache = new Map() // 绠€鍗曞唴瀛樼紦瀛?
+    this.cacheTimeout = 5 * 60 * 1000 // 5鍒嗛挓
   }
 
   setupInterceptors() {
@@ -33,7 +32,7 @@ class StatisticsService {
 
     this.apiClient.interceptors.response.use(
       response => {
-        // Mock服务器返回格式兼容处理
+        // Mock鏈嶅姟鍣ㄨ繑鍥炴牸寮忓吋瀹瑰鐞?
         if (response.data.data) {
           return { ...response, data: response.data.data }
         }
@@ -50,7 +49,7 @@ class StatisticsService {
   }
 
   /**
-   * 缓存键生成
+   * 缂撳瓨閿敓鎴?
    */
   getCacheKey(method, params = {}) {
     const sortedParams = Object.keys(params)
@@ -62,7 +61,7 @@ class StatisticsService {
   }
 
   /**
-   * 获取缓存数据
+   * 鑾峰彇缂撳瓨鏁版嵁
    */
   getFromCache(key) {
     const cached = this.cache.get(key)
@@ -74,7 +73,7 @@ class StatisticsService {
   }
 
   /**
-   * 设置缓存数据
+   * 璁剧疆缂撳瓨鏁版嵁
    */
   setCache(key, data) {
     this.cache.set(key, {
@@ -84,7 +83,7 @@ class StatisticsService {
   }
 
   /**
-   * 清除用户相关缓存
+   * 娓呴櫎鐢ㄦ埛鐩稿叧缂撳瓨
    */
   clearUserCache(userId) {
     for (const [key] of this.cache) {
@@ -95,11 +94,11 @@ class StatisticsService {
   }
 
   /**
-   * 获取用户综合统计数据
-   * @param {Object} options 查询选项
-   * @param {string} options.timeRange 时间范围 ('daily', 'weekly', 'monthly', 'yearly', 'all')
-   * @param {boolean} options.detail 是否返回详细信息
-   * @param {boolean} options.forceRefresh 是否强制刷新
+   * 鑾峰彇鐢ㄦ埛缁煎悎缁熻鏁版嵁
+   * @param {Object} options 鏌ヨ閫夐」
+   * @param {string} options.timeRange 鏃堕棿鑼冨洿 ('daily', 'weekly', 'monthly', 'yearly', 'all')
+   * @param {boolean} options.detail 鏄惁杩斿洖璇︾粏淇℃伅
+   * @param {boolean} options.forceRefresh 鏄惁寮哄埗鍒锋柊
    * @returns {Promise<Object>}
    */
   async getUserStatistics(options = {}) {
@@ -119,7 +118,7 @@ class StatisticsService {
     }
 
     try {
-      console.log('获取用户统计数据:', { timeRange, detail })
+      console.log('鑾峰彇鐢ㄦ埛缁熻鏁版嵁:', { timeRange, detail })
 
       const response = await this.apiClient.get('/users/statistics', {
         params: { timeRange, detail }
@@ -134,7 +133,7 @@ class StatisticsService {
         fromCache: false
       }
     } catch (error) {
-      console.error('获取用户统计失败:', error)
+      console.error('鑾峰彇鐢ㄦ埛缁熻澶辫触:', error)
       return {
         success: false,
         error: this.handleError(error),
@@ -144,18 +143,18 @@ class StatisticsService {
   }
 
   /**
-   * 增强统计数据处理
+   * 澧炲己缁熻鏁版嵁澶勭悊
    */
   enhanceStatisticsData(rawData) {
     const enhanced = {
       ...rawData,
-      // 计算趋势
+      // 璁＄畻瓒嬪娍
       trends: this.calculateTrends(rawData),
-      // 生成成就
+      // 鐢熸垚鎴愬氨
       achievements: this.generateAchievements(rawData),
-      // 个性化推荐
+      // 涓€у寲鎺ㄨ崘
       recommendations: this.generateRecommendations(rawData),
-      // 格式化显示数据
+      // 鏍煎紡鍖栨樉绀烘暟鎹?
       formatted: this.formatDisplayData(rawData)
     }
 
@@ -163,12 +162,12 @@ class StatisticsService {
   }
 
   /**
-   * 计算数据趋势
+   * 璁＄畻鏁版嵁瓒嬪娍
    */
   calculateTrends(data) {
     const trends = {}
 
-    // 分数趋势
+    // 鍒嗘暟瓒嬪娍
     if (data.timeSeriesData?.monthly?.length >= 2) {
       const recent = data.timeSeriesData.monthly
       const current = recent[recent.length - 1]
@@ -179,7 +178,7 @@ class StatisticsService {
       trends.scoreChangeText = trends.scoreChange > 0 ? `+${trends.scoreChange.toFixed(1)}` : trends.scoreChange.toFixed(1)
     }
 
-    // 练习量趋势
+    // 缁冧範閲忚秼鍔?
     if (data.timeSeriesData?.monthly?.length >= 2) {
       const recent = data.timeSeriesData.monthly
       const currentInterviews = recent[recent.length - 1].interviews
@@ -194,42 +193,42 @@ class StatisticsService {
   }
 
   /**
-   * 生成成就系统
+   * 鐢熸垚鎴愬氨绯荤粺
    */
   generateAchievements(data) {
     const achievements = []
     const stats = data.summary || data
 
-    // 面试次数成就
+    // 闈㈣瘯娆℃暟鎴愬氨
     if (stats.interviewCount >= 1) achievements.push({
       id: 'first_interview',
-      title: '🎯 初次面试',
-      description: '完成第一次面试',
+      title: '馃幆 鍒濇闈㈣瘯',
+      description: '瀹屾垚绗竴娆￠潰璇?,
       unlocked: true,
       tier: 'bronze'
     })
 
     if (stats.interviewCount >= 10) achievements.push({
       id: 'interview_veteran',
-      title: '🏅 面试老手',
-      description: '完成10次面试',
+      title: '馃弲 闈㈣瘯鑰佹墜',
+      description: '瀹屾垚10娆￠潰璇?,
       unlocked: true,
       tier: 'silver'
     })
 
     if (stats.interviewCount >= 50) achievements.push({
       id: 'interview_master',
-      title: '👑 面试大师',
-      description: '完成50次面试',
+      title: '馃憫 闈㈣瘯澶у笀',
+      description: '瀹屾垚50娆￠潰璇?,
       unlocked: true,
       tier: 'gold'
     })
 
-    // 分数成就
+    // 鍒嗘暟鎴愬氨
     if (stats.averageScore >= 90) achievements.push({
       id: 'high_achiever',
-      title: '🌟 优秀表现',
-      description: '平均分数达到90分',
+      title: '馃専 浼樼琛ㄧ幇',
+      description: '骞冲潎鍒嗘暟杈惧埌90鍒?,
       unlocked: true,
       tier: 'gold'
     })
@@ -238,40 +237,40 @@ class StatisticsService {
   }
 
   /**
-   * 生成个性化推荐
+   * 鐢熸垚涓€у寲鎺ㄨ崘
    */
   generateRecommendations(data) {
     const recommendations = []
     const stats = data.summary || data
 
-    // 基于分数的推荐
+    // 鍩轰簬鍒嗘暟鐨勬帹鑽?
     if (stats.averageScore < 70) {
       recommendations.push({
         type: 'improvement',
-        title: '💪 加强基础练习',
-        content: '建议多进行基础技能的练习，重点提升技术能力',
+        title: '馃挭 鍔犲己鍩虹缁冧範',
+        content: '寤鸿澶氳繘琛屽熀纭€鎶€鑳界殑缁冧範锛岄噸鐐规彁鍗囨妧鏈兘鍔?,
         priority: 'high',
         actionUrl: '/questions?difficulty=easy'
       })
     }
 
-    // 基于面试次数的推荐
+    // 鍩轰簬闈㈣瘯娆℃暟鐨勬帹鑽?
     if (stats.interviewCount < 5) {
       recommendations.push({
         type: 'practice',
-        title: '🚀 增加练习频率',
-        content: '多进行模拟面试可以显著提升您的表现',
+        title: '馃殌 澧炲姞缁冧範棰戠巼',
+        content: '澶氳繘琛屾ā鎷熼潰璇曞彲浠ユ樉钁楁彁鍗囨偍鐨勮〃鐜?,
         priority: 'medium',
         actionUrl: '/interview/new'
       })
     }
 
-    // 基于分类表现的推荐
+    // 鍩轰簬鍒嗙被琛ㄧ幇鐨勬帹鑽?
     if (data.categoryBreakdown?.aiInterview?.avgScore < data.categoryBreakdown?.mockInterview?.avgScore) {
       recommendations.push({
         type: 'focus',
-        title: '🤖 专注AI面试训练',
-        content: 'AI面试表现有提升空间，建议多加练习',
+        title: '馃 涓撴敞AI闈㈣瘯璁粌',
+        content: 'AI闈㈣瘯琛ㄧ幇鏈夋彁鍗囩┖闂达紝寤鸿澶氬姞缁冧範',
         priority: 'medium',
         actionUrl: '/interview/ai'
       })
@@ -281,7 +280,7 @@ class StatisticsService {
   }
 
   /**
-   * 格式化显示数据
+   * 鏍煎紡鍖栨樉绀烘暟鎹?
    */
   formatDisplayData(data) {
     const stats = data.summary || data
@@ -289,7 +288,7 @@ class StatisticsService {
     return {
       interviewCount: {
         value: stats.interviewCount || 0,
-        formatted: `${stats.interviewCount || 0}次`
+        formatted: `${stats.interviewCount || 0}娆
       },
       practiceTime: {
         value: stats.totalPracticeTime || 0,
@@ -297,41 +296,41 @@ class StatisticsService {
       },
       averageScore: {
         value: stats.averageScore || 0,
-        formatted: `${(stats.averageScore || 0).toFixed(1)}分`
+        formatted: `${(stats.averageScore || 0).toFixed(1)}鍒哷
       },
       rank: {
         level: stats.rank?.level || 'N/A',
         percentile: stats.rank?.percentile || 0,
-        formatted: `${stats.rank?.level || 'N/A'} (前${(100 - (stats.rank?.percentile || 0)).toFixed(1)}%)`
+        formatted: `${stats.rank?.level || 'N/A'} (鍓?{(100 - (stats.rank?.percentile || 0)).toFixed(1)}%)`
       }
     }
   }
 
   /**
-   * 时间格式化
+   * 鏃堕棿鏍煎紡鍖?
    */
   formatTime(seconds) {
-    if (!seconds || seconds < 0) return '0分钟'
+    if (!seconds || seconds < 0) return '0鍒嗛挓'
 
     const hours = Math.floor(seconds / 3600)
     const minutes = Math.floor((seconds % 3600) / 60)
 
     if (hours > 0) {
-      return `${hours}小时${minutes}分钟`
+      return `${hours}灏忔椂${minutes}鍒嗛挓`
     } else {
-      return `${minutes}分钟`
+      return `${minutes}鍒嗛挓`
     }
   }
 
   /**
-   * 更新面试完成后的统计
+   * 鏇存柊闈㈣瘯瀹屾垚鍚庣殑缁熻
    */
   async updateAfterInterview(sessionData) {
     try {
-      // 清除相关缓存
+      // 娓呴櫎鐩稿叧缂撳瓨
       this.clearUserCache(sessionData.userId || 'current')
 
-      // 记录面试完成事件
+      // 璁板綍闈㈣瘯瀹屾垚浜嬩欢
       await this.apiClient.post('/users/statistics/events', {
         type: 'interview_completed',
         data: sessionData
@@ -339,13 +338,13 @@ class StatisticsService {
 
       return { success: true }
     } catch (error) {
-      console.error('更新面试统计失败:', error)
+      console.error('鏇存柊闈㈣瘯缁熻澶辫触:', error)
       return { success: false, error: this.handleError(error) }
     }
   }
 
   /**
-   * 获取排行榜数据
+   * 鑾峰彇鎺掕姒滄暟鎹?
    */
   async getLeaderboard(options = {}) {
     const { limit = 10, timeRange = 'monthly' } = options
@@ -360,7 +359,7 @@ class StatisticsService {
         data: response.data
       }
     } catch (error) {
-      console.error('获取排行榜失败:', error)
+      console.error('鑾峰彇鎺掕姒滃け璐?', error)
       return {
         success: false,
         error: this.handleError(error),
@@ -370,7 +369,7 @@ class StatisticsService {
   }
 
   /**
-   * 获取用户详细趋势数据
+   * 鑾峰彇鐢ㄦ埛璇︾粏瓒嬪娍鏁版嵁
    */
   async getUserTrends(timeRange = 'monthly') {
     const cacheKey = this.getCacheKey('user_trends', { timeRange })
@@ -393,7 +392,7 @@ class StatisticsService {
         fromCache: false
       }
     } catch (error) {
-      console.error('获取趋势数据失败:', error)
+      console.error('鑾峰彇瓒嬪娍鏁版嵁澶辫触:', error)
       return {
         success: false,
         error: this.handleError(error),
@@ -403,7 +402,7 @@ class StatisticsService {
   }
 
   /**
-   * 增强的错误处理
+   * 澧炲己鐨勯敊璇鐞?
    */
   handleError(error) {
     if (error.response) {
@@ -414,49 +413,49 @@ class StatisticsService {
         case 400:
           return {
             code: 'INVALID_PARAMS',
-            message: '请求参数无效',
+            message: '璇锋眰鍙傛暟鏃犳晥',
             type: 'client',
             fallback: false
           }
         case 401:
           return {
             code: 'UNAUTHORIZED',
-            message: '身份验证失败，请重新登录',
+            message: '韬唤楠岃瘉澶辫触锛岃閲嶆柊鐧诲綍',
             type: 'auth',
             redirect: '/login'
           }
         case 403:
           return {
             code: 'FORBIDDEN',
-            message: '权限不足，无法访问该资源',
+            message: '鏉冮檺涓嶈冻锛屾棤娉曡闂璧勬簮',
             type: 'permission',
             fallback: false
           }
         case 404:
           return {
             code: 'DATA_NOT_FOUND',
-            message: '统计数据不存在，已启用默认数据',
+            message: '缁熻鏁版嵁涓嶅瓨鍦紝宸插惎鐢ㄩ粯璁ゆ暟鎹?,
             type: 'notfound',
             fallback: true
           }
         case 429:
           return {
             code: 'RATE_LIMIT',
-            message: '请求过于频繁，请稍后重试',
+            message: '璇锋眰杩囦簬棰戠箒锛岃绋嶅悗閲嶈瘯',
             type: 'rate_limit',
             retryable: true
           }
         case 503:
           return {
             code: 'SERVICE_UNAVAILABLE',
-            message: '统计服务暂时不可用，已启用备用数据',
+            message: '缁熻鏈嶅姟鏆傛椂涓嶅彲鐢紝宸插惎鐢ㄥ鐢ㄦ暟鎹?,
             type: 'server',
             fallback: true
           }
         default:
           return {
             code: 'API_ERROR',
-            message: message || '服务器内部错误',
+            message: message || '鏈嶅姟鍣ㄥ唴閮ㄩ敊璇?,
             type: status >= 500 ? 'server' : 'client',
             fallback: status >= 500
           }
@@ -464,7 +463,7 @@ class StatisticsService {
     } else if (error.request) {
       return {
         code: 'NETWORK_ERROR',
-        message: '网络连接失败，已切换到离线模式',
+        message: '缃戠粶杩炴帴澶辫触锛屽凡鍒囨崲鍒扮绾挎ā寮?,
         type: 'network',
         fallback: true,
         retryable: true
@@ -472,14 +471,14 @@ class StatisticsService {
     } else if (error.code === 'ECONNABORTED') {
       return {
         code: 'TIMEOUT',
-        message: '请求超时，请检查网络连接',
+        message: '璇锋眰瓒呮椂锛岃妫€鏌ョ綉缁滆繛鎺?,
         type: 'timeout',
         retryable: true
       }
     } else {
       return {
         code: 'UNKNOWN_ERROR',
-        message: error.message || '未知错误，已启用默认数据',
+        message: error.message || '鏈煡閿欒锛屽凡鍚敤榛樿鏁版嵁',
         type: 'unknown',
         fallback: true
       }
@@ -487,7 +486,7 @@ class StatisticsService {
   }
 
   /**
-   * 重试机制
+   * 閲嶈瘯鏈哄埗
    */
   async executeWithRetry(operation, maxRetries = 3, delay = 1000) {
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
@@ -496,27 +495,27 @@ class StatisticsService {
       } catch (error) {
         const errorInfo = this.handleError(error)
 
-        // 如果不是可重试的错误，直接抛出
+        // 濡傛灉涓嶆槸鍙噸璇曠殑閿欒锛岀洿鎺ユ姏鍑?
         if (!errorInfo.retryable && errorInfo.type !== 'timeout' && errorInfo.type !== 'network') {
           throw error
         }
 
-        // 如果是最后一次尝试，抛出错误
+        // 濡傛灉鏄渶鍚庝竴娆″皾璇曪紝鎶涘嚭閿欒
         if (attempt === maxRetries) {
-          console.log(`重试 ${maxRetries} 次后仍然失败，启用降级方案`)
+          console.log(`閲嶈瘯 ${maxRetries} 娆″悗浠嶇劧澶辫触锛屽惎鐢ㄩ檷绾ф柟妗坄)
           throw error
         }
 
-        // 等待后重试，每次延时递增
-        const retryDelay = delay * Math.pow(2, attempt - 1) // 指数退避
+        // 绛夊緟鍚庨噸璇曪紝姣忔寤舵椂閫掑
+        const retryDelay = delay * Math.pow(2, attempt - 1) // 鎸囨暟閫€閬?
         await new Promise(resolve => setTimeout(resolve, retryDelay))
-        console.log(`第 ${attempt} 次重试，${retryDelay}ms 后执行...`)
+        console.log(`绗?${attempt} 娆￠噸璇曪紝${retryDelay}ms 鍚庢墽琛?..`)
       }
     }
   }
 
   /**
-   * 降级数据
+   * 闄嶇骇鏁版嵁
    */
   getFallbackData() {
     return {
@@ -530,14 +529,14 @@ class StatisticsService {
       achievements: [],
       recommendations: [{
         type: 'system',
-        title: '🔄 数据加载中',
-        content: '统计数据正在加载，请稍后刷新页面',
+        title: '馃攧 鏁版嵁鍔犺浇涓?,
+        content: '缁熻鏁版嵁姝ｅ湪鍔犺浇锛岃绋嶅悗鍒锋柊椤甸潰',
         priority: 'low'
       }],
       formatted: {
-        interviewCount: { value: 0, formatted: '0次' },
-        practiceTime: { value: 0, formatted: '0分钟' },
-        averageScore: { value: 0, formatted: '0.0分' },
+        interviewCount: { value: 0, formatted: '0次'次'娆? },
+        practiceTime: { value: 0, formatted: '0次'次'鍒嗛挓' },
+        averageScore: { value: 0, formatted: '0次'次'.0鍒? },
         rank: { level: 'N/A', formatted: 'N/A' }
       }
     }

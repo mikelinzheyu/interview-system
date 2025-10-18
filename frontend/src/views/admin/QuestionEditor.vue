@@ -1,6 +1,6 @@
 <template>
   <div class="question-editor-page">
-    <el-page-header @back="handleBack" title="返回">
+    <el-page-header title="返回" @back="handleBack">
       <template #content>
         <h2>{{ isEdit ? '编辑题目' : '创建新题目' }}</h2>
       </template>
@@ -109,8 +109,8 @@
             v-for="tag in form.tags"
             :key="tag"
             closable
-            @close="removeTag(tag)"
             class="tag-item"
+            @close="removeTag(tag)"
           >
             {{ tag }}
           </el-tag>
@@ -124,14 +124,14 @@
         </el-form-item>
 
         <!-- 专业字段 (动态渲染) -->
-        <el-divider content-position="left" v-if="currentFieldConfig.fields?.length">
+        <el-divider v-if="currentFieldConfig.fields?.length" content-position="left">
           <h3>{{ currentDomainName }}专业字段</h3>
         </el-divider>
 
         <DynamicFormRenderer
           v-if="currentFieldConfig.fields?.length"
-          :fields="currentFieldConfig.fields"
           v-model="form.metadata"
+          :fields="currentFieldConfig.fields"
         />
 
         <!-- 答案与解析 -->
@@ -162,8 +162,8 @@
             v-for="(hint, index) in form.hints"
             :key="index"
             closable
-            @close="removeHint(index)"
             class="tag-item"
+            @close="removeHint(index)"
           >
             {{ hint }}
           </el-tag>
@@ -178,7 +178,7 @@
 
         <!-- 操作按钮 -->
         <el-form-item>
-          <el-button type="primary" @click="handleSubmit" :loading="submitting">
+          <el-button type="primary" :loading="submitting" @click="handleSubmit">
             {{ isEdit ? '保存修改' : '创建题目' }}
           </el-button>
           <el-button @click="handleReset">重置</el-button>

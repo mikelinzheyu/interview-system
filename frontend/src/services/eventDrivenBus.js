@@ -1,4 +1,4 @@
-// EventEmitter polyfill for browser
+﻿// EventEmitter polyfill for browser
 class EventEmitter {
   constructor() {
     this.events = {}
@@ -56,8 +56,8 @@ class EventEmitter {
 }
 
 /**
- * 事件驱动总线
- * 实现松耦合的微服务化事件通信架构
+ * 浜嬩欢椹卞姩鎬荤嚎
+ * 瀹炵幇鏉捐€﹀悎鐨勫井鏈嶅姟鍖栦簨浠堕€氫俊鏋舵瀯
  */
 export class EventDrivenBus extends EventEmitter {
   constructor() {
@@ -68,7 +68,7 @@ export class EventDrivenBus extends EventEmitter {
     this.middleware = []
     this.retryQueue = []
 
-    // 事件优先级定义
+    // 浜嬩欢浼樺厛绾у畾涔?
     this.eventPriorities = {
       'system.critical': 10,
       'system.check.failed': 9,
@@ -83,9 +83,9 @@ export class EventDrivenBus extends EventEmitter {
       'log.info': 1
     }
 
-    // 事件路由配置
+    // 浜嬩欢璺敱閰嶇疆
     this.eventRoutes = new Map([
-      // 系统检查事件流
+      // 绯荤粺妫€鏌ヤ簨浠舵祦
       ['system.check.started', ['ui.showProgress', 'analytics.track']],
       ['system.check.device.success', ['system.check.network.start', 'ui.updateProgress']],
       ['system.check.network.success', ['system.check.browser.start', 'ui.updateProgress']],
@@ -93,35 +93,35 @@ export class EventDrivenBus extends EventEmitter {
       ['system.check.completed', ['interview.config.prepare', 'ui.showReady', 'cache.warmup']],
       ['system.check.failed', ['ui.showError', 'recovery.suggest', 'analytics.error']],
 
-      // 面试流程事件
+      // 闈㈣瘯娴佺▼浜嬩欢
       ['interview.config.ready', ['interview.enable.start', 'ui.updateButton']],
       ['interview.started', ['timer.start', 'recording.init', 'session.create', 'analytics.start']],
       ['interview.paused', ['timer.pause', 'state.snapshot', 'recovery.prepare']],
       ['interview.resumed', ['timer.resume', 'state.restore', 'recording.resume']],
       ['interview.ended', ['timer.stop', 'session.complete', 'analysis.trigger']],
 
-      // 问答交互事件
+      // 闂瓟浜や簰浜嬩欢
       ['question.generated', ['ui.displayQuestion', 'timer.questionStart', 'cache.update']],
       ['question.answered', ['analysis.trigger', 'question.next.prepare', 'progress.update']],
       ['answer.analyzed', ['ui.showAnalysis', 'progress.increment', 'recommendations.generate']],
 
-      // 连接状态事件
+      // 杩炴帴鐘舵€佷簨浠?
       ['connection.lost', ['offline.mode.enable', 'sync.queue.start', 'ui.showOffline']],
       ['connection.restored', ['offline.mode.disable', 'sync.queue.process', 'ui.showOnline']],
       ['heartbeat.failed', ['connection.check', 'retry.schedule']],
 
-      // 分析完成事件流
+      // 鍒嗘瀽瀹屾垚浜嬩欢娴?
       ['analysis.completed', ['results.display', 'report.generate', 'feedback.prepare']],
       ['report.generated', ['export.enable', 'share.prepare', 'storage.save']],
       ['report.exported', ['session.cleanup', 'feedback.request', 'analytics.complete']],
 
-      // 错误处理事件
+      // 閿欒澶勭悊浜嬩欢
       ['error.occurred', ['error.log', 'error.display', 'recovery.attempt']],
       ['recovery.attempted', ['error.resolve', 'fallback.activate']],
       ['fallback.activated', ['service.degrade', 'user.notify']]
     ])
 
-    // 微服务注册表
+    // 寰湇鍔℃敞鍐岃〃
     this.microservices = new Map([
       ['device-service', {
         events: ['system.check.device.*', 'camera.*', 'microphone.*'],
@@ -159,26 +159,26 @@ export class EventDrivenBus extends EventEmitter {
   }
 
   /**
-   * 初始化事件总线
+   * 鍒濆鍖栦簨浠舵€荤嚎
    */
   initializeEventBus() {
-    // 设置最大监听器数量
+    // 璁剧疆鏈€澶х洃鍚櫒鏁伴噺
     this.setMaxListeners(100)
 
-    // 注册核心中间件
+    // 娉ㄥ唽鏍稿績涓棿浠?
     this.use(this.loggingMiddleware)
     this.use(this.priorityMiddleware)
     this.use(this.retryMiddleware)
     this.use(this.analyticsMiddleware)
 
-    // 启动事件处理器
+    // 鍚姩浜嬩欢澶勭悊鍣?
     this.setupEventHandlers()
     this.startHealthMonitoring()
     this.startRetryProcessor()
   }
 
   /**
-   * 发布事件（支持优先级和路由）
+   * 鍙戝竷浜嬩欢锛堟敮鎸佷紭鍏堢骇鍜岃矾鐢憋級
    */
   publish(eventName, payload = {}, options = {}) {
     const eventData = {
@@ -191,28 +191,28 @@ export class EventDrivenBus extends EventEmitter {
         source: options.source || 'unknown',
         target: options.target || 'broadcast',
         retryable: options.retryable !== false,
-        ttl: options.ttl || 30000 // 30秒过期
+        ttl: options.ttl || 30000 // 30绉掕繃鏈?
       }
     }
 
-    // 记录事件历史
+    // 璁板綍浜嬩欢鍘嗗彶
     this.recordEvent(eventData)
 
-    // 执行中间件
+    // 鎵ц涓棿浠?
     return this.executeMiddleware(eventData)
       .then(() => {
-        // 触发直接监听器
+        // 瑙﹀彂鐩存帴鐩戝惉鍣?
         this.emit(eventName, eventData.payload, eventData.options)
 
-        // 处理事件路由
+        // 澶勭悊浜嬩欢璺敱
         this.processEventRoutes(eventName, eventData)
 
         return { success: true, eventId: eventData.options.id }
       })
       .catch(error => {
-        console.error(`事件发布失败: ${eventName}`, error)
+        console.error(`浜嬩欢鍙戝竷澶辫触: ${eventName}`, error)
 
-        // 加入重试队列
+        // 鍔犲叆閲嶈瘯闃熷垪
         if (eventData.options.retryable) {
           this.addToRetryQueue(eventData, error)
         }
@@ -222,7 +222,7 @@ export class EventDrivenBus extends EventEmitter {
   }
 
   /**
-   * 订阅事件（支持模式匹配）
+   * 璁㈤槄浜嬩欢锛堟敮鎸佹ā寮忓尮閰嶏級
    */
   subscribe(eventPattern, handler, options = {}) {
     const subscription = {
@@ -240,27 +240,27 @@ export class EventDrivenBus extends EventEmitter {
       callCount: 0
     }
 
-    // 处理通配符模式
+    // 澶勭悊閫氶厤绗︽ā寮?
     if (eventPattern.includes('*')) {
       this.addPatternSubscription(subscription)
     } else {
       this.addDirectSubscription(subscription)
     }
 
-    // 记录订阅
+    // 璁板綍璁㈤槄
     this.subscribers.set(subscription.id, subscription)
 
     return subscription.id
   }
 
   /**
-   * 取消订阅
+   * 鍙栨秷璁㈤槄
    */
   unsubscribe(subscriptionId) {
     const subscription = this.subscribers.get(subscriptionId)
     if (!subscription) return false
 
-    // 移除监听器
+    // 绉婚櫎鐩戝惉鍣?
     this.removeListener(subscription.pattern, subscription.handler)
     this.subscribers.delete(subscriptionId)
 
@@ -268,7 +268,7 @@ export class EventDrivenBus extends EventEmitter {
   }
 
   /**
-   * 微服务注册
+   * 寰湇鍔℃敞鍐?
    */
   registerMicroservice(serviceName, config) {
     const serviceConfig = {
@@ -282,7 +282,7 @@ export class EventDrivenBus extends EventEmitter {
 
     this.microservices.set(serviceName, serviceConfig)
 
-    // 为服务事件创建代理
+    // 涓烘湇鍔′簨浠跺垱寤轰唬鐞?
     this.createServiceProxy(serviceName, serviceConfig)
 
     this.publish('microservice.registered', {
@@ -292,19 +292,19 @@ export class EventDrivenBus extends EventEmitter {
   }
 
   /**
-   * 微服务注销
+   * 寰湇鍔℃敞閿€
    */
   unregisterMicroservice(serviceName) {
     const service = this.microservices.get(serviceName)
     if (!service) return false
 
-    // 更新服务状态
+    // 鏇存柊鏈嶅姟鐘舵€?
     service.status = 'inactive'
 
-    // 发布服务注销事件
+    // 鍙戝竷鏈嶅姟娉ㄩ攢浜嬩欢
     this.publish('microservice.unregistered', { serviceName })
 
-    // 延迟移除（允许清理）
+    // 寤惰繜绉婚櫎锛堝厑璁告竻鐞嗭級
     setTimeout(() => {
       this.microservices.delete(serviceName)
     }, 5000)
@@ -313,21 +313,21 @@ export class EventDrivenBus extends EventEmitter {
   }
 
   /**
-   * 服务健康检查
+   * 鏈嶅姟鍋ュ悍妫€鏌?
    */
   async checkServiceHealth(serviceName) {
     const service = this.microservices.get(serviceName)
     if (!service) return { healthy: false, reason: 'Service not found' }
 
     try {
-      // 发送健康检查事件
+      // 鍙戦€佸仴搴锋鏌ヤ簨浠?
       const healthResult = await this.publishAndWait(
         `${serviceName}.health.check`,
         {},
         { timeout: 5000 }
       )
 
-      // 更新健康状态
+      // 鏇存柊鍋ュ悍鐘舵€?
       service.health = healthResult.healthy ? 100 : 0
       service.lastHealthCheck = Date.now()
 
@@ -341,7 +341,7 @@ export class EventDrivenBus extends EventEmitter {
   }
 
   /**
-   * 发布并等待响应
+   * 鍙戝竷骞剁瓑寰呭搷搴?
    */
   async publishAndWait(eventName, payload, options = {}) {
     const timeout = options.timeout || 10000
@@ -350,7 +350,7 @@ export class EventDrivenBus extends EventEmitter {
     return new Promise((resolve, reject) => {
       const timeoutId = setTimeout(() => {
         this.removeListener(responseEvent, responseHandler)
-        reject(new Error(`等待响应超时: ${eventName}`))
+        reject(new Error(`绛夊緟鍝嶅簲瓒呮椂: ${eventName}`))
       }, timeout)
 
       const responseHandler = (response) => {
@@ -364,12 +364,12 @@ export class EventDrivenBus extends EventEmitter {
   }
 
   /**
-   * 批量事件发布
+   * 鎵归噺浜嬩欢鍙戝竷
    */
   async publishBatch(events) {
     const results = []
 
-    // 按优先级排序
+    // 鎸変紭鍏堢骇鎺掑簭
     const sortedEvents = events.sort((a, b) =>
       (b.options?.priority || 5) - (a.options?.priority || 5)
     )
@@ -387,7 +387,7 @@ export class EventDrivenBus extends EventEmitter {
   }
 
   /**
-   * 事件重放
+   * 浜嬩欢閲嶆斁
    */
   replayEvents(filter = null, fromTimestamp = null) {
     let eventsToReplay = this.eventHistory
@@ -403,7 +403,7 @@ export class EventDrivenBus extends EventEmitter {
     }
 
     return eventsToReplay.map(eventData => {
-      // 重新发布事件（标记为重放）
+      // 閲嶆柊鍙戝竷浜嬩欢锛堟爣璁颁负閲嶆斁锛?
       return this.publish(eventData.name, eventData.payload, {
         ...eventData.options,
         isReplay: true,
@@ -413,7 +413,7 @@ export class EventDrivenBus extends EventEmitter {
   }
 
   /**
-   * 获取服务状态
+   * 鑾峰彇鏈嶅姟鐘舵€?
    */
   getServicesStatus() {
     const status = {}
@@ -432,7 +432,7 @@ export class EventDrivenBus extends EventEmitter {
   }
 
   /**
-   * 获取事件统计
+   * 鑾峰彇浜嬩欢缁熻
    */
   getEventStats() {
     const stats = {
@@ -443,7 +443,7 @@ export class EventDrivenBus extends EventEmitter {
       recentEvents: this.eventHistory.slice(-10)
     }
 
-    // 统计事件类型
+    // 缁熻浜嬩欢绫诲瀷
     this.eventHistory.forEach(event => {
       stats.eventTypes[event.name] = (stats.eventTypes[event.name] || 0) + 1
     })
@@ -451,17 +451,17 @@ export class EventDrivenBus extends EventEmitter {
     return stats
   }
 
-  // 中间件系统
+  // 涓棿浠剁郴缁?
 
   /**
-   * 添加中间件
+   * 娣诲姞涓棿浠?
    */
   use(middleware) {
     this.middleware.push(middleware)
   }
 
   /**
-   * 日志中间件
+   * 鏃ュ織涓棿浠?
    */
   loggingMiddleware = async (eventData, next) => {
     console.log(`[EventBus] ${eventData.name}`, {
@@ -473,14 +473,14 @@ export class EventDrivenBus extends EventEmitter {
   }
 
   /**
-   * 优先级中间件
+   * 浼樺厛绾т腑闂翠欢
    */
   priorityMiddleware = async (eventData, next) => {
     if (eventData.options.priority >= 8) {
-      // 高优先级事件立即处理
+      // 楂樹紭鍏堢骇浜嬩欢绔嬪嵆澶勭悊
       return next()
     } else {
-      // 低优先级事件延迟处理
+      // 浣庝紭鍏堢骇浜嬩欢寤惰繜澶勭悊
       return new Promise(resolve => {
         setTimeout(async () => {
           await next()
@@ -491,7 +491,7 @@ export class EventDrivenBus extends EventEmitter {
   }
 
   /**
-   * 重试中间件
+   * 閲嶈瘯涓棿浠?
    */
   retryMiddleware = async (eventData, next) => {
     const maxRetries = 3
@@ -502,9 +502,9 @@ export class EventDrivenBus extends EventEmitter {
     } catch (error) {
       if (eventData.options.retryable && retryCount < maxRetries) {
         eventData.options.retryCount = retryCount + 1
-        console.warn(`事件重试 ${retryCount + 1}/${maxRetries}: ${eventData.name}`)
+        console.warn(`浜嬩欢閲嶈瘯 ${retryCount + 1}/${maxRetries}: ${eventData.name}`)
 
-        // 指数退避
+        // 鎸囨暟閫€閬?
         const delay = Math.pow(2, retryCount) * 1000
         await new Promise(resolve => setTimeout(resolve, delay))
 
@@ -515,7 +515,7 @@ export class EventDrivenBus extends EventEmitter {
   }
 
   /**
-   * 分析中间件
+   * 鍒嗘瀽涓棿浠?
    */
   analyticsMiddleware = async (eventData, next) => {
     const startTime = performance.now()
@@ -524,7 +524,7 @@ export class EventDrivenBus extends EventEmitter {
       const result = await next()
       const duration = performance.now() - startTime
 
-      // 记录性能指标
+      // 璁板綍鎬ц兘鎸囨爣
       this.recordPerformanceMetric(eventData.name, duration, true)
 
       return result
@@ -535,7 +535,7 @@ export class EventDrivenBus extends EventEmitter {
     }
   }
 
-  // 私有方法
+  // 绉佹湁鏂规硶
 
   executeMiddleware(eventData) {
     let index = 0
@@ -557,7 +557,7 @@ export class EventDrivenBus extends EventEmitter {
     if (!routes) return
 
     routes.forEach(targetEvent => {
-      // 延迟触发路由事件，避免同步执行
+      // 寤惰繜瑙﹀彂璺敱浜嬩欢锛岄伩鍏嶅悓姝ユ墽琛?
       setTimeout(() => {
         this.publish(targetEvent, eventData.payload, {
           ...eventData.options,
@@ -569,17 +569,17 @@ export class EventDrivenBus extends EventEmitter {
   }
 
   setupEventHandlers() {
-    // 设置系统级事件处理器
+    // 璁剧疆绯荤粺绾т簨浠跺鐞嗗櫒
     this.on('error', (error) => {
-      console.error('EventBus错误:', error)
+      console.error('EventBus閿欒:', error)
     })
 
-    this.on('newListener', (eventName, listener) => {
-      console.debug(`新监听器: ${eventName}`)
+    this.on('newListener', (eventName, _listener) => {
+    console.debug([Performance] : ms )
     })
 
-    this.on('removeListener', (eventName, listener) => {
-      console.debug(`移除监听器: ${eventName}`)
+    this.on('removeListener', (eventName, _listener) => {
+      console.debug(`绉婚櫎鐩戝惉鍣? ${eventName}`)
     })
   }
 
@@ -590,13 +590,13 @@ export class EventDrivenBus extends EventEmitter {
           await this.checkServiceHealth(name)
         }
       })
-    }, 30000) // 30秒检查一次
+    }, 30000) // 30绉掓鏌ヤ竴娆?
   }
 
   startRetryProcessor() {
     setInterval(() => {
       this.processRetryQueue()
-    }, 5000) // 5秒处理一次重试队列
+    }, 5000) // 5绉掑鐞嗕竴娆￠噸璇曢槦鍒?
   }
 
   processRetryQueue() {
@@ -619,15 +619,14 @@ export class EventDrivenBus extends EventEmitter {
   recordEvent(eventData) {
     this.eventHistory.push(eventData)
 
-    // 限制历史记录大小
+    // 闄愬埗鍘嗗彶璁板綍澶у皬
     if (this.eventHistory.length > 1000) {
       this.eventHistory = this.eventHistory.slice(-500)
     }
   }
 
   recordPerformanceMetric(eventName, duration, success) {
-    // 简化的性能指标记录
-    console.debug(`[Performance] ${eventName}: ${duration.toFixed(2)}ms ${success ? '✓' : '✗'}`)
+    console.debug(`[Performance] ${eventName}: ${duration.toFixed(2)}ms ${success ? 'success' : 'fail'}`)
   }
 
   addToRetryQueue(eventData, error) {
@@ -635,7 +634,7 @@ export class EventDrivenBus extends EventEmitter {
       event: eventData,
       error,
       attempts: 1,
-      nextRetry: Date.now() + 5000, // 5秒后重试
+      nextRetry: Date.now() + 5000, // 5绉掑悗閲嶈瘯
       maxRetries: 3
     }
 
@@ -651,8 +650,7 @@ export class EventDrivenBus extends EventEmitter {
   }
 
   addPatternSubscription(subscription) {
-    // 简化的模式匹配实现
-    const regex = new RegExp(subscription.pattern.replace(/\*/g, '.*'))
+    // 绠€鍖栫殑妯″紡鍖归厤瀹炵幇
 
     const wrappedHandler = (payload, options) => {
       if (subscription.options.filter && !subscription.options.filter(payload, options)) {
@@ -672,8 +670,8 @@ export class EventDrivenBus extends EventEmitter {
       }
     }
 
-    // 这里需要更复杂的模式匹配逻辑
-    // 简化实现：直接注册到具体事件
+    // 杩欓噷闇€瑕佹洿澶嶆潅鐨勬ā寮忓尮閰嶉€昏緫
+    // 绠€鍖栧疄鐜帮細鐩存帴娉ㄥ唽鍒板叿浣撲簨浠?
     this.on(subscription.pattern.replace(/\*/g, ''), wrappedHandler)
   }
 
@@ -692,7 +690,7 @@ export class EventDrivenBus extends EventEmitter {
 
       if (subscription.options.timeout) {
         const timeoutId = setTimeout(() => {
-          console.warn(`事件处理超时: ${subscription.pattern}`)
+          console.warn(`浜嬩欢澶勭悊瓒呮椂: ${subscription.pattern}`)
         }, subscription.options.timeout)
 
         Promise.resolve(subscription.handler(processedPayload, options))
@@ -714,10 +712,10 @@ export class EventDrivenBus extends EventEmitter {
   }
 
   createServiceProxy(serviceName, serviceConfig) {
-    // 为服务创建事件代理
+    // 涓烘湇鍔″垱寤轰簨浠朵唬鐞?
     serviceConfig.events.forEach(eventPattern => {
       this.subscribe(eventPattern, (payload, options) => {
-        // 转发到具体服务实例
+        // 杞彂鍒板叿浣撴湇鍔″疄渚?
         if (serviceConfig.instance && typeof serviceConfig.instance.handleEvent === 'function') {
           serviceConfig.instance.handleEvent(options.eventName || eventPattern, payload, options)
         }

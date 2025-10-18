@@ -1,10 +1,44 @@
+# ====================================================
 # AI面试系统 - 完整生产环境 Docker Compose 配置
-# 包含前端、后端、Redis会话存储服务、存储API
+# 包含：MySQL、Redis、Storage API、Java后端、Node.js后端、前端、Nginx
+# ====================================================
 
 version: '3.8'
 
 services:
-  # ==================== 核心服务 ====================
+  # ==================== 数据库服务 ====================
+
+  # MySQL 数据库
+  mysql:
+    image: mysql:8.0
+    container_name: interview-mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: interview_system
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      TZ: Asia/Shanghai
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+      - --default-authentication-plugin=mysql_native_password
+      - --max_connections=500
+      - --innodb_buffer_pool_size=256M
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./logs/mysql:/var/log/mysql
+      - ./init-db.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    ports:
+      - "${MYSQL_PORT:-3307}:3306"
+    networks:
+      - interview-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD}"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 30s
 
   # Redis 缓存和会话存储
   redis:
@@ -13,25 +47,27 @@ services:
     restart: always
     environment:
       TZ: Asia/Shanghai
-    command: >
-      redis-server
-      --appendonly yes
-      --requirepass ${REDIS_PASSWORD}
-      --maxmemory 512mb
-      --maxmemory-policy allkeys-lru
+    command:
+      - redis-server
+      - --appendonly yes
+      - --requirepass ${REDIS_PASSWORD}
+      - --maxmemory 512mb
+      - --maxmemory-policy allkeys-lru
     volumes:
       - redis_data:/data
       - ./logs/redis:/var/log/redis
     ports:
-      - "${REDIS_PORT:-6379}:6379"
+      - "${REDIS_PORT:-6380}:6379"
     networks:
       - interview-network
     healthcheck:
-      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "ping"]
       interval: 10s
       timeout: 3s
       retries: 3
       start_period: 10s
+
+  # ==================== 后端服务 ====================
 
   # 存储服务 API (Spring Boot + Redis)
   storage-api:
@@ -43,10 +79,10 @@ services:
     environment:
       TZ: Asia/Shanghai
       API_KEY: ${STORAGE_API_KEY}
-      spring.data.redis.host: redis
-      spring.data.redis.port: 6379
-      spring.data.redis.password: ${REDIS_PASSWORD}
-      server.port: 8080
+      SPRING_DATA_REDIS_HOST: redis
+      SPRING_DATA_REDIS_PORT: 6379
+      SPRING_DATA_REDIS_PASSWORD: ${REDIS_PASSWORD}
+      SERVER_PORT: 8080
       JAVA_OPTS: "-Xms256m -Xmx512m"
     ports:
       - "${STORAGE_API_PORT:-8090}:8080"
@@ -64,12 +100,62 @@ services:
       retries: 5
       start_period: 60s
 
-  # 后端 API 服务 (Node.js Mock Server)
-  backend:
+  # Java后端服务 (Spring Boot)
+  backend-java:
+    build:
+      context: ../backend-java
+      dockerfile: Dockerfile
+    container_name: interview-backend-java
+    restart: always
+    environment:
+      TZ: Asia/Shanghai
+      # 数据库配置
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/interview_system?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_USERNAME: ${MYSQL_USER}
+      SPRING_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD}
+      # Redis配置
+      SPRING_DATA_REDIS_HOST: redis
+      SPRING_DATA_REDIS_PORT: 6379
+      SPRING_DATA_REDIS_PASSWORD: ${REDIS_PASSWORD}
+      # JWT配置
+      JWT_SECRET: ${JWT_SECRET}
+      # AI配置
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      OPENAI_BASE_URL: ${OPENAI_BASE_URL}
+      # Dify配置
+      AI_DIFY_WORKFLOW_URL: ${DIFY_WORKFLOW_URL}
+      AI_DIFY_APP_ID: ${DIFY_APP_ID}
+      # JVM配置
+      JAVA_OPTS: "-Xms512m -Xmx1024m"
+      # 服务端口
+      SERVER_PORT: 8080
+    ports:
+      - "${BACKEND_JAVA_PORT:-8080}:8080"
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      storage-api:
+        condition: service_healthy
+    volumes:
+      - ./logs/backend-java:/app/logs
+      - ./uploads:/app/uploads
+    networks:
+      - interview-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 90s
+
+  # Node.js Mock API服务器 (WebSocket + Mock Data)
+  backend-node:
     build:
       context: ../backend
       dockerfile: Dockerfile
-    container_name: interview-backend
+    container_name: interview-backend-node
     restart: always
     environment:
       NODE_ENV: production
@@ -81,14 +167,14 @@ services:
       STORAGE_API_URL: http://storage-api:8080/api/sessions
       STORAGE_API_KEY: ${STORAGE_API_KEY}
     ports:
-      - "${BACKEND_PORT:-3001}:3001"
+      - "${BACKEND_NODE_PORT:-3001}:3001"
     depends_on:
       redis:
         condition: service_healthy
       storage-api:
         condition: service_healthy
     volumes:
-      - ./logs/backend:/app/logs
+      - ./logs/backend-node:/app/logs
     networks:
       - interview-network
     healthcheck:
@@ -97,6 +183,8 @@ services:
       timeout: 10s
       retries: 5
       start_period: 30s
+
+  # ==================== 前端服务 ====================
 
   # 前端 Web 服务 (Vue.js + Nginx)
   frontend:
@@ -112,8 +200,10 @@ services:
     ports:
       - "${FRONTEND_PORT:-80}:80"
     depends_on:
-      backend:
-        condition: service_healthy
+      backend-java:
+        condition: service_started
+      backend-node:
+        condition: service_started
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
       - ./logs/nginx:/var/log/nginx
@@ -126,47 +216,12 @@ services:
       retries: 5
       start_period: 20s
 
-  # ==================== 可选服务 ====================
-
-  # Nginx 反向代理 (生产环境推荐，用于SSL和负载均衡)
-  nginx-proxy:
-    image: nginx:alpine
-    container_name: interview-proxy
-    restart: always
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ./nginx/proxy.conf:/etc/nginx/nginx.conf:ro
-      - ./nginx/ssl:/etc/nginx/ssl:ro
-      - ./logs/proxy:/var/log/nginx
-    depends_on:
-      frontend:
-        condition: service_healthy
-      backend:
-        condition: service_healthy
-      storage-api:
-        condition: service_healthy
-    networks:
-      - interview-network
-    environment:
-      TZ: Asia/Shanghai
-    profiles:
-      - with-proxy
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-
 # ==================== 数据卷 ====================
 volumes:
+  mysql_data:
+    driver: local
   redis_data:
     driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: ./data/redis
 
 # ==================== 网络配置 ====================
 networks:
@@ -174,8 +229,4 @@ networks:
     driver: bridge
     ipam:
       config:
-        - subnet: 172.22.0.0/16
-          gateway: 172.22.0.1
-    driver_opts:
-      com.docker.network.bridge.name: interview-prod-br0
-      com.docker.network.driver.mtu: 1500
+        - subnet: 172.25.0.0/16

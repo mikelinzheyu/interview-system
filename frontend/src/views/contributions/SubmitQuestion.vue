@@ -21,8 +21,8 @@
           <el-select
             v-model="form.domainId"
             placeholder="请选择领域"
-            @change="handleDomainChange"
             style="width: 100%"
+            @change="handleDomainChange"
           >
             <el-option
               v-for="domain in domains"
@@ -81,8 +81,8 @@
             v-for="tag in form.tags"
             :key="tag"
             closable
-            @close="handleRemoveTag(tag)"
             style="margin-right: 10px"
+            @close="handleRemoveTag(tag)"
           >
             {{ tag }}
           </el-tag>
@@ -121,8 +121,8 @@
             <template #append>
               <el-button
                 v-if="form.options.length > 2"
-                @click="removeOption(index)"
                 icon="Delete"
+                @click="removeOption(index)"
               >
                 删除
               </el-button>
@@ -132,9 +132,9 @@
 
         <el-form-item>
           <el-button
-            @click="addOption"
             icon="Plus"
             :disabled="form.options.length >= 6"
+            @click="addOption"
           >
             添加选项
           </el-button>
@@ -180,8 +180,8 @@
           >
             <template #append>
               <el-button
-                @click="removeHint(index)"
                 icon="Delete"
+                @click="removeHint(index)"
               >
                 删除
               </el-button>
@@ -191,9 +191,9 @@
 
         <el-form-item>
           <el-button
-            @click="addHint"
             icon="Plus"
             :disabled="form.hints.length >= 5"
+            @click="addHint"
           >
             添加提示
           </el-button>
@@ -202,7 +202,7 @@
         <!-- 专业字段 -->
         <el-divider content-position="left">专业字段 (可选)</el-divider>
 
-        <el-form-item label="编程语言" v-if="form.domainId === 1">
+        <el-form-item v-if="form.domainId === 1" label="编程语言">
           <el-select
             v-model="form.metadata.languageRestrictions"
             multiple
@@ -217,7 +217,7 @@
           </el-select>
         </el-form-item>
 
-        <el-form-item label="时间复杂度" v-if="form.domainId === 1">
+        <el-form-item v-if="form.domainId === 1" label="时间复杂度">
           <el-input
             v-model="form.metadata.timeComplexity"
             placeholder="例如: O(n)"
@@ -226,7 +226,7 @@
 
         <!-- 操作按钮 -->
         <el-form-item>
-          <el-button type="primary" @click="handleSubmit" :loading="submitting">
+          <el-button type="primary" :loading="submitting" @click="handleSubmit">
             提交题目
           </el-button>
           <el-button @click="handleReset">重置</el-button>
@@ -261,11 +261,11 @@
             <strong>{{ option.id }}.</strong> {{ option.text }}
           </div>
         </div>
-        <div class="explanation" v-if="form.explanation">
+        <div v-if="form.explanation" class="explanation">
           <strong>答案解析:</strong>
           <p>{{ form.explanation }}</p>
         </div>
-        <div class="hints" v-if="form.hints.length > 0">
+        <div v-if="form.hints.length > 0" class="hints">
           <strong>提示:</strong>
           <ul>
             <li v-for="(hint, index) in form.hints" :key="index">{{ hint }}</li>

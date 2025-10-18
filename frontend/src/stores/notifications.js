@@ -3,6 +3,7 @@
  */
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
+import { getWebSocketBaseUrl } from '@/utils/networkConfig'
 
 export const useNotificationsStore = defineStore('notifications', () => {
   // 通知列表
@@ -30,7 +31,7 @@ export const useNotificationsStore = defineStore('notifications', () => {
 
     try {
       // 生产环境应使用实际的 WebSocket 地址
-      const wsUrl = `ws://localhost:3001/ws/notifications?userId=${userId}`
+      const wsUrl = `${getWebSocketBaseUrl()}/ws/notifications?userId=${userId}`
       ws = new WebSocket(wsUrl)
 
       ws.onopen = () => {

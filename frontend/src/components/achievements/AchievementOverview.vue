@@ -1,9 +1,9 @@
-<template>
+﻿<template>
   <div class="achievement-overview">
     <div class="overview-header">
       <h2 class="section-title">成就总览</h2>
       <div class="header-actions">
-        <el-button type="primary" @click="handleViewProgress" size="small">
+        <el-button type="primary" size="small" @click="handleViewProgress">
           <el-icon><TrendCharts /></el-icon>
           查看进度
         </el-button>
@@ -75,7 +75,7 @@
     </div>
 
     <!-- 成就等级展示 -->
-    <div class="achievement-level" v-if="!loading">
+    <div v-if="!loading" class="achievement-level">
       <div class="level-info">
         <div class="level-icon">
           <el-icon :size="48" :color="levelData.color">
@@ -109,7 +109,7 @@
     </div>
 
     <!-- 快速统计 -->
-    <div class="quick-stats" v-if="!loading">
+    <div v-if="!loading" class="quick-stats">
       <div class="stat-item">
         <div class="stat-icon">
           <el-icon :color="'#67c23a'"><Medal /></el-icon>
@@ -155,11 +155,30 @@
 
 <script setup>
 import { computed } from 'vue'
-import { ElMessage } from 'element-plus'
 import {
   Trophy, Lock, TrendCharts,
-  Medal, Star, CircleCheck, GoldMedal
+  Medal, Star, CircleCheck, GoldMedal, Gem
 } from '@element-plus/icons-vue'
+
+const iconRegistry = {
+  Trophy,
+  Lock,
+  TrendCharts,
+  Medal,
+  Star,
+  CircleCheck,
+  GoldMedal,
+  Gem
+}
+
+const resolveIcon = (iconName, fallback) => {
+  if (!iconName) return fallback
+  if (typeof iconName === 'string') {
+    return iconRegistry[iconName] || fallback
+  }
+  return iconName
+}
+
 import EnhancedStatsCard from '@/components/statistics/EnhancedStatsCard.vue'
 
 const props = defineProps({
@@ -227,8 +246,10 @@ const levelData = computed(() => {
   const levelRange = nextLevel.threshold - currentLevel.threshold
   const progressPercentage = levelRange > 0 ? Math.min(100, (currentLevelProgress / levelRange) * 100) : 100
 
+  const resolvedIcon = resolveIcon(currentLevel.icon, Trophy)
   return {
     ...currentLevel,
+    icon: resolvedIcon,
     nextLevel: nextLevel.title,
     nextLevelRequirement: Math.max(0, nextLevelRequirement),
     progressPercentage: Math.round(progressPercentage)

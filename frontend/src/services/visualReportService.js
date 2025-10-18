@@ -1,11 +1,10 @@
-import axios from 'axios'
-import * as echarts from 'echarts'
+﻿import * as echarts from 'echarts'
 import html2canvas from 'html2canvas'
 import jsPDF from 'jspdf'
 
 /**
- * 多维度可视化报告服务
- * 提供交互式图表、多角色报告和导出功能
+ * 澶氱淮搴﹀彲瑙嗗寲鎶ュ憡鏈嶅姟
+ * 鎻愪緵浜や簰寮忓浘琛ㄣ€佸瑙掕壊鎶ュ憡鍜屽鍑哄姛鑳?
  */
 export class VisualReportService {
   constructor() {
@@ -88,11 +87,11 @@ export class VisualReportService {
   }
 
   /**
-   * 生成完整的可视化报告
+   * 鐢熸垚瀹屾暣鐨勫彲瑙嗗寲鎶ュ憡
    */
   async generateVisualReport(analysisData, reportType = 'candidate', exportFormat = null) {
     try {
-      console.log('生成可视化报告:', { reportType, exportFormat })
+      console.log('鐢熸垚鍙鍖栨姤鍛?', { reportType, exportFormat })
 
       const reportData = await this.processAnalysisData(analysisData)
       const visualComponents = await this.createVisualComponents(reportData, reportType)
@@ -113,13 +112,13 @@ export class VisualReportService {
       }
 
     } catch (error) {
-      console.error('生成可视化报告失败:', error)
+      console.error('鐢熸垚鍙鍖栨姤鍛婂け璐?', error)
       return this.createFallbackReport(analysisData, error)
     }
   }
 
   /**
-   * 创建五维度雷达图
+   * 鍒涘缓浜旂淮搴﹂浄杈惧浘
    */
   createRadarChart(container, data, options = {}) {
     const defaultOptions = {
@@ -129,7 +128,7 @@ export class VisualReportService {
 
     const chartConfig = {
       title: {
-        text: '五维度能力分析',
+        text: '浜旂淮搴﹁兘鍔涘垎鏋?,
         left: 'center',
         textStyle: {
           fontSize: 18,
@@ -140,21 +139,21 @@ export class VisualReportService {
       tooltip: {
         trigger: 'item',
         formatter: function(params) {
-          return `${params.name}: ${params.value}分`
+          return `${params.name}: ${params.value}鍒哷
         }
       },
       legend: {
-        data: ['当前得分', '行业平均', '目标水平'],
+        data: ['褰撳墠寰楀垎', '琛屼笟骞冲潎', '鐩爣姘村钩'],
         bottom: 10,
         textStyle: { fontSize: 12 }
       },
       radar: {
         indicator: [
-          { name: '技术准确性', max: 100 },
-          { name: '完整性', max: 100 },
-          { name: '逻辑清晰度', max: 100 },
-          { name: '专业术语', max: 100 },
-          { name: '表达流畅性', max: 100 }
+          { name: '鎶€鏈噯纭€?, max: 100 },
+          { name: '瀹屾暣鎬?, max: 100 },
+          { name: '閫昏緫娓呮櫚搴?, max: 100 },
+          { name: '涓撲笟鏈', max: 100 },
+          { name: '琛ㄨ揪娴佺晠鎬?, max: 100 }
         ],
         shape: 'polygon',
         splitNumber: 5,
@@ -172,7 +171,7 @@ export class VisualReportService {
         }
       },
       series: [{
-        name: '能力评估',
+        name: '鑳藉姏璇勪及',
         type: 'radar',
         data: [
           {
@@ -183,13 +182,13 @@ export class VisualReportService {
               data.professionalTerms || 0,
               data.fluency || 0
             ],
-            name: '当前得分',
+            name: '褰撳墠寰楀垎',
             itemStyle: { color: '#409eff' },
             areaStyle: { color: 'rgba(64, 158, 255, 0.2)' }
           },
           {
             value: this.getBenchmarkScores(data.position, data.level),
-            name: '行业平均',
+            name: '琛屼笟骞冲潎',
             itemStyle: { color: '#67c23a' },
             areaStyle: { color: 'rgba(103, 194, 58, 0.1)' }
           }
@@ -203,7 +202,7 @@ export class VisualReportService {
     const chart = echarts.init(container)
     chart.setOption(chartConfig)
 
-    // 添加交互事件
+    // 娣诲姞浜や簰浜嬩欢
     if (defaultOptions.interactive) {
       chart.on('click', (params) => {
         this.handleRadarChartClick(params, data)
@@ -215,7 +214,7 @@ export class VisualReportService {
   }
 
   /**
-   * 创建回答时间线图表
+   * 鍒涘缓鍥炵瓟鏃堕棿绾垮浘琛?
    */
   createTimelineChart(container, timelineData, options = {}) {
     const defaultOptions = {
@@ -225,7 +224,7 @@ export class VisualReportService {
 
     const chartConfig = {
       title: {
-        text: '回答时间分析',
+        text: '鍥炵瓟鏃堕棿鍒嗘瀽',
         left: 'center',
         textStyle: { fontSize: 16, fontWeight: 'bold' }
       },
@@ -233,9 +232,9 @@ export class VisualReportService {
         trigger: 'axis',
         formatter: function(params) {
           const point = params[0]
-          return `问题 ${point.dataIndex + 1}<br/>
-                  回答时长: ${point.value}秒<br/>
-                  ${point.value > 120 ? '⚠️ 超时' : point.value < 30 ? '⚡ 很快' : '✅ 正常'}`
+          return `闂 ${point.dataIndex + 1}<br/>
+                  鍥炵瓟鏃堕暱: ${point.value}绉?br/>
+                  ${point.value > 120 ? '鈿狅笍 瓒呮椂' : point.value < 30 ? '鈿?寰堝揩' : '鉁?姝ｅ父'}`
         }
       },
       grid: {
@@ -251,12 +250,12 @@ export class VisualReportService {
       },
       yAxis: {
         type: 'value',
-        name: '时间(秒)',
+        name: '鏃堕棿(绉?',
         axisLabel: { formatter: '{value}s' }
       },
       series: [
         {
-          name: '回答时长',
+          name: '鍥炵瓟鏃堕暱',
           type: 'line',
           data: timelineData.responseTimes,
           smooth: defaultOptions.smoothing,
@@ -267,10 +266,10 @@ export class VisualReportService {
       ]
     }
 
-    // 添加最佳时间范围标记
+    // 娣诲姞鏈€浣虫椂闂磋寖鍥存爣璁?
     if (defaultOptions.showOptimalRange) {
       chartConfig.series.push({
-        name: '最佳范围',
+        name: '鏈€浣宠寖鍥?,
         type: 'line',
         data: timelineData.questions.map(() => 60),
         lineStyle: { color: '#67c23a', type: 'dashed' },
@@ -279,9 +278,9 @@ export class VisualReportService {
       })
     }
 
-    // 高亮长时间停顿
+    // 楂樹寒闀挎椂闂村仠椤?
     if (defaultOptions.highlightLongPauses) {
-      const longPauses = timelineData.responseTimes.map((time, index) =>
+      const longPauses = timelineData.responseTimes.map((time) =>
         time > 120 ? { value: time, itemStyle: { color: '#f56c6c' }} : time
       )
       chartConfig.series[0].data = longPauses
@@ -294,7 +293,7 @@ export class VisualReportService {
   }
 
   /**
-   * 创建词云图
+   * 鍒涘缓璇嶄簯鍥?
    */
   createWordCloud(container, wordsData, options = {}) {
     const defaultOptions = {
@@ -302,7 +301,7 @@ export class VisualReportService {
       ...options
     }
 
-    // 转换词云数据格式
+    // 杞崲璇嶄簯鏁版嵁鏍煎紡
     const cloudData = wordsData.map(word => ({
       name: word.text,
       value: word.frequency,
@@ -318,7 +317,7 @@ export class VisualReportService {
 
     const chartConfig = {
       title: {
-        text: '关键词使用分析',
+        text: '鍏抽敭璇嶄娇鐢ㄥ垎鏋?,
         left: 'center',
         textStyle: { fontSize: 16, fontWeight: 'bold' }
       },
@@ -347,7 +346,7 @@ export class VisualReportService {
   }
 
   /**
-   * 创建技能缺口矩阵
+   * 鍒涘缓鎶€鑳界己鍙ｇ煩闃?
    */
   createSkillGapMatrix(container, skillsData, options = {}) {
     const defaultOptions = {
@@ -359,16 +358,16 @@ export class VisualReportService {
 
     const chartConfig = {
       title: {
-        text: '技能缺口分析',
+        text: '鎶€鑳界己鍙ｅ垎鏋?,
         left: 'center',
         textStyle: { fontSize: 16, fontWeight: 'bold' }
       },
       tooltip: {
         position: 'top',
         formatter: function(params) {
-          return `${params.data[2]}技能: ${params.data[0]}<br/>
-                  当前水平: ${params.data[1]}%<br/>
-                  ${params.data[1] < 70 ? '🔴 需要提升' : params.data[1] < 85 ? '🟡 良好' : '🟢 优秀'}`
+          return `${params.data[2]}鎶€鑳? ${params.data[0]}<br/>
+                  褰撳墠姘村钩: ${params.data[1]}%<br/>
+                  ${params.data[1] < 70 ? '馃敶 闇€瑕佹彁鍗? : params.data[1] < 85 ? '馃煛 鑹ソ' : '馃煝 浼樼'}`
         }
       },
       grid: {
@@ -400,7 +399,7 @@ export class VisualReportService {
         }
       },
       series: [{
-        name: '技能水平',
+        name: '鎶€鑳芥按骞?,
         type: 'heatmap',
         data: matrixData.data,
         label: {
@@ -421,7 +420,7 @@ export class VisualReportService {
   }
 
   /**
-   * 创建进度环图
+   * 鍒涘缓杩涘害鐜浘
    */
   createProgressRing(container, progressData, options = {}) {
     const defaultOptions = {
@@ -481,7 +480,7 @@ export class VisualReportService {
   }
 
   /**
-   * 导出报告
+   * 瀵煎嚭鎶ュ憡
    */
   async exportReport(reportHtml, format, reportType) {
     try {
@@ -495,31 +494,31 @@ export class VisualReportService {
         case 'html':
           return this.exportToHTML(reportHtml, reportType)
         default:
-          throw new Error(`不支持的导出格式: ${format}`)
+          throw new Error(`涓嶆敮鎸佺殑瀵煎嚭鏍煎紡: ${format}`)
       }
     } catch (error) {
-      console.error('报告导出失败:', error)
+      console.error('鎶ュ憡瀵煎嚭澶辫触:', error)
       throw error
     }
   }
 
   /**
-   * 导出为PDF
+   * 瀵煎嚭涓篜DF
    */
   async exportToPDF(reportHtml, reportType) {
     try {
-      // 创建临时容器
+      // 鍒涘缓涓存椂瀹瑰櫒
       const tempContainer = document.createElement('div')
       tempContainer.innerHTML = reportHtml
       tempContainer.style.position = 'absolute'
       tempContainer.style.left = '-9999px'
-      tempContainer.style.width = '210mm' // A4宽度
+      tempContainer.style.width = '210mm' // A4瀹藉害
       document.body.appendChild(tempContainer)
 
-      // 渲染图表
+      // 娓叉煋鍥捐〃
       await this.renderChartsInContainer(tempContainer)
 
-      // 转换为Canvas
+      // 杞崲涓篊anvas
       const canvas = await html2canvas(tempContainer, {
         scale: 2,
         useCORS: true,
@@ -527,7 +526,7 @@ export class VisualReportService {
         backgroundColor: '#ffffff'
       })
 
-      // 创建PDF
+      // 鍒涘缓PDF
       const pdf = new jsPDF('p', 'mm', 'a4')
       const imgData = canvas.toDataURL('image/png')
       const imgWidth = 210
@@ -546,7 +545,7 @@ export class VisualReportService {
         heightLeft -= pageHeight
       }
 
-      // 清理临时容器
+      // 娓呯悊涓存椂瀹瑰櫒
       document.body.removeChild(tempContainer)
 
       const pdfBlob = pdf.output('blob')
@@ -559,13 +558,13 @@ export class VisualReportService {
       }
 
     } catch (error) {
-      console.error('PDF导出失败:', error)
+      console.error('PDF瀵煎嚭澶辫触:', error)
       throw error
     }
   }
 
   /**
-   * 导出为PNG
+   * 瀵煎嚭涓篜NG
    */
   async exportToPNG(reportHtml) {
     const tempContainer = document.createElement('div')
@@ -604,7 +603,7 @@ export class VisualReportService {
   }
 
   /**
-   * 导出为HTML
+   * 瀵煎嚭涓篐TML
    */
   exportToHTML(reportHtml, reportType) {
     const template = this.exportEngine.templates[reportType]
@@ -616,7 +615,7 @@ export class VisualReportService {
       <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>面试分析报告</title>
+        <title>闈㈣瘯鍒嗘瀽鎶ュ憡</title>
         <style>
           body { font-family: 'Arial', sans-serif; margin: 0; padding: 20px; }
           .report-container { max-width: 1200px; margin: 0 auto; }
@@ -627,7 +626,7 @@ export class VisualReportService {
       </head>
       <body>
         <div class="report-container">
-          ${branding.showLogo ? '<div class="logo">🤖 AI Interview System</div>' : ''}
+          ${branding.showLogo ? '<div class="logo">馃 AI Interview System</div>' : ''}
           ${reportHtml}
           <div class="report-footer">
             ${this.exportEngine.branding.footerText} | Generated at ${new Date().toLocaleString()}
@@ -647,7 +646,7 @@ export class VisualReportService {
     }
   }
 
-  // 辅助方法
+  // 杈呭姪鏂规硶
 
   async processAnalysisData(analysisData) {
     return {
@@ -698,7 +697,7 @@ export class VisualReportService {
       components.skillMatrix = this.generateSkillMatrixHtml(reportData.skills)
     }
 
-    // 创建进度环
+    // 鍒涘缓杩涘害鐜?
     Object.keys(reportData.scores).forEach(dimension => {
       if (dimension !== 'overall') {
         components.progressRings.push({
@@ -771,11 +770,11 @@ export class VisualReportService {
 
   getDimensionLabel(dimension) {
     const labels = {
-      technicalAccuracy: '技术准确性',
-      completeness: '完整性',
-      logicClarity: '逻辑清晰度',
-      professionalTerms: '专业术语',
-      fluency: '表达流畅性'
+      technicalAccuracy: '鎶€鏈噯纭€?,
+      completeness: '瀹屾暣鎬?,
+      logicClarity: '閫昏緫娓呮櫚搴?,
+      professionalTerms: '涓撲笟鏈',
+      fluency: '琛ㄨ揪娴佺晠鎬?
     }
     return labels[dimension] || dimension
   }
@@ -792,7 +791,7 @@ export class VisualReportService {
   }
 
   /**
-   * 清理所有图表实例
+   * 娓呯悊鎵€鏈夊浘琛ㄥ疄渚?
    */
   cleanup() {
     this.chartInstances.forEach(chart => {

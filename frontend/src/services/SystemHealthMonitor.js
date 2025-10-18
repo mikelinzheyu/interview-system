@@ -1,4 +1,4 @@
-/**
+﻿/**
  * 系统健康监控服务
  * 实时监控系统状态、性能指标和健康状况
  */
@@ -368,7 +368,7 @@ export class SystemHealthMonitor {
     }
 
     const unsupportedFeatures = Object.entries(compatibility)
-      .filter(([key, supported]) => !supported)
+      .filter(([, supported]) => !supported)
       .map(([key]) => key)
 
     return {
@@ -438,7 +438,6 @@ export class SystemHealthMonitor {
     }
 
     const timing = performance.timing
-    const navigation = performance.navigation
     const memory = performance.memory
 
     const metrics = {
@@ -486,7 +485,7 @@ export class SystemHealthMonitor {
     let itemCount = 0
 
     for (let key in localStorage) {
-      if (localStorage.hasOwnProperty(key)) {
+      if (Object.prototype.hasOwnProperty.call(localStorage, key)) {
         totalSize += localStorage.getItem(key).length + key.length
         itemCount++
       }
@@ -631,7 +630,6 @@ export class SystemHealthMonitor {
    * 计算整体健康状态
    */
   calculateOverallHealth(results) {
-    let healthyCount = 0
     let warningCount = 0
     let errorCount = 0
     let criticalErrorCount = 0
@@ -639,7 +637,6 @@ export class SystemHealthMonitor {
     Object.values(results).forEach(result => {
       switch (result.status) {
         case 'healthy':
-          healthyCount++
           break
         case 'warning':
           warningCount++

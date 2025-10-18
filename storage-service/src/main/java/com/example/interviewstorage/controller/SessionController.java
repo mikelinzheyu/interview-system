@@ -30,9 +30,15 @@ public class SessionController {
     @PostMapping
     public ResponseEntity<?> saveSession(@RequestBody SessionData session) {
         try {
-            if (session.getSessionId() == null || session.getQaData() == null) {
-                return ResponseEntity.badRequest().body(Map.of("error", "Missing required fields: sessionId, qaData"));
+            if (session.getSessionId() == null) {
+                return ResponseEntity.badRequest().body(Map.of("error", "Missing required field: sessionId"));
             }
+
+            // 支持新工作流格式(questions)和旧格式(qaData)
+            if (session.getQuestions() == null && session.getQaData() == null) {
+                return ResponseEntity.badRequest().body(Map.of("error", "Missing required fields: questions or qaData"));
+            }
+
             session.setCreatedAt(Instant.now().toString());
             session.setUpdatedAt(Instant.now().toString());
             String key = "interview:session:" + session.getSessionId();
@@ -43,7 +49,16 @@ public class SessionController {
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
             response.put("sessionId", session.getSessionId());
-            response.put("qa_count", session.getQaData().size());
+            response.put("message", "Session saved successfully");
+
+            // 根据数据格式返回不同的统计信息
+            if (session.getQuestions() != null) {
+                response.put("question_count", session.getQuestions().size());
+                response.put("job_title", session.getJobTitle());
+                response.put("status", session.getStatus());
+            } else if (session.getQaData() != null) {
+                response.put("qa_count", session.getQaData().size());
+            }
             response.put("expires_in_days", 7);
 
             return new ResponseEntity<>(response, HttpStatus.CREATED);
@@ -65,15 +80,36 @@ public class SessionController {
             SessionData sessionData = objectMapper.readValue(sessionDataStr, SessionData.class);
 
             if (question.isPresent()) {
-                for (Map<String, Object> qa : sessionData.getQaData()) {
-                    if (Objects.equals(qa.get("question"), question.get())) {
-                        Map<String, Object> response = new HashMap<>();
-                        response.put("session_id", sessionId);
-                        response.put("question", question.get());
-                        response.put("answer", qa.get("answer"));
-                        return ResponseEntity.ok(response);
+                String questionText = question.get();
+
+                // 先尝试在新格式(questions)中查找
+                if (sessionData.getQuestions() != null) {
+                    for (var q : sessionData.getQuestions()) {
+                        if (Objects.equals(q.getQuestion(), questionText)) {
+                            Map<String, Object> response = new HashMap<>();
+                            response.put("session_id", sessionId);
+                            response.put("question", q.getQuestion());
+                            response.put("answer", q.getAnswer());
+                            response.put("has_answer", q.getHasAnswer());
+                            response.put("question_id", q.getId());
+                            return ResponseEntity.ok(response);
+                        }
                     }
                 }
+
+                // 如果新格式没找到,尝试旧格式(qaData)
+                if (sessionData.getQaData() != null) {
+                    for (Map<String, Object> qa : sessionData.getQaData()) {
+                        if (Objects.equals(qa.get("question"), questionText)) {
+                            Map<String, Object> response = new HashMap<>();
+                            response.put("session_id", sessionId);
+                            response.put("question", questionText);
+                            response.put("answer", qa.get("answer"));
+                            return ResponseEntity.ok(response);
+                        }
+                    }
+                }
+
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", "Question not found in session"));
             }
 

@@ -11,8 +11,8 @@
       :code-style="codeStyle"
       :box-shadow="boxShadow"
       @change="handleChange"
-      @imgAdd="handleImageAdd"
-      @imgDel="handleImageDel"
+      @img-add="handleImageAdd"
+      @img-del="handleImageDel"
     />
   </div>
 </template>

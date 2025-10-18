@@ -1,6 +1,6 @@
 <template>
   <div class="post-list-page">
-    <el-page-header @back="$router.back()" :title="backTitle">
+    <el-page-header :title="backTitle" @back="$router.back()">
       <template #content>
         <span class="page-title">{{ pageTitle }}</span>
       </template>
@@ -11,8 +11,8 @@
         v-model="searchKeyword"
         placeholder="搜索帖子..."
         clearable
-        @keyup.enter="handleSearch"
         style="width: 300px"
+        @keyup.enter="handleSearch"
       >
         <template #prefix>
           <el-icon><Search /></el-icon>

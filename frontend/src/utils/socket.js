@@ -4,10 +4,36 @@
  */
 import { io } from 'socket.io-client'
 import { ElNotification } from 'element-plus'
+import { getWebSocketBaseUrl } from '@/utils/networkConfig'
+
+const DEFAULT_WS_URL = 'ws://localhost:3001'
+
+const normalizeSocketUrl = (value) => {
+  if (!value || typeof value !== 'string') {
+    return ''
+  }
+  return value.trim()
+}
+
+const resolveWebSocketUrl = (candidate) => {
+  const direct = normalizeSocketUrl(candidate)
+  if (direct) {
+    return direct
+  }
+
+  const envResolved = normalizeSocketUrl(getWebSocketBaseUrl())
+  if (envResolved) {
+    return envResolved
+  }
+
+  console.warn('[Socket] 未解析到 WebSocket 地址，回退到默认 ws://localhost:3001')
+  return DEFAULT_WS_URL
+}
 
 class SocketService {
   constructor() {
     this.socket = null
+    this.socketUrl = DEFAULT_WS_URL
     this.connected = false
     this.reconnectAttempts = 0
     this.maxReconnectAttempts = 5
@@ -20,15 +46,18 @@ class SocketService {
    * @param {string} token - JWT token
    * @param {string} url - WebSocket 服务器地址
    */
-  connect(token, url = 'http://localhost:3001') {
+  connect(token, url) {
     if (this.socket && this.connected) {
       console.log('[Socket] 已经连接，无需重复连接')
       return
     }
 
-    console.log('[Socket] 正在连接到 WebSocket 服务器...')
+    const targetUrl = resolveWebSocketUrl(url)
+    this.socketUrl = targetUrl
 
-    this.socket = io(url, {
+    console.log('[Socket] 正在连接到 WebSocket 服务器...', targetUrl)
+
+    this.socket = io(targetUrl, {
       auth: {
         token: token || '1' // 传递 JWT token
       },
@@ -42,7 +71,7 @@ class SocketService {
     this.socket.on('connect', () => {
       this.connected = true
       this.reconnectAttempts = 0
-      console.log('[Socket] WebSocket 已连接', this.socket.id)
+      console.log('[Socket] WebSocket 已连接', this.socket.id, '->', this.socketUrl)
 
       ElNotification({
         title: '实时通信已连接',
@@ -57,12 +86,12 @@ class SocketService {
 
     // 连接错误
     this.socket.on('connect_error', (error) => {
-      console.error('[Socket] 连接错误:', error)
+      console.error('[Socket] 连接错误 ->', this.socketUrl, error)
       this.connected = false
 
       if (this.reconnectAttempts < this.maxReconnectAttempts) {
         this.reconnectAttempts++
-        console.log(`[Socket] 尝试重连 (${this.reconnectAttempts}/${this.maxReconnectAttempts})`)
+        console.log(`[Socket] 尝试重连 (${this.reconnectAttempts}/${this.maxReconnectAttempts}) -> ${this.socketUrl}`)
       } else {
         ElNotification({
           title: '连接失败',
@@ -76,7 +105,7 @@ class SocketService {
     // 断开连接
     this.socket.on('disconnect', (reason) => {
       this.connected = false
-      console.log('[Socket] 连接已断开:', reason)
+      console.log('[Socket] 连接已断开:', reason, '->', this.socketUrl)
 
       if (reason === 'io server disconnect') {
         // 服务器主动断开，需要手动重连
@@ -99,6 +128,7 @@ class SocketService {
     if (this.socket) {
       this.socket.disconnect()
       this.socket = null
+      this.socketUrl = DEFAULT_WS_URL
       this.connected = false
       this.listeners.clear()
       console.log('[Socket] 已断开连接')

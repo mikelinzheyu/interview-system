@@ -1,353 +1,422 @@
-<template>
-  <div class="chat-list-container">
-    <el-card class="header-card">
-      <div class="header">
-        <h2>💬 聊天室</h2>
-        <el-button type="primary" @click="showCreateDialog = true">
-          <el-icon><Plus /></el-icon>
-          创建聊天室
-        </el-button>
-      </div>
-      <el-divider />
-      <div class="stats">
-        <el-statistic title="在线用户" :value="onlineUserCount" />
-        <el-statistic title="聊天室总数" :value="rooms.length" />
-        <el-statistic title="我加入的" :value="joinedRoomCount" />
-      </div>
-    </el-card>
+﻿<template>
+  <div class="chat-list-page chat-theme">
+    <chat-list-header
+      :stats="stats"
+      :search-value="filters.search"
+      :loading="loading"
+      @update:search="handleSearch"
+      @create="openCreateDialog"
+    />
 
-    <el-row :gutter="20" class="room-grid">
-      <el-col
-        v-for="room in rooms"
+    <chat-category-tabs
+      :categories="categories"
+      :active-key="filters.category"
+      @change="handleCategoryChange"
+    />
+
+    <div class="chat-list-page__filters">
+      <div class="chat-list-page__filters-left">
+        <el-switch
+          v-model="onlyJoinedModel"
+          inline-prompt
+          active-text="只看已加入"
+        />
+        <el-tooltip content="只展示你已加入的聊天室" placement="top">
+          <el-icon><InfoFilled /></el-icon>
+        </el-tooltip>
+      </div>
+      <el-button text type="primary" @click="refreshRooms">
+        刷新列表
+      </el-button>
+    </div>
+
+    <el-skeleton v-if="loading" :rows="6" animated />
+
+    <div v-else-if="filteredRooms.length" class="chat-room-grid">
+      <chat-room-card
+        v-for="room in filteredRooms"
         :key="room.id"
-        :xs="24"
-        :sm="12"
-        :md="8"
-        :lg="6"
-      >
-        <el-card
-          class="room-card"
-          :class="{ 'joined': room.isJoined }"
-          shadow="hover"
-          @click="enterRoom(room)"
-        >
-          <div class="room-header">
-            <el-avatar :size="60" :src="room.avatar">
-              {{ room.name.substring(0, 2) }}
-            </el-avatar>
-            <el-tag
-              v-if="room.type === 'public'"
-              type="success"
-              size="small"
-            >
-              公开
-            </el-tag>
-            <el-tag
-              v-else-if="room.type === 'group'"
-              type="warning"
-              size="small"
-            >
-              群组
-            </el-tag>
-            <el-tag
-              v-else
-              type="info"
-              size="small"
-            >
-              私聊
-            </el-tag>
-          </div>
+        :room="room"
+        :joining="joiningRoomId === room.id"
+        @join="handleJoinRoom"
+        @enter="enterRoom"
+        @preview="openPreview"
+      />
+    </div>
 
-          <h3 class="room-name">{{ room.name }}</h3>
-          <p class="room-description">{{ room.description }}</p>
-
-          <div class="room-stats">
-            <span>
-              <el-icon><User /></el-icon>
-              {{ room.memberCount }} / {{ room.maxMembers }}
-            </span>
-            <span v-if="room.isJoined" class="joined-badge">
-              <el-icon><Check /></el-icon>
-              已加入
-            </span>
-          </div>
-
-          <el-button
-            v-if="!room.isJoined"
-            type="primary"
-            size="small"
-            class="join-btn"
-            @click.stop="handleJoinRoom(room)"
-          >
-            加入聊天室
-          </el-button>
-          <el-button
-            v-else
-            type="success"
-            size="small"
-            class="enter-btn"
-            @click.stop="enterRoom(room)"
-          >
-            进入聊天
-          </el-button>
-        </el-card>
-      </el-col>
-    </el-row>
-
-    <!-- 创建聊天室对话框 -->
-    <el-dialog
+    <div v-else class="chat-room-empty">
+      <div class="chat-room-empty__title">暂时没有符合条件的聊天室</div>
+      <p>试着调整搜索关键词或筛选条件，或者创建一个新的聊天室来发起话题。</p>
+      <el-button type="primary" size="large" @click="openCreateDialog">
+        创建聊天室
+      </el-button>
+    </div>    <el-dialog
       v-model="showCreateDialog"
       title="创建聊天室"
-      width="500px"
+      width="560px"
+      @closed="resetCreateForm"
     >
-      <el-form :model="createForm" label-width="100px">
-        <el-form-item label="聊天室名称" required>
+      <el-form
+        ref="createFormRef"
+        :model="createForm"
+        :rules="createRules"
+        label-width="108px"
+      >
+        <el-form-item prop="name" label="聊天室名称">
           <el-input
             v-model="createForm.name"
-            placeholder="请输入聊天室名称"
             maxlength="30"
             show-word-limit
+            placeholder="请输入聊天室名称"
           />
         </el-form-item>
-
-        <el-form-item label="类型" required>
+        <el-form-item prop="type" label="类型">
           <el-radio-group v-model="createForm.type">
-            <el-radio value="public">公开聊天室</el-radio>
-            <el-radio value="group">群组</el-radio>
+            <el-radio-button label="public">公开</el-radio-button>
+            <el-radio-button label="group">群组</el-radio-button>
+            <el-radio-button label="private">私密</el-radio-button>
           </el-radio-group>
         </el-form-item>
-
-        <el-form-item label="描述">
+        <el-form-item prop="description" label="介绍">
           <el-input
             v-model="createForm.description"
             type="textarea"
             :rows="3"
-            placeholder="请输入聊天室描述"
             maxlength="200"
             show-word-limit
+            placeholder="简要描述讨论主题，让大家更了解聊天室"
           />
         </el-form-item>
-
-        <el-form-item label="最大成员数">
-          <el-input-number
+        <el-form-item prop="categoryKey" label="分类">
+          <el-select
+            v-model="createForm.categoryKey"
+            filterable
+            allow-create
+            default-first-option
+            placeholder="选择或输入分类"
+          >
+            <el-option
+              v-for="category in categories"
+              :key="category.key"
+              :label="category.label"
+              :value="category.key"
+            />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="标签">
+          <el-select
+            v-model="createForm.tags"
+            multiple
+            allow-create
+            filterable
+            collapse-tags
+            placeholder="添加一些标签，方便搜索"
+          >
+            <el-option
+              v-for="tag in tagSuggestions"
+              :key="tag"
+              :label="tag"
+              :value="tag"
+            />
+          </el-select>
+        </el-form-item>
+        <el-form-item prop="maxMembers" label="人数上限">
+          <el-slider
             v-model="createForm.maxMembers"
-            :min="2"
-            :max="1000"
+            :min="20"
+            :max="500"
             :step="10"
+            show-input
+            input-size="small"
           />
         </el-form-item>
       </el-form>
-
       <template #footer>
         <el-button @click="showCreateDialog = false">取消</el-button>
-        <el-button type="primary" @click="handleCreateRoom">创建</el-button>
+        <el-button type="primary" :loading="createLoading" @click="handleCreateRoom">
+          创建
+        </el-button>
       </template>
     </el-dialog>
+
+    <el-drawer
+      v-model="previewVisible"
+      :title="previewRoom?.name || '聊天室详情'"
+      size="420px"
+      direction="rtl"
+    >
+      <div v-if="previewRoom">
+        <div class="chat-preview__header">
+          <el-avatar :size="64" :src="previewRoom.avatar">
+            {{ previewRoom.name.slice(0, 2) }}
+          </el-avatar>
+          <div>
+            <h3>{{ previewRoom.name }}</h3>
+            <p>{{ previewRoom.description }}</p>
+          </div>
+        </div>
+        <el-descriptions :column="1" border>
+          <el-descriptions-item label="分类">{{ previewRoom.categoryLabel }}</el-descriptions-item>
+          <el-descriptions-item label="成员">
+            {{ previewRoom.memberCount }} / {{ previewRoom.maxMembers }}
+          </el-descriptions-item>
+          <el-descriptions-item label="活跃度">
+            {{ previewRoom.activityScore || activityFromRoom(previewRoom) }}
+          </el-descriptions-item>
+          <el-descriptions-item label="最近活跃">
+            {{ previewRoom.lastMessageAt || previewRoom.updatedAt || '未知' }}
+          </el-descriptions-item>
+          <el-descriptions-item label="标签">
+            <el-tag
+              v-for="tag in previewRoom.tags"
+              :key="tag"
+              type="info"
+              effect="light"
+              style="margin-right: 6px; margin-bottom: 6px;"
+            >
+              {{ tag }}
+            </el-tag>
+          </el-descriptions-item>
+        </el-descriptions>
+        <div class="chat-preview__actions">
+          <el-button type="primary" @click="handleJoinRoom(previewRoom)">
+            {{ previewRoom.isJoined ? '进入聊天室' : '加入并进入' }}
+          </el-button>
+          <el-button @click="previewVisible = false">关闭</el-button>
+        </div>
+      </div>
+    </el-drawer>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { computed, onBeforeUnmount, onMounted, reactive, ref } from 'vue'
+import { storeToRefs } from 'pinia'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import { Plus, User, Check } from '@element-plus/icons-vue'
-import { getChatRooms, createChatRoom, joinChatRoom } from '@/api/chat'
+import { InfoFilled } from '@element-plus/icons-vue'
+import ChatListHeader from '@/components/chat/ChatListHeader.vue'
+import ChatCategoryTabs from '@/components/chat/ChatCategoryTabs.vue'
+import ChatRoomCard from '@/components/chat/ChatRoomCard.vue'
+import { createChatRoom, joinChatRoom } from '@/api/chat'
+import { useChatRoomsStore } from '@/stores/chatRooms'
 import socketService from '@/utils/socket'
 
 const router = useRouter()
+const chatRoomsStore = useChatRoomsStore()
+const { filters, filteredRooms, categories, stats, loading, rooms } = storeToRefs(chatRoomsStore)
 
-// 数据
-const rooms = ref([])
-const onlineUserCount = ref(0)
 const showCreateDialog = ref(false)
+const createLoading = ref(false)
+const joiningRoomId = ref(null)
+const previewVisible = ref(false)
+const previewRoom = ref(null)
+const createFormRef = ref()
 
-const createForm = ref({
+const createForm = reactive({
   name: '',
   type: 'group',
   description: '',
-  maxMembers: 100
+  maxMembers: 120,
+  categoryKey: '',
+  tags: []
 })
 
-// 计算属性
-const joinedRoomCount = computed(() => {
-  return rooms.value.filter(r => r.isJoined).length
-})
-
-// 获取聊天室列表
-const fetchRooms = async () => {
-  try {
-    const response = await getChatRooms()
-    rooms.value = response.data
-  } catch (error) {
-    ElMessage.error('获取聊天室列表失败')
-    console.error(error)
-  }
+const createRules = {
+  name: [
+    { required: true, message: '请输入聊天室名称', trigger: 'blur' },
+    { min: 2, max: 30, message: '名称长度需为 2-30 个字符', trigger: 'blur' }
+  ],
+  description: [
+    { max: 200, message: '介绍不能超过 200 字', trigger: 'blur' }
+  ]
 }
 
-// 加入聊天室
-const handleJoinRoom = async (room) => {
-  if (room.memberCount >= room.maxMembers) {
-    ElMessage.warning('聊天室已满，无法加入')
+const tagSuggestions = computed(() => {
+  const tagSet = new Set()
+  rooms.value.forEach((room) => {
+    room.tags?.forEach((tag) => tagSet.add(tag))
+  })
+  return Array.from(tagSet)
+})
+
+const onlyJoinedModel = computed({
+  get: () => filters.value.onlyJoined,
+  set: (val) => chatRoomsStore.toggleOnlyJoined(val)
+})
+
+function handleSearch(value) {
+  chatRoomsStore.setSearch(value)
+}
+
+function handleCategoryChange(categoryKey) {
+  chatRoomsStore.setCategory(categoryKey)
+}
+
+function refreshRooms() {
+  chatRoomsStore.fetchRooms()
+}
+
+function openCreateDialog() {
+  showCreateDialog.value = true
+}
+
+function resetCreateForm() {
+  Object.assign(createForm, {
+    name: '',
+    type: 'group',
+    description: '',
+    maxMembers: 120,
+    categoryKey: '',
+    tags: []
+  })
+  createFormRef.value?.clearValidate()
+}
+
+async function handleCreateRoom() {
+  try {
+    await createFormRef.value?.validate()
+  } catch (error) {
     return
   }
 
+  createLoading.value = true
   try {
-    await joinChatRoom(room.id)
-    ElMessage.success(`已加入聊天室：${room.name}`)
+    const payload = {
+      name: createForm.name,
+      type: createForm.type,
+      description: createForm.description,
+      maxMembers: createForm.maxMembers,
+      category: createForm.categoryKey || undefined,
+      tags: createForm.tags
+    }
 
-    // 更新本地状态
-    room.isJoined = true
-    room.memberCount++
+    const { data } = await createChatRoom(payload)
+    ElMessage.success('聊天室创建成功')
+    showCreateDialog.value = false
+    resetCreateForm()
 
-    // 进入聊天室
-    setTimeout(() => {
-      enterRoom(room)
-    }, 500)
+    if (data) {
+      const merged = { ...payload, ...data, isJoined: true }
+      chatRoomsStore.upsertRoom(merged)
+      setTimeout(() => enterRoom(merged), 200)
+    } else {
+      await chatRoomsStore.fetchRooms()
+    }
   } catch (error) {
-    ElMessage.error('加入聊天室失败')
-    console.error(error)
+    console.error('[chat] create room failed', error)
+    ElMessage.error('创建聊天室失败，请稍后再试')
+  } finally {
+    createLoading.value = false
   }
 }
 
-// 进入聊天室
-const enterRoom = (room) => {
-  if (!room.isJoined) {
+async function handleJoinRoom(room) {
+  if (!room) return
+  if (room.memberCount >= room.maxMembers) {
+    ElMessage.warning('聊天室已满，暂时无法加入')
+    return
+  }
+
+  joiningRoomId.value = room.id
+  try {
+    await joinChatRoom(room.id)
+    ElMessage.success(`已加入聊天室「${room.name}」`)
+    chatRoomsStore.upsertRoom({ ...room, isJoined: true, memberCount: (room.memberCount ?? 0) + 1 })
+    setTimeout(() => enterRoom({ ...room, isJoined: true }), 150)
+  } catch (error) {
+    console.error('[chat] join room failed', error)
+    ElMessage.error('加入聊天室失败，请稍后再试')
+  } finally {
+    joiningRoomId.value = null
+  }
+}
+
+function enterRoom(room) {
+  const target = typeof room === 'object' ? room : filteredRooms.value.find((item) => item.id === room)
+  if (!target) {
+    ElMessage.warning('未找到聊天室')
+    return
+  }
+  if (!target.isJoined) {
     ElMessage.warning('请先加入聊天室')
     return
   }
-
-  router.push({
-    name: 'ChatRoom',
-    params: { roomId: room.id }
-  })
+  router.push({ name: 'ChatRoom', params: { roomId: target.id } })
 }
 
-// 创建聊天室
-const handleCreateRoom = async () => {
-  if (!createForm.value.name.trim()) {
-    ElMessage.warning('请输入聊天室名称')
-    return
-  }
-
-  try {
-    const response = await createChatRoom(createForm.value)
-    ElMessage.success('聊天室创建成功')
-
-    // 刷新列表
-    await fetchRooms()
-
-    // 关闭对话框
-    showCreateDialog.value = false
-
-    // 重置表单
-    createForm.value = {
-      name: '',
-      type: 'group',
-      description: '',
-      maxMembers: 100
-    }
-
-    // 进入新创建的聊天室
-    const newRoom = response.data
-    setTimeout(() => {
-      enterRoom(newRoom)
-    }, 500)
-  } catch (error) {
-    ElMessage.error('创建聊天室失败')
-    console.error(error)
-  }
+function openPreview(room) {
+  previewRoom.value = room
+  previewVisible.value = true
 }
 
-// 监听在线用户数更新
-socketService.on('online-users-updated', (data) => {
-  onlineUserCount.value = data.count
-})
+function activityFromRoom(room) {
+  if (room.activityScore) return room.activityScore
+  if (!room.maxMembers) return 0
+  return Math.round((room.memberCount / room.maxMembers) * 100)
+}
+
+function handleOnlineUsers(data) {
+  if (data?.count !== undefined) {
+    chatRoomsStore.setOnlineUsers(data.count)
+  }
+}
 
 onMounted(() => {
-  fetchRooms()
+  chatRoomsStore.fetchRooms()
+  socketService.on('online-users-updated', handleOnlineUsers)
+})
+
+onBeforeUnmount(() => {
+  socketService.off?.('online-users-updated', handleOnlineUsers)
 })
 </script>
 
 <style scoped>
-.chat-list-container {
-  padding: 20px;
-}
-
-.header-card {
-  margin-bottom: 20px;
-}
-
-.header {
+.chat-list-page__filters {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  margin-bottom: 16px;
 }
 
-.header h2 {
+.chat-list-page__filters-left {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--chat-text-secondary);
+}
+
+.chat-preview__header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.chat-preview__header h3 {
   margin: 0;
-  font-size: 24px;
+  font-size: 20px;
 }
 
-.stats {
+.chat-preview__header p {
+  margin: 4px 0 0;
+  color: var(--chat-text-secondary);
+}
+
+.chat-preview__actions {
+  margin-top: 24px;
   display: flex;
-  gap: 40px;
-}
-
-.room-grid {
-  margin-top: 20px;
-}
-
-.room-card {
-  margin-bottom: 20px;
-  cursor: pointer;
-  transition: all 0.3s;
-}
-
-.room-card:hover {
-  transform: translateY(-5px);
-}
-
-.room-card.joined {
-  border: 2px solid #67c23a;
-}
-
-.room-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 15px;
-}
-
-.room-name {
-  font-size: 18px;
-  margin: 10px 0;
-  font-weight: bold;
-}
-
-.room-description {
-  color: #909399;
-  font-size: 14px;
-  margin: 10px 0;
-  min-height: 40px;
-}
-
-.room-stats {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin: 15px 0;
-  font-size: 14px;
-  color: #606266;
-}
-
-.joined-badge {
-  color: #67c23a;
-  font-weight: bold;
-}
-
-.join-btn,
-.enter-btn {
-  width: 100%;
-  margin-top: 10px;
+  gap: 12px;
 }
 </style>
+
+
+
+
+
+
+
+
+
+

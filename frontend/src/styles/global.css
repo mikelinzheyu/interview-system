@@ -1,4 +1,6 @@
-/* 全局样式 */
+﻿@import url('./design-tokens.css');
+@import url('./modules/chat.css');
+/* 鍏ㄥ眬鏍峰紡 */
 * {
   margin: 0;
   padding: 0;
@@ -12,7 +14,7 @@ body {
   line-height: 1.6;
 }
 
-/* 主要颜色变量 */
+/* 涓昏棰滆壊鍙橀噺 */
 :root {
   --primary-color: #409eff;
   --success-color: #67c23a;
@@ -28,7 +30,7 @@ body {
   --background-base: #f5f7fa;
 }
 
-/* 页面容器 */
+/* 椤甸潰瀹瑰櫒 */
 .page-container {
   min-height: 100vh;
   padding: 20px;
@@ -39,7 +41,7 @@ body {
   margin: 0 auto;
 }
 
-/* 卡片样式 */
+/* 鍗＄墖鏍峰紡 */
 .card {
   background: white;
   border-radius: 8px;
@@ -48,7 +50,7 @@ body {
   margin-bottom: 20px;
 }
 
-/* 表单样式 */
+/* 琛ㄥ崟鏍峰紡 */
 .form-container {
   max-width: 400px;
   margin: 0 auto;
@@ -63,12 +65,12 @@ body {
   margin-bottom: 32px;
 }
 
-/* 按钮样式 */
+/* 鎸夐挳鏍峰紡 */
 .btn-full-width {
   width: 100%;
 }
 
-/* 统计卡片 */
+/* 缁熻鍗＄墖 */
 .stats-card {
   text-align: center;
   padding: 24px;
@@ -89,7 +91,7 @@ body {
   opacity: 0.9;
 }
 
-/* 聊天界面样式 */
+/* 鑱婂ぉ鐣岄潰鏍峰紡 */
 .chat-container {
   height: calc(100vh - 200px);
   display: flex;
@@ -143,7 +145,7 @@ body {
   border-top: 1px solid var(--border-light);
 }
 
-/* 动画效果 */
+/* 鍔ㄧ敾鏁堟灉 */
 .fade-enter-active,
 .fade-leave-active {
   transition: opacity 0.3s ease;
@@ -154,7 +156,7 @@ body {
   opacity: 0;
 }
 
-/* 加载动画 */
+/* 鍔犺浇鍔ㄧ敾 */
 .loading-spinner {
   display: flex;
   justify-content: center;
@@ -167,7 +169,7 @@ body {
   color: var(--text-secondary);
 }
 
-/* 空状态 */
+/* 绌虹姸鎬?*/
 .empty-state {
   text-align: center;
   padding: 40px 20px;
@@ -190,7 +192,7 @@ body {
   color: var(--text-placeholder);
 }
 
-/* 错误状态 */
+/* 閿欒鐘舵€?*/
 .error-boundary {
   padding: 40px 20px;
   text-align: center;
@@ -217,7 +219,7 @@ body {
   margin-bottom: 20px;
 }
 
-/* 标签样式 */
+/* 鏍囩鏍峰紡 */
 .tag {
   display: inline-block;
   padding: 4px 8px;
@@ -244,7 +246,7 @@ body {
   background: var(--danger-color);
 }
 
-/* 面试会话专用样式 */
+/* 闈㈣瘯浼氳瘽涓撶敤鏍峰紡 */
 .interview-container {
   height: 100vh;
   display: flex;
@@ -294,14 +296,14 @@ body {
   flex-direction: column;
 }
 
-/* 工具提示 */
+/* 宸ュ叿鎻愮ず */
 .tooltip-content {
   max-width: 200px;
   font-size: 12px;
   line-height: 1.4;
 }
 
-/* 表格样式 */
+/* 琛ㄦ牸鏍峰紡 */
 .data-table {
   width: 100%;
   background: white;
@@ -310,14 +312,14 @@ body {
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
 }
 
-/* 分页器样式 */
+/* 鍒嗛〉鍣ㄦ牱寮?*/
 .pagination-container {
   display: flex;
   justify-content: center;
   padding: 20px 0;
 }
 
-/* 搜索框样式 */
+/* 鎼滅储妗嗘牱寮?*/
 .search-container {
   margin-bottom: 20px;
 }
@@ -326,7 +328,7 @@ body {
   max-width: 400px;
 }
 
-/* 操作按钮组 */
+/* 鎿嶄綔鎸夐挳缁?*/
 .action-buttons {
   display: flex;
   gap: 8px;
@@ -336,7 +338,7 @@ body {
   margin-left: 0;
 }
 
-/* 状态指示器 */
+/* 鐘舵€佹寚绀哄櫒 */
 .status-indicator {
   display: inline-flex;
   align-items: center;
@@ -362,7 +364,7 @@ body {
   background: var(--danger-color);
 }
 
-/* 面试评分卡片 */
+/* 闈㈣瘯璇勫垎鍗＄墖 */
 .score-card {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
@@ -389,7 +391,7 @@ body {
   border-top: 1px solid rgba(255, 255, 255, 0.2);
 }
 
-/* 技能标签云 */
+/* 鎶€鑳芥爣绛句簯 */
 .skill-tags {
   display: flex;
   flex-wrap: wrap;
@@ -412,7 +414,7 @@ body {
   box-shadow: 0 4px 8px rgba(64, 158, 255, 0.3);
 }
 
-/* 响应式设计 */
+/* 鍝嶅簲寮忚璁?*/
 @media (max-width: 1024px) {
   .interview-sidebar {
     width: 240px;
@@ -460,3 +462,4 @@ body {
     justify-content: center;
   }
 }
+

@@ -6,8 +6,8 @@
 
 const https = require('https');
 
-const MCP_URL = 'https://api.dify.ai/mcp/server/sUb5skskelb6Nkm1/mcp';
-const API_KEY = 'app-vZlc0w5Dio2gnrTkdlblcPXG';
+const MCP_URL = 'https://api.dify.ai/mcp/server/sQFDstpnlPUJ5MeX/mcp';
+const API_KEY = 'app-aROZ5FjseJWUtmRzzjlb6b5E';
 
 // MCP 工具调用函数
 function callDifyTool(toolParams) {

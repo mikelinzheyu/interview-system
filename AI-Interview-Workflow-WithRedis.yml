@@ -671,7 +671,7 @@ workflow:
           \  # 单个项目失败不影响整体\n            continue\n    \n    # 检查是否有有效数据\n    if not\
           \ clean_qa_data:\n        return {\n            \"session_id\": \"\",\n\
           \            \"error\": \"没有有效的问答数据\"\n        }\n    \n    # 3. API 配置\n\
-          \    api_url = \"https://chestier-unremittently-willis.ngrok-free.dev/api/sessions\"\
+          \    api_url = \"{BASE_URL}/api/sessions\"\
           \n    api_key = \"ak_live_a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0\"\n \
           \   \n    # 4. 构建请求 - 尝试驼峰命名\n    request_data = {\n        \"sessionId\"\
           : session_id,\n        \"qaData\": clean_qa_data,  # 发送清洗后的数据\n        \"\
@@ -770,7 +770,7 @@ workflow:
         code: "import json\nimport urllib.request\nimport urllib.error\nimport urllib.parse\n\
           import ssl\n\ndef main(session_id: str, question: str) -> dict:\n    \"\"\
           \"\n    通过 HTTP API 加载会话数据\n    \"\"\"\n    # 1. API 配置\n    api_url = f\"\
-          https://chestier-unremittently-willis.ngrok-free.dev/api/sessions/{session_id}\"\
+          {BASE_URL}/api/sessions/{session_id}\"\
           \n    api_key = \"ak_live_a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0\"\n \
           \   \n    # 2. 构建查询参数\n    params = urllib.parse.urlencode({'question':\
           \ question})\n    full_url = f\"{api_url}?{params}\"\n    \n    # 3. 发送请求\n\

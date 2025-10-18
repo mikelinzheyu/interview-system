@@ -7785,6 +7785,164 @@ const payload = { ...paginatedResult, items }
     }, '消息已撤回')
   },
 
+  // ==================== 用户状态 API ====================
+
+  // 用户状态 API - 获取当前用户状态
+  'GET:/api/chat/users/me/status': (req, res) => {
+    const userStatuses = mockData.userStatuses || {}
+    const currentStatus = userStatuses[CURRENT_USER_ID] || {
+      status: 'online',
+      customStatus: null,
+      lastActivityTime: new Date().toISOString()
+    }
+
+    sendResponse(res, 200, {
+      userId: CURRENT_USER_ID,
+      ...currentStatus,
+      statusInfo: {
+        online: { label: '在线', icon: '🟢', priority: 1 },
+        away: { label: '离开', icon: '🟡', priority: 2 },
+        busy: { label: '忙碌', icon: '🔴', priority: 3 },
+        offline: { label: '离线', icon: '⚫', priority: 4 }
+      }[currentStatus.status]
+    }, '获取用户状态成功')
+  },
+
+  // 用户状态 API - 更新当前用户状态
+  'PUT:/api/chat/users/me/status': (req, res) => {
+    let body = ''
+    req.on('data', chunk => {
+      body += chunk
+    })
+    req.on('end', () => {
+      try {
+        const data = JSON.parse(body)
+        if (!mockData.userStatuses) {
+          mockData.userStatuses = {}
+        }
+
+        mockData.userStatuses[CURRENT_USER_ID] = {
+          status: data.status || 'online',
+          customStatus: data.customStatus || null,
+          lastActivityTime: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        }
+
+        sendResponse(res, 200, {
+          userId: CURRENT_USER_ID,
+          ...mockData.userStatuses[CURRENT_USER_ID],
+          message: '状态已更新'
+        }, '用户状态已更新')
+      } catch (error) {
+        sendResponse(res, 400, null, '更新状态失败')
+      }
+    })
+  },
+
+  // 用户状态 API - 获取指定用户状态
+  'GET:/api/chat/users/:userId/status': (req, res) => {
+    const userId = url.parse(req.url, true).pathname.split('/')[4]
+    const userStatuses = mockData.userStatuses || {}
+    const userStatus = userStatuses[userId] || {
+      status: 'offline',
+      customStatus: null,
+      lastActivityTime: new Date().toISOString()
+    }
+
+    sendResponse(res, 200, {
+      userId,
+      ...userStatus,
+      statusInfo: {
+        online: { label: '在线', icon: '🟢', priority: 1 },
+        away: { label: '离开', icon: '🟡', priority: 2 },
+        busy: { label: '忙碌', icon: '🔴', priority: 3 },
+        offline: { label: '离线', icon: '⚫', priority: 4 }
+      }[userStatus.status]
+    }, '获取用户状态成功')
+  },
+
+  // 用户状态 API - 批量获取多个用户状态
+  'POST:/api/chat/users/statuses': (req, res) => {
+    let body = ''
+    req.on('data', chunk => {
+      body += chunk
+    })
+    req.on('end', () => {
+      try {
+        const data = JSON.parse(body)
+        const userIds = data.userIds || []
+        const userStatuses = mockData.userStatuses || {}
+
+        const result = userIds.map(userId => {
+          const status = userStatuses[userId] || {
+            status: 'offline',
+            customStatus: null,
+            lastActivityTime: new Date().toISOString()
+          }
+          return {
+            userId,
+            ...status,
+            statusInfo: {
+              online: { label: '在线', icon: '🟢', priority: 1 },
+              away: { label: '离开', icon: '🟡', priority: 2 },
+              busy: { label: '忙碌', icon: '🔴', priority: 3 },
+              offline: { label: '离线', icon: '⚫', priority: 4 }
+            }[status.status]
+          }
+        })
+
+        sendResponse(res, 200, { statuses: result }, '批量获取用户状态成功')
+      } catch (error) {
+        sendResponse(res, 400, null, '批量获取状态失败')
+      }
+    })
+  },
+
+  // 用户状态 API - 设置自定义状态消息
+  'PUT:/api/chat/users/me/status-message': (req, res) => {
+    let body = ''
+    req.on('data', chunk => {
+      body += chunk
+    })
+    req.on('end', () => {
+      try {
+        const data = JSON.parse(body)
+        if (!mockData.userStatuses) {
+          mockData.userStatuses = {}
+        }
+        if (!mockData.userStatuses[CURRENT_USER_ID]) {
+          mockData.userStatuses[CURRENT_USER_ID] = {
+            status: 'online',
+            customStatus: null,
+            lastActivityTime: new Date().toISOString()
+          }
+        }
+
+        mockData.userStatuses[CURRENT_USER_ID].customStatus = data.message || null
+        mockData.userStatuses[CURRENT_USER_ID].updatedAt = new Date().toISOString()
+
+        sendResponse(res, 200, {
+          userId: CURRENT_USER_ID,
+          customStatus: data.message,
+          updatedAt: mockData.userStatuses[CURRENT_USER_ID].updatedAt
+        }, '自定义状态消息已更新')
+      } catch (error) {
+        sendResponse(res, 400, null, '更新自定义消息失败')
+      }
+    })
+  },
+
+  // 用户状态 API - 获取用户状态历史
+  'GET:/api/chat/users/me/status-history': (req, res) => {
+    const statusHistory = mockData.statusHistory || []
+    const limit = url.parse(req.url, true).query.limit || 20
+
+    sendResponse(res, 200, {
+      userId: CURRENT_USER_ID,
+      history: statusHistory.slice(-limit).reverse()
+    }, '获取状态历史成功')
+  },
+
   // 默认404处理
   'default': (req, res) => {
     sendResponse(res, 404, null, 'API接口不存在')

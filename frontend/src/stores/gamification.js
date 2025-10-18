@@ -1,4 +1,4 @@
-/**
+﻿/**
  * 游戏化系统 Store (积分、徽章、等级)
  */
 import { defineStore } from 'pinia'
@@ -225,6 +225,7 @@ export const useGamificationStore = defineStore('gamification', () => {
    * 消费积分
    */
   const spendPoints = async (amount, reason) => {
+    void reason // placeholder until API wiring is implemented
     if (userPoints.value.available >= amount) {
       userPoints.value.available -= amount
       userPoints.value.used += amount

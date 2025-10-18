@@ -26,8 +26,8 @@
           <el-button
             type="primary"
             size="large"
-            @click="startAIInterview"
             :loading="loading"
+            @click="startAIInterview"
           >
             <el-icon><VideoPlay /></el-icon>
             开始AI面试

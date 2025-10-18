@@ -5,8 +5,8 @@
       <div class="header-left">
         <el-button 
           type="text" 
-          @click="handleEndInterview"
           :disabled="sessionStatus === 'ended'"
+          @click="handleEndInterview"
         >
           <el-icon><Close /></el-icon>
           结束面试
@@ -32,7 +32,7 @@
 
     <!-- 主要聊天区域 -->
     <div class="chat-container">
-      <div class="chat-messages" ref="messagesContainer">
+      <div ref="messagesContainer" class="chat-messages">
         <div 
           v-for="message in messages" 
           :key="message.id"
@@ -40,10 +40,10 @@
           :class="{ 'message-user': message.role === 'user', 'message-ai': message.role === 'ai' }"
         >
           <div class="message-avatar">
-            <el-avatar :size="36" v-if="message.role === 'ai'">
-              <el-icon><Robot /></el-icon>
+            <el-avatar v-if="message.role === 'ai'" :size="36">
+              <el-icon><Avatar /></el-icon>
             </el-avatar>
-            <el-avatar :size="36" :src="userStore.user?.avatar" v-else>
+            <el-avatar v-else :size="36" :src="userStore.user?.avatar">
               {{ userStore.user?.real_name?.[0] || 'U' }}
             </el-avatar>
           </div>
@@ -59,7 +59,7 @@
             <div class="message-text" v-html="formatMessageContent(message.content)"></div>
             
             <!-- AI消息的操作按钮 -->
-            <div class="message-actions" v-if="message.role === 'ai'">
+            <div v-if="message.role === 'ai'" class="message-actions">
               <el-button size="small" type="text" @click="likeMessage(message.id)">
                 <el-icon><CircleCheck /></el-icon>
                 有用
@@ -76,7 +76,7 @@
         <div v-if="isAiTyping" class="message message-ai">
           <div class="message-avatar">
             <el-avatar :size="36">
-              <el-icon><Robot /></el-icon>
+              <el-icon><Avatar /></el-icon>
             </el-avatar>
           </div>
           <div class="message-content">
@@ -108,9 +108,9 @@
             type="textarea"
             placeholder="请输入您的回答..."
             :autosize="{ minRows: 2, maxRows: 6 }"
+            :disabled="sessionStatus === 'ended'"
             @keydown.ctrl.enter="sendMessage"
             @keydown.meta.enter="sendMessage"
-            :disabled="sessionStatus === 'ended'"
           />
           
           <div class="input-actions">
@@ -119,9 +119,9 @@
             </div>
             <el-button 
               type="primary" 
-              @click="sendMessage"
               :loading="isSending"
               :disabled="!currentMessage.trim() || sessionStatus === 'ended'"
+              @click="sendMessage"
             >
               发送
             </el-button>
@@ -205,7 +205,7 @@ import { useUserStore } from '@/stores/user'
 import { mockAI } from '@/api/interview'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import {
-  Close, Timer, Robot, CircleCheck, Refresh, Microphone, DocumentAdd,
+  Close, Timer, Avatar, CircleCheck, Refresh, Microphone, DocumentAdd,
   WarningFilled
 } from '@element-plus/icons-vue'
 

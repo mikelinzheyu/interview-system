@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="home-container">
     <!-- 顶部导航 -->
     <el-header class="header">
@@ -59,7 +59,7 @@
             label="面试次数"
             :value="formattedStats.interviewCount.value"
             :value-unit="'次'"
-            icon="VideoCamera"
+            :icon="VideoCamera"
             icon-color="#409eff"
             :loading="loading"
             :show-trend="true"
@@ -72,7 +72,7 @@
             type="time"
             label="总练习时长"
             :value="formattedStats.practiceTime.formatted"
-            icon="Clock"
+            :icon="Clock"
             icon-color="#67c23a"
             :loading="loading"
             :show-trend="true"
@@ -86,7 +86,7 @@
             label="平均分数"
             :value="formattedStats.averageScore.value"
             :value-unit="'分'"
-            icon="Trophy"
+            :icon="Trophy"
             icon-color="#e6a23c"
             :loading="loading"
             :show-trend="true"
@@ -100,7 +100,7 @@
             label="当前排名"
             :value="formattedStats.rank.level"
             :subtitle="formattedStats.rank.formatted"
-            icon="Star"
+            :icon="Star"
             icon-color="#f56c6c"
             :loading="loading"
             :show-trend="false"
@@ -114,9 +114,9 @@
           <h2 class="section-title">功能入口</h2>
           <div class="feature-grid">
             <el-card 
-              class="feature-card" 
               v-for="feature in features" 
-              :key="feature.key"
+              :key="feature.key" 
+              class="feature-card"
               @click="handleFeatureClick(feature)"
             >
               <div class="feature-content">
@@ -171,16 +171,15 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, markRaw } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/user'
 import { useStatisticsStore } from '@/stores/statistics'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import {
   ChatRound, Plus, ArrowDown,
-  TrendCharts, Clock, Trophy, Star,
-  VideoCamera, Document, DataAnalysis, User,
-  Edit, PieChart, MagicStick
+  Document, DataAnalysis, User,
+  Edit, PieChart, MagicStick, VideoCamera, Clock, Trophy, Star
 } from '@element-plus/icons-vue'
 import EnhancedStatsCard from '@/components/statistics/EnhancedStatsCard.vue'
 import TrendAnalysis from '@/components/statistics/TrendAnalysis.vue'
@@ -221,7 +220,7 @@ const features = ref([
     title: 'AI模拟面试',
     description: '与AI进行真实的面试对话，提升面试技能',
     buttonText: '开始面试',
-    icon: 'VideoCamera',
+    icon: markRaw(VideoCamera),
     color: '#409eff',
     route: '/interview/new'
   },
@@ -230,16 +229,16 @@ const features = ref([
     title: '题库练习',
     description: '海量面试题目，分类练习提升专业能力',
     buttonText: '开始练习',
-    icon: 'Document',
+    icon: markRaw(Document),
     color: '#67c23a',
     route: '/questions'
   },
   {
     key: 'community',
-    title: '社区中心',
+    title: '面试社区',
     description: '统一的社区功能入口，包含贡献、审核、排行榜、徽章等',
     buttonText: '进入社区',
-    icon: 'User',
+    icon: markRaw(User),
     color: '#9b59b6',
     route: '/community'
   },
@@ -248,7 +247,7 @@ const features = ref([
     title: '能力画像',
     description: '查看跨专业能力分析，了解您的T型指数和发展建议',
     buttonText: '查看画像',
-    icon: 'PieChart',
+    icon: markRaw(PieChart),
     color: '#e6a23c',
     route: '/ability/profile'
   },
@@ -257,7 +256,7 @@ const features = ref([
     title: 'AI生成题目',
     description: '使用AI自动生成题目，快速扩充题库内容',
     buttonText: '开始生成',
-    icon: 'MagicStick',
+    icon: markRaw(MagicStick),
     color: '#3498db',
     route: '/ai/generate'
   }

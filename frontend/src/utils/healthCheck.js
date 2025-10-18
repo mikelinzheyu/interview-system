@@ -1,5 +1,7 @@
+﻿import { buildApiUrl } from './networkConfig'
+
 /**
- * API健康检查工具
+ * API鍋ュ悍妫€鏌ュ伐鍏?
  */
 class HealthChecker {
   constructor() {
@@ -8,7 +10,7 @@ class HealthChecker {
       { name: 'Statistics API', url: '/api/users/statistics', critical: true },
       { name: 'Trends API', url: '/api/users/trends', critical: false }
     ]
-    this.checkInterval = 30000 // 30秒
+    this.checkInterval = 30000 // 30绉?
     this.status = {
       overall: 'unknown',
       services: {},
@@ -17,10 +19,10 @@ class HealthChecker {
   }
 
   /**
-   * 执行健康检查
+   * 鎵ц鍋ュ悍妫€鏌?
    */
   async checkHealth() {
-    console.log('开始API健康检查...')
+    console.log('寮€濮婣PI鍋ュ悍妫€鏌?..')
     const results = {}
     let allCriticalServicesHealthy = true
 
@@ -38,9 +40,8 @@ class HealthChecker {
           details: response.data || response
         }
 
-        console.log(`✅ ${endpoint.name}: 正常 (${Math.round(responseTime)}ms)`)
+        console.log(`鉁?${endpoint.name}: 姝ｅ父 (${Math.round(responseTime)}ms)`)
       } catch (error) {
-        const isHealthy = false
         results[endpoint.name] = {
           status: 'unhealthy',
           error: error.message,
@@ -49,7 +50,7 @@ class HealthChecker {
           details: error.response?.data || null
         }
 
-        console.error(`❌ ${endpoint.name}: 异常 - ${error.message}`)
+        console.error(`鉂?${endpoint.name}: 寮傚父 - ${error.message}`)
 
         if (endpoint.critical) {
           allCriticalServicesHealthy = false
@@ -67,64 +68,71 @@ class HealthChecker {
   }
 
   /**
-   * 发起API请求
+   * 鍙戣捣API璇锋眰
    */
   async makeRequest(url) {
-    const fullUrl = url.startsWith('/') ? `http://localhost:3001${url}` : url
+    const fullUrl = buildApiUrl(url)
 
-    const response = await fetch(fullUrl, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      timeout: 5000 // 5秒超时
-    })
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), 5000)
 
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}: ${response.statusText}`)
+    try {
+      const response = await fetch(fullUrl, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        signal: controller.signal
+      })
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`)
+      }
+
+      return await response.json()
+    } finally {
+      clearTimeout(timeoutId)
     }
-
-    return await response.json()
   }
 
   /**
-   * 获取当前状态
+   * 鑾峰彇褰撳墠鐘舵€?
    */
   getStatus() {
     return this.status
   }
 
   /**
-   * 检查特定服务是否健康
+   * 妫€鏌ョ壒瀹氭湇鍔℃槸鍚﹀仴搴?
    */
   isServiceHealthy(serviceName) {
     return this.status.services[serviceName]?.status === 'healthy'
   }
 
   /**
-   * 检查整体服务是否健康
+   * 妫€鏌ユ暣浣撴湇鍔℃槸鍚﹀仴搴?
    */
   isOverallHealthy() {
     return this.status.overall === 'healthy'
   }
 
   /**
-   * 启动定期健康检查
+   * 鍚姩瀹氭湡鍋ュ悍妫€鏌?
    */
   startPeriodicCheck() {
-    console.log(`启动定期健康检查，间隔: ${this.checkInterval / 1000}秒`)
+    console.log(`鍚姩瀹氭湡鍋ュ悍妫€鏌ワ紝闂撮殧: ${this.checkInterval / 1000}绉抈)
 
-    // 立即执行一次
+    // 绔嬪嵆鎵ц涓€娆?
     this.checkHealth()
 
-    // 设置定期检查
+    // 璁剧疆瀹氭湡妫€鏌?
     setInterval(() => {
       this.checkHealth()
     }, this.checkInterval)
   }
 
   /**
-   * 获取健康检查报告
+   * 鑾峰彇鍋ュ悍妫€鏌ユ姤鍛?
    */
   getHealthReport() {
     const { overall, services, lastCheck } = this.status
@@ -145,7 +153,7 @@ class HealthChecker {
   }
 }
 
-// 创建全局实例
+// 鍒涘缓鍏ㄥ眬瀹炰緥
 const healthChecker = new HealthChecker()
 
 export default healthChecker

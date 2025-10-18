@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <el-card
     class="enhanced-stats-card"
     :class="[
@@ -43,7 +43,7 @@
         <div class="stats-icon-section">
           <div class="stats-icon" :style="{ backgroundColor: iconBgColor }">
             <el-icon :size="iconSize" :color="iconColor">
-              <component :is="icon" />
+              <component :is="iconComponent" />
             </el-icon>
           </div>
         </div>
@@ -94,9 +94,7 @@
           :size="action.size || 'small'"
           @click.stop="handleAction(action)"
         >
-          <el-icon v-if="action.icon">
-            <component :is="action.icon" />
-          </el-icon>
+          <el-icon v-if="resolveActionIcon(action.icon)">\r\n            <component :is="resolveActionIcon(action.icon)" />\r\n          </el-icon>
           {{ action.text }}
         </el-button>
       </div>
@@ -113,12 +111,12 @@
     </div>
 
     <!-- 点击波纹效果 -->
-    <div v-if="clickable" class="click-ripple" ref="rippleRef"></div>
+    <div v-if="clickable" ref="rippleRef" class="click-ripple"></div>
   </el-card>
 </template>
 
 <script setup>
-import { ref, computed, nextTick } from 'vue'
+import { ref, computed, markRaw } from 'vue'
 import {
   TrendCharts, Minus, VideoCamera, Clock, Trophy, Star,
   ArrowRight, Refresh
@@ -148,7 +146,7 @@ const props = defineProps({
     default: ''
   },
   icon: {
-    type: String,
+    type: [String, Object, Function],
     default: 'VideoCamera'
   },
   iconColor: {
@@ -212,6 +210,33 @@ const props = defineProps({
 const emit = defineEmits(['click', 'action'])
 
 const rippleRef = ref(null)
+const iconRegistry = {
+  VideoCamera: markRaw(VideoCamera),
+  Clock: markRaw(Clock),
+  Trophy: markRaw(Trophy),
+  Star: markRaw(Star),
+  ArrowRight: markRaw(ArrowRight),
+  Refresh: markRaw(Refresh),
+  TrendCharts: markRaw(TrendCharts),
+  Minus: markRaw(Minus)
+}
+
+const defaultIcon = iconRegistry.VideoCamera
+
+const iconComponent = computed(() => {
+  if (typeof props.icon === 'string') {
+    return iconRegistry[props.icon] || defaultIcon
+  }
+  return props.icon ? markRaw(props.icon) : defaultIcon
+})
+
+const resolveActionIcon = (iconName) => {
+  if (!iconName) return null
+  if (typeof iconName === 'string') {
+    return iconRegistry[iconName] || iconRegistry.ArrowRight
+  }
+  return markRaw(iconName)
+}
 
 // 计算属性
 const displayValue = computed(() => {
@@ -240,7 +265,6 @@ const iconBgColor = computed(() => {
   }
   return colorMap[color] || 'rgba(64, 158, 255, 0.1)'
 })
-
 // 事件处理
 const handleClick = (event) => {
   if (!props.clickable) return
@@ -262,7 +286,6 @@ const handleAction = (action) => {
     data: action.data
   })
 }
-
 // 波纹效果
 const createRipple = async (event) => {
   if (!rippleRef.value) return
@@ -611,3 +634,9 @@ const createRipple = async (event) => {
   pointer-events: none;
 }
 </style>
+
+
+
+
+
+

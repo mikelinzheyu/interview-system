@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="error-boundary">
     <!-- 正常内容显示 -->
     <div v-if="!hasError" class="content-wrapper">
@@ -48,7 +48,7 @@
           <div class="error-content">
             <h3>服务连接失败</h3>
             <p>{{ errorMessage }}</p>
-            <div class="error-details" v-if="showDetails">
+            <div v-if="showDetails" class="error-details">
               <p><strong>错误类型:</strong> {{ errorDetails.type }}</p>
               <p><strong>状态码:</strong> {{ errorDetails.status }}</p>
               <p><strong>请求URL:</strong> {{ errorDetails.url }}</p>
@@ -163,7 +163,7 @@ onErrorCaptured((error, instance, errorInfo) => {
   // 自动重试逻辑
   if (props.autoRetry && retryCount.value < props.maxRetries) {
     setTimeout(() => {
-      autoRetry()
+      performAutoRetry()
     }, 2000 * Math.pow(2, retryCount.value)) // 指数退避
   }
 
@@ -198,7 +198,8 @@ function recordErrorDetails(error, errorInfo) {
     url: error.config?.url || 'N/A',
     timestamp: new Date().toISOString(),
     userAgent: navigator.userAgent.substring(0, 100),
-    retryCount: retryCount.value
+    retryCount: retryCount.value,
+    info: Array.isArray(errorInfo) ? errorInfo.slice(0, 5) : errorInfo ?? null
   }
 }
 
@@ -296,7 +297,7 @@ function retry() {
 /**
  * 自动重试
  */
-function autoRetry() {
+function performAutoRetry() {
   retryCount.value++
   console.log(`自动重试第${retryCount.value}次`)
 

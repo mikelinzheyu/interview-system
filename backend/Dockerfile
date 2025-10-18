@@ -18,6 +18,8 @@ COPY package.json ./
 
 # 复制Mock服务器文件
 COPY mock-server.js ./
+COPY websocket-server.js ./
+COPY redis-client.js ./
 
 # 安装依赖（虽然目前没有外部依赖）
 RUN npm config set registry https://registry.npmmirror.com && \

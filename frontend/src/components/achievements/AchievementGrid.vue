@@ -1,5 +1,5 @@
-<template>
-  <div class="achievement-grid" v-loading="loading">
+﻿<template>
+  <div v-loading="loading" class="achievement-grid">
     <!-- 空状态 -->
     <div v-if="!loading && achievements.length === 0" class="empty-state">
       <el-empty
@@ -27,8 +27,8 @@
         :item-size="itemSize"
         class="virtual-scroll-container"
       >
-        <template #default="{ item, index }">
-          <div class="virtual-item-wrapper" :key="`virtual-${item.id}`">
+        <template #default="{ item }">
+          <div :key="`virtual-${item.id}`" class="virtual-item-wrapper">
             <AchievementCard
               :achievement="item"
               @click="handleAchievementClick"
@@ -69,8 +69,8 @@
           type="primary"
           size="large"
           :loading="loadingMore"
-          @click="handleLoadMore"
           class="load-more-btn"
+          @click="handleLoadMore"
         >
           <template #loading>
             <div class="loading-spinner">
@@ -87,14 +87,14 @@
     </div>
 
     <!-- 快捷操作浮动按钮 -->
-    <div class="floating-actions" v-if="achievements.length > 0">
+    <div v-if="achievements.length > 0" class="floating-actions">
       <el-tooltip content="回到顶部" placement="left">
         <el-button
           circle
           type="primary"
-          @click="scrollToTop"
           class="float-btn scroll-top"
           :class="{ visible: showScrollTop }"
+          @click="scrollToTop"
         >
           <el-icon><Top /></el-icon>
         </el-button>
@@ -104,8 +104,8 @@
         <el-button
           circle
           type="info"
-          @click="handleRandomAchievement"
           class="float-btn random-btn"
+          @click="handleRandomAchievement"
         >
           <el-icon><Refresh /></el-icon>
         </el-button>
@@ -115,8 +115,8 @@
         <el-button
           circle
           type="success"
-          @click="showGridSettings = true"
           class="float-btn settings-btn"
+          @click="showGridSettings = true"
         >
           <el-icon><Setting /></el-icon>
         </el-button>
@@ -184,7 +184,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import {
   Box, ArrowDown, Loading, Top, Refresh, Setting
@@ -239,10 +239,6 @@ const virtualScrollHeight = ref(600)
 const itemSize = ref(320) // 每个成就卡片的高度
 
 // 计算属性
-const gridStyles = computed(() => ({
-  '--grid-columns': gridColumns.value,
-  '--grid-gap': `${gridGap.value}px`
-}))
 
 // 方法
 const handleAchievementClick = (achievement) => {

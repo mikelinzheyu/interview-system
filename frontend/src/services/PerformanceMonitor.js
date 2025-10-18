@@ -1,4 +1,4 @@
-/**
+﻿/**
  * 性能监控和缓存优化系统
  * 监控应用性能、管理缓存策略、优化用户体验
  */
@@ -346,7 +346,7 @@ export class PerformanceMonitor {
     }
 
     // 检查性能阈值
-    this.checkPerformanceThreshold(name, value, metadata)
+    this.checkPerformanceThreshold(name, value)
 
     // 记录到测量数组
     this.measurements.push(metric)
@@ -401,7 +401,7 @@ export class PerformanceMonitor {
   /**
    * 检查性能阈值
    */
-  checkPerformanceThreshold(name, value, metadata) {
+  checkPerformanceThreshold(name, value) {
     let threshold = null
     let message = null
 
@@ -438,8 +438,6 @@ export class PerformanceMonitor {
    * 触发性能警告
    */
   triggerPerformanceAlert(type, data) {
-    const alertKey = `${type}_${Date.now()}`
-
     // 防止重复警告
     const recentAlerts = this.getRecentAlerts()
     if (recentAlerts.some(alert => alert.type === type && Date.now() - alert.timestamp < 60000)) {
@@ -1094,21 +1092,21 @@ export class CacheManager {
     for (const [category, cache] of this.caches) {
       const itemsToDelete = []
 
-      for (const [key, item] of cache) {
+      for (const [cacheKey, item] of cache) {
         if (now - item.timestamp > item.ttl) {
-          itemsToDelete.push(key)
+          itemsToDelete.push(cacheKey)
         }
       }
 
-      itemsToDelete.forEach(key => {
+      itemsToDelete.forEach((key) => {
         cache.delete(key)
         this.removeFromStorage(category, key)
-        cleanedCount++
+        cleanedCount += 1
       })
     }
 
     if (cleanedCount > 0) {
-      console.log(`🧹 缓存清理完成，清理了 ${cleanedCount} 个过期项目`)
+      console.log(`[cache] cleanup removed ${cleanedCount} expired entries`)
     }
   }
 
@@ -1127,7 +1125,7 @@ export class CacheManager {
       let categorySize = 0
       let categoryItems = cache.size
 
-      for (const [key, item] of cache) {
+      for (const item of cache.values()) {
         categorySize += item.size || 0
       }
 

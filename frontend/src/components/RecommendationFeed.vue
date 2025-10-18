@@ -108,7 +108,7 @@
 
       <!-- 加载更多 -->
       <div v-if="hasMore && !loading" class="load-more">
-        <el-button @click="loadMore" :loading="loadingMore">
+        <el-button :loading="loadingMore" @click="loadMore">
           加载更多
         </el-button>
       </div>

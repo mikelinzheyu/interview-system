@@ -1,4 +1,4 @@
-/**
+﻿/**
  * 实时问题诊断系统
  * 基于日志文件分析的智能问题诊断和解决方案推荐
  */
@@ -522,7 +522,7 @@ export class DiagnosticSystem {
    * 显示即时通知
    */
   showImmediateNotification(diagnosis) {
-    const { pattern, confidence } = diagnosis
+    const { pattern } = diagnosis
 
     ElNotification({
       title: `🚨 ${pattern.title}`,
@@ -630,7 +630,7 @@ export class DiagnosticSystem {
    * 标记问题已解决
    */
   markIssueResolved(patternKey) {
-    for (const [id, issue] of this.activeIssues) {
+    for (const issue of this.activeIssues.values()) {
       if (issue.pattern.key === patternKey) {
         issue.status = 'resolved'
         issue.resolvedAt = Date.now()
@@ -715,15 +715,13 @@ export class DiagnosticSystem {
    * 清理历史记录
    */
   cleanupHistory() {
-    const cutoff = Date.now() - (24 * 60 * 60 * 1000) // 24小时前
+    const cutoff = Date.now() - 24 * 60 * 60 * 1000
 
-    // 清理诊断历史
-    this.diagnosticHistory = this.diagnosticHistory.filter(d => d.timestamp > cutoff)
+    this.diagnosticHistory = this.diagnosticHistory.filter((item) => item.timestamp > cutoff)
 
-    // 清理活跃问题
-    for (const [id, issue] of this.activeIssues) {
+    for (const [issueId, issue] of this.activeIssues) {
       if (issue.timestamp < cutoff || issue.status === 'resolved') {
-        this.activeIssues.delete(id)
+        this.activeIssues.delete(issueId)
       }
     }
   }

@@ -4,7 +4,7 @@
       <el-card class="header-card">
         <div class="header-content">
           <div class="back-btn">
-            <el-button @click="$router.back()" icon="ArrowLeft" circle />
+            <el-button icon="ArrowLeft" circle @click="$router.back()" />
           </div>
           <div class="header-title">
             <h1>🤖 AI智能面试</h1>
@@ -61,7 +61,7 @@
           <el-card class="flow-card">
             <h2>📋 面试流程</h2>
             <div class="flow-steps">
-              <div class="step-item" v-for="(step, index) in interviewSteps" :key="index">
+              <div v-for="(step, index) in interviewSteps" :key="index" class="step-item">
                 <div class="step-number">{{ index + 1 }}</div>
                 <div class="step-content">
                   <h4>{{ step.title }}</h4>
@@ -136,10 +136,10 @@
               <el-button
                 type="primary"
                 size="large"
-                @click="startInterview"
                 :disabled="!canStartInterview"
                 :loading="starting"
                 class="start-btn"
+                @click="startInterview"
               >
                 <el-icon><VideoPlay /></el-icon>
                 开始面试

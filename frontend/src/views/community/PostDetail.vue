@@ -1,6 +1,6 @@
 <template>
   <div class="post-detail-page">
-    <el-page-header @back="$router.back()" title="返回">
+    <el-page-header title="返回" @back="$router.back()">
       <template #content>
         <span class="page-title">帖子详情</span>
       </template>
@@ -69,8 +69,8 @@
           <el-button
             type="primary"
             :loading="submitting"
-            @click="submitComment"
             style="margin-top: 10px"
+            @click="submitComment"
           >
             发表评论
           </el-button>

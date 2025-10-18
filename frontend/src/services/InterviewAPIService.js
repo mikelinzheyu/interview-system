@@ -1,4 +1,4 @@
-/**
+﻿/**
  * AI智能面试系统 - API服务生态系统
  * 统一的API调用、错误处理、重试机制和降级策略
  */
@@ -179,7 +179,7 @@ class InterviewAPIService {
         console.log(`[${config.metadata.requestId}] 请求完成:`, response.status, `${duration}ms`)
 
         // 隐藏加载状态
-        this.hideLoading(config)
+        this.hideLoading()
 
         // 统一数据格式处理
         const res = response.data
@@ -195,7 +195,7 @@ class InterviewAPIService {
         if (config?.metadata) {
           const duration = Date.now() - config.metadata.startTime
           console.error(`[${config.metadata.requestId}] 请求失败:`, error.message, `${duration}ms`)
-          this.hideLoading(config)
+          this.hideLoading()
         }
 
         return this.handleResponseError(error)
@@ -308,7 +308,7 @@ class InterviewAPIService {
   /**
    * 隐藏加载状态
    */
-  hideLoading(config) {
+  hideLoading() {
     // 隐藏loading
   }
 

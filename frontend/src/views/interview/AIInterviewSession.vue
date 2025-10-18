@@ -30,10 +30,10 @@
                 <el-button
                   :type="statusButtonType"
                   size="large"
-                  @click="handleStatusClick"
                   :disabled="isProcessing"
                   :loading="isStarting"
                   class="status-button"
+                  @click="handleStatusClick"
                 >
                   <el-icon v-if="statusIcon" class="status-icon">
                     <component :is="statusIcon" />
@@ -51,17 +51,17 @@
                 <el-button
                   :type="cameraEnabled ? 'success' : 'info'"
                   :icon="cameraEnabled ? VideoPause : VideoPlay"
-                  @click="toggleCamera"
                   :disabled="isProcessing"
+                  @click="toggleCamera"
                 >
                   {{ cameraEnabled ? '关闭摄像头' : '开启摄像头' }}
                 </el-button>
                 <el-button
                   :type="isListening ? 'warning' : 'primary'"
                   :icon="isListening ? Microphone : Microphone"
-                  @click="toggleSpeechRecognition"
                   :disabled="!cameraEnabled || isProcessing"
                   :loading="isProcessing"
+                  @click="toggleSpeechRecognition"
                 >
                   {{ isListening ? '停止录音' : '开始录音' }}
                 </el-button>
@@ -69,8 +69,8 @@
               <el-button
                 v-if="interviewSession.status === 'active'"
                 type="danger"
-                @click="endInterview"
                 style="margin-left: 12px"
+                @click="endInterview"
               >
                 结束面试
               </el-button>
@@ -79,314 +79,292 @@
         </el-card>
       </div>
 
-    <div class="interview-main">
-      <!-- 智能专业题目生成版块 - 放在最顶部，独占一行 -->
-      <el-row style="margin-bottom: 20px;">
-        <el-col :span="24">
-          <el-card class="profession-search-card">
-            <template #header>
-              <div class="card-header">
-                <span>🎯 智能专业题目生成</span>
-                <el-tag size="small" type="success">AI驱动</el-tag>
-              </div>
-            </template>
-            <div class="profession-search-content">
-              <div class="search-input-group">
-                <el-autocomplete
-                  v-model="selectedProfession"
-                  :fetch-suggestions="queryProfessionSuggestions"
-                  placeholder="输入任意专业名称，如：前端开发工程师"
-                  clearable
-                  class="profession-select"
-                  @select="handleProfessionChange"
-                  size="large"
-                >
-                  <template #prefix>
-                    <el-icon><Search /></el-icon>
-                  </template>
-                  <template #default="{ item }">
-                    <div class="suggestion-item">
-                      <span class="icon">{{ item.icon }}</span>
-                      <span class="label">{{ item.label }}</span>
-                    </div>
-                  </template>
-                </el-autocomplete>
-                <el-select
-                  v-model="selectedDifficulty"
-                  placeholder="难度"
-                  class="difficulty-select"
-                  size="large"
-                >
-                  <el-option label="初级" value="初级"></el-option>
-                  <el-option label="中级" value="中级"></el-option>
-                  <el-option label="高级" value="高级"></el-option>
-                </el-select>
-                <el-button
-                  type="primary"
-                  @click="generateSmartQuestion"
-                  :loading="smartQuestionLoading"
-                  :disabled="!selectedProfession || !selectedProfession.trim()"
-                  class="generate-btn"
-                  size="large"
-                >
-                  <el-icon><MagicStick /></el-icon>
-                  智能生成题目
-                </el-button>
-              </div>
-
-              <!-- 快速选择标签 -->
-              <div class="quick-profession-tags">
-                <span class="tags-label">快速选择：</span>
-                <el-tag
-                  v-for="prof in popularProfessions"
-                  :key="prof.value"
-                  :type="selectedProfession === prof.value ? 'primary' : 'info'"
-                  class="quick-tag"
-                  @click="selectQuickProfession(prof.value)"
-                  effect="plain"
-                  size="default"
-                >
-                  {{ prof.icon }} {{ prof.label }}
-                </el-tag>
-              </div>
-
-              <div v-if="selectedProfession && selectedProfession.trim()" class="profession-info">
-                <el-tag size="small" type="info">
-                  将为 <strong>{{ selectedProfession }}</strong> 专业生成 <strong>{{ selectedDifficulty }}</strong> 难度的面试题目
-                </el-tag>
-              </div>
-            </div>
-          </el-card>
-        </el-col>
-      </el-row>
-
-      <!-- 视频监控和面试问题版块 -->
-      <el-row :gutter="20">
-        <el-col :span="12">
-          <el-card class="video-card">
-            <template #header>
-              <div class="card-header">
-                <span>视频监控</span>
-                <el-tag v-if="cameraEnabled" type="success" size="small">
-                  <el-icon><VideoCamera /></el-icon>
-                  摄像头已启用
-                </el-tag>
-              </div>
-            </template>
-            <div class="video-container">
-              <video
-                ref="videoElement"
-                class="video-preview"
-                autoplay
-                muted
-                playsinline
-              ></video>
-              <div v-if="!cameraEnabled" class="video-placeholder">
-                <el-icon size="60"><VideoCamera /></el-icon>
-                <p>点击开启摄像头</p>
-              </div>
-            </div>
-          </el-card>
-        </el-col>
-
-        <el-col :span="12">
-          <el-card class="question-card">
-            <template #header>
-              <div class="card-header">
-                <span>面试问题</span>
-                <div class="question-actions">
-                  <el-button
-                    v-if="currentQuestion && currentQuestion.generatedBy === 'dify_workflow'"
-                    size="small"
-                    type="success"
-                    disabled
+      <div class="interview-main">
+        <!-- 智能专业题目生成版块 - 放在最顶部，独占一行 -->
+        <el-row style="margin-bottom: 20px;">
+          <el-col :span="24">
+            <el-card class="profession-search-card">
+              <template #header>
+                <div class="card-header">
+                  <span>🎯 智能专业题目生成</span>
+                  <el-tag size="small" type="success">AI驱动</el-tag>
+                </div>
+              </template>
+              <div class="profession-search-content">
+                <div class="search-input-group">
+                  <el-autocomplete
+                    v-model="selectedProfession"
+                    :fetch-suggestions="queryProfessionSuggestions"
+                    placeholder="输入任意专业名称，如：前端开发工程师"
+                    clearable
+                    class="profession-select"
+                    size="large"
+                    @select="handleProfessionChange"
                   >
-                    <el-icon><Star /></el-icon>
-                    AI智能生成
-                  </el-button>
+                    <template #prefix>
+                      <el-icon><Search /></el-icon>
+                    </template>
+                    <template #default="{ item }">
+                      <div class="suggestion-item">
+                        <span class="icon">{{ item.icon }}</span>
+                        <span class="label">{{ item.label }}</span>
+                      </div>
+                    </template>
+                  </el-autocomplete>
+                  <el-select
+                    v-model="selectedDifficulty"
+                    placeholder="难度"
+                    class="difficulty-select"
+                    size="large"
+                  >
+                    <el-option label="初级" value="初级"></el-option>
+                    <el-option label="中级" value="中级"></el-option>
+                    <el-option label="高级" value="高级"></el-option>
+                  </el-select>
                   <el-button
                     type="primary"
-                    size="small"
-                    @click="generateNewQuestion"
-                    :loading="questionLoading"
+                    :loading="smartQuestionLoading"
+                    :disabled="!selectedProfession || !selectedProfession.trim()"
+                    class="generate-btn"
+                    size="large"
+                    @click="generateSmartQuestion"
                   >
-                    下一题
+                    <el-icon><MagicStick /></el-icon>
+                    智能生成题目
                   </el-button>
                 </div>
               </div>
-            </template>
-            <div class="question-content">
-              <div v-if="currentQuestion" class="question">
-                <h3>{{ currentQuestion.question }}</h3>
-                <el-divider />
-                <div class="question-info">
-                  <el-tag size="small">{{ currentQuestion.category || '综合能力' }}</el-tag>
-                  <el-tag size="small" type="info">难度: {{ currentQuestion.difficulty || '中等' }}</el-tag>
-                </div>
-              </div>
-              <div v-else class="question-placeholder">
-                <el-empty description="点击生成问题开始面试" />
-              </div>
-            </div>
-          </el-card>
-        </el-col>
-      </el-row>
+            </el-card>
+          </el-col>
+        </el-row>
 
-      <el-row :gutter="20" style="margin-top: 20px;">
-        <el-col :span="12">
-          <el-card class="speech-card">
-            <template #header>
-              <div class="card-header">
-                <span>语音识别</span>
-                <el-tag
-                  v-if="isListening"
-                  type="warning"
-                  class="listening-indicator"
-                  effect="dark"
-                >
-                  <el-icon class="pulse"><Microphone /></el-icon>
-                  正在录音...
-                </el-tag>
-              </div>
-            </template>
-            <div class="speech-content">
-              <div class="transcript-area">
-                <div v-if="finalTranscript" class="final-transcript">
-                  <h4>最终文本：</h4>
-                  <p>{{ finalTranscript }}</p>
-                </div>
-                <div v-if="interimTranscript && isListening" class="interim-transcript">
-                  <h4>实时识别：</h4>
-                  <p class="interim-text">{{ interimTranscript }}</p>
-                </div>
-                <div v-if="!finalTranscript && !interimTranscript" class="transcript-placeholder">
-                  <el-icon><Microphone /></el-icon>
-                  <p>开始录音后，语音识别结果将显示在这里</p>
-                </div>
-              </div>
-              <div class="speech-controls">
-                <el-button
-                  v-if="finalTranscript"
-                  type="primary"
-                  @click="analyzeAnswer"
-                  :loading="analysisLoading"
-                  :disabled="!currentQuestion"
-                >
-                  分析回答
-                </el-button>
-                <el-button
-                  v-if="finalTranscript"
-                  @click="clearTranscript"
-                  :disabled="analysisLoading"
-                >
-                  清空文本
-                </el-button>
-              </div>
-            </div>
-          </el-card>
-        </el-col>
-
-        <el-col :span="12">
-          <el-card class="analysis-card">
-            <template #header>
-              <div class="card-header">
-                <span>AI分析结果</span>
-                <div v-if="interviewSession.questions.length > 0" class="question-counter">
-                  <el-tag size="small" type="info">
-                    第 {{ interviewSession.questions.length }} 题
+        <!-- 视频监控和面试问题版块 -->
+        <el-row :gutter="20">
+          <el-col :span="12">
+            <el-card class="video-card">
+              <template #header>
+                <div class="card-header">
+                  <span>视频监控</span>
+                  <el-tag v-if="cameraEnabled" type="success" size="small">
+                    <el-icon><VideoCamera /></el-icon>
+                    摄像头已启用
                   </el-tag>
                 </div>
+              </template>
+              <div class="video-container">
+                <video
+                  ref="videoElement"
+                  class="video-preview"
+                  autoplay
+                  muted
+                  playsinline
+                ></video>
+                <div v-if="!cameraEnabled" class="video-placeholder">
+                  <el-icon size="60"><VideoCamera /></el-icon>
+                  <p>点击开启摄像头</p>
+                </div>
               </div>
-            </template>
-            <div class="analysis-content">
-              <LoadingSpinner v-if="analysisLoading" text="AI正在分析您的回答..." />
-              <div v-else-if="analysisResult" class="analysis-result">
-                <div class="overall-score">
-                  <el-progress
-                    :percentage="analysisResult.overallScore || analysisResult.overall?.score || 0"
-                    :color="getScoreColor(analysisResult.overallScore || analysisResult.overall?.score || 0)"
-                    :stroke-width="20"
-                    text-inside
-                  >
-                    <template #default="{ percentage }">
-                      {{ percentage }}分
-                    </template>
-                  </el-progress>
-                </div>
+            </el-card>
+          </el-col>
 
-                <el-divider />
-
-                <!-- 简化的能力评估 -->
-                <div class="simplified-scores">
-                  <div class="score-item">
-                    <span>技术能力:</span>
-                    <el-progress
-                      :percentage="analysisResult.technicalScore || 0"
-                      :color="getScoreColor(analysisResult.technicalScore || 0)"
-                      :stroke-width="8"
-                      :show-text="true"
-                    />
-                  </div>
-                  <div class="score-item">
-                    <span>表达能力:</span>
-                    <el-progress
-                      :percentage="analysisResult.communicationScore || 0"
-                      :color="getScoreColor(analysisResult.communicationScore || 0)"
-                      :stroke-width="8"
-                      :show-text="true"
-                    />
-                  </div>
-                  <div class="score-item">
-                    <span>逻辑思维:</span>
-                    <el-progress
-                      :percentage="analysisResult.logicalScore || 0"
-                      :color="getScoreColor(analysisResult.logicalScore || 0)"
-                      :stroke-width="8"
-                      :show-text="true"
-                    />
+          <el-col :span="12">
+            <el-card class="question-card">
+              <template #header>
+                <div class="card-header">
+                  <span>面试问题</span>
+                  <div class="question-actions">
+                    <el-button
+                      v-if="currentQuestion && currentQuestion.generatedBy === 'dify_workflow'"
+                      size="small"
+                      type="success"
+                      disabled
+                    >
+                      <el-icon><Star /></el-icon>
+                      AI智能生成
+                    </el-button>
+                    <el-button
+                      type="primary"
+                      size="small"
+                      :loading="questionLoading"
+                      @click="generateNewQuestion"
+                    >
+                      下一题
+                    </el-button>
                   </div>
                 </div>
-
-                <!-- AI分析引擎信息 -->
-                <div v-if="analysisResult.difyAnalysis" class="analysis-meta">
+              </template>
+              <div class="question-content">
+                <div v-if="currentQuestion" class="question">
+                  <h3>{{ currentQuestion.question }}</h3>
                   <el-divider />
-                  <div class="analysis-engine-info">
-                    <el-tag type="success" size="small">
-                      <el-icon><MagicStick /></el-icon>
-                      Dify AI工作流分析
-                    </el-tag>
-                    <span v-if="analysisResult.processingTime" class="processing-time">
-                      处理时间: {{ analysisResult.processingTime }}ms
-                    </span>
+                  <div class="question-info">
+                    <el-tag size="small">{{ currentQuestion.category || '综合能力' }}</el-tag>
+                    <el-tag size="small" type="info">难度: {{ currentQuestion.difficulty || '中等' }}</el-tag>
                   </div>
                 </div>
-
-                <el-divider />
-
-                <div class="analysis-summary">
-                  <h4>总结:</h4>
-                  <p>{{ analysisResult.summary || analysisResult.overall?.summary || '分析完成' }}</p>
-                </div>
-
-                <div v-if="analysisResult.suggestions?.length" class="suggestions">
-                  <h4>改进建议:</h4>
-                  <ul>
-                    <li v-for="suggestion in analysisResult.suggestions" :key="suggestion">
-                      {{ suggestion }}
-                    </li>
-                  </ul>
+                <div v-else class="question-placeholder">
+                  <el-empty description="点击生成问题开始面试" />
                 </div>
               </div>
-              <div v-else class="analysis-placeholder">
-                <el-icon><ChatDotRound /></el-icon>
-                <p>回答问题后，AI分析结果将显示在这里</p>
+            </el-card>
+          </el-col>
+        </el-row>
+
+        <el-row :gutter="20" style="margin-top: 20px;">
+          <el-col :span="12">
+            <el-card class="speech-card">
+              <template #header>
+                <div class="card-header">
+                  <span>语音识别</span>
+                  <el-tag
+                    v-if="isListening"
+                    type="warning"
+                    class="listening-indicator"
+                    effect="dark"
+                  >
+                    <el-icon class="pulse"><Microphone /></el-icon>
+                    正在录音...
+                  </el-tag>
+                </div>
+              </template>
+              <div class="speech-content">
+                <div class="transcript-area">
+                  <div v-if="finalTranscript" class="final-transcript">
+                    <h4>最终文本：</h4>
+                    <p>{{ finalTranscript }}</p>
+                  </div>
+                  <div v-if="interimTranscript && isListening" class="interim-transcript">
+                    <h4>实时识别：</h4>
+                    <p class="interim-text">{{ interimTranscript }}</p>
+                  </div>
+                  <div v-if="!finalTranscript && !interimTranscript" class="transcript-placeholder">
+                    <el-icon><Microphone /></el-icon>
+                    <p>开始录音后，语音识别结果将显示在这里</p>
+                  </div>
+                </div>
+                <div class="speech-controls">
+                  <el-button
+                    v-if="finalTranscript"
+                    type="primary"
+                    :loading="analysisLoading"
+                    :disabled="!currentQuestion"
+                    @click="analyzeAnswer"
+                  >
+                    分析回答
+                  </el-button>
+                  <el-button
+                    v-if="finalTranscript"
+                    :disabled="analysisLoading"
+                    @click="clearTranscript"
+                  >
+                    清空文本
+                  </el-button>
+                </div>
               </div>
-            </div>
-          </el-card>
-        </el-col>
-      </el-row>
+            </el-card>
+          </el-col>
+
+          <el-col :span="12">
+            <el-card class="analysis-card">
+              <template #header>
+                <div class="card-header">
+                  <span>AI分析结果</span>
+                  <div v-if="interviewSession.questions.length > 0" class="question-counter">
+                    <el-tag size="small" type="info">
+                      第 {{ interviewSession.questions.length }} 题
+                    </el-tag>
+                  </div>
+                </div>
+              </template>
+              <div class="analysis-content">
+                <LoadingSpinner v-if="analysisLoading" text="AI正在分析您的回答..." />
+                <div v-else-if="analysisResult" class="analysis-result">
+                  <div class="overall-score">
+                    <el-progress
+                      :percentage="analysisResult.overallScore || analysisResult.overall?.score || 0"
+                      :color="getScoreColor(analysisResult.overallScore || analysisResult.overall?.score || 0)"
+                      :stroke-width="20"
+                      text-inside
+                    >
+                      <template #default="{ percentage }">
+                        {{ percentage }}分
+                      </template>
+                    </el-progress>
+                  </div>
+
+                  <el-divider />
+
+                  <!-- 简化的能力评估 -->
+                  <div class="simplified-scores">
+                    <div class="score-item">
+                      <span>技术能力:</span>
+                      <el-progress
+                        :percentage="analysisResult.technicalScore || 0"
+                        :color="getScoreColor(analysisResult.technicalScore || 0)"
+                        :stroke-width="8"
+                        :show-text="true"
+                      />
+                    </div>
+                    <div class="score-item">
+                      <span>表达能力:</span>
+                      <el-progress
+                        :percentage="analysisResult.communicationScore || 0"
+                        :color="getScoreColor(analysisResult.communicationScore || 0)"
+                        :stroke-width="8"
+                        :show-text="true"
+                      />
+                    </div>
+                    <div class="score-item">
+                      <span>逻辑思维:</span>
+                      <el-progress
+                        :percentage="analysisResult.logicalScore || 0"
+                        :color="getScoreColor(analysisResult.logicalScore || 0)"
+                        :stroke-width="8"
+                        :show-text="true"
+                      />
+                    </div>
+                  </div>
+
+                  <!-- AI分析引擎信息 -->
+                  <div v-if="analysisResult.difyAnalysis" class="analysis-meta">
+                    <el-divider />
+                    <div class="analysis-engine-info">
+                      <el-tag type="success" size="small">
+                        <el-icon><MagicStick /></el-icon>
+                        Dify AI工作流分析
+                      </el-tag>
+                      <span v-if="analysisResult.processingTime" class="processing-time">
+                        处理时间: {{ analysisResult.processingTime }}ms
+                      </span>
+                    </div>
+                  </div>
+
+                  <el-divider />
+
+                  <div class="analysis-summary">
+                    <h4>总结:</h4>
+                    <p>{{ analysisResult.summary || analysisResult.overall?.summary || '分析完成' }}</p>
+                  </div>
+
+                  <div v-if="analysisResult.suggestions?.length" class="suggestions">
+                    <h4>改进建议:</h4>
+                    <ul>
+                      <li v-for="suggestion in analysisResult.suggestions" :key="suggestion">
+                        {{ suggestion }}
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+                <div v-else class="analysis-placeholder">
+                  <el-icon><ChatDotRound /></el-icon>
+                  <p>回答问题后，AI分析结果将显示在这里</p>
+                </div>
+              </div>
+            </el-card>
+          </el-col>
+        </el-row>
+      </div>
     </div>
-  </div>
   </ErrorBoundary>
 </template>
 
@@ -480,8 +458,11 @@ export default {
     const analysisResult = ref(null)
     const interviewSession = reactive({
       id: Date.now(),
+      sessionId: null,
+      jobTitle: '',
       questions: [],
       answers: [],
+      allQuestions: [],
       startTime: null,
       endTime: null,
       status: 'idle' // idle, active, paused, completed
@@ -725,35 +706,50 @@ export default {
         if (result.success && result.data) {
           const questionData = result.data
 
-          currentQuestion.value = {
-            id: Date.now(),
+          interviewSession.sessionId = questionData.sessionId || interviewSession.sessionId
+          interviewSession.jobTitle = questionData.jobTitle || selectedProfession.value
+          interviewSession.allQuestions = questionData.allQuestions || []
+
+          const questionEntry = {
+            id: questionData.questionId || Date.now(),
             question: questionData.question,
-            expectedAnswer: questionData.answer,
-            keywords: questionData.skills || [],
-            category: questionData.category || '技术面试',
-            difficulty: questionData.level || '中等',
-            // 智能生成的元数据
-            generatedBy: questionData.generatedBy || 'ai-algorithm',
-            confidenceScore: questionData.confidenceScore || 0.8,
-            smartGeneration: questionData.smartGeneration || false,
-            requestedSkills: questionData.requestedSkills || []
+            expectedAnswer: questionData.expectedAnswer,
+            keywords: questionData.keywords || [],
+            category: questionData.category || selectedProfession.value,
+            difficulty: questionData.difficulty || selectedDifficulty.value,
+            generatedBy: questionData.generatedBy || 'dify_workflow',
+            confidenceScore: questionData.confidenceScore || 0.9,
+            smartGeneration: true,
+            profession: selectedProfession.value,
+            searchSource: questionData.searchSource || 'dify_rag',
+            sourceUrls: questionData.sourceUrls || [],
+            workflowId: result.metadata?.workflowRunId,
+            sessionId: questionData.sessionId || interviewSession.sessionId,
+            hasAnswer: questionData.hasAnswer
           }
 
-          interviewSession.questions.push(currentQuestion.value)
+          currentQuestion.value = questionEntry
 
-          // 如果是第一题，开始计时
-          if (interviewSession.questions.length === 1) {
+          const exists = interviewSession.questions.find(item => item.id === questionEntry.id)
+          if (!exists) {
+            interviewSession.questions.push(questionEntry)
+          } else {
+            Object.assign(exists, questionEntry)
+          }
+
+          if (interviewSession.questions.length === 1 && interviewSession.status !== 'active') {
             startTimer()
             interviewSession.startTime = new Date()
             interviewSession.status = 'active'
           }
 
-          // 显示智能生成成功消息
-          const successMessage = questionData.smartGeneration
-            ? `🧠 智能问题生成成功 (置信度: ${Math.round((questionData.confidenceScore || 0.8) * 100)}%)`
-            : '✅ 问题生成成功'
+          const processingTime = result.metadata?.processingTime || 0
+          ElMessage.success({
+            message: `?? ?????????(????: ${processingTime}ms)`,
+            duration: 3000
+          })
 
-          ElMessage.success(successMessage)
+          console.log('Dify????????:', currentQuestion.value)
 
         } else {
           throw new Error(result.message || result.error || '生成问题失败')
@@ -1184,8 +1180,10 @@ export default {
         // 构建Dify分析请求
         const analysisRequest = {
           question: currentQuestion.value.question,
+          questionId: currentQuestion.value.id,
           answer: finalTranscript.value,
-          profession: selectedProfession.value || currentQuestion.value.profession || '通用'
+          profession: selectedProfession.value || currentQuestion.value.profession || '??',
+          sessionId: interviewSession.sessionId
         }
 
         console.log('开始Dify工作流分析:', analysisRequest)
@@ -1230,6 +1228,8 @@ export default {
             analysisEngine: result.source || 'dify_workflow',
             processingTime: result.processingTime || 0,
             difyAnalysis: result.source === 'dify_workflow',
+            standardAnswer: result.data?.standardAnswer || '',
+            sessionId: result.data?.sessionId || interviewSession.sessionId,
             strengths: result.data?.strengths || ['回答较为完整'],
             weaknesses: result.data?.weaknesses || ['可以更加深入']
           }
@@ -1239,6 +1239,7 @@ export default {
             questionId: currentQuestion.value.id,
             answer: finalTranscript.value,
             analysis: analysisResult.value,
+            standardAnswer: analysisResult.value.standardAnswer || '',
             timestamp: Date.now(),
             analysisType: result.source === 'dify_workflow' ? 'dify' : 'traditional',
             profession: selectedProfession.value
@@ -1911,37 +1912,6 @@ export default {
   font-size: 14px;
 }
 
-/* 快速选择标签区域 */
-.quick-profession-tags {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-bottom: 16px;
-  padding: 12px 16px;
-  background: #f9fafb;
-  border-radius: 8px;
-  border: 1px dashed #d1d5db;
-}
-
-.tags-label {
-  font-size: 14px;
-  color: #6b7280;
-  font-weight: 500;
-  margin-right: 8px;
-}
-
-.quick-tag {
-  cursor: pointer;
-  transition: all 0.3s ease;
-  padding: 6px 12px;
-  font-size: 13px;
-}
-
-.quick-tag:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
 
 /* 专业搜索框样式 */
 .profession-search-card {
@@ -1963,23 +1933,19 @@ export default {
 
 .search-input-group {
   display: flex;
-  gap: 16px;
-  align-items: center;
-  margin-bottom: 16px;
-  justify-content: center;
-  flex-wrap: wrap;
+  gap: 12px;
+  align-items: stretch;
+  justify-content: flex-start;
 }
 
 .profession-select {
-  flex: 2;
-  min-width: 250px;
-  max-width: 350px;
+  flex: 1;
+  min-width: 300px;
 }
 
 .difficulty-select {
-  flex: 1;
-  min-width: 120px;
-  max-width: 150px;
+  width: 120px;
+  flex-shrink: 0;
 }
 
 .generate-btn {
@@ -1987,8 +1953,8 @@ export default {
   background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
   border-color: #ff9800;
   font-weight: 600;
-  padding: 10px 20px;
-  border-radius: 25px;
+  padding: 10px 24px;
+  border-radius: 8px;
   transition: all 0.3s ease;
   min-width: 160px;
   font-size: 14px;
@@ -2001,19 +1967,6 @@ export default {
 
 .generate-btn .el-icon {
   margin-right: 8px;
-}
-
-.profession-info {
-  padding: 12px 20px;
-  background: #f0f9ff;
-  border-radius: 10px;
-  border-left: 4px solid #2196f3;
-  text-align: center;
-  font-size: 14px;
-}
-
-.profession-info strong {
-  color: #1976d2;
 }
 
 /* 问题卡片增强样式 */

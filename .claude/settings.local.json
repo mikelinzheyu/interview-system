@@ -55,7 +55,9 @@
       "WebFetch(domain:api.dify.ai)",
       "Bash(python -c \"import yaml; yaml.safe_load(open(''D:\\code7\\interview-system\\AI 面试官 - 全流程定制与评分 (RAG) (2).yml'', ''r'', encoding=''utf-8''))\")",
       "Read(//d/code7/test7/interview-storage-service/src/main/java/com/example/interviewstorage/**)",
-      "Read(//d/code7/test7/interview-storage-service/src/main/java/com/example/interviewstorage/model/**)"
+      "Read(//d/code7/test7/interview-storage-service/src/main/java/com/example/interviewstorage/model/**)",
+      "Bash(powershell -Command \"nginx.exe -v\")",
+      "Bash(powershell -Command:*)"
     ],
     "deny": [],
     "ask": []

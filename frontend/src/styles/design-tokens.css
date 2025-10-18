@@ -1,0 +1,121 @@
+﻿:root {
+  --chat-primary: #3a7afe;
+  --chat-primary-dark: #2b64d5;
+  --chat-accent: #ffaf4d;
+  --chat-success: #34c759;
+  --chat-surface: #ffffff;
+  --chat-surface-subtle: #f5f8ff;
+  --chat-surface-muted: #eef2fb;
+  --chat-border: #d8e0f0;
+  --chat-border-strong: #b9c6e3;
+  --chat-text-primary: #1f2a44;
+  --chat-text-secondary: #5f6c8f;
+  --chat-text-tertiary: #8a95b1;
+  --chat-shadow-soft: 0 12px 30px rgba(44, 72, 140, 0.12);
+  --chat-shadow-hover: 0 18px 35px rgba(44, 72, 140, 0.18);
+  --chat-radius-sm: 10px;
+  --chat-radius-md: 16px;
+  --chat-radius-lg: 22px;
+  --chat-radius-pill: 999px;
+  --chat-hero-gradient: linear-gradient(135deg, rgba(80, 126, 255, 0.18) 0%, rgba(126, 216, 255, 0.2) 50%, rgba(240, 244, 255, 0.6) 100%);
+  --chat-card-gradient: linear-gradient(135deg, rgba(255, 255, 255, 0.92) 0%, rgba(255, 255, 255, 0.7) 100%);
+  --chat-badge-hot: linear-gradient(120deg, #ffcf71 0%, #ff8976 100%);
+  --chat-badge-new: linear-gradient(120deg, #95e5ff 0%, #5f8bff 100%);
+  --chat-badge-locked: linear-gradient(120deg, #9795f0 0%, #9be7ff 100%);
+  --chat-progress-bg: rgba(58, 122, 254, 0.1);
+  --chat-progress-fill: linear-gradient(120deg, #3a7afe 0%, #67c8ff 100%);
+}
+
+.chat-theme {
+  background: var(--chat-surface-subtle);
+  color: var(--chat-text-primary);
+  font-family: 'HarmonyOS Sans', 'PingFang SC', 'Microsoft YaHei', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+.chat-elevated-card {
+  background: var(--chat-card-gradient);
+  border-radius: var(--chat-radius-lg);
+  box-shadow: var(--chat-shadow-soft);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(12px);
+}
+
+.chat-circle-stat {
+  width: 116px;
+  height: 116px;
+  border-radius: 50%;
+  background: var(--chat-surface);
+  box-shadow: 0 20px 45px rgba(58, 122, 254, 0.12);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  color: var(--chat-text-primary);
+}
+
+.chat-circle-stat__value {
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.chat-circle-stat__label {
+  font-size: 14px;
+  color: var(--chat-text-secondary);
+}
+
+.chat-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: var(--chat-radius-pill);
+  font-size: 12px;
+  font-weight: 600;
+  color: #fff;
+}
+
+.chat-badge--hot {
+  background: var(--chat-badge-hot);
+}
+
+.chat-badge--new {
+  background: var(--chat-badge-new);
+}
+
+.chat-badge--locked {
+  background: var(--chat-badge-locked);
+}
+
+.chat-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 12px;
+  border-radius: var(--chat-radius-pill);
+  background: rgba(58, 122, 254, 0.08);
+  color: var(--chat-text-secondary);
+  font-size: 12px;
+}
+
+.chat-tag__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--chat-primary);
+}
+
+.chat-progress {
+  width: 100%;
+  height: 8px;
+  border-radius: var(--chat-radius-pill);
+  background: var(--chat-progress-bg);
+  overflow: hidden;
+}
+
+.chat-progress__bar {
+  height: 100%;
+  border-radius: inherit;
+  background: var(--chat-progress-fill);
+  transition: width 0.4s ease;
+}

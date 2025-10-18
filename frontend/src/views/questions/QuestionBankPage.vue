@@ -6,14 +6,14 @@
           <el-button
             v-if="currentDomain"
             link
-            @click="backToDomainSelector"
             class="back-btn"
+            @click="backToDomainSelector"
           >
             <el-icon><ArrowLeft /></el-icon>
             返回领域选择
           </el-button>
         </div>
-        <div class="domain-info" v-if="currentDomain">
+        <div v-if="currentDomain" class="domain-info">
           <span class="domain-icon">{{ currentDomain.icon }}</span>
           <h1>{{ currentDomain.name }} - 题库练习</h1>
         </div>
@@ -49,7 +49,7 @@
             />
             <el-empty v-else description="分类加载中" :image-size="80" />
             <div class="filter-actions">
-              <el-button text size="small" @click="clearCategory" v-if="store.filters.categoryId">
+              <el-button v-if="store.filters.categoryId" text size="small" @click="clearCategory">
                 清除分类
               </el-button>
               <el-switch
@@ -232,7 +232,7 @@
               </el-card>
             </div>
 
-            <div class="list-pagination" v-if="store.pagination.totalPages > 1">
+            <div v-if="store.pagination.totalPages > 1" class="list-pagination">
               <el-pagination
                 background
                 layout="prev, pager, next, total"

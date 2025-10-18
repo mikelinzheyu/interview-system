@@ -208,7 +208,7 @@
               />
             </el-form-item>
 
-            <el-form-item label="改进建议" v-if="reviewForm.result !== 'approved'">
+            <el-form-item v-if="reviewForm.result !== 'approved'" label="改进建议">
               <el-input
                 v-model="reviewForm.suggestions"
                 type="textarea"

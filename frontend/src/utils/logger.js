@@ -1,4 +1,4 @@
-/**
+﻿/**
  * 统一日志管理工具
  * 提供统一的日志格式和级别管理
  */
@@ -180,7 +180,10 @@ class Logger {
   /**
    * 发送日志到监控系统
    */
-  sendToMonitoring(level, category, message, data) {
+  sendToMonitoring(level, _category, _message, _data) {
+    void _category;
+    void _message;
+    void _data;
     // 这里可以集成第三方监控服务
     if (level === 'ERROR') {
       // 只发送错误日志到监控系统

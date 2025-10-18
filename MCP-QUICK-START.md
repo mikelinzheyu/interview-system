@@ -1,98 +1,98 @@
-# Dify MCP 快速开始指南
+﻿# Dify MCP 蹇€熷紑濮嬫寚鍗?
 
-## 🚀 5分钟快速上手
+## 馃殌 5鍒嗛挓蹇€熶笂鎵?
 
-### 步骤 1: 验证 MCP 配置
+### 姝ラ 1: 楠岃瘉 MCP 閰嶇疆
 
-MCP 配置文件已经创建在：`.claude/mcp.json`
+MCP 閰嶇疆鏂囦欢宸茬粡鍒涘缓鍦細`.claude/mcp.json`
 
 ```json
 {
   "mcpServers": {
     "dify-interview-workflow": {
-      "url": "https://api.dify.ai/mcp/server/sUb5skskelb6Nkm1/mcp",
+      "url": "https://api.dify.ai/mcp/server/sQFDstpnlPUJ5MeX/mcp",
       "headers": {
-        "Authorization": "Bearer app-vZlc0w5Dio2gnrTkdlblcPXG"
+        "Authorization": "Bearer app-aROZ5FjseJWUtmRzzjlb6b5E"
       }
     }
   }
 }
 ```
 
-### 步骤 2: 测试 MCP 连接
+### 姝ラ 2: 娴嬭瘯 MCP 杩炴帴
 
-运行测试脚本验证连接：
+杩愯娴嬭瘯鑴氭湰楠岃瘉杩炴帴锛?
 
 ```bash
 node test-dify-mcp.js
 ```
 
-✅ **预期输出**: 应该看到 "✅ 所有测试完成！"
+鉁?**棰勬湡杈撳嚭**: 搴旇鐪嬪埌 "鉁?鎵€鏈夋祴璇曞畬鎴愶紒"
 
-### 步骤 3: 运行演示
+### 姝ラ 3: 杩愯婕旂ず
 
-选择一个演示运行：
+閫夋嫨涓€涓紨绀鸿繍琛岋細
 
 ```bash
-# 演示 1: 为 Python 后端生成题目（需要 30-60 秒）
+# 婕旂ず 1: 涓?Python 鍚庣鐢熸垚棰樼洰锛堥渶瑕?30-60 绉掞級
 node demo-dify-mcp.js 1
 
-# 演示 2: 为前端开发生成题目
+# 婕旂ず 2: 涓哄墠绔紑鍙戠敓鎴愰鐩?
 node demo-dify-mcp.js 2
 
-# 演示 3: 查看参数格式（不调用 API）
+# 婕旂ず 3: 鏌ョ湅鍙傛暟鏍煎紡锛堜笉璋冪敤 API锛?
 node demo-dify-mcp.js 3
 
-# 演示 4: 为区块链工程师生成题目
+# 婕旂ず 4: 涓哄尯鍧楅摼宸ョ▼甯堢敓鎴愰鐩?
 node demo-dify-mcp.js 4
 ```
 
-### 步骤 4: 在 Claude Code 中使用
+### 姝ラ 4: 鍦?Claude Code 涓娇鐢?
 
-在 Claude Code 对话中直接请求：
+鍦?Claude Code 瀵硅瘽涓洿鎺ヨ姹傦細
 
 ```
-请使用 Dify MCP 工具为 "数据分析师" 职位生成面试问题
+璇蜂娇鐢?Dify MCP 宸ュ叿涓?"鏁版嵁鍒嗘瀽甯? 鑱屼綅鐢熸垚闈㈣瘯闂
 ```
 
-Claude Code 会自动调用 MCP 工具！
+Claude Code 浼氳嚜鍔ㄨ皟鐢?MCP 宸ュ叿锛?
 
-## 📋 可用的 MCP 工具
+## 馃搵 鍙敤鐨?MCP 宸ュ叿
 
-### 工具名称
-`AI 面试官 - 全流程定制与评分 (RAG)`
+### 宸ュ叿鍚嶇О
+`AI 闈㈣瘯瀹?- 鍏ㄦ祦绋嬪畾鍒朵笌璇勫垎 (RAG)`
 
-### 输入参数
+### 杈撳叆鍙傛暟
 
-| 参数 | 类型 | 必填 | 说明 |
+| 鍙傛暟 | 绫诲瀷 | 蹇呭～ | 璇存槑 |
 |------|------|------|------|
-| `request_type` | string | ✅ | 请求类型 |
-| `job_title` | string | ❌ | 职位名称 |
-| `question` | string | ❌ | 面试问题 |
-| `candidate_answer` | string | ❌ | 候选人答案 |
-| `session_id` | string | ❌ | 会话 ID |
+| `request_type` | string | 鉁?| 璇锋眰绫诲瀷 |
+| `job_title` | string | 鉂?| 鑱屼綅鍚嶇О |
+| `question` | string | 鉂?| 闈㈣瘯闂 |
+| `candidate_answer` | string | 鉂?| 鍊欓€変汉绛旀 |
+| `session_id` | string | 鉂?| 浼氳瘽 ID |
 
-### 请求类型
+### 璇锋眰绫诲瀷
 
-1. **`generate_questions`** - 生成面试问题
+1. **`generate_questions`** - 鐢熸垚闈㈣瘯闂
    ```json
    {
      "request_type": "generate_questions",
-     "job_title": "前端开发工程师"
+     "job_title": "鍓嶇寮€鍙戝伐绋嬪笀"
    }
    ```
 
-2. **`analyze_answer`** - 分析答案
+2. **`analyze_answer`** - 鍒嗘瀽绛旀
    ```json
    {
      "request_type": "analyze_answer",
      "session_id": "sess-xxx",
-     "question": "什么是闭包？",
-     "candidate_answer": "闭包是..."
+     "question": "浠€涔堟槸闂寘锛?,
+     "candidate_answer": "闂寘鏄?.."
    }
    ```
 
-3. **`continue_interview`** - 继续面试
+3. **`continue_interview`** - 缁х画闈㈣瘯
    ```json
    {
      "request_type": "continue_interview",
@@ -100,74 +100,74 @@ Claude Code 会自动调用 MCP 工具！
    }
    ```
 
-## 💡 使用场景
+## 馃挕 浣跨敤鍦烘櫙
 
-### 场景 1: 快速生成面试题目
+### 鍦烘櫙 1: 蹇€熺敓鎴愰潰璇曢鐩?
 
-**在 Claude Code 中**：
+**鍦?Claude Code 涓?*锛?
 ```
-使用 Dify MCP 为 "机器学习工程师" 生成 5 个面试问题
+浣跨敤 Dify MCP 涓?"鏈哄櫒瀛︿範宸ョ▼甯? 鐢熸垚 5 涓潰璇曢棶棰?
 ```
 
-**或使用 Node.js**：
+**鎴栦娇鐢?Node.js**锛?
 ```bash
 node demo-dify-mcp.js 1
 ```
 
-### 场景 2: 测试不同职位
+### 鍦烘櫙 2: 娴嬭瘯涓嶅悓鑱屼綅
 
 ```
-依次为以下职位生成题目：
-1. 前端开发工程师
-2. Python 后端工程师
-3. DevOps 工程师
+渚濇涓轰互涓嬭亴浣嶇敓鎴愰鐩細
+1. 鍓嶇寮€鍙戝伐绋嬪笀
+2. Python 鍚庣宸ョ▼甯?
+3. DevOps 宸ョ▼甯?
 ```
 
-### 场景 3: 验证答案评估
+### 鍦烘櫙 3: 楠岃瘉绛旀璇勪及
 
 ```
-使用 Dify MCP 评估这个答案：
-问题：什么是 Docker？
-答案：Docker 是一个容器化平台...
+浣跨敤 Dify MCP 璇勪及杩欎釜绛旀锛?
+闂锛氫粈涔堟槸 Docker锛?
+绛旀锛欴ocker 鏄竴涓鍣ㄥ寲骞冲彴...
 ```
 
-## 🔧 故障排除
+## 馃敡 鏁呴殰鎺掗櫎
 
-### 问题 1: 连接失败
+### 闂 1: 杩炴帴澶辫触
 
-**症状**: `node test-dify-mcp.js` 显示连接错误
+**鐥囩姸**: `node test-dify-mcp.js` 鏄剧ず杩炴帴閿欒
 
-**解决方案**:
-1. 检查网络连接
-2. 确认 API Key 正确
-3. 验证 MCP URL 可访问
+**瑙ｅ喅鏂规**:
+1. 妫€鏌ョ綉缁滆繛鎺?
+2. 纭 API Key 姝ｇ‘
+3. 楠岃瘉 MCP URL 鍙闂?
 
-### 问题 2: 超时错误
+### 闂 2: 瓒呮椂閿欒
 
-**症状**: 调用超时（timeout）
+**鐥囩姸**: 璋冪敤瓒呮椂锛坱imeout锛?
 
-**原因**: Dify 工作流需要搜索引擎查询，通常需要 30-60 秒
+**鍘熷洜**: Dify 宸ヤ綔娴侀渶瑕佹悳绱㈠紩鎿庢煡璇紝閫氬父闇€瑕?30-60 绉?
 
-**解决方案**: 增加超时时间或耐心等待
+**瑙ｅ喅鏂规**: 澧炲姞瓒呮椂鏃堕棿鎴栬€愬績绛夊緟
 
-### 问题 3: Claude Code 找不到工具
+### 闂 3: Claude Code 鎵句笉鍒板伐鍏?
 
-**症状**: Claude Code 说找不到 MCP 工具
+**鐥囩姸**: Claude Code 璇存壘涓嶅埌 MCP 宸ュ叿
 
-**解决方案**:
-1. 确认 `.claude/mcp.json` 文件存在
-2. 重启 Claude Code
-3. 检查配置文件格式
+**瑙ｅ喅鏂规**:
+1. 纭 `.claude/mcp.json` 鏂囦欢瀛樺湪
+2. 閲嶅惎 Claude Code
+3. 妫€鏌ラ厤缃枃浠舵牸寮?
 
-## 📚 相关文档
+## 馃摎 鐩稿叧鏂囨。
 
-- **完整文档**: `DIFY-MCP-INTEGRATION.md`
-- **自由输入功能**: `SMART-PROFESSION-INPUT-UPDATE.md`
-- **Dify 集成指南**: `DIFY-INTEGRATION-GUIDE.md`
+- **瀹屾暣鏂囨。**: `DIFY-MCP-INTEGRATION.md`
+- **鑷敱杈撳叆鍔熻兘**: `SMART-PROFESSION-INPUT-UPDATE.md`
+- **Dify 闆嗘垚鎸囧崡**: `DIFY-INTEGRATION-GUIDE.md`
 
-## ✨ 高级用法
+## 鉁?楂樼骇鐢ㄦ硶
 
-### 在代码中调用 MCP
+### 鍦ㄤ唬鐮佷腑璋冪敤 MCP
 
 ```javascript
 const https = require('https');
@@ -178,29 +178,29 @@ async function callDifyMCP(params) {
     id: Date.now(),
     method: 'tools/call',
     params: {
-      name: 'AI 面试官 - 全流程定制与评分 (RAG)',
+      name: 'AI 闈㈣瘯瀹?- 鍏ㄦ祦绋嬪畾鍒朵笌璇勫垎 (RAG)',
       arguments: params
     }
   });
 
-  // ... (参考 demo-dify-mcp.js 完整实现)
+  // ... (鍙傝€?demo-dify-mcp.js 瀹屾暣瀹炵幇)
 }
 
-// 使用
+// 浣跨敤
 const result = await callDifyMCP({
   request_type: 'generate_questions',
-  job_title: '全栈开发工程师'
+  job_title: '鍏ㄦ爤寮€鍙戝伐绋嬪笀'
 });
 ```
 
-### 批量生成题目
+### 鎵归噺鐢熸垚棰樼洰
 
 ```javascript
 const professions = [
-  '前端开发工程师',
-  'Python后端开发工程师',
-  '数据分析师',
-  '产品经理'
+  '鍓嶇寮€鍙戝伐绋嬪笀',
+  'Python鍚庣寮€鍙戝伐绋嬪笀',
+  '鏁版嵁鍒嗘瀽甯?,
+  '浜у搧缁忕悊'
 ];
 
 for (const prof of professions) {
@@ -208,33 +208,34 @@ for (const prof of professions) {
     request_type: 'generate_questions',
     job_title: prof
   });
-  console.log(`${prof}: 已生成 ${result.questions.length} 道题目`);
+  console.log(`${prof}: 宸茬敓鎴?${result.questions.length} 閬撻鐩甡);
 }
 ```
 
-## 🎯 下一步
+## 馃幆 涓嬩竴姝?
 
-1. ✅ 运行 `node test-dify-mcp.js` 验证连接
-2. ✅ 运行 `node demo-dify-mcp.js 1` 生成第一个题目
-3. ✅ 在 Claude Code 中尝试调用 MCP 工具
-4. ✅ 将 MCP 集成到您的开发流程
+1. 鉁?杩愯 `node test-dify-mcp.js` 楠岃瘉杩炴帴
+2. 鉁?杩愯 `node demo-dify-mcp.js 1` 鐢熸垚绗竴涓鐩?
+3. 鉁?鍦?Claude Code 涓皾璇曡皟鐢?MCP 宸ュ叿
+4. 鉁?灏?MCP 闆嗘垚鍒版偍鐨勫紑鍙戞祦绋?
 
-## 💬 需要帮助？
+## 馃挰 闇€瑕佸府鍔╋紵
 
-在 Claude Code 对话中询问：
-
-```
-我想了解如何使用 Dify MCP 工具
-```
-
-或者查看完整文档：
+鍦?Claude Code 瀵硅瘽涓闂細
 
 ```
-请打开并解释 DIFY-MCP-INTEGRATION.md 文件
+鎴戞兂浜嗚В濡備綍浣跨敤 Dify MCP 宸ュ叿
+```
+
+鎴栬€呮煡鐪嬪畬鏁存枃妗ｏ細
+
+```
+璇锋墦寮€骞惰В閲?DIFY-MCP-INTEGRATION.md 鏂囦欢
 ```
 
 ---
 
-**更新时间**: 2025-10-10
-**版本**: 1.0
-**状态**: ✅ 可用
+**鏇存柊鏃堕棿**: 2025-10-10
+**鐗堟湰**: 1.0
+**鐘舵€?*: 鉁?鍙敤
+

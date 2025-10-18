@@ -73,9 +73,9 @@
           <el-form-item v-if="verificationStep === 0">
             <el-button
               type="primary"
-              @click="handleShowSlider"
               :disabled="!registerForm.phone"
               class="verify-button"
+              @click="handleShowSlider"
             >
               <el-icon><Lock /></el-icon>
               点击按钮进行验证

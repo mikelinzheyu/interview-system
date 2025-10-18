@@ -1,7 +1,7 @@
-<template>
+﻿<template>
   <div class="trend-analysis">
     <!-- 趋势图表区域 -->
-    <el-card class="trend-chart-card" v-loading="loading">
+    <el-card v-loading="loading" class="trend-chart-card">
       <template #header>
         <div class="card-header">
           <div class="header-info">
@@ -21,7 +21,7 @@
       <div class="chart-container">
         <!-- 简化的趋势图显示 -->
         <div class="trend-metrics">
-          <div class="metric-item" v-for="metric in trendMetrics" :key="metric.key">
+          <div v-for="metric in trendMetrics" :key="metric.key" class="metric-item">
             <div class="metric-header">
               <el-icon :size="18" :color="metric.color">
                 <component :is="metric.icon" />
@@ -50,9 +50,9 @@
           </div>
           <div class="graph-line">
             <div
-              class="data-point"
               v-for="(point, index) in trendData"
               :key="index"
+              class="data-point"
               :style="{
                 height: `${(point.score / 100) * 60}px`,
                 backgroundColor: getScoreColor(point.score)
@@ -79,7 +79,7 @@
               </div>
             </template>
             <div class="insights-content">
-              <div class="insight-item" v-for="insight in insights" :key="insight.type">
+              <div v-for="insight in insights" :key="insight.type" class="insight-item">
                 <div class="insight-icon">
                   <el-icon :size="20" :color="getInsightColor(insight.type)">
                     <component :is="insight.icon" />
@@ -106,9 +106,9 @@
             </template>
             <div class="recommendations-content">
               <div
-                class="recommendation-item"
                 v-for="rec in recommendations"
                 :key="rec.type"
+                class="recommendation-item"
                 :class="`priority-${rec.priority}`"
                 @click="handleRecommendationClick(rec)"
               >
@@ -145,9 +145,9 @@
 
       <div class="achievements-grid">
         <div
-          class="achievement-item"
           v-for="achievement in achievements"
           :key="achievement.id"
+          class="achievement-item"
           :class="{ 'unlocked': achievement.unlocked }"
         >
           <div class="achievement-icon">
@@ -175,7 +175,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, inject } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useStatisticsStore } from '@/stores/statistics'
 import { ElMessage } from 'element-plus'
@@ -183,6 +183,29 @@ import {
   TrendCharts, DataAnalysis, Compass, Trophy, ArrowRight,
   CaretTop, CaretBottom, Minus, Clock, VideoCamera, Star
 } from '@element-plus/icons-vue'
+
+const iconRegistry = {
+  TrendCharts,
+  DataAnalysis,
+  Compass,
+  Trophy,
+  ArrowRight,
+  CaretTop,
+  CaretBottom,
+  Minus,
+  Clock,
+  VideoCamera,
+  Star
+}
+
+const resolveIcon = (iconName, fallback = TrendCharts) => {
+  if (!iconName) return fallback
+  if (typeof iconName === 'string') {
+    return iconRegistry[iconName] || fallback
+  }
+  return iconName
+}
+
 
 const router = useRouter()
 const statisticsStore = useStatisticsStore()
@@ -192,7 +215,7 @@ const loading = ref(false)
 const selectedTimeRange = ref('monthly')
 
 // 从store获取数据
-const { userStats, trends, achievements, recommendations, timeSeriesData } = statisticsStore
+const { userStats, achievements, recommendations, timeSeriesData } = statisticsStore
 
 // 计算属性
 const trendData = computed(() => {
@@ -208,20 +231,24 @@ const averageScore = computed(() => {
 const trendMetrics = computed(() => {
   const current = trendData.value[trendData.value.length - 1]
   const previous = trendData.value[trendData.value.length - 2]
+  const normalize = (items, fallbackIcon = VideoCamera) => items.map((item) => ({
+    ...item,
+    icon: resolveIcon(item.icon, fallbackIcon)
+  }))
 
   if (!current || !previous) {
-    return [
+    return normalize([
       { key: 'interviews', label: '面试次数', value: userStats?.summary?.interviewCount || 0, change: '0', trend: 'stable', icon: 'VideoCamera', color: '#409eff' },
       { key: 'score', label: '平均分数', value: (userStats?.summary?.averageScore || 0).toFixed(1), change: '0', trend: 'stable', icon: 'Star', color: '#e6a23c' },
       { key: 'time', label: '学习时长', value: formatTime(userStats?.summary?.totalPracticeTime || 0), change: '0', trend: 'stable', icon: 'Clock', color: '#67c23a' }
-    ]
+    ])
   }
 
   const interviewChange = current.interviews - previous.interviews
   const scoreChange = (current.score - previous.score).toFixed(1)
   const timeChange = current.totalTime - previous.totalTime
 
-  return [
+  return normalize([
     {
       key: 'interviews',
       label: '面试次数',
@@ -249,18 +276,23 @@ const trendMetrics = computed(() => {
       icon: 'Clock',
       color: '#67c23a'
     }
-  ]
+  ])
 })
 
 const insights = computed(() => {
-  return userStats?.insights || [
+  const list = userStats?.insights || [
     {
       type: 'trend',
-      title: '表现稳步提升',
-      content: '最近的练习成果显著，建议保持当前学习节奏',
+      title: '学习进步趋势',
+      content: '坚持练习已见成效，继续保持当前学习节奏',
       icon: 'TrendCharts'
     }
   ]
+
+  return list.map((item) => ({
+    ...item,
+    icon: resolveIcon(item.icon, DataAnalysis)
+  }))
 })
 
 // 方法

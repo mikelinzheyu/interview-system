@@ -4,7 +4,7 @@
     <el-header class="progress-header">
       <div class="header-content">
         <div class="nav-section">
-          <el-button type="text" @click="handleGoBack" class="back-btn">
+          <el-button type="text" class="back-btn" @click="handleGoBack">
             <el-icon><ArrowLeft /></el-icon>
             返回
           </el-button>
@@ -14,7 +14,7 @@
     </el-header>
 
     <!-- 主内容 -->
-    <el-main class="progress-content" v-loading="loading">
+    <el-main v-loading="loading" class="progress-content">
       <div class="content-wrapper">
         <!-- 总体进度概览 -->
         <div class="overview-section">
@@ -22,7 +22,7 @@
             <template #header>
               <div class="card-header">
                 <span class="card-title">整体进度概览</span>
-                <el-button @click="refreshData" :loading="refreshing" size="small">
+                <el-button :loading="refreshing" size="small" @click="refreshData">
                   <el-icon><Refresh /></el-icon>
                   刷新
                 </el-button>

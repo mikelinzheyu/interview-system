@@ -14,7 +14,7 @@
           </template>
           <el-form :model="form" label-width="100px">
             <el-form-item label="Prompt模板">
-              <el-select v-model="form.templateId" @change="handleTemplateChange" style="width: 100%">
+              <el-select v-model="form.templateId" style="width: 100%" @change="handleTemplateChange">
                 <el-option
                   v-for="template in promptTemplates"
                   :key="template.id"
@@ -30,7 +30,7 @@
             </el-form-item>
 
             <el-form-item label="领域">
-              <el-select v-model="form.domainId" @change="handleDomainChange" style="width: 100%">
+              <el-select v-model="form.domainId" style="width: 100%" @change="handleDomainChange">
                 <el-option
                   v-for="domain in domains"
                   :key="domain.id"
@@ -114,7 +114,7 @@
 
             <el-divider />
 
-            <el-form-item label="编程语言" v-if="form.domainId === 1">
+            <el-form-item v-if="form.domainId === 1" label="编程语言">
               <el-select
                 v-model="form.metadata.languageRestrictions"
                 multiple
@@ -126,7 +126,7 @@
               </el-select>
             </el-form-item>
 
-            <el-form-item label="时间复杂度" v-if="form.domainId === 1">
+            <el-form-item v-if="form.domainId === 1" label="时间复杂度">
               <el-input v-model="form.metadata.timeComplexity" placeholder="例如: O(n)" />
             </el-form-item>
 
@@ -134,17 +134,17 @@
               <el-space direction="vertical" style="width: 100%">
                 <el-button
                   type="primary"
-                  @click="handleGenerate"
                   :loading="generating"
                   style="width: 100%"
+                  @click="handleGenerate"
                 >
                   <el-icon v-if="!generating"><MagicStick /></el-icon>
                   {{ generating ? `生成中... ${generationProgress}%` : '生成题目' }}
                 </el-button>
                 <el-button
-                  @click="handleRecommendParams"
                   :loading="recommendLoading"
                   style="width: 100%"
+                  @click="handleRecommendParams"
                 >
                   智能推荐参数
                 </el-button>
@@ -297,12 +297,12 @@
             </div>
 
             <!-- 批量操作 -->
-            <div class="batch-actions" v-if="currentGeneration.generatedQuestions.length > 0">
+            <div v-if="currentGeneration.generatedQuestions.length > 0" class="batch-actions">
               <el-space>
                 <el-button
                   type="primary"
-                  @click="handleBatchApprove"
                   :disabled="selectedCount === 0"
+                  @click="handleBatchApprove"
                 >
                   批量通过 ({{ selectedCount }})
                 </el-button>
@@ -336,7 +336,7 @@
       width="70%"
       :close-on-click-modal="false"
     >
-      <el-button type="primary" @click="showCreateTemplateDialog = true" class="mb-20">
+      <el-button type="primary" class="mb-20" @click="showCreateTemplateDialog = true">
         <el-icon><Plus /></el-icon>
         创建新模板
       </el-button>

@@ -1,9 +1,9 @@
-/**
- * 新功能模块测试运行器
- * 用于测试五大新增模块的基本功能
+﻿/**
+ * 鏂板姛鑳芥ā鍧楁祴璇曡繍琛屽櫒
+ * 鐢ㄤ簬娴嬭瘯浜斿ぇ鏂板妯″潡鐨勫熀鏈姛鑳?
  */
 
-// 导入测试模块
+// 瀵煎叆娴嬭瘯妯″潡
 import systemCheckService from '../services/systemCheckService.js'
 import resilientSessionService from '../services/resilientSessionService.js'
 import visualReportService from '../services/visualReportService.js'
@@ -21,10 +21,10 @@ class TestRunner {
   }
 
   /**
-   * 运行所有测试
+   * 杩愯鎵€鏈夋祴璇?
    */
   async runAllTests() {
-    console.log('🧪 开始新功能模块测试...\n')
+    console.log('馃И 寮€濮嬫柊鍔熻兘妯″潡娴嬭瘯...\n')
 
     try {
       await this.testSystemCheckService()
@@ -35,100 +35,103 @@ class TestRunner {
       this.generateTestReport()
 
     } catch (error) {
-      console.error('❌ 测试运行失败:', error)
+      console.error('鉂?娴嬭瘯杩愯澶辫触:', error)
     }
   }
 
   /**
-   * 测试智能系统检测服务
+   * 娴嬭瘯鏅鸿兘绯荤粺妫€娴嬫湇鍔?
    */
   async testSystemCheckService() {
-    console.log('🔍 测试智能诊断引擎...')
+    console.log('馃攳 娴嬭瘯鏅鸿兘璇婃柇寮曟搸...')
     const category = 'systemCheck'
 
-    // 测试1: 服务初始化
-    await this.runTest(category, '服务初始化', async () => {
+    // 娴嬭瘯1: 鏈嶅姟鍒濆鍖?
+    await this.runTest(category, '鏈嶅姟鍒濆鍖?, async () => {
       const service = systemCheckService
-      this.assert(service !== null, '服务实例应该存在')
-      this.assert(typeof service.performFullSystemCheck === 'function', '应该有performFullSystemCheck方法')
+      this.assert(service !== null, '鏈嶅姟瀹炰緥搴旇瀛樺湪')
+      this.assert(typeof service.performFullSystemCheck === 'function', '搴旇鏈塸erformFullSystemCheck鏂规硶')
       return true
     })
 
-    // 测试2: 检测矩阵结构
-    await this.runTest(category, '检测矩阵结构', async () => {
+    // 娴嬭瘯2: 妫€娴嬬煩闃电粨鏋?
+    await this.runTest(category, '妫€娴嬬煩闃电粨鏋?, async () => {
       const service = systemCheckService
-      this.assert(service.checkMatrix, '应该有checkMatrix配置')
-      this.assert(service.checkMatrix.deviceLayer, '应该有设备层检测')
-      this.assert(service.checkMatrix.networkLayer, '应该有网络层检测')
-      this.assert(service.checkMatrix.browserLayer, '应该有浏览器层检测')
-      this.assert(service.checkMatrix.profileLayer, '应该有配置层检测')
+      this.assert(service.checkMatrix, '搴旇鏈塩heckMatrix閰嶇疆')
+      this.assert(service.checkMatrix.deviceLayer, '搴旇鏈夎澶囧眰妫€娴?)
+      this.assert(service.checkMatrix.networkLayer, '搴旇鏈夌綉缁滃眰妫€娴?)
+      this.assert(service.checkMatrix.browserLayer, '搴旇鏈夋祻瑙堝櫒灞傛娴?)
+      this.assert(service.checkMatrix.profileLayer, '搴旇鏈夐厤缃眰妫€娴?)
       return true
     })
 
-    // 测试3: 错误处理引擎
-    await this.runTest(category, '错误处理引擎', async () => {
+    // 娴嬭瘯3: 閿欒澶勭悊寮曟搸
+    await this.runTest(category, '閿欒澶勭悊寮曟搸', async () => {
       const service = systemCheckService
-      this.assert(service.errorHandlingEngine, '应该有错误处理引擎')
-      this.assert(service.errorHandlingEngine.errorKnowledgeBase, '应该有错误知识库')
-      this.assert(service.errorHandlingEngine.autoRepair, '应该有自动修复配置')
+      this.assert(service.errorHandlingEngine, '搴旇鏈夐敊璇鐞嗗紩鎿?)
+      this.assert(service.errorHandlingEngine.errorKnowledgeBase, '搴旇鏈夐敊璇煡璇嗗簱')
+      this.assert(service.errorHandlingEngine.autoRepair, '搴旇鏈夎嚜鍔ㄤ慨澶嶉厤缃?)
 
       const knowledgeBase = service.errorHandlingEngine.errorKnowledgeBase
-      this.assert(knowledgeBase['CAMERA_PERMISSION_DENIED'], '应该有摄像头权限错误处理')
-      this.assert(knowledgeBase['LOW_BANDWIDTH'], '应该有低带宽错误处理')
+      this.assert(knowledgeBase['CAMERA_PERMISSION_DENIED'], '搴旇鏈夋憚鍍忓ご鏉冮檺閿欒澶勭悊')
+      this.assert(knowledgeBase['LOW_BANDWIDTH'], '搴旇鏈変綆甯﹀閿欒澶勭悊')
       return true
     })
 
-    // 测试4: 模拟系统检查（不涉及实际硬件）
-    await this.runTest(category, '模拟系统检查', async () => {
+    // 娴嬭瘯4: 妯℃嫙绯荤粺妫€鏌ワ紙涓嶆秹鍙婂疄闄呯‖浠讹級
+    await this.runTest(category, '妯℃嫙绯荤粺妫€鏌?, async () => {
       let progressCalled = false
       const mockProgress = (data) => {
         progressCalled = true
-        console.log(`  📊 检查进度: ${data.stage} - ${data.progress}%`)
+        console.log(`  馃搳 妫€鏌ヨ繘搴? ${data.stage} - ${data.progress}%`)
       }
 
-      // 由于涉及硬件权限，这里只测试方法存在性
+      mockProgress({ stage: 'init', progress: 0 })
+      this.assert(progressCalled, 'Progress callback should be callable')
+
+      // 鐢变簬娑夊強纭欢鏉冮檺锛岃繖閲屽彧娴嬭瘯鏂规硶瀛樺湪鎬?
       const service = systemCheckService
-      this.assert(typeof service.checkDeviceLayer === 'function', '应该有设备检测方法')
-      this.assert(typeof service.checkNetworkLayer === 'function', '应该有网络检测方法')
-      this.assert(typeof service.checkBrowserLayer === 'function', '应该有浏览器检测方法')
-      this.assert(typeof service.checkProfileLayer === 'function', '应该有配置检测方法')
+      this.assert(typeof service.checkDeviceLayer === 'function', '搴旇鏈夎澶囨娴嬫柟娉?)
+      this.assert(typeof service.checkNetworkLayer === 'function', '搴旇鏈夌綉缁滄娴嬫柟娉?)
+      this.assert(typeof service.checkBrowserLayer === 'function', '搴旇鏈夋祻瑙堝櫒妫€娴嬫柟娉?)
+      this.assert(typeof service.checkProfileLayer === 'function', '搴旇鏈夐厤缃娴嬫柟娉?)
 
       return true
     })
 
-    console.log('✅ 智能诊断引擎测试完成\n')
+    console.log('鉁?鏅鸿兘璇婃柇寮曟搸娴嬭瘯瀹屾垚\n')
   }
 
   /**
-   * 测试弹性会话服务
+   * 娴嬭瘯寮规€т細璇濇湇鍔?
    */
   async testResilientSessionService() {
-    console.log('🛡️ 测试弹性会话架构...')
+    console.log('馃洝锔?娴嬭瘯寮规€т細璇濇灦鏋?..')
     const category = 'resilientSession'
 
-    // 测试1: 服务初始化和配置
-    await this.runTest(category, '服务初始化', async () => {
+    // 娴嬭瘯1: 鏈嶅姟鍒濆鍖栧拰閰嶇疆
+    await this.runTest(category, '鏈嶅姟鍒濆鍖?, async () => {
       const service = resilientSessionService
-      this.assert(service !== null, '服务实例应该存在')
-      this.assert(service.sessionState, '应该有会话状态')
-      this.assert(service.resilience, '应该有弹性配置')
-      this.assert(service.aiServiceFallback, '应该有AI服务降级配置')
+      this.assert(service !== null, '鏈嶅姟瀹炰緥搴旇瀛樺湪')
+      this.assert(service.sessionState, '搴旇鏈変細璇濈姸鎬?)
+      this.assert(service.resilience, '搴旇鏈夊脊鎬ч厤缃?)
+      this.assert(service.aiServiceFallback, '搴旇鏈堿I鏈嶅姟闄嶇骇閰嶇疆')
       return true
     })
 
-    // 测试2: 会话状态管理
-    await this.runTest(category, '会话状态管理', async () => {
+    // 娴嬭瘯2: 浼氳瘽鐘舵€佺鐞?
+    await this.runTest(category, '浼氳瘽鐘舵€佺鐞?, async () => {
       const service = resilientSessionService
       const initialState = service.sessionState
 
-      this.assert(initialState.status === 'idle', '初始状态应该是idle')
-      this.assert(Array.isArray(initialState.answers), 'answers应该是数组')
-      this.assert(typeof initialState.currentQuestionIndex === 'number', 'currentQuestionIndex应该是数字')
+      this.assert(initialState.status === 'idle', '鍒濆鐘舵€佸簲璇ユ槸idle')
+      this.assert(Array.isArray(initialState.answers), 'answers搴旇鏄暟缁?)
+      this.assert(typeof initialState.currentQuestionIndex === 'number', 'currentQuestionIndex搴旇鏄暟瀛?)
       return true
     })
 
-    // 测试3: 事件发射能力
-    await this.runTest(category, '事件发射能力', async () => {
+    // 娴嬭瘯3: 浜嬩欢鍙戝皠鑳藉姏
+    await this.runTest(category, '浜嬩欢鍙戝皠鑳藉姏', async () => {
       const service = resilientSessionService
       let eventReceived = false
 
@@ -138,130 +141,130 @@ class TestRunner {
 
       service.emit('test-event')
 
-      this.assert(eventReceived, '应该能够发射和接收事件')
+      this.assert(eventReceived, '搴旇鑳藉鍙戝皠鍜屾帴鏀朵簨浠?)
       return true
     })
 
-    // 测试4: 降级服务配置
-    await this.runTest(category, '降级服务配置', async () => {
+    // 娴嬭瘯4: 闄嶇骇鏈嶅姟閰嶇疆
+    await this.runTest(category, '闄嶇骇鏈嶅姟閰嶇疆', async () => {
       const service = resilientSessionService
       const fallback = service.aiServiceFallback
 
-      this.assert(fallback.questionGeneration, '应该有问题生成降级配置')
-      this.assert(fallback.answerAnalysis, '应该有答案分析降级配置')
+      this.assert(fallback.questionGeneration, '搴旇鏈夐棶棰樼敓鎴愰檷绾ч厤缃?)
+      this.assert(fallback.answerAnalysis, '搴旇鏈夌瓟妗堝垎鏋愰檷绾ч厤缃?)
 
-      this.assert(fallback.questionGeneration.primary === 'smartQuestionGenerator', '主服务应该是智能问题生成器')
-      this.assert(fallback.answerAnalysis.primary === 'fiveDimensionAnalyzer', '主服务应该是五维度分析器')
+      this.assert(fallback.questionGeneration.primary === 'smartQuestionGenerator', '涓绘湇鍔″簲璇ユ槸鏅鸿兘闂鐢熸垚鍣?)
+      this.assert(fallback.answerAnalysis.primary === 'fiveDimensionAnalyzer', '涓绘湇鍔″簲璇ユ槸浜旂淮搴﹀垎鏋愬櫒')
       return true
     })
 
-    // 测试5: 自适应参数
-    await this.runTest(category, '自适应难度调整', async () => {
+    // 娴嬭瘯5: 鑷€傚簲鍙傛暟
+    await this.runTest(category, '鑷€傚簲闅惧害璋冩暣', async () => {
       const service = resilientSessionService
       const adaptive = service.adaptiveQuestionFlow
 
-      this.assert(adaptive.difficultyAdaptation, '应该有难度自适应配置')
-      this.assert(adaptive.multiPathFlow, '应该有多路径流程配置')
+      this.assert(adaptive.difficultyAdaptation, '搴旇鏈夐毦搴﹁嚜閫傚簲閰嶇疆')
+      this.assert(adaptive.multiPathFlow, '搴旇鏈夊璺緞娴佺▼閰嶇疆')
 
-      this.assert(typeof adaptive.difficultyAdaptation.currentDifficulty === 'number', '应该有当前难度值')
+      this.assert(typeof adaptive.difficultyAdaptation.currentDifficulty === 'number', '搴旇鏈夊綋鍓嶉毦搴﹀€?)
       return true
     })
 
-    console.log('✅ 弹性会话架构测试完成\n')
+    console.log('鉁?寮规€т細璇濇灦鏋勬祴璇曞畬鎴怽n')
   }
 
   /**
-   * 测试多维可视化服务
+   * 娴嬭瘯澶氱淮鍙鍖栨湇鍔?
    */
   async testVisualReportService() {
-    console.log('📊 测试多维可视化引擎...')
+    console.log('馃搳 娴嬭瘯澶氱淮鍙鍖栧紩鎿?..')
     const category = 'visualReport'
 
-    // 测试1: 服务初始化
-    await this.runTest(category, '服务初始化', async () => {
+    // 娴嬭瘯1: 鏈嶅姟鍒濆鍖?
+    await this.runTest(category, '鏈嶅姟鍒濆鍖?, async () => {
       const service = visualReportService
-      this.assert(service !== null, '服务实例应该存在')
-      this.assert(service.chartTypes, '应该有图表类型配置')
-      this.assert(service.exportEngine, '应该有导出引擎配置')
-      this.assert(service.industryBenchmarks, '应该有行业基准数据')
+      this.assert(service !== null, '鏈嶅姟瀹炰緥搴旇瀛樺湪')
+      this.assert(service.chartTypes, '搴旇鏈夊浘琛ㄧ被鍨嬮厤缃?)
+      this.assert(service.exportEngine, '搴旇鏈夊鍑哄紩鎿庨厤缃?)
+      this.assert(service.industryBenchmarks, '搴旇鏈夎涓氬熀鍑嗘暟鎹?)
       return true
     })
 
-    // 测试2: 图表类型配置
-    await this.runTest(category, '图表类型配置', async () => {
+    // 娴嬭瘯2: 鍥捐〃绫诲瀷閰嶇疆
+    await this.runTest(category, '鍥捐〃绫诲瀷閰嶇疆', async () => {
       const service = visualReportService
       const chartTypes = service.chartTypes
 
-      this.assert(chartTypes.radarChart, '应该有雷达图配置')
-      this.assert(chartTypes.timelineChart, '应该有时间线图配置')
-      this.assert(chartTypes.wordCloud, '应该有词云图配置')
-      this.assert(chartTypes.skillGapMatrix, '应该有技能缺口矩阵配置')
-      this.assert(chartTypes.progressRing, '应该有进度环配置')
+      this.assert(chartTypes.radarChart, '搴旇鏈夐浄杈惧浘閰嶇疆')
+      this.assert(chartTypes.timelineChart, '搴旇鏈夋椂闂寸嚎鍥鹃厤缃?)
+      this.assert(chartTypes.wordCloud, '搴旇鏈夎瘝浜戝浘閰嶇疆')
+      this.assert(chartTypes.skillGapMatrix, '搴旇鏈夋妧鑳界己鍙ｇ煩闃甸厤缃?)
+      this.assert(chartTypes.progressRing, '搴旇鏈夎繘搴︾幆閰嶇疆')
       return true
     })
 
-    // 测试3: 导出引擎配置
-    await this.runTest(category, '导出引擎配置', async () => {
+    // 娴嬭瘯3: 瀵煎嚭寮曟搸閰嶇疆
+    await this.runTest(category, '瀵煎嚭寮曟搸閰嶇疆', async () => {
       const service = visualReportService
       const exportEngine = service.exportEngine
 
-      this.assert(Array.isArray(exportEngine.formats), '导出格式应该是数组')
-      this.assert(exportEngine.formats.includes('PDF'), '应该支持PDF导出')
-      this.assert(exportEngine.formats.includes('PNG'), '应该支持PNG导出')
-      this.assert(exportEngine.templates, '应该有报告模板')
-      this.assert(exportEngine.templates.candidate, '应该有候选人模板')
-      this.assert(exportEngine.templates.hr, '应该有HR模板')
+      this.assert(Array.isArray(exportEngine.formats), '瀵煎嚭鏍煎紡搴旇鏄暟缁?)
+      this.assert(exportEngine.formats.includes('PDF'), '搴旇鏀寔PDF瀵煎嚭')
+      this.assert(exportEngine.formats.includes('PNG'), '搴旇鏀寔PNG瀵煎嚭')
+      this.assert(exportEngine.templates, '搴旇鏈夋姤鍛婃ā鏉?)
+      this.assert(exportEngine.templates.candidate, '搴旇鏈夊€欓€変汉妯℃澘')
+      this.assert(exportEngine.templates.hr, '搴旇鏈塇R妯℃澘')
       return true
     })
 
-    // 测试4: 行业基准数据
-    await this.runTest(category, '行业基准数据', async () => {
+    // 娴嬭瘯4: 琛屼笟鍩哄噯鏁版嵁
+    await this.runTest(category, '琛屼笟鍩哄噯鏁版嵁', async () => {
       const service = visualReportService
       const benchmarks = service.industryBenchmarks
 
-      this.assert(benchmarks.frontend, '应该有前端行业数据')
-      this.assert(benchmarks.backend, '应该有后端行业数据')
-      this.assert(benchmarks.fullstack, '应该有全栈行业数据')
+      this.assert(benchmarks.frontend, '搴旇鏈夊墠绔涓氭暟鎹?)
+      this.assert(benchmarks.backend, '搴旇鏈夊悗绔涓氭暟鎹?)
+      this.assert(benchmarks.fullstack, '搴旇鏈夊叏鏍堣涓氭暟鎹?)
 
-      this.assert(benchmarks.frontend.junior, '前端应该有初级数据')
-      this.assert(benchmarks.frontend.mid, '前端应该有中级数据')
-      this.assert(benchmarks.frontend.senior, '前端应该有高级数据')
+      this.assert(benchmarks.frontend.junior, '鍓嶇搴旇鏈夊垵绾ф暟鎹?)
+      this.assert(benchmarks.frontend.mid, '鍓嶇搴旇鏈変腑绾ф暟鎹?)
+      this.assert(benchmarks.frontend.senior, '鍓嶇搴旇鏈夐珮绾ф暟鎹?)
       return true
     })
 
-    // 测试5: 报告生成方法
-    await this.runTest(category, '报告生成方法', async () => {
+    // 娴嬭瘯5: 鎶ュ憡鐢熸垚鏂规硶
+    await this.runTest(category, '鎶ュ憡鐢熸垚鏂规硶', async () => {
       const service = visualReportService
 
-      this.assert(typeof service.generateVisualReport === 'function', '应该有报告生成方法')
-      this.assert(typeof service.createRadarChart === 'function', '应该有雷达图创建方法')
-      this.assert(typeof service.createTimelineChart === 'function', '应该有时间线图创建方法')
-      this.assert(typeof service.exportReport === 'function', '应该有报告导出方法')
+      this.assert(typeof service.generateVisualReport === 'function', '搴旇鏈夋姤鍛婄敓鎴愭柟娉?)
+      this.assert(typeof service.createRadarChart === 'function', '搴旇鏈夐浄杈惧浘鍒涘缓鏂规硶')
+      this.assert(typeof service.createTimelineChart === 'function', '搴旇鏈夋椂闂寸嚎鍥惧垱寤烘柟娉?)
+      this.assert(typeof service.exportReport === 'function', '搴旇鏈夋姤鍛婂鍑烘柟娉?)
       return true
     })
 
-    console.log('✅ 多维可视化引擎测试完成\n')
+    console.log('鉁?澶氱淮鍙鍖栧紩鎿庢祴璇曞畬鎴怽n')
   }
 
   /**
-   * 测试事件驱动总线
+   * 娴嬭瘯浜嬩欢椹卞姩鎬荤嚎
    */
   async testEventDrivenBus() {
-    console.log('⚡ 测试事件驱动总线...')
+    console.log('鈿?娴嬭瘯浜嬩欢椹卞姩鎬荤嚎...')
     const category = 'eventBus'
 
-    // 测试1: 总线初始化
-    await this.runTest(category, '总线初始化', async () => {
+    // 娴嬭瘯1: 鎬荤嚎鍒濆鍖?
+    await this.runTest(category, '鎬荤嚎鍒濆鍖?, async () => {
       const bus = eventDrivenBus
-      this.assert(bus !== null, '总线实例应该存在')
-      this.assert(bus.eventRoutes, '应该有事件路由配置')
-      this.assert(bus.microservices, '应该有微服务注册表')
-      this.assert(bus.eventPriorities, '应该有事件优先级配置')
+      this.assert(bus !== null, '鎬荤嚎瀹炰緥搴旇瀛樺湪')
+      this.assert(bus.eventRoutes, '搴旇鏈変簨浠惰矾鐢遍厤缃?)
+      this.assert(bus.microservices, '搴旇鏈夊井鏈嶅姟娉ㄥ唽琛?)
+      this.assert(bus.eventPriorities, '搴旇鏈変簨浠朵紭鍏堢骇閰嶇疆')
       return true
     })
 
-    // 测试2: 事件发布和订阅
-    await this.runTest(category, '事件发布和订阅', async () => {
+    // 娴嬭瘯2: 浜嬩欢鍙戝竷鍜岃闃?
+    await this.runTest(category, '浜嬩欢鍙戝竷鍜岃闃?, async () => {
       const bus = eventDrivenBus
       let eventReceived = false
       let receivedPayload = null
@@ -273,33 +276,33 @@ class TestRunner {
 
       await bus.publish('test.event', { test: 'data' })
 
-      // 等待异步事件处理
+      // 绛夊緟寮傛浜嬩欢澶勭悊
       await new Promise(resolve => setTimeout(resolve, 50))
 
-      this.assert(eventReceived, '应该接收到发布的事件')
-      this.assert(receivedPayload.test === 'data', '应该接收到正确的载荷')
+      this.assert(eventReceived, '搴旇鎺ユ敹鍒板彂甯冪殑浜嬩欢')
+      this.assert(receivedPayload.test === 'data', '搴旇鎺ユ敹鍒版纭殑杞借嵎')
 
       bus.unsubscribe(subscriptionId)
       return true
     })
 
-    // 测试3: 事件路由
-    await this.runTest(category, '事件路由', async () => {
+    // 娴嬭瘯3: 浜嬩欢璺敱
+    await this.runTest(category, '浜嬩欢璺敱', async () => {
       const bus = eventDrivenBus
       const routes = bus.eventRoutes
 
-      this.assert(routes.has('system.check.started'), '应该有系统检查启动路由')
-      this.assert(routes.has('interview.started'), '应该有面试启动路由')
-      this.assert(routes.has('analysis.completed'), '应该有分析完成路由')
+      this.assert(routes.has('system.check.started'), '搴旇鏈夌郴缁熸鏌ュ惎鍔ㄨ矾鐢?)
+      this.assert(routes.has('interview.started'), '搴旇鏈夐潰璇曞惎鍔ㄨ矾鐢?)
+      this.assert(routes.has('analysis.completed'), '搴旇鏈夊垎鏋愬畬鎴愯矾鐢?)
 
       const systemCheckRoutes = routes.get('system.check.started')
-      this.assert(Array.isArray(systemCheckRoutes), '路由应该是数组')
-      this.assert(systemCheckRoutes.length > 0, '应该有具体的路由目标')
+      this.assert(Array.isArray(systemCheckRoutes), '璺敱搴旇鏄暟缁?)
+      this.assert(systemCheckRoutes.length > 0, '搴旇鏈夊叿浣撶殑璺敱鐩爣')
       return true
     })
 
-    // 测试4: 微服务注册
-    await this.runTest(category, '微服务注册', async () => {
+    // 娴嬭瘯4: 寰湇鍔℃敞鍐?
+    await this.runTest(category, '寰湇鍔℃敞鍐?, async () => {
       const bus = eventDrivenBus
 
       bus.registerMicroservice('test-service', {
@@ -307,18 +310,18 @@ class TestRunner {
         metadata: { version: '1.0' }
       })
 
-      this.assert(bus.microservices.has('test-service'), '应该成功注册微服务')
+      this.assert(bus.microservices.has('test-service'), '搴旇鎴愬姛娉ㄥ唽寰湇鍔?)
 
       const service = bus.microservices.get('test-service')
-      this.assert(service.status === 'active', '新注册服务状态应该是active')
-      this.assert(service.events.includes('test.*'), '应该记录服务事件模式')
+      this.assert(service.status === 'active', '鏂版敞鍐屾湇鍔＄姸鎬佸簲璇ユ槸active')
+      this.assert(service.events.includes('test.*'), '搴旇璁板綍鏈嶅姟浜嬩欢妯″紡')
 
       bus.unregisterMicroservice('test-service')
       return true
     })
 
-    // 测试5: 批量事件发布
-    await this.runTest(category, '批量事件发布', async () => {
+    // 娴嬭瘯5: 鎵归噺浜嬩欢鍙戝竷
+    await this.runTest(category, '鎵归噺浜嬩欢鍙戝竷', async () => {
       const bus = eventDrivenBus
 
       const events = [
@@ -329,21 +332,21 @@ class TestRunner {
 
       const results = await bus.publishBatch(events)
 
-      this.assert(Array.isArray(results), '批量发布应该返回结果数组')
-      this.assert(results.length === 3, '应该有3个结果')
-      this.assert(results.every(r => r.success), '所有事件应该发布成功')
+      this.assert(Array.isArray(results), '鎵归噺鍙戝竷搴旇杩斿洖缁撴灉鏁扮粍')
+      this.assert(results.length === 3, '搴旇鏈?涓粨鏋?)
+      this.assert(results.every(r => r.success), '鎵€鏈変簨浠跺簲璇ュ彂甯冩垚鍔?)
       return true
     })
 
-    console.log('✅ 事件驱动总线测试完成\n')
+    console.log('鉁?浜嬩欢椹卞姩鎬荤嚎娴嬭瘯瀹屾垚\n')
   }
 
   /**
-   * 运行单个测试
+   * 杩愯鍗曚釜娴嬭瘯
    */
   async runTest(category, testName, testFunction) {
     try {
-      console.log(`  🧪 ${testName}...`)
+      console.log(`  馃И ${testName}...`)
       await testFunction()
       this.testResults[category].passed++
       this.testResults[category].tests.push({
@@ -351,7 +354,7 @@ class TestRunner {
         status: 'passed',
         time: Date.now()
       })
-      console.log(`    ✅ 通过`)
+      console.log(`    鉁?閫氳繃`)
     } catch (error) {
       this.testResults[category].failed++
       this.testResults[category].tests.push({
@@ -360,24 +363,24 @@ class TestRunner {
         error: error.message,
         time: Date.now()
       })
-      console.log(`    ❌ 失败: ${error.message}`)
+      console.log(`    鉂?澶辫触: ${error.message}`)
     }
   }
 
   /**
-   * 断言工具
+   * 鏂█宸ュ叿
    */
   assert(condition, message) {
     if (!condition) {
-      throw new Error(message || '断言失败')
+      throw new Error(message || '鏂█澶辫触')
     }
   }
 
   /**
-   * 生成测试报告
+   * 鐢熸垚娴嬭瘯鎶ュ憡
    */
   generateTestReport() {
-    console.log('\n📋 测试报告 ===================')
+    console.log('\n馃搵 娴嬭瘯鎶ュ憡 ===================')
 
     let totalPassed = 0
     let totalFailed = 0
@@ -390,14 +393,14 @@ class TestRunner {
       const passRate = total > 0 ? ((result.passed / total) * 100).toFixed(1) : '0.0'
 
       console.log(`\n${this.getCategoryName(category)}:`)
-      console.log(`  通过: ${result.passed}  失败: ${result.failed}  通过率: ${passRate}%`)
+      console.log(`  閫氳繃: ${result.passed}  澶辫触: ${result.failed}  閫氳繃鐜? ${passRate}%`)
 
       if (result.failed > 0) {
-        console.log(`  失败的测试:`)
+        console.log(`  澶辫触鐨勬祴璇?`)
         result.tests
           .filter(test => test.status === 'failed')
           .forEach(test => {
-            console.log(`    ❌ ${test.name}: ${test.error}`)
+            console.log(`    鉂?${test.name}: ${test.error}`)
           })
       }
 
@@ -405,7 +408,7 @@ class TestRunner {
       totalFailed += result.failed
     })
 
-    // 总体统计
+    // 鎬讳綋缁熻
     const totalTests = totalPassed + totalFailed
     const overallPassRate = totalTests > 0 ? ((totalPassed / totalTests) * 100).toFixed(1) : '0.0'
 
@@ -416,45 +419,45 @@ class TestRunner {
       passRate: overallPassRate
     }
 
-    console.log('\n=== 总体结果 ===')
-    console.log(`总测试数: ${totalTests}`)
-    console.log(`通过: ${totalPassed}`)
-    console.log(`失败: ${totalFailed}`)
-    console.log(`通过率: ${overallPassRate}%`)
+    console.log('\n=== 鎬讳綋缁撴灉 ===')
+    console.log(`鎬绘祴璇曟暟: ${totalTests}`)
+    console.log(`閫氳繃: ${totalPassed}`)
+    console.log(`澶辫触: ${totalFailed}`)
+    console.log(`閫氳繃鐜? ${overallPassRate}%`)
 
     if (totalFailed === 0) {
-      console.log('\n🎉 所有测试通过！新功能模块运行正常！')
+      console.log('\n馃帀 鎵€鏈夋祴璇曢€氳繃锛佹柊鍔熻兘妯″潡杩愯姝ｅ父锛?)
     } else {
-      console.log(`\n⚠️  有 ${totalFailed} 个测试失败，请检查相关模块`)
+      console.log(`\n鈿狅笍  鏈?${totalFailed} 涓祴璇曞け璐ワ紝璇锋鏌ョ浉鍏虫ā鍧梎)
     }
 
-    console.log('\n测试完成时间:', new Date().toLocaleString())
+    console.log('\n娴嬭瘯瀹屾垚鏃堕棿:', new Date().toLocaleString())
   }
 
   getCategoryName(category) {
     const names = {
-      systemCheck: '🔍 智能诊断引擎',
-      resilientSession: '🛡️ 弹性会话架构',
-      visualReport: '📊 多维可视化引擎',
-      eventBus: '⚡ 事件驱动总线'
+      systemCheck: '馃攳 鏅鸿兘璇婃柇寮曟搸',
+      resilientSession: '馃洝锔?寮规€т細璇濇灦鏋?,
+      visualReport: '馃搳 澶氱淮鍙鍖栧紩鎿?,
+      eventBus: '鈿?浜嬩欢椹卞姩鎬荤嚎'
     }
     return names[category] || category
   }
 }
 
-// 创建测试运行器实例
+// 鍒涘缓娴嬭瘯杩愯鍣ㄥ疄渚?
 const testRunner = new TestRunner()
 
-// 导出测试函数供外部调用
+// 瀵煎嚭娴嬭瘯鍑芥暟渚涘閮ㄨ皟鐢?
 export const runModuleTests = () => testRunner.runAllTests()
 export const getTestResults = () => testRunner.testResults
 
-// 如果直接运行此文件，执行测试
+// 濡傛灉鐩存帴杩愯姝ゆ枃浠讹紝鎵ц娴嬭瘯
 if (typeof window !== 'undefined') {
-  // 浏览器环境
+  // 娴忚鍣ㄧ幆澧?
   window.runModuleTests = runModuleTests
-  console.log('💡 新功能测试已准备就绪！在浏览器控制台中运行 runModuleTests() 开始测试')
+  console.log('馃挕 鏂板姛鑳芥祴璇曞凡鍑嗗灏辩华锛佸湪娴忚鍣ㄦ帶鍒跺彴涓繍琛?runModuleTests() 寮€濮嬫祴璇?)
 } else {
-  // Node.js环境
+  // Node.js鐜
   runModuleTests()
 }

@@ -73,9 +73,9 @@
                   :key="prof.value"
                   :type="form.jobTitle === prof.value ? 'primary' : 'info'"
                   class="quick-tag"
-                  @click="selectProfession(prof.value)"
                   effect="plain"
                   size="large"
+                  @click="selectProfession(prof.value)"
                 >
                   {{ prof.icon }} {{ prof.label }}
                 </el-tag>
@@ -87,10 +87,10 @@
               <el-button
                 type="primary"
                 size="large"
-                @click="handleGenerate"
                 :loading="generating"
                 :disabled="!form.jobTitle.trim()"
                 style="width: 100%"
+                @click="handleGenerate"
               >
                 <el-icon v-if="!generating"><MagicStick /></el-icon>
                 {{ generating ? '正在生成中...' : '🚀 开始生成面试题目' }}
@@ -399,21 +399,46 @@ const handleGenerate = async () => {
     currentStep.value = '整理结果...'
 
     if (response.code === 200 && response.data) {
-      const { generated_questions, session_id } = response.data
+      // 根据工作流1的返回格式解析数据
+      // 期待格式: { session_id, questions (JSON string), job_title, question_count }
+      const responseData = response.data
+
+      // 解析questions JSON字符串
+      let parsedQuestions = []
+      if (responseData.questions_json) {
+        try {
+          parsedQuestions = JSON.parse(responseData.questions_json)
+        } catch (e) {
+          console.error('解析questions失败:', e)
+          parsedQuestions = responseData.questions || []
+        }
+      } else if (responseData.questions) {
+        parsedQuestions = responseData.questions
+      }
+
+      // 将新格式的questions转换为前端展示格式
+      // 新格式: { id, question, hasAnswer, answer }
+      // 前端格式: { question, answer }
+      const formattedQuestions = parsedQuestions.map(q => ({
+        id: q.id,
+        question: q.question,
+        answer: q.answer || '标准答案生成中...',
+        hasAnswer: q.hasAnswer || false
+      }))
 
       // 构建结果
       result.value = {
         jobTitle: form.jobTitle,
-        sessionId: session_id,
+        sessionId: responseData.session_id,
         timestamp: Date.now(),
-        questions: generated_questions || []
+        questions: formattedQuestions
       }
 
       // 保存到历史记录
       generationHistory.value.unshift({
         jobTitle: form.jobTitle,
         timestamp: Date.now(),
-        sessionId: session_id
+        sessionId: responseData.session_id
       })
 
       // 只保留最近10条

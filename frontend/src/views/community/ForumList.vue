@@ -1,13 +1,13 @@
 <template>
   <div class="forum-list-page">
-    <el-page-header @back="$router.push('/')" title="返回首页">
+    <el-page-header title="返回首页" @back="$router.push('/')">
       <template #content>
         <span class="page-title">社区论坛</span>
       </template>
     </el-page-header>
 
     <div class="forum-header">
-      <h1>欢迎来到 AI 面试通社区</h1>
+      <h1>欢迎来到 社区论坛</h1>
       <p>在这里分享经验、交流技术、共同成长</p>
     </div>
 

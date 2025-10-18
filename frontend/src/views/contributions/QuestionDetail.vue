@@ -65,7 +65,7 @@
         </el-alert>
 
         <div class="question-content">
-          <div v-html="renderedContent" class="markdown-body"></div>
+          <div class="markdown-body" v-html="renderedContent"></div>
         </div>
 
         <div class="question-footer">
@@ -107,13 +107,13 @@
                 <span class="time">{{ discussion.createdAt }}</span>
               </div>
 
-              <div v-html="discussion.content" class="discussion-content markdown-body"></div>
+              <div class="discussion-content markdown-body" v-html="discussion.content"></div>
 
               <div class="discussion-actions">
                 <el-button
                   size="small"
                   :type="discussion.isLiked ? 'primary' : 'default'"
-                  :icon="Like"
+                  :icon="StarFilled"
                   @click="toggleLike(discussion.id)"
                 >
                   {{ discussion.likes }}
@@ -136,7 +136,7 @@
                       <strong>{{ reply.author }}</strong>
                       <span class="time">{{ reply.createdAt }}</span>
                     </div>
-                    <div v-html="reply.content" class="markdown-body"></div>
+                    <div class="markdown-body" v-html="reply.content"></div>
                   </div>
                 </div>
               </div>
@@ -185,7 +185,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import {
   ArrowLeft, Star, Share, User, Clock, View, ChatDotRound,
-  Like, TrophyBase
+  StarFilled, TrophyBase
 } from '@element-plus/icons-vue'
 import { marked } from 'marked'
 import RichTextEditor from '@/components/RichTextEditor.vue'

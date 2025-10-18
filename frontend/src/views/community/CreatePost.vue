@@ -1,6 +1,6 @@
 <template>
   <div class="create-post-page">
-    <el-page-header @back="$router.back()" title="返回">
+    <el-page-header title="返回" @back="$router.back()">
       <template #content>
         <span class="page-title">发布新帖</span>
       </template>

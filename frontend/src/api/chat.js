@@ -224,3 +224,77 @@ export function recallMessage(conversationId, messageId) {
     method: 'post'
   })
 }
+
+// ==================== 用户状态 API ====================
+
+/**
+ * 获取当前用户状态
+ */
+export function getCurrentUserStatus() {
+  return api({
+    url: '/chat/users/me/status',
+    method: 'get'
+  })
+}
+
+/**
+ * 更新当前用户状态
+ * @param {Object} data - 状态数据
+ * @param {string} data.status - 状态(online/away/busy/offline)
+ * @param {string} data.customStatus - 自定义状态消息
+ */
+export function updateUserStatus(data) {
+  return api({
+    url: '/chat/users/me/status',
+    method: 'put',
+    data
+  })
+}
+
+/**
+ * 获取指定用户状态
+ * @param {number|string} userId - 用户ID
+ */
+export function getUserStatus(userId) {
+  return api({
+    url: `/chat/users/${userId}/status`,
+    method: 'get'
+  })
+}
+
+/**
+ * 批量获取多个用户状态
+ * @param {Array} userIds - 用户ID数组
+ */
+export function getUserStatuses(userIds) {
+  return api({
+    url: '/chat/users/statuses',
+    method: 'post',
+    data: { userIds }
+  })
+}
+
+/**
+ * 设置自定义状态消息
+ * @param {string} message - 自定义消息(最多50字符)
+ */
+export function setStatusMessage(message) {
+  return api({
+    url: '/chat/users/me/status-message',
+    method: 'put',
+    data: { message }
+  })
+}
+
+/**
+ * 获取用户状态历史
+ * @param {Object} params - 查询参数
+ * @param {number} params.limit - 限制数量(默认20)
+ */
+export function getStatusHistory(params = {}) {
+  return api({
+    url: '/chat/users/me/status-history',
+    method: 'get',
+    params
+  })
+}

@@ -4,7 +4,7 @@
     <el-header class="category-header">
       <div class="header-content">
         <div class="nav-section">
-          <el-button type="text" @click="handleGoBack" class="back-btn">
+          <el-button type="text" class="back-btn" @click="handleGoBack">
             <el-icon><ArrowLeft /></el-icon>
             返回
           </el-button>
@@ -17,8 +17,8 @@
     </el-header>
 
     <!-- 主内容 -->
-    <el-main class="category-content" v-loading="loading">
-      <div class="content-wrapper" v-if="categoryInfo">
+    <el-main v-loading="loading" class="category-content">
+      <div v-if="categoryInfo" class="content-wrapper">
         <!-- 分类信息头部 -->
         <div class="category-hero">
           <div class="category-icon-large" :style="{ backgroundColor: categoryInfo.color + '20' }">

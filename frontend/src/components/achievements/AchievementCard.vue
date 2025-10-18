@@ -23,7 +23,7 @@
     <div class="achievement-icon-wrapper">
       <div class="achievement-icon" :style="{ backgroundColor: iconBgColor }">
         <el-icon :size="compact ? 32 : 40" :color="iconColor">
-          <component :is="achievement.icon || 'Trophy'" />
+          <component :is="displayIcon" />
         </el-icon>
       </div>
 
@@ -74,13 +74,13 @@
     </div>
 
     <!-- 操作按钮 -->
-    <div class="achievement-actions" v-if="!compact">
+    <div v-if="!compact" class="achievement-actions">
       <el-button
+        v-if="achievement.progress?.unlocked"
         size="small"
         type="primary"
         text
         @click.stop="handleShare"
-        v-if="achievement.progress?.unlocked"
       >
         <el-icon><Share /></el-icon>
         分享
@@ -98,7 +98,7 @@
     </div>
 
     <!-- 点击波纹效果 -->
-    <div class="click-ripple" ref="rippleRef"></div>
+    <div ref="rippleRef" class="click-ripple"></div>
   </div>
 </template>
 
@@ -123,6 +123,18 @@ const props = defineProps({
 const emit = defineEmits(['click', 'share', 'view-detail'])
 
 const rippleRef = ref(null)
+
+const iconRegistry = {
+  Trophy,
+  Star,
+  Clock,
+  InfoFilled,
+  Share,
+  View,
+  CircleCheckFilled,
+  Lock,
+  Loading
+}
 
 // 计算属性
 const isRecentlyUnlocked = computed(() => {
@@ -155,9 +167,9 @@ const statusClass = computed(() => {
 })
 
 const statusIcon = computed(() => {
-  if (props.achievement.progress?.unlocked) return 'CircleCheckFilled'
-  if ((props.achievement.progress?.progress || 0) > 0) return 'Loading'
-  return 'Lock'
+  if (props.achievement.progress?.unlocked) return CircleCheckFilled
+  if ((props.achievement.progress?.progress || 0) > 0) return Loading
+  return Lock
 })
 
 const rarityText = computed(() => {
@@ -170,6 +182,28 @@ const rarityText = computed(() => {
   return rarityMap[props.achievement.rarity] || '普通'
 })
 
+const iconKey = computed(() => {
+  const icon = props.achievement.icon
+  if (typeof icon === 'string' && icon.trim()) {
+    return icon
+  }
+  if (icon && typeof icon === 'object' && 'name' in icon) {
+    return icon.name
+  }
+  return 'Trophy'
+})
+
+const displayIcon = computed(() => {
+  const icon = props.achievement.icon
+  if (typeof icon === 'string') {
+    return iconRegistry[icon] || icon
+  }
+  if (icon) {
+    return icon
+  }
+  return Trophy
+})
+
 const iconColor = computed(() => {
   const colorMap = {
     VideoCamera: '#409eff',
@@ -179,7 +213,7 @@ const iconColor = computed(() => {
     Medal: '#722ed1',
     GoldMedal: '#fa8c16'
   }
-  return colorMap[props.achievement.icon] || '#409eff'
+  return colorMap[iconKey.value] || '#409eff'
 })
 
 const iconBgColor = computed(() => {

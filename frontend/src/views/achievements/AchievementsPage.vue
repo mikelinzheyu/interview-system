@@ -4,7 +4,7 @@
     <el-header class="header">
       <div class="header-content">
         <div class="nav-section">
-          <el-button type="text" @click="$router.back()" class="back-btn">
+          <el-button type="text" class="back-btn" @click="$router.back()">
             <el-icon><ArrowLeft /></el-icon>
             返回
           </el-button>
@@ -20,7 +20,7 @@
             clearable
             @input="handleSearch"
           />
-          <el-button @click="refreshData" :loading="refreshing">
+          <el-button :loading="refreshing" @click="refreshData">
             <el-icon><Refresh /></el-icon>
             刷新
           </el-button>
@@ -103,7 +103,7 @@
         />
 
         <!-- 分页控制 -->
-        <div class="pagination-section" v-if="totalPages > 1">
+        <div v-if="totalPages > 1" class="pagination-section">
           <el-pagination
             v-model:current-page="currentPage"
             :page-size="pageSize"
@@ -116,7 +116,7 @@
         </div>
 
         <!-- 最近解锁的成就 -->
-        <div class="recent-section" v-if="recentUnlocked.length > 0">
+        <div v-if="recentUnlocked.length > 0" class="recent-section">
           <h2 class="section-title">最近解锁</h2>
           <div class="recent-achievements">
             <AchievementCard

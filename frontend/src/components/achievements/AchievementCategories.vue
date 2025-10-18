@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="achievement-categories">
     <div class="categories-header">
       <h3 class="categories-title">成就分类</h3>
@@ -6,15 +6,15 @@
         <el-button
           type="text"
           :class="{ active: activeCategory === 'all' }"
-          @click="handleCategoryChange('all')"
           class="category-all-btn"
+          @click="handleCategoryChange('all')"
         >
           全部分类
         </el-button>
       </div>
     </div>
 
-    <div class="categories-grid" v-loading="loading">
+    <div v-loading="loading" class="categories-grid">
       <div
         v-for="category in categoriesWithStats"
         :key="category.id"
@@ -56,7 +56,7 @@
           </div>
 
           <!-- 稀有成就标识 -->
-          <div class="rare-badges" v-if="category.rareAchievements.length > 0">
+          <div v-if="category.rareAchievements.length > 0" class="rare-badges">
             <el-tag
               v-for="rare in category.rareAchievements"
               :key="rare.rarity"
@@ -70,12 +70,12 @@
         </div>
 
         <!-- 活跃指示器 -->
-        <div class="category-indicator" v-if="activeCategory === category.id">
+        <div v-if="activeCategory === category.id" class="category-indicator">
           <div class="indicator-dot"></div>
         </div>
 
         <!-- 最新解锁提示 -->
-        <div class="recent-unlock" v-if="category.hasRecentUnlock">
+        <div v-if="category.hasRecentUnlock" class="recent-unlock">
           <el-icon color="#67c23a" size="16">
             <CircleCheckFilled />
           </el-icon>
@@ -85,7 +85,7 @@
     </div>
 
     <!-- 分类统计摘要 -->
-    <div class="categories-summary" v-if="!loading">
+    <div v-if="!loading" class="categories-summary">
       <div class="summary-item">
         <el-icon color="#409eff"><FolderOpened /></el-icon>
         <span class="summary-text">{{ totalCategories }} 个分类</span>
@@ -106,10 +106,7 @@
 
 <script setup>
 import { computed } from 'vue'
-import {
-  VideoCamera, Clock, Star, Trophy, CircleCheckFilled,
-  FolderOpened, Medal, GoldMedal
-} from '@element-plus/icons-vue'
+import { Star, Trophy, CircleCheckFilled, FolderOpened } from '@element-plus/icons-vue'
 
 const props = defineProps({
   categories: {

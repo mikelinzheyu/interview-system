@@ -6,7 +6,7 @@
     <h3 class="error-title">出现了一些问题</h3>
     <p class="error-message">{{ errorMessage }}</p>
     <div class="action-buttons">
-      <el-button @click="retry" type="primary">重试</el-button>
+      <el-button type="primary" @click="retry">重试</el-button>
       <el-button @click="reset">重置</el-button>
     </div>
   </div>

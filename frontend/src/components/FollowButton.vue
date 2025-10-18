@@ -4,9 +4,9 @@
     :size="size"
     :loading="loading"
     :icon="isFollowing ? Check : Plus"
-    @click.stop="handleClick"
     class="follow-button"
     :class="{ 'is-following': isFollowing }"
+    @click.stop="handleClick"
   >
     <span v-if="!loading">{{ buttonText }}</span>
   </el-button>

@@ -4,7 +4,7 @@
     <el-header class="detail-header">
       <div class="header-content">
         <div class="nav-section">
-          <el-button type="text" @click="handleGoBack" class="back-btn">
+          <el-button type="text" class="back-btn" @click="handleGoBack">
             <el-icon><ArrowLeft /></el-icon>
             返回
           </el-button>
@@ -15,11 +15,11 @@
         </div>
 
         <div class="header-actions">
-          <el-button @click="handleShare" v-if="achievement?.progress?.unlocked">
+          <el-button v-if="achievement?.progress?.unlocked" @click="handleShare">
             <el-icon><Share /></el-icon>
             分享成就
           </el-button>
-          <el-button @click="refreshDetail" :loading="loading">
+          <el-button :loading="loading" @click="refreshDetail">
             <el-icon><Refresh /></el-icon>
             刷新
           </el-button>
@@ -28,8 +28,8 @@
     </el-header>
 
     <!-- 主内容区 -->
-    <el-main class="detail-content" v-loading="loading">
-      <div class="content-wrapper" v-if="achievement">
+    <el-main v-loading="loading" class="detail-content">
+      <div v-if="achievement" class="content-wrapper">
         <!-- 成就主要信息 -->
         <div class="achievement-hero">
           <div class="hero-background" :class="`rarity-${achievement.rarity}`">
@@ -151,7 +151,7 @@
             <template #header>
               <div class="card-header">
                 <span class="card-title">
-                  <el-icon><Lightbulb /></el-icon>
+                  <el-icon><QuestionFilled /></el-icon>
                   完成提示
                 </span>
               </div>
@@ -173,7 +173,7 @@
               </div>
 
               <div v-else class="tips-list">
-                <div class="tip-item" v-for="tip in achievementTips" :key="tip.id">
+                <div v-for="tip in achievementTips" :key="tip.id" class="tip-item">
                   <div class="tip-icon">
                     <el-icon :color="tip.color">
                       <component :is="tip.icon" />
@@ -187,7 +187,7 @@
               </div>
 
               <!-- 相关成就推荐 -->
-              <div class="related-achievements" v-if="relatedAchievements.length > 0">
+              <div v-if="relatedAchievements.length > 0" class="related-achievements">
                 <h4 class="related-title">相关成就推荐</h4>
                 <div class="related-list">
                   <div
@@ -236,7 +236,7 @@ import { useStatisticsStore } from '@/stores/statistics'
 import { ElMessage } from 'element-plus'
 import {
   ArrowLeft, Share, Refresh, Trophy, CircleCheckFilled,
-  Lightbulb, VideoCamera, Clock, Star
+  QuestionFilled, VideoCamera, Clock, Star
 } from '@element-plus/icons-vue'
 
 const route = useRoute()
