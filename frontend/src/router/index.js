@@ -188,6 +188,12 @@ const routes = [
     meta: { requiresAuth: true },
     props: true
   },
+  {
+    path: '/chat/search',
+    name: 'ChatSearch',
+    component: () => import('@/views/chat/ChatSearch.vue'),
+    meta: { requiresAuth: true }
+  },
 
   // Phase 3: 关注系统
   {

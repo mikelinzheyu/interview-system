@@ -1,515 +1,744 @@
 <template>
-  <div class="chat-room-container">
-    <el-container>
-      <!-- 左侧：聊天区域 -->
-      <el-main class="chat-main">
-        <!-- 顶部：房间信息 -->
-        <el-card class="room-header" shadow="never">
-          <div class="header-content">
-            <div class="room-info">
-              <el-avatar :size="40" :src="room.avatar">
-                {{ room.name?.substring(0, 2) }}
-              </el-avatar>
-              <div class="room-details">
-                <h3>{{ room.name }}</h3>
-                <p>{{ room.memberCount }} 位成员在线</p>
-              </div>
-            </div>
-            <div class="header-actions">
-              <el-button @click="showMembersDrawer = true">
-                <el-icon><User /></el-icon>
-                成员列表
-              </el-button>
-              <el-button @click="handleLeaveRoom">
-                <el-icon><Close /></el-icon>
-                离开聊天室
-              </el-button>
-            </div>
-          </div>
-        </el-card>
-
-        <!-- 消息列表 -->
-        <div class="message-list" ref="messageListRef">
-          <div v-if="loading" class="loading-container">
-            <el-skeleton :rows="5" animated />
-          </div>
-
-          <div v-else>
-            <el-empty
-              v-if="messages.length === 0"
-              description="暂无消息，开始聊天吧！"
-            />
-
-            <div
-              v-for="message in messages"
-              :key="message.id"
-              class="message-item"
-              :class="{ 'own-message': message.senderId === currentUserId }"
-            >
-              <el-avatar
-                :size="40"
-                :src="message.senderAvatar"
-                class="message-avatar"
-              >
-                {{ message.senderName?.substring(0, 2) }}
-              </el-avatar>
-
-              <div class="message-content">
-                <div class="message-header">
-                  <span class="sender-name">{{ message.senderName }}</span>
-                  <span class="message-time">{{ formatTime(message.createdAt) }}</span>
-                </div>
-                <div class="message-bubble">
-                  {{ message.content }}
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- 有人正在输入提示 -->
-          <div v-if="typingUsers.length > 0" class="typing-indicator">
-            <el-icon class="typing-icon"><Loading /></el-icon>
-            {{ typingUsers.join(', ') }} 正在输入...
-          </div>
-        </div>
-
-        <!-- 底部：输入框 -->
-        <div class="message-input-area">
-          <el-input
-            v-model="messageInput"
-            type="textarea"
-            :rows="3"
-            placeholder="输入消息... (Ctrl+Enter 发送)"
-            @keydown.ctrl.enter="handleSendMessage"
-            @input="handleTyping"
-            maxlength="1000"
-            show-word-limit
+  <div class="chat-room">
+    <div class="chat-room__gradient" />
+    <div class="chat-room__container">
+      <ChatLayout :show-panel="showRightPanel">
+        <template #aside>
+          <ConversationListEnhanced
+            :conversations="store.conversations"
+            :active-conversation-id="store.activeConversationId"
+            :loading="store.conversationsLoading"
+            :user-status-map="userStatusMap"
+            :show-online-status="true"
+            @select="handleConversationSelect"
+            @create="handleCreateConversation"
+            @pin="handlePin"
+            @mute="handleMute"
+            @mark-read="handleMarkRead"
+            @delete="handleDeleteConversation"
+            @search="handleSearch"
           />
-          <div class="input-actions">
-            <el-button type="primary" @click="handleSendMessage">
-              <el-icon><Position /></el-icon>
-              发送消息
-            </el-button>
-          </div>
-        </div>
-      </el-main>
+        </template>
 
-      <!-- 右侧：成员列表抽屉 -->
-      <el-drawer
-        v-model="showMembersDrawer"
-        title="聊天室成员"
-        direction="rtl"
-        size="300px"
-      >
-        <div class="members-list">
-          <div
-            v-for="member in members"
-            :key="member.userId"
-            class="member-item"
+        <template #default>
+          <MessagePanel
+            :messages="store.activeMessages"
+            :loading="messageLoading"
+            :typing-users="store.activeTypingUsers"
+            :has-more="messageHasMore"
+            :prepend-loading="messagePrependLoading"
+            :action-states="messageActionStates"
+            @load-previous="handleLoadPrevious"
+            @resend-message="handleResendMessage"
+            @recall-message="handleRecallMessage"
+            @toggle-day="handleToggleDay"
           >
-            <el-avatar :size="40" :src="member.avatar">
-              {{ member.username?.substring(0, 2) }}
-            </el-avatar>
-            <div class="member-info">
-              <span class="member-name">{{ member.username }}</span>
-              <el-tag
-                v-if="member.role === 'owner'"
-                type="danger"
-                size="small"
-              >
-                房主
-              </el-tag>
-              <el-tag
-                v-else-if="member.role === 'admin'"
-                type="warning"
-                size="small"
-              >
-                管理员
-              </el-tag>
-            </div>
-          </div>
-        </div>
-      </el-drawer>
-    </el-container>
+            <template #header>
+              <div v-if="store.activeConversation" class="chat-room__header">
+                <div class="chat-room__header-info">
+                  <el-avatar :size="48" :src="store.activeConversation.avatar">
+                    {{ store.activeConversation.name?.slice(0, 1) || '?' }}
+                  </el-avatar>
+                  <div>
+                    <div class="chat-room__title">
+                      {{ store.activeConversation.name || 'δ�����Ự' }}
+                      <el-tag v-if="store.activeConversation.type === 'group'" size="small">Ⱥ��</el-tag>
+                    </div>
+                    <p class="chat-room__subtitle">
+                      {{ store.activeConversation.description || '��ӭ��ʼ�µĶԻ���' }}
+                    </p>
+                  </div>
+                </div>
+                <div class="chat-room__header-meta">
+                  <el-tag type="success" effect="dark">���� {{ store.activeConversation.onlineCount || 0 }}</el-tag>
+                  <el-tag type="info">��Ա {{ store.activeConversation.memberCount || 0 }}</el-tag>
+                </div>
+              </div>
+            </template>
+          </MessagePanel>
+
+          <MessageComposer
+            v-model="draft"
+            :disabled="!store.activeConversationId"
+            @send="handleSend"
+            @attachments-selected="handleAttachmentsSelected"
+            @attachment-rejected="handleAttachmentRejected"
+          />
+        </template>
+
+        <template #panel>
+          <ParticipantSidebar
+            :participants="store.activeParticipants"
+            :loading="participantsLoading"
+          />
+        </template>
+      </ChatLayout>
+    </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted, nextTick, computed } from 'vue'
+import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { ElMessage, ElMessageBox } from 'element-plus'
-import { User, Close, Position, Loading } from '@element-plus/icons-vue'
-import {
-  getChatRoomDetail,
-  getChatMessages,
-  leaveChatRoom
-} from '@/api/chat'
-import socketService from '@/utils/socket'
+import ChatLayout from '@/components/chat/ChatLayout.vue'
+import ConversationListEnhanced from '@/components/chat/ConversationListEnhanced.vue'
+import MessagePanel from '@/components/chat/MessagePanel.vue'
+import MessageComposer from '@/components/chat/MessageComposer.vue'
+import ParticipantSidebar from '@/components/chat/ParticipantSidebar.vue'
+import MessageBubble from '@/components/chat/MessageBubble.vue'
+import { useUserStatusStore } from '@/stores/userStatus'
+import { ElMessage } from 'element-plus'
+import { useChatWorkspaceStore } from '@/stores/chatWorkspace'
 import { useUserStore } from '@/stores/user'
+import socketService from '@/utils/socket'
+import {
+  pinConversation,
+  muteConversation,
+  markConversationRead,
+  deleteConversation
+} from '@/api/chat'
 
 const route = useRoute()
 const router = useRouter()
+const store = useChatWorkspaceStore()
 const userStore = useUserStore()
 
-// 数据
-const roomId = ref(parseInt(route.params.roomId))
-const room = ref({})
-const messages = ref([])
-const members = ref([])
-const messageInput = ref('')
-const loading = ref(true)
-const showMembersDrawer = ref(false)
-const messageListRef = ref(null)
-const typingUsers = ref([])
-const typingTimeout = ref(null)
+const draft = ref('')
+const uploadTasks = new Map()
+const socketListeners = []
+const messageActionStates = reactive({})
+let joinedRoomId = null
+let typingStopTimer = null
 
-const currentUserId = computed(() => userStore.user?.id || 1)
+const messageLoading = computed(() => {
+  const id = store.activeConversationId
+  return id ? store.messageLoadingMap[id] : false
+})
 
-// 获取房间详情
-const fetchRoomDetail = async () => {
-  try {
-    const response = await getChatRoomDetail(roomId.value)
-    room.value = response.data.room
-    members.value = response.data.members
-  } catch (error) {
-    ElMessage.error('获取房间信息失败')
-    console.error(error)
-  }
-}
+const messagePrependLoading = computed(() => {
+  const id = store.activeConversationId
+  return id ? store.messagePrependLoadingMap[id] : false
+})
 
-// 获取历史消息
-const fetchMessages = async () => {
-  loading.value = true
-  try {
-    const response = await getChatMessages(roomId.value, {
-      page: 1,
-      size: 50
-    })
-    messages.value = response.data.items
-    await nextTick()
-    scrollToBottom()
-  } catch (error) {
-    ElMessage.error('获取消息历史失败')
-    console.error(error)
-  } finally {
-    loading.value = false
-  }
-}
+const messageHasMore = computed(() => store.activeHasMore)
 
-// 发送消息
-const handleSendMessage = () => {
-  const content = messageInput.value.trim()
+const participantsLoading = computed(() => {
+  const id = store.activeConversationId
+  return id ? store.participantsLoadingMap[id] : false
+})
 
-  if (!content) {
-    ElMessage.warning('消息内容不能为空')
-    return
-  }
+const showRightPanel = computed(() => true)
 
-  if (content.length > 1000) {
-    ElMessage.warning('消息内容过长')
-    return
-  }
-
-  // 通过 WebSocket 发送消息
-  socketService.sendMessage(roomId.value, content)
-
-  // 清空输入框
-  messageInput.value = ''
-}
-
-// 处理输入状态
-const handleTyping = () => {
-  // 发送输入状态
-  socketService.sendTypingStatus(roomId.value, true)
-
-  // 3秒后取消输入状态
-  if (typingTimeout.value) {
-    clearTimeout(typingTimeout.value)
-  }
-
-  typingTimeout.value = setTimeout(() => {
-    socketService.sendTypingStatus(roomId.value, false)
-  }, 3000)
-}
-
-// 离开聊天室
-const handleLeaveRoom = async () => {
-  try {
-    await ElMessageBox.confirm(
-      '确定要离开这个聊天室吗？',
-      '提示',
-      {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }
-    )
-
-    await leaveChatRoom(roomId.value)
-    socketService.leaveRoom(roomId.value)
-
-    ElMessage.success('已离开聊天室')
-    router.push({ name: 'ChatList' })
-  } catch (error) {
-    if (error !== 'cancel') {
-      ElMessage.error('离开聊天室失败')
-      console.error(error)
-    }
-  }
-}
-
-// 格式化时间
-const formatTime = (timestamp) => {
-  const date = new Date(timestamp)
-  const now = new Date()
-  const diff = now - date
-
-  if (diff < 60000) {
-    return '刚刚'
-  } else if (diff < 3600000) {
-    return `${Math.floor(diff / 60000)} 分钟前`
-  } else if (diff < 86400000) {
-    return `${Math.floor(diff / 3600000)} 小时前`
-  } else {
-    return date.toLocaleDateString() + ' ' + date.toLocaleTimeString()
-  }
-}
-
-// 滚动到底部
-const scrollToBottom = () => {
-  if (messageListRef.value) {
-    messageListRef.value.scrollTop = messageListRef.value.scrollHeight
-  }
-}
-
-// WebSocket 事件监听
-const setupSocketListeners = () => {
-  // 监听新消息
-  socketService.onNewMessage((message) => {
-    if (message.roomId === roomId.value) {
-      messages.value.push(message)
-      nextTick(() => {
-        scrollToBottom()
-      })
-    }
-  })
-
-  // 监听用户加入
-  socketService.onUserJoined((data) => {
-    if (data.roomId === roomId.value) {
-      ElMessage.info(`用户 ${data.userId} 加入了聊天室`)
-      // 刷新成员列表
-      fetchRoomDetail()
-    }
-  })
-
-  // 监听用户离开
-  socketService.onUserLeft((data) => {
-    if (data.roomId === roomId.value) {
-      ElMessage.info(`用户 ${data.userId} 离开了聊天室`)
-      // 刷新成员列表
-      fetchRoomDetail()
-    }
-  })
-
-  // 监听输入状态
-  socketService.onUserTyping((data) => {
-    if (data.roomId === roomId.value && data.userId !== currentUserId.value) {
-      if (data.isTyping) {
-        if (!typingUsers.value.includes(`用户${data.userId}`)) {
-          typingUsers.value.push(`用户${data.userId}`)
-        }
-      } else {
-        const index = typingUsers.value.indexOf(`用户${data.userId}`)
-        if (index > -1) {
-          typingUsers.value.splice(index, 1)
-        }
-      }
-    }
-  })
-}
+// User status management
+const statusStore = useUserStatusStore()
+const userStatusMap = computed(() => statusStore.userStatusMap)
 
 onMounted(async () => {
-  // 加入聊天室
-  socketService.joinRoom(roomId.value)
+  store.setCurrentUser(userStore.user?.id || 1)
+  ensureSocketConnection()
+  bindSocketEvents()
 
-  // 获取数据
-  await Promise.all([
-    fetchRoomDetail(),
-    fetchMessages()
-  ])
+  if (!store.conversationsLoaded) {
+    await store.fetchConversations()
+  }
 
-  // 设置 WebSocket 监听
-  setupSocketListeners()
-})
-
-onUnmounted(() => {
-  // 离开聊天室
-  socketService.leaveRoom(roomId.value)
-
-  // 清除定时器
-  if (typingTimeout.value) {
-    clearTimeout(typingTimeout.value)
+  const routeId = resolveConversationId(route.params.roomId)
+  if (routeId) {
+    store.setActiveConversation(routeId)
+  } else if (store.conversations.length) {
+    store.setActiveConversation(store.conversations[0].id)
+    pushRoute(store.conversations[0].id)
   }
 })
+
+onBeforeUnmount(() => {
+  cleanupUploadTasks()
+  teardownSocket()
+})
+
+watch(
+  () => store.activeConversationId,
+  (conversationId, previousId) => {
+    if (previousId && previousId !== conversationId) {
+      if (socketService.isConnected()) {
+        try {
+          if (store.notifyTyping(previousId, false)) {
+            socketService.sendTypingStatus(previousId, false)
+          }
+          socketService.leaveRoom(previousId)
+        } catch (error) {
+          console.warn('[chat] leave room failed', error)
+        }
+      }
+      store.clearTyping(previousId)
+    }
+
+    if (!conversationId) {
+      joinedRoomId = null
+      clearAllActionStates()
+      return
+    }
+
+    joinedRoomId = conversationId
+    clearAllActionStates()
+
+    if (socketService.isConnected()) {
+      try {
+        socketService.joinRoom(conversationId)
+      } catch (error) {
+        console.warn('[chat] join room failed', error)
+      }
+    }
+
+    store.fetchParticipants(conversationId)
+    store.markConversationRead(conversationId)
+  },
+  { immediate: true }
+)
+
+watch(
+  () =>
+    (store.activeMessages || [])
+      .map((message) => `${message?.id}:${message?.status}`)
+      .join('|'),
+  () => {
+    const conversationId = store.activeConversationId
+    if (!conversationId) return
+
+    const unreadIds = (store.activeMessages || [])
+      .filter((message) => message && !message.isOwn && message.status !== 'read')
+      .map((message) => message.id)
+
+    if (!unreadIds.length) return
+
+    store.markConversationRead(conversationId)
+
+    if (socketService.isConnected()) {
+      try {
+        socketService.emit('message-read', {
+          roomId: conversationId,
+          messageIds: unreadIds
+        })
+      } catch (error) {
+        console.warn('[chat] emit read receipt failed', error)
+      }
+    }
+  }
+)
+
+watch(
+  draft,
+  (value) => {
+    const conversationId = store.activeConversationId
+    if (!conversationId) return
+
+    const hasContent = Boolean(value && value.trim())
+
+    if (socketService.isConnected()) {
+      try {
+        if (store.notifyTyping(conversationId, hasContent)) {
+          socketService.sendTypingStatus(conversationId, hasContent)
+        }
+      } catch (error) {
+        console.warn('[chat] typing status emit failed', error)
+      }
+    }
+
+    if (typingStopTimer) {
+      clearTimeout(typingStopTimer)
+      typingStopTimer = null
+    }
+
+    if (!hasContent) {
+      if (socketService.isConnected()) {
+        try {
+          if (store.notifyTyping(conversationId, false)) {
+            socketService.sendTypingStatus(conversationId, false)
+          }
+        } catch (error) {
+          console.warn('[chat] typing stop emit failed', error)
+        }
+      }
+      return
+    }
+
+    typingStopTimer = setTimeout(() => {
+      if (!store.activeConversationId) return
+      if (socketService.isConnected()) {
+        try {
+          if (store.notifyTyping(store.activeConversationId, false)) {
+            socketService.sendTypingStatus(store.activeConversationId, false)
+          }
+        } catch (error) {
+          console.warn('[chat] typing stop emit failed', error)
+        }
+      }
+      typingStopTimer = null
+    }, 2000)
+  }
+)
+
+watch(
+  () => route.params.roomId,
+  (value) => {
+    const id = resolveConversationId(value)
+    if (id) {
+      store.setActiveConversation(id)
+    }
+  }
+)
+
+watch(
+  () => userStore.user,
+  (user) => {
+    if (user?.id) {
+      store.setCurrentUser(user.id)
+      ensureSocketConnection()
+    }
+  },
+  { immediate: true }
+)
+
+function actionKeyFromMessage(message) {
+  if (!message) return null
+  return (
+    message.id ||
+    message.tempId ||
+    message.localId ||
+    `${message.conversationId || store.activeConversationId || 'local'}-${message.createdAt || Date.now()}`
+  ).toString()
+}
+
+function setActionLoading(messageId, type, value) {
+  if (!messageId || !type) return
+  const current = messageActionStates[messageId] || {}
+  current[type] = value
+  messageActionStates[messageId] = { ...current }
+  if (!value) {
+    cleanupActionLoading(messageId)
+  }
+}
+
+function cleanupActionLoading(messageId) {
+  const current = messageActionStates[messageId]
+  if (!current) return
+  const hasActive = Object.values(current).some(Boolean)
+  if (!hasActive) {
+    delete messageActionStates[messageId]
+  }
+}
+
+function clearAllActionStates() {
+  Object.keys(messageActionStates).forEach((key) => {
+    delete messageActionStates[key]
+  })
+}
+
+async function handleResendMessage(message) {
+  const conversationId = store.activeConversationId
+  if (!conversationId || !message) return
+  const key = actionKeyFromMessage(message)
+  setActionLoading(key, 'resend', true)
+  try {
+    await store.resendMessage(conversationId, message)
+    ElMessage.success('已重新发送')
+  } catch (error) {
+    console.error('[chat] resend failed', error)
+    ElMessage.error('重新发送失败，请稍后再试')
+  } finally {
+    setActionLoading(key, 'resend', false)
+  }
+}
+
+async function handleRecallMessage(message) {
+  const conversationId = store.activeConversationId
+  if (!conversationId || !message) return
+  const key = actionKeyFromMessage(message)
+  setActionLoading(key, 'recall', true)
+  try {
+    await store.recallMessage(conversationId, message)
+    ElMessage.success('消息已撤回')
+  } catch (error) {
+    console.error('[chat] recall failed', error)
+    ElMessage.error('撤回失败，请稍后再试')
+  } finally {
+    setActionLoading(key, 'recall', false)
+  }
+}
+
+function handleToggleDay(payload) {
+  if (!payload?.dayKey) return
+  // 占位：可用于埋点或持久化折叠状态
+}
+
+function ensureSocketConnection() {
+  try {
+    if (!socketService.isConnected()) {
+      socketService.connect(userStore.token, userStore.user?.wsEndpoint)
+    }
+  } catch (error) {
+    console.warn('[chat] socket connect failed', error)
+  }
+}
+
+function addSocketListener(event, handler) {
+  if (!event || typeof handler !== 'function') return
+  socketService.on(event, handler)
+  socketListeners.push([event, handler])
+}
+
+function bindSocketEvents() {
+  if (socketListeners.length) return
+  addSocketListener('connect', handleSocketConnect)
+  addSocketListener('user-typing', handleSocketTyping)
+  addSocketListener('user-joined', handleSocketUserJoined)
+  addSocketListener('user-left', handleSocketUserLeft)
+  addSocketListener('message-read', handleSocketMessageRead)
+  addSocketListener('online-users-updated', handleOnlineUsersUpdated)
+}
+
+function teardownSocket() {
+  if (typingStopTimer) {
+    clearTimeout(typingStopTimer)
+    typingStopTimer = null
+  }
+
+  if (joinedRoomId && socketService.isConnected()) {
+    try {
+      if (store.notifyTyping(joinedRoomId, false)) {
+        socketService.sendTypingStatus(joinedRoomId, false)
+      }
+      socketService.leaveRoom(joinedRoomId)
+    } catch (error) {
+      console.warn('[chat] leave room failed', error)
+    }
+  }
+
+  if (joinedRoomId) {
+    store.clearTyping(joinedRoomId)
+  }
+
+  joinedRoomId = null
+
+  while (socketListeners.length) {
+    const [event, handler] = socketListeners.pop()
+    socketService.off(event, handler)
+  }
+}
+
+function currentUsername() {
+  return (
+    userStore.user?.nickname ||
+    userStore.user?.username ||
+    userStore.user?.name ||
+    '我'
+  )
+}
+
+function handleSocketTyping(payload) {
+  const roomId = payload?.roomId ?? payload?.conversationId
+  const username = payload?.username || payload?.userName || payload?.user?.name
+  if (!roomId || !username) return
+  if (username === currentUsername()) return
+  const isTyping = payload?.isTyping !== false
+  store.handleRemoteTyping(roomId, username, isTyping)
+}
+
+function handleSocketUserJoined(payload) {
+  const roomId = payload?.roomId
+  const user = payload?.user || payload
+  if (!roomId || !user) return
+  const userId = user.id ?? user.userId
+  if (!userId) return
+
+  store.upsertParticipant(roomId, {
+    userId,
+    username: user.name || user.username,
+    avatar: user.avatar,
+    role: user.role,
+    status: 'online',
+    lastSeen: new Date().toISOString()
+  })
+
+  store.setParticipantStatus(roomId, userId, 'online', {
+    username: user.name || user.username,
+    avatar: user.avatar,
+    lastSeen: new Date().toISOString()
+  })
+
+  if (payload?.onlineCount != null) {
+    store.updateConversationMeta(roomId, { onlineCount: payload.onlineCount })
+  }
+}
+
+function handleSocketUserLeft(payload) {
+  const roomId = payload?.roomId
+  const user = payload?.user || payload
+  if (!roomId || !user) return
+  const userId = user.id ?? user.userId
+  if (!userId) return
+
+  store.setParticipantStatus(roomId, userId, 'offline', {
+    lastSeen: new Date().toISOString()
+  })
+
+  if (payload?.onlineCount != null) {
+    store.updateConversationMeta(roomId, { onlineCount: payload.onlineCount })
+  }
+}
+
+function handleSocketConnect() {
+  if (!joinedRoomId) return
+  try {
+    socketService.joinRoom(joinedRoomId)
+  } catch (error) {
+    console.warn('[chat] rejoin room failed', error)
+  }
+}
+
+function handleSocketMessageRead(payload) {
+  const roomId = payload?.roomId
+  if (!roomId) return
+  store.applyReadReceipt(roomId, {
+    messageIds: payload?.messageIds,
+    readerId: payload?.readerId,
+    readAt: payload?.readAt
+  })
+}
+
+function handleOnlineUsersUpdated(payload) {
+  if (!joinedRoomId) return
+  if (payload?.count == null) return
+  store.updateConversationMeta(joinedRoomId, {
+    onlineCount: payload.count
+  })
+}
+
+function resolveConversationId(value) {
+  if (!value) return null
+  const numeric = Number(value)
+  return Number.isNaN(numeric) ? value : numeric
+}
+
+function pushRoute(id) {
+  if (route.params.roomId?.toString() === id.toString()) return
+  router.replace({ name: route.name || 'ChatRoom', params: { ...route.params, roomId: id } })
+}
+
+function handleConversationSelect(id) {
+  store.setActiveConversation(id)
+  pushRoute(id)
+}
+
+function handleCreateConversation() {
+  ElMessage.info('�����Ự���ܼ�������')
+}
+
+async function handleSend(content) {
+  if (!store.activeConversationId) return
+  await store.sendMessage(store.activeConversationId, content)
+}
+
+async function handleLoadPrevious() {
+  if (!store.activeConversationId) return
+  await store.loadOlderMessages(store.activeConversationId)
+}
+
+function handleAttachmentsSelected(files) {
+  if (!store.activeConversationId || !files?.length) return
+  const placeholder = store.createAttachmentPlaceholder(store.activeConversationId, files)
+  if (!placeholder?.id) return
+  simulateAttachmentUpload(store.activeConversationId, placeholder.id)
+}
+
+function handleAttachmentRejected(payload) {
+  if (!payload) return
+  if (payload.reason === 'size') {
+    ElMessage.warning('���ָ���������С���ƣ��Ѻ���')
+  } else if (payload.reason === 'count') {
+    ElMessage.warning('���������������ƣ�������Ѻ���')
+  }
+}
+
+function simulateAttachmentUpload(conversationId, messageId) {
+  cleanupTask(messageId)
+
+  let progress = 0
+  const step = () => {
+    progress = Math.min(progress + Math.floor(Math.random() * 20 + 15), 100)
+    store.updateMessage(conversationId, messageId, (current) => {
+      if (!current?.attachments?.length) return {}
+      const attachments = current.attachments.map((attachment) => ({
+        ...attachment,
+        progress,
+        status: progress >= 100 ? 'uploaded' : 'uploading'
+      }))
+      return {
+        attachments,
+        status: progress >= 100 ? 'delivered' : 'uploading',
+        localOnly: progress < 100
+      }
+    })
+
+    if (progress >= 100) {
+      cleanupTask(messageId)
+    }
+  }
+
+  const timer = setInterval(step, 400)
+  uploadTasks.set(messageId, timer)
+  step()
+}
+
+function cleanupTask(messageId) {
+  const timer = uploadTasks.get(messageId)
+  if (timer) {
+    clearInterval(timer)
+    uploadTasks.delete(messageId)
+  }
+}
+
+function cleanupUploadTasks() {
+  uploadTasks.forEach((timer) => clearInterval(timer))
+  uploadTasks.clear()
+}
+
+// 会话置顶处理
+async function handlePin(conversationId) {
+  try {
+    const conversation = store.conversations.find(c => c.id === conversationId)
+    if (!conversation) return
+
+    const newPinned = !conversation.pinned
+    await pinConversation(conversationId, newPinned)
+
+    conversation.pinned = newPinned
+    ElMessage.success(newPinned ? '已置顶' : '已取消置顶')
+  } catch (error) {
+    console.error('Pin conversation failed:', error)
+    ElMessage.error('操作失败，请稍后重试')
+  }
+}
+
+// 会话免打扰处理
+async function handleMute(conversationId) {
+  try {
+    const conversation = store.conversations.find(c => c.id === conversationId)
+    if (!conversation) return
+
+    const newMuted = !conversation.isMuted
+    await muteConversation(conversationId, newMuted)
+
+    conversation.isMuted = newMuted
+    ElMessage.success(newMuted ? '已禁言' : '已取消禁言')
+  } catch (error) {
+    console.error('Mute conversation failed:', error)
+    ElMessage.error('操作失败，请稍后重试')
+  }
+}
+
+// 标记为已读处理
+async function handleMarkRead(conversationId) {
+  try {
+    await markConversationRead(conversationId)
+    store.markConversationRead(conversationId)
+    ElMessage.success('已标记为已读')
+  } catch (error) {
+    console.error('Mark conversation read failed:', error)
+    ElMessage.error('操作失败，请稍后重试')
+  }
+}
+
+// 删除会话处理
+async function handleDeleteConversation(conversationId) {
+  try {
+    await deleteConversation(conversationId)
+    store.conversations = store.conversations.filter(c => c.id !== conversationId)
+    ElMessage.success('已删除会话')
+  } catch (error) {
+    console.error('Delete conversation failed:', error)
+    ElMessage.error('操作失败，请稍后重试')
+  }
+}
+
+// 搜索处理
+function handleSearch(query) {
+  if (!query?.trim()) {
+    ElMessage.warning('请输入搜索关键词')
+    return
+  }
+  router.push({
+    name: 'ChatSearch',
+    query: { q: query }
+  })
+}
 </script>
 
 <style scoped>
-.chat-room-container {
-  height: calc(100vh - 60px);
-  background-color: #f5f7fa;
+.chat-room {
+  position: relative;
+  min-height: calc(100vh - 64px);
+  background: #ecf2ff;
 }
 
-.chat-main {
-  display: flex;
-  flex-direction: column;
-  padding: 0;
-  height: 100%;
+.chat-room__gradient {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 10% 20%, rgba(123, 167, 255, 0.32), transparent 45%),
+    radial-gradient(circle at 90% 10%, rgba(255, 173, 231, 0.3), transparent 50%),
+    radial-gradient(circle at 30% 80%, rgba(129, 228, 203, 0.25), transparent 55%),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.6), rgba(219, 233, 255, 0.8));
 }
 
-.room-header {
-  border-radius: 0;
-  border-bottom: 1px solid #dcdfe6;
+.chat-room__container {
+  position: relative;
+  z-index: 1;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 24px 32px 48px;
+  box-sizing: border-box;
 }
 
-.header-content {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.room-info {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-}
-
-.room-details h3 {
-  margin: 0;
-  font-size: 18px;
-}
-
-.room-details p {
-  margin: 5px 0 0;
-  font-size: 14px;
-  color: #909399;
-}
-
-.header-actions {
-  display: flex;
-  gap: 10px;
-}
-
-.message-list {
-  flex: 1;
-  overflow-y: auto;
-  padding: 20px;
-  background-color: #fff;
-}
-
-.loading-container {
-  padding: 20px;
-}
-
-.message-item {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 20px;
-}
-
-.message-item.own-message {
-  flex-direction: row-reverse;
-}
-
-.message-avatar {
-  flex-shrink: 0;
-}
-
-.message-content {
-  max-width: 60%;
-}
-
-.own-message .message-content {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-}
-
-.message-header {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 5px;
-  font-size: 12px;
-  color: #909399;
-}
-
-.sender-name {
-  font-weight: bold;
-}
-
-.message-bubble {
-  padding: 10px 15px;
-  border-radius: 10px;
-  background-color: #f0f2f5;
-  word-break: break-word;
-  line-height: 1.6;
-}
-
-.own-message .message-bubble {
-  background-color: #409eff;
-  color: #fff;
-}
-
-.typing-indicator {
-  color: #909399;
-  font-size: 14px;
-  padding: 10px;
-  display: flex;
-  align-items: center;
-  gap: 5px;
-}
-
-.typing-icon {
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
-.message-input-area {
-  padding: 15px;
-  background-color: #fff;
-  border-top: 1px solid #dcdfe6;
-}
-
-.input-actions {
-  display: flex;
-  justify-content: flex-end;
-  margin-top: 10px;
-}
-
-.members-list {
-  padding: 10px 0;
-}
-
-.member-item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 10px;
-  border-bottom: 1px solid #f0f2f5;
-}
-
-.member-info {
-  flex: 1;
+.chat-room__header {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 16px;
 }
 
-.member-name {
-  font-weight: 500;
+.chat-room__header-info {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+}
+
+.chat-room__title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 20px;
+  font-weight: 600;
+  color: #243058;
+}
+
+.chat-room__subtitle {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: #7b80a1;
+}
+
+.chat-room__header-meta {
+  display: flex;
+  gap: 8px;
+}
+
+@media (max-width: 960px) {
+  .chat-room__container {
+    padding: 16px;
+  }
+
+  .chat-room__header-meta {
+    display: none;
+  }
 }
 </style>

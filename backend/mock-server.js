@@ -5,6 +5,9 @@
 const http = require('http')
 const https = require('https')
 const url = require('url')
+const fs = require('fs')
+const path = require('path')
+const crypto = require('crypto')
 const QRCode = require('qrcode')
 const { initializeWebSocket } = require('./websocket-server')
 const redisClient = require('./redis-client')
@@ -12,11 +15,67 @@ require('dotenv').config()
 
 const PORT = 3001
 
+const CURRENT_USER_ID = 1
+
 // ============ Dify API 配置 ============
 const DIFY_CONFIG = {
   apiKey: process.env.DIFY_API_KEY || 'app-vZlc0w5Dio2gnrTkdlblcPXG',
   baseURL: process.env.DIFY_API_BASE_URL || 'https://api.dify.ai/v1',
   workflowURL: process.env.DIFY_WORKFLOW_URL || 'https://udify.app/workflow/u4Pzho5oyj5HIOn8'
+}
+
+
+const MEDIA_BASE_PATH = '/api/chat/uploads'
+const MEDIA_STORAGE_ROOT = path.join(__dirname, 'uploads')
+const MAX_UPLOAD_SIZE = 10 * 1024 * 1024 // 10MB
+const CACHE_TTL_MS = 5000
+const SEARCH_CACHE_TTL_MS = 8000
+
+if (!fs.existsSync(MEDIA_STORAGE_ROOT)) {
+  fs.mkdirSync(MEDIA_STORAGE_ROOT, { recursive: true })
+}
+
+const cacheStore = new Map()
+
+function buildCacheKey(namespace, params) {
+  return `${namespace}:${JSON.stringify(params)}`
+}
+
+function cacheSet(key, value, ttlMs = CACHE_TTL_MS) {
+  cacheStore.set(key, { value, expiresAt: Date.now() + ttlMs })
+}
+
+function cacheGet(key) {
+  const record = cacheStore.get(key)
+  if (!record) return null
+  if (record.expiresAt <= Date.now()) {
+    cacheStore.delete(key)
+    return null
+  }
+  return record.value
+}
+
+function cacheInvalidate(prefix) {
+  if (!prefix) return
+  const keys = Array.from(cacheStore.keys())
+  keys.forEach((key) => {
+    if (key.startsWith(prefix)) {
+      cacheStore.delete(key)
+    }
+  })
+}
+
+function sanitizeFileName(name) {
+  if (!name) return 'file'
+  return name.replace(/[^a-zA-Z0-9._-]/g, '_')
+}
+
+function decodeBase64Payload(payload) {
+  if (!payload) return null
+  if (payload.includes('base64,')) {
+    return Buffer.from(payload.split('base64,').pop(), 'base64')
+  }
+  return Buffer.from(payload, 'base64')
 }
 
 console.log('🔧 Dify 配置:', {
@@ -34,6 +93,10 @@ const mockData = {
   },
 
   // 用户数据
+
+  mediaIdCounter: 1,
+  mediaLibrary: [],
+  mediaLookup: new Map(),
   users: [
     {
       id: 1,
@@ -1807,6 +1870,97 @@ const mockData = {
   followIdCounter: 3,
   feedIdCounter: 3
 }
+function registerMediaRecord(record) {
+  const stored = { ...record, id: mockData.mediaIdCounter++ }
+  mockData.mediaLibrary.push(stored)
+  mockData.mediaLookup.set(String(stored.id), stored)
+  mockData.mediaLookup.set(stored.storageName, stored)
+  return stored
+}
+
+function findMediaRecord(key) {
+  if (!key) return null
+  return mockData.mediaLookup.get(String(key)) || null
+}
+
+function removeMediaRecord(key) {
+  const record = findMediaRecord(key)
+  if (!record) return null
+  mockData.mediaLibrary = mockData.mediaLibrary.filter((item) => item.id !== record.id)
+  mockData.mediaLookup.delete(String(record.id))
+  mockData.mediaLookup.delete(record.storageName)
+  return record
+}
+function storeUploadedMedia({ fileName, contentType, base64 }) {
+  const buffer = decodeBase64Payload(base64)
+  if (!buffer || !buffer.length) {
+    throw new Error('EMPTY_FILE')
+  }
+  if (buffer.length > MAX_UPLOAD_SIZE) {
+    throw new Error('FILE_TOO_LARGE')
+  }
+  const safeName = sanitizeFileName(fileName || 'file')
+  const extension = path.extname(safeName)
+  const storageName = `${Date.now()}-${crypto.randomBytes(6).toString('hex')}${extension}`
+  const filePath = path.join(MEDIA_STORAGE_ROOT, storageName)
+  fs.writeFileSync(filePath, buffer)
+  const record = registerMediaRecord({
+    fileName: fileName || safeName,
+    contentType: contentType || 'application/octet-stream',
+    size: buffer.length,
+    storageName,
+    path: filePath,
+    createdAt: new Date().toISOString()
+  })
+  return { ...record, url: `${MEDIA_BASE_PATH}/${record.storageName}` }
+}
+function resolveMediaFile(key) {
+  const record = findMediaRecord(key)
+  if (!record) return null
+  const filePath = path.join(MEDIA_STORAGE_ROOT, record.storageName)
+  if (!fs.existsSync(filePath)) {
+    return null
+  }
+  return { record, filePath }
+}
+function buildSearchSnippet(content, keyword) {
+  if (!content) return ''
+  const lower = content.toLowerCase()
+  const needle = keyword.toLowerCase()
+  const index = lower.indexOf(needle)
+  if (index === -1) {
+    return content.length > 60 ? `${content.slice(0, 57)}...` : content
+  }
+  const start = Math.max(0, index - 20)
+  const end = Math.min(content.length, index + needle.length + 20)
+  const prefix = start > 0 ? '...' : ''
+  const suffix = end < content.length ? '...' : ''
+  return `${prefix}${content.slice(start, end)}${suffix}`
+}
+
+function serializeMedia(record) {
+  if (!record) return null
+  const storageName = record.storageName || (record.url ? record.url.split('/').pop() : null)
+  const urlPath = record.url || (storageName ? `${MEDIA_BASE_PATH}/${storageName}` : null)
+  if (!urlPath) return null
+  return {
+    id: record.id ?? null,
+    fileName: record.fileName || 'file',
+    contentType: record.contentType || 'application/octet-stream',
+    size: record.size || 0,
+    url: urlPath,
+    createdAt: record.createdAt || new Date().toISOString()
+  }
+}
+
+
+
+
+
+
+
+
+
 
 /**
  * 时间格式化辅助函数
@@ -6472,6 +6626,148 @@ const routes = {
   // ==================== 聊天室 API ====================
 
   // 获取聊天室列表
+  'POST:/api/chat/uploads': async (req, res) => {
+    try {
+      const body = await parseJSONBody(req)
+      if (!body || !body.data) {
+        sendResponse(res, 400, null, 'Missing file payload')
+        return
+      }
+      const record = storeUploadedMedia({
+        fileName: body.fileName,
+        contentType: body.contentType,
+        base64: body.data
+      })
+      cacheInvalidate('search:')
+      sendResponse(res, 201, record)
+    } catch (error) {
+      if (error.message === 'FILE_TOO_LARGE') {
+        sendResponse(res, 413, null, 'File size exceeds limit')
+        return
+      }
+      if (error.message === 'EMPTY_FILE') {
+        sendResponse(res, 400, null, 'File payload is empty')
+        return
+      }
+      console.error('[upload] failed to store media', error)
+      sendResponse(res, 500, null, 'Failed to store media')
+    }
+  },
+
+  'GET:/api/chat/uploads/:key': (req, res) => {
+    try {
+      const parsedUrl = url.parse(req.url, true)
+      const key = decodeURIComponent(parsedUrl.pathname.split('/').pop())
+      const resource = resolveMediaFile(key)
+      if (!resource) {
+        sendResponse(res, 404, null, 'File not found')
+        return
+      }
+      const { record, filePath } = resource
+      res.writeHead(200, {
+        'Content-Type': record.contentType || 'application/octet-stream',
+        'Content-Length': record.size || 0,
+        'Cache-Control': 'public, max-age=31536000'
+      })
+      fs.createReadStream(filePath).pipe(res)
+    } catch (error) {
+      console.error('[upload] failed to read media', error)
+      sendResponse(res, 500, null, 'Failed to read media')
+    }
+  },
+
+  'DELETE:/api/chat/uploads/:key': (req, res) => {
+    try {
+      const parsedUrl = url.parse(req.url, true)
+      const key = decodeURIComponent(parsedUrl.pathname.split('/').pop())
+      const record = removeMediaRecord(key)
+      if (!record) {
+        sendResponse(res, 404, null, 'File not found')
+        return
+      }
+      const filePath = path.join(MEDIA_STORAGE_ROOT, record.storageName)
+      if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath)
+      }
+      cacheInvalidate('messages:')
+      cacheInvalidate('search:')
+      sendResponse(res, 200, { success: true })
+    } catch (error) {
+      console.error('[upload] failed to delete media', error)
+      sendResponse(res, 500, null, 'Failed to delete media')
+    }
+  },
+
+  'GET:/api/chat/messages/search': (req, res) => {
+    const parsedUrl = url.parse(req.url, true)
+    const query = parsedUrl.query || {}
+    const keyword = (query.q || '').toString().trim().toLowerCase()
+    if (!keyword) {
+      sendResponse(res, 400, null, 'Search keyword is required')
+      return
+    }
+
+    const roomId = query.roomId ? parseInt(query.roomId) : null
+    const limit = Math.max(1, Math.min(Number(query.limit || 20), 100))
+    const cacheKey = buildCacheKey('search', { keyword, roomId, limit })
+    const cached = cacheGet(cacheKey)
+    if (cached) {
+      sendResponse(res, 200, cached, '搜索成功')
+      return
+    }
+
+    const source = roomId
+      ? mockData.messages.filter((message) => message.roomId === roomId)
+      : mockData.messages
+
+    const matches = []
+    for (const message of source) {
+      const attachments = Array.isArray(message.attachments)
+        ? message.attachments
+            .map((item) => {
+              if (!item) return null
+              const key = item.storageName || item.id || item.mediaId || (item.url ? item.url.split('/').pop() : null)
+              const record = key ? findMediaRecord(key) : null
+              if (record) return serializeMedia(record)
+              const fallback = {
+                id: item.id || key || null,
+                fileName: item.fileName || item.name || 'file',
+                contentType: item.contentType || item.mimeType || 'application/octet-stream',
+                size: item.size || 0,
+                url: item.url || (key ? `${MEDIA_BASE_PATH}/${key}` : null)
+              }
+              return fallback.url ? fallback : null
+            })
+            .filter(Boolean)
+        : []
+      const haystack = [
+        message.content || '',
+        attachments.map((file) => file.fileName || '').join(' ')
+      ]
+        .join(' ')
+        .toLowerCase()
+
+      if (!haystack.includes(keyword)) continue
+
+      matches.push({
+        id: message.id,
+        roomId: message.roomId,
+        senderId: message.senderId,
+        senderName: message.senderName,
+        content: message.content,
+        createdAt: message.createdAt,
+        attachments,
+        snippet: buildSearchSnippet(message.content || '', keyword)
+      })
+      if (matches.length >= limit) break
+    }
+
+    const payload = { items: matches, total: matches.length }
+    cacheSet(cacheKey, payload, SEARCH_CACHE_TTL_MS)
+
+    sendResponse(res, 200, payload, '搜索成功')
+  },
+
   'GET:/api/chat/rooms': (req, res) => {
     const rooms = mockData.chatRooms.map(room => ({
       ...room,
@@ -6550,25 +6846,147 @@ const routes = {
   },
 
   // 获取聊天室历史消息
-  'GET:/api/chat/rooms/:id/messages': (req, res) => {
-    const parsedUrl = url.parse(req.url, true)
-    const roomId = parseInt(parsedUrl.pathname.split('/')[4])
-    const query = parsedUrl.query
+  'POST:/api/chat/rooms/:id/messages': async (req, res) => {
+    try {
+      const parsedUrl = url.parse(req.url, true)
+      const roomId = parseInt(parsedUrl.pathname.split('/')[4])
+      const room = mockData.chatRooms.find((r) => r.id === roomId)
 
-    let messages = mockData.messages.filter(m => m.roomId === roomId)
+      if (!room) {
+        sendResponse(res, 404, null, 'Chat room not found')
+        return
+      }
 
-    // 按时间倒序排列
-    messages.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+      const body = await parseJSONBody(req)
+      const rawContent = body?.content != null ? body.content.toString() : ''
+      const trimmedContent = rawContent.trim()
+      const attachmentsInput = Array.isArray(body?.attachments) ? body.attachments : []
+      const attachments = []
 
-    const paginatedResult = paginate(messages, query.page, query.size || 50)
-    // 返回时再按时间正序
-    paginatedResult.items.reverse()
+      for (const item of attachmentsInput) {
+        if (!item) continue
+        try {
+          if (item.data) {
+            const stored = storeUploadedMedia({
+              fileName: item.fileName || item.name,
+              contentType: item.contentType || item.mimeType,
+              base64: item.data
+            })
+            attachments.push(stored)
+          } else if (item.mediaId || item.id || item.storageName) {
+            const key = item.mediaId || item.id || item.storageName
+            const found = findMediaRecord(key)
+            if (found) {
+              attachments.push({ ...found, url: `${MEDIA_BASE_PATH}/${found.storageName}` })
+            }
+          }
+        } catch (uploadError) {
+          console.error('[chat] attachment processing failed', uploadError)
+        }
+      }
 
-    sendResponse(res, 200, paginatedResult, '获取历史消息成功')
+      if (!trimmedContent && attachments.length === 0) {
+        sendResponse(res, 400, null, 'Message content or attachment is required')
+        return
+      }
+
+      const sender = mockData.users.find((user) => user.id === CURRENT_USER_ID) || mockData.users[0]
+      const messageId = mockData.messageIdCounter++
+      const sanitizedAttachments = attachments.map((record) => serializeMedia(record)).filter(Boolean)
+      const content = trimmedContent || (body?.caption?.toString().trim() || (sanitizedAttachments.length ? '[附件]' : ''))
+      const contentType = body?.contentType || (sanitizedAttachments.length && !trimmedContent ? 'attachment' : sanitizedAttachments.length ? 'mixed' : 'text')
+
+      const newMessage = {
+        id: messageId,
+        roomId,
+        senderId: sender?.id || CURRENT_USER_ID,
+        senderName: sender?.nickname || sender?.username || 'user',
+        senderAvatar: sender?.avatar || '',
+        content,
+        contentType,
+        status: 'delivered',
+        createdAt: new Date().toISOString(),
+        attachments: sanitizedAttachments,
+        hasAttachments: sanitizedAttachments.length > 0,
+        metadata: { attachmentsCount: sanitizedAttachments.length }
+      }
+
+      mockData.messages.push(newMessage)
+      room.lastMessage = { content, senderId: newMessage.senderId, senderName: newMessage.senderName }
+      room.lastMessageAt = newMessage.createdAt
+      room.updatedAt = newMessage.createdAt
+
+      cacheInvalidate(`messages:${roomId}`)
+      cacheInvalidate('search:')
+
+      sendResponse(res, 200, newMessage, 'Message sent successfully')
+    } catch (error) {
+      console.error('Failed to send message:', error)
+      sendResponse(res, 500, null, 'Failed to send message')
+    }
   },
 
-  // 获取聊天室成员列表
-  'GET:/api/chat/rooms/:id/members': (req, res) => {
+'GET:/api/chat/rooms/:id/messages': (req, res) => {
+    const parsedUrl = url.parse(req.url, true)
+    const roomId = parseInt(parsedUrl.pathname.split('/')[4])
+    const query = parsedUrl.query || {}
+    const page = Number(query.page || 1)
+    const size = Number(query.size || 50)
+    const cacheKey = buildCacheKey(`messages:${roomId}`, { page, size })
+    const cached = cacheGet(cacheKey)
+    if (cached) {
+      sendResponse(res, 200, cached, '获取历史消息成功')
+      return
+    }
+
+    let messages = mockData.messages.filter((m) => m.roomId === roomId)
+
+    messages.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+
+    const paginatedResult = paginate(messages, page, size)
+    paginatedResult.items.reverse()
+
+    const items = paginatedResult.items.map((message) => {
+      const attachments = Array.isArray(message.attachments)
+        ? message.attachments
+            .map((item) => {
+              if (!item) return null
+              const key = item.storageName || item.id || item.mediaId || (item.url ? item.url.split('/').pop() : null)
+              const record = key ? findMediaRecord(key) : null
+              if (record) {
+                return serializeMedia(record)
+              }
+              const fallback = {
+                id: item.id || key || null,
+                fileName: item.fileName || item.name || 'file',
+                contentType: item.contentType || item.mimeType || 'application/octet-stream',
+                size: item.size || 0,
+                url: item.url || (key ? `${MEDIA_BASE_PATH}/${key}` : null),
+                createdAt: item.createdAt || message.createdAt
+              }
+              return fallback.url ? fallback : null
+            })
+            .filter(Boolean)
+        : []
+
+      return {
+        ...message,
+        attachments,
+        hasAttachments: attachments.length > 0,
+        metadata: {
+          ...(message.metadata || {}),
+          attachmentsCount: attachments.length
+        }
+      }
+    })
+
+const payload = { ...paginatedResult, items }
+    cacheSet(cacheKey, payload)
+
+    sendResponse(res, 200, payload, '获取历史消息成功')
+  },
+
+'GET:/api/chat/rooms/:id/members': (req, res) => {
     const parsedUrl = url.parse(req.url, true)
     const roomId = parseInt(parsedUrl.pathname.split('/')[4])
 
@@ -7199,6 +7617,75 @@ const routes = {
         sendResponse(res, 400, null, '请求数据格式错误')
       }
     })
+  },
+
+  // 聊天 API - 会话置顶
+  'POST:/api/chat/conversations/:id/pin': (req, res) => {
+    let bodyStr = ''
+    req.on('data', chunk => {
+      bodyStr += chunk.toString()
+    })
+
+    req.on('end', () => {
+      try {
+        const body = JSON.parse(bodyStr)
+        const conversationId = url.parse(req.url, true).pathname.split('/')[4]
+
+        sendResponse(res, 200, {
+          id: conversationId,
+          pinned: body.pinned === true,
+          updatedAt: new Date().toISOString()
+        }, body.pinned ? '已置顶会话' : '已取消置顶')
+      } catch (error) {
+        sendResponse(res, 400, null, '请求数据格式错误')
+      }
+    })
+  },
+
+  // 聊天 API - 会话免打扰
+  'POST:/api/chat/conversations/:id/mute': (req, res) => {
+    let bodyStr = ''
+    req.on('data', chunk => {
+      bodyStr += chunk.toString()
+    })
+
+    req.on('end', () => {
+      try {
+        const body = JSON.parse(bodyStr)
+        const conversationId = url.parse(req.url, true).pathname.split('/')[4]
+
+        sendResponse(res, 200, {
+          id: conversationId,
+          muted: body.muted === true,
+          duration: body.duration,
+          updatedAt: new Date().toISOString()
+        }, body.muted ? '已禁言会话' : '已取消禁言')
+      } catch (error) {
+        sendResponse(res, 400, null, '请求数据格式错误')
+      }
+    })
+  },
+
+  // 聊天 API - 标记会话为已读
+  'POST:/api/chat/conversations/:id/mark-read': (req, res) => {
+    const conversationId = url.parse(req.url, true).pathname.split('/')[4]
+
+    sendResponse(res, 200, {
+      id: conversationId,
+      markedRead: true,
+      readAt: new Date().toISOString()
+    }, '会话已标记为已读')
+  },
+
+  // 聊天 API - 删除会话
+  'DELETE:/api/chat/conversations/:id': (req, res) => {
+    const conversationId = url.parse(req.url, true).pathname.split('/')[4]
+
+    sendResponse(res, 200, {
+      id: conversationId,
+      deleted: true,
+      deletedAt: new Date().toISOString()
+    }, '会话已删除')
   },
 
   // 默认404处理
