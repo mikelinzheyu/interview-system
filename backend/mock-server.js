@@ -2431,19 +2431,33 @@ async function callDifyWorkflow(requestData) {
       res.on('end', () => {
         try {
           console.log('📥 Dify 响应状态:', res.statusCode)
+          console.log('📦 Dify 完整响应体:', data.substring(0, 500))
 
           const response = JSON.parse(data)
+          console.log('📦 解析后的 outputs:', JSON.stringify(response.data?.outputs || {}, null, 2))
 
           if (res.statusCode === 200) {
             const outputs = response.data?.outputs || {}
 
             // 根据 request_type 返回不同的数据结构
             if (requestData.requestType === 'generate_questions') {
+              // 处理 Dify 工作流1 输出 (可能是 generated_questions 或 questions)
+              let questionsData = outputs.generated_questions || outputs.questions || '[]'
+
+              // 如果是字符串，需要解析为JSON
+              if (typeof questionsData === 'string') {
+                try {
+                  questionsData = JSON.parse(questionsData)
+                } catch (e) {
+                  questionsData = []
+                }
+              }
+
               resolve({
                 success: true,
                 data: {
                   session_id: outputs.session_id,
-                  generated_questions: parseQuestions(outputs.generated_questions),
+                  generated_questions: parseQuestions(questionsData),
                   metadata: {
                     workflowId: response.workflow_run_id,
                     processingTime: response.elapsed_time || 0
