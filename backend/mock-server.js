@@ -21,7 +21,22 @@ const CURRENT_USER_ID = 1
 const DIFY_CONFIG = {
   apiKey: process.env.DIFY_API_KEY || 'app-vZlc0w5Dio2gnrTkdlblcPXG',
   baseURL: process.env.DIFY_API_BASE_URL || 'https://api.dify.ai/v1',
-  workflowURL: process.env.DIFY_WORKFLOW_URL || 'https://udify.app/workflow/u4Pzho5oyj5HIOn8'
+  workflowURL: process.env.DIFY_WORKFLOW_URL || 'https://udify.app/workflow/u4Pzho5oyj5HIOn8',
+  // 具体工作流配置（三个工作流，每个有独立的API Key）
+  workflows: {
+    generate_questions: {
+      id: '560EB9DDSwOFc8As',
+      apiKey: 'app-hHvF3glxCRhtfkyX7Pg9i9kb'
+    },
+    generate_answer: {
+      id: '5X6RBtTFMCZr0r4R',
+      apiKey: 'app-TEw1j6rBUw0ZHHlTdJvJFfPB'
+    },
+    score_answer: {
+      id: '7C4guOpDk2GfmIFy',
+      apiKey: 'app-Omq7PcI6P5g1CfyDnT8CNiua'
+    }
+  }
 }
 
 
@@ -2355,11 +2370,28 @@ function mockAIReview(content) {
  */
 async function callDifyWorkflow(requestData) {
   return new Promise((resolve, reject) => {
+    // 根据 requestType 选择正确的工作流配置
+    let workflowId = '560EB9DDSwOFc8As'
+    let apiKey = DIFY_CONFIG.workflows.generate_questions.apiKey
+
+    if (requestData.requestType === 'generate_questions') {
+      workflowId = DIFY_CONFIG.workflows.generate_questions.id
+      apiKey = DIFY_CONFIG.workflows.generate_questions.apiKey
+    } else if (requestData.requestType === 'generate_answer') {
+      workflowId = DIFY_CONFIG.workflows.generate_answer.id
+      apiKey = DIFY_CONFIG.workflows.generate_answer.apiKey
+    } else if (requestData.requestType === 'score_answer') {
+      workflowId = DIFY_CONFIG.workflows.score_answer.id
+      apiKey = DIFY_CONFIG.workflows.score_answer.apiKey
+    }
+
     const requestBody = JSON.stringify({
       inputs: {
         job_title: requestData.jobTitle || '',
         request_type: requestData.requestType || 'generate_questions',
         question: requestData.question || '',
+        question_id: requestData.questionId || '',
+        standard_answer: requestData.standardAnswer || '',
         candidate_answer: requestData.candidateAnswer || '',
         session_id: requestData.sessionId || ''
       },
@@ -2367,6 +2399,8 @@ async function callDifyWorkflow(requestData) {
       user: requestData.userId || 'user-' + Date.now()
     })
 
+    // 使用正确的 Dify 工作流 API 端点
+    // 注意：Dify API 使用 /workflows/run 通用端点，工作流通过 API Key 区分
     const apiUrl = new URL(`${DIFY_CONFIG.baseURL}/workflows/run`)
 
     const options = {
@@ -2376,7 +2410,7 @@ async function callDifyWorkflow(requestData) {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${DIFY_CONFIG.apiKey}`,
+        'Authorization': `Bearer ${apiKey}`,
         'Content-Length': Buffer.byteLength(requestBody)
       }
     }
