@@ -3367,54 +3367,10 @@ const routes = {
     }, '获取跨专业推荐成功')
   },
 
-  // ========== Phase 3.3: AI 自动出题 API ==========
+  // ========== Phase 3.3: AI 自动出题 API (已弃用，使用 POST:/api/ai/dify-workflow) ==========
 
-  // 15. 生成题目
-  'POST:/api/ai/generate-questions': (req, res) => {
-    let body = ''
-    req.on('data', chunk => { body += chunk })
-    req.on('end', () => {
-      const config = JSON.parse(body)
-
-      // 模拟 AI 生成 (实际应调用 OpenAI/Claude API)
-      const mockGenerated = {
-        id: mockData.aiGeneratedQuestions.length + 1,
-        promptConfig: config,
-        generatedQuestions: [
-          {
-            title: `AI生成题目示例 - ${config.difficulty}`,
-            content: `这是一道关于${config.domainName}的${config.difficulty}难度题目...`,
-            options: [
-              { id: 'A', text: '选项A' },
-              { id: 'B', text: '选项B' },
-              { id: 'C', text: '选项C' },
-              { id: 'D', text: '选项D' }
-            ],
-            correctAnswer: 'A',
-            explanation: 'AI生成的详细解析...',
-            qualityScore: 8.0,
-            qualityMetrics: {
-              clarity: 8,
-              difficulty: 8,
-              relevance: 8,
-              completeness: 8
-            }
-          }
-        ],
-        generatedAt: new Date().toISOString(),
-        generatedBy: config.model || 'gpt-4',
-        tokensUsed: 1000,
-        cost: 0.03,
-        status: 'pending',
-        approvedQuestions: [],
-        rejectedQuestions: []
-      }
-
-      mockData.aiGeneratedQuestions.push(mockGenerated)
-
-      sendResponse(res, 200, mockGenerated, 'AI题目生成成功')
-    })
-  },
+  // NOTE: 旧的 POST:/api/ai/generate-questions 已删除，改为使用 POST:/api/ai/dify-workflow
+  // 原因：避免路由冲突，统一使用 Dify 工作流接口
 
   // 16. 获取生成历史
   'GET:/api/ai/generation-history': (req, res) => {
@@ -5014,17 +4970,47 @@ const routes = {
         const requestData = JSON.parse(body)
         console.log('智能问题生成请求:', requestData)
 
-        const question = mockData.questions[Math.floor(Math.random() * mockData.questions.length)]
+        // 获取随机题目作为当前题目
+        const rawQuestion = mockData.questions[Math.floor(Math.random() * mockData.questions.length)]
 
-        sendResponse(res, 200, {
-          ...question,
+        // 获取额外的题目作为选择题列表
+        const allQuestions = mockData.questions
+          .filter(q => q.id !== rawQuestion.id)
+          .slice(0, 4)
+        allQuestions.unshift(rawQuestion)
+
+        // 标准化格式以匹配前端期望
+        const standardizedQuestion = {
+          questionId: rawQuestion.id,
+          question: rawQuestion.question,
+          expectedAnswer: rawQuestion.answer,
+          keywords: rawQuestion.tags || [],
+          category: rawQuestion.categoryId,
+          difficulty: rawQuestion.difficulty,
+          explanation: rawQuestion.explanation,
+          estimatedTime: rawQuestion.estimatedTime,
+          generatedBy: 'dify_workflow',
+          confidenceScore: 0.85 + Math.random() * 0.15,
+          smartGeneration: true,
+          searchSource: 'dify_rag',
+          sourceUrls: [],
+          sessionId: `session-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+          hasAnswer: true,
+          allQuestions: allQuestions.map(q => ({
+            id: q.id,
+            question: q.question,
+            difficulty: q.difficulty,
+            category: q.categoryId,
+            tags: q.tags
+          })),
           generatedAt: new Date().toISOString(),
           source: 'mock_smart_api',
-          smartGeneration: true,
-          algorithmVersion: 'v2.0',
-          confidenceScore: 0.85 + Math.random() * 0.15
-        }, '智能问题生成成功')
+          algorithmVersion: 'v2.0'
+        }
+
+        sendResponse(res, 200, standardizedQuestion, '智能问题生成成功')
       } catch (error) {
+        console.error('智能问题生成错误:', error)
         sendResponse(res, 400, null, '请求数据格式错误')
       }
     })
@@ -5129,12 +5115,22 @@ const routes = {
   // Dify 工作流调用接口
   'POST:/api/ai/dify-workflow': (req, res) => {
     let body = ''
+
     req.on('data', chunk => {
       body += chunk.toString()
     })
 
     req.on('end', async () => {
       try {
+        // 确保 body 不为空
+        if (!body || body.trim().length === 0) {
+          sendResponse(res, 400, null, '请求体为空')
+          return
+        }
+
+        console.log('📦 接收到的原始 body:', body)
+        console.log('📊 Body 长度:', body.length)
+
         const requestData = JSON.parse(body)
         console.log('🔄 收到 Dify 工作流请求:', requestData)
 
@@ -5981,67 +5977,8 @@ const routes = {
   // ==================== AI 自动出题系统 ====================
 
   // AI 生成题目
-  'POST:/api/ai/generate-questions': (req, res) => {
-    let bodyStr = ''
-    req.on('data', chunk => {
-      bodyStr += chunk.toString()
-    })
-
-    req.on('end', () => {
-      try {
-        const body = JSON.parse(bodyStr)
-        // 模拟生成延迟（实际应调用 AI API）
-        setTimeout(() => {
-          const generatedQuestions = []
-          for (let i = 0; i < body.count; i++) {
-            generatedQuestions.push({
-              title: `AI生成题目 ${i + 1} - ${body.domainName}`,
-              content: `这是一道关于${body.domainName}的${body.difficulty}难度题目。\n\n请回答以下问题：\n\n假设你正在开发一个大型分布式系统...`,
-              type: 'multiple_choice',
-              difficulty: body.difficulty,
-              options: [
-                { id: 'A', text: '选项 A - 正确答案' },
-                { id: 'B', text: '选项 B' },
-                { id: 'C', text: '选项 C' },
-                { id: 'D', text: '选项 D' }
-              ],
-              correctAnswer: 'A',
-              explanation: `这道题考察的是${body.domainName}中的核心概念。正确答案是 A，因为...`,
-              tags: ['AI生成', body.domainName],
-              metadata: body.metadata || {},
-              qualityScore: Math.floor(Math.random() * 30) + 70,
-              qualityMetrics: {
-                clarity: Math.floor(Math.random() * 3) + 7,
-                difficulty: Math.floor(Math.random() * 3) + 7,
-                relevance: Math.floor(Math.random() * 3) + 7,
-                completeness: Math.floor(Math.random() * 3) + 7
-              }
-            })
-          }
-
-          const generationRecord = {
-            id: Date.now(),
-            domainId: body.domainId,
-            domainName: body.domainName,
-            categoryId: body.categoryId,
-            difficulty: body.difficulty,
-            count: body.count,
-            generatedBy: body.model,
-            temperature: body.temperature,
-            generatedQuestions: generatedQuestions,
-            generatedAt: new Date().toISOString(),
-            tokensUsed: Math.floor(Math.random() * 2000) + 1000,
-            cost: (Math.random() * 0.5 + 0.1).toFixed(4),
-            status: 'pending_review'
-          }
-
-          sendResponse(res, 200, generationRecord, 'AI 题目生成成功')
-        }, 2000)
-      } catch (error) {
-        sendResponse(res, 400, null, '请求数据格式错误')
-      }
-    })
-  },
+  // NOTE: 重复的 POST:/api/ai/generate-questions 已删除（原来在此处）
+  // 使用 POST:/api/ai/dify-workflow 代替以调用真实的 Dify 工作流
 
   // 获取生成历史
   'GET:/api/ai/generation-history': (req, res) => {
@@ -7989,6 +7926,26 @@ const payload = { ...paginatedResult, items }
       userId: CURRENT_USER_ID,
       history: statusHistory.slice(-limit).reverse()
     }, '获取状态历史成功')
+  },
+
+  // 错题管理 API - 获取错题统计
+  'GET:/api/wrong-answers/statistics': (req, res) => {
+    const statistics = {
+      totalWrongCount: 5,
+      masteredCount: 2,
+      reviewingCount: 1,
+      unreviewedCount: 2,
+      sourceBreakdown: {
+        'ai_interview': 3,
+        'question_bank': 2
+      },
+      difficultyBreakdown: {
+        'easy': 1,
+        'medium': 2,
+        'hard': 2
+      }
+    }
+    sendResponse(res, 200, statistics, '获取错题统计成功')
   },
 
   // 默认404处理
