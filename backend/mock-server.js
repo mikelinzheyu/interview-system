@@ -2465,11 +2465,17 @@ async function callDifyWorkflow(requestData) {
                 }
               })
             } else if (requestData.requestType === 'score_answer') {
+              // 工作流3 返回评分结果
+              // 包含来自 Dify 工作流的输出字段
               resolve({
                 success: true,
                 data: {
-                  comprehensive_evaluation: outputs.comprehensive_evaluation,
-                  overall_score: outputs.overall_score,
+                  session_id: requestData.sessionId || outputs.session_id,
+                  question_id: requestData.questionId || outputs.question_id,
+                  question: requestData.question || outputs.question,
+                  comprehensive_evaluation: outputs.comprehensive_evaluation || '',
+                  overall_score: outputs.overall_score || 0,
+                  standard_answer: outputs.standard_answer || '',
                   metadata: {
                     workflowId: response.workflow_run_id,
                     processingTime: response.elapsed_time || 0
