@@ -205,7 +205,7 @@ import { useUserStore } from '@/stores/user'
 import { mockAI } from '@/api/interview'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import {
-  Close, Timer, Robot, CircleCheck, Refresh, Microphone, DocumentAdd,
+  Close, Timer, CircleCheck, Refresh, Microphone, DocumentAdd,
   WarningFilled
 } from '@element-plus/icons-vue'
 
