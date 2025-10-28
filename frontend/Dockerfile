@@ -8,8 +8,8 @@ WORKDIR /app
 COPY package*.json ./
 
 # 安装依赖（使用国内镜像源提升速度）
-RUN npm config set registry https://registry.npmmirror.com && \
-    npm install --only=production --silent
+RUN npm config set registry https://registry.npmmirror.com && npm install --silent
+npm install --only=production --silent
 
 # 复制源代码
 COPY . .
