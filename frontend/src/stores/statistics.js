@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { ElMessage, ElNotification } from 'element-plus'
-import statisticsService from '@/services/StatisticsService'
+import StatisticsService from '@/services/statisticsService'
 import healthChecker from '@/utils/healthCheck'
 
 export const useStatisticsStore = defineStore('statistics', () => {
