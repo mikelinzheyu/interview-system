@@ -1,0 +1,294 @@
+╔════════════════════════════════════════════════════════════════════╗
+║          Storage Service Docker 生产部署 - 快速参考               ║
+╚════════════════════════════════════════════════════════════════════╝
+
+【快速启动】
+────────────────────────────────────────────────────────────────────
+
+Linux/Mac:
+  cd storage-service
+  chmod +x deploy-prod.sh
+  ./deploy-prod.sh start
+
+Windows:
+  cd storage-service
+  deploy-prod.bat start
+
+【验证部署】
+────────────────────────────────────────────────────────────────────
+
+curl http://localhost:8081/api/sessions
+
+预期响应: 200 OK 和空的会话列表
+
+【基本命令】
+────────────────────────────────────────────────────────────────────
+
+启动:
+  docker-compose -f docker-compose-prod.yml up -d
+
+停止:
+  docker-compose -f docker-compose-prod.yml down
+
+查看日志:
+  docker-compose -f docker-compose-prod.yml logs -f interview-storage-service
+
+重启:
+  docker-compose -f docker-compose-prod.yml restart
+
+状态检查:
+  docker-compose -f docker-compose-prod.yml ps
+
+【重要配置】
+────────────────────────────────────────────────────────────────────
+
+编辑 .env.prod 修改:
+
+1. Redis 密码 (强制更改!)
+   SPRING_REDIS_PASSWORD=your-secure-password
+
+2. API Key (强制更改!)
+   SESSION_STORAGE_API_KEY=ak_prod_your_key
+
+3. JVM 内存 (根据服务器调整)
+   JAVA_OPTS=-Xms512m -Xmx1024m
+
+【容器结构】
+────────────────────────────────────────────────────────────────────
+
+interview-redis (6379)
+  ↑
+  ├── Redis 7-Alpine
+  ├── 数据持久化: /data
+  └── 连接密码: redis-password-prod
+
+interview-storage-service (8081)
+  ↑
+  ├── Java Spring Boot
+  ├── 依赖: Redis
+  ├── 日志: /app/logs
+  └── 数据: /app/data
+
+【网络配置】
+────────────────────────────────────────────────────────────────────
+
+Docker Network: interview-network (bridge)
+
+容器间通信:
+  Storage Service → Redis: interview-redis:6379
+
+外部访问:
+  http://localhost:8081/api/sessions
+
+【端口映射】
+────────────────────────────────────────────────────────────────────
+
+8081 → interview-storage-service (Spring Boot)
+6379 → interview-redis (Redis)
+
+修改端口: 编辑 docker-compose-prod.yml 中的 ports 部分
+
+【故障排查】
+────────────────────────────────────────────────────────────────────
+
+问题: 容器无法启动
+→ docker-compose logs interview-storage-service
+→ 检查 .env.prod 配置
+→ 确认 Docker 磁盘空间充足
+
+问题: Redis 连接失败
+→ docker-compose logs interview-redis
+→ 检查 SPRING_REDIS_PASSWORD 是否正确
+→ 确保 Redis 容器健康
+
+问题: API 无响应
+→ docker-compose ps (检查容器是否运行)
+→ curl http://localhost:8081/api/sessions
+→ 检查防火墙设置
+
+问题: 磁盘空间不足
+→ docker system prune -a --volumes
+→ 清理旧镜像和卷
+
+【监控和日志】
+────────────────────────────────────────────────────────────────────
+
+实时日志:
+  docker-compose logs -f interview-storage-service
+
+限制行数:
+  docker-compose logs --tail=100 interview-storage-service
+
+特定时间范围:
+  docker-compose logs --since 2025-10-27 interview-storage-service
+
+资源监控:
+  docker stats interview-storage-service interview-redis
+
+【备份和恢复】
+────────────────────────────────────────────────────────────────────
+
+备份:
+  ./deploy-prod.sh backup        # Linux/Mac
+  deploy-prod.bat backup         # Windows
+
+手动备份 Redis:
+  docker cp interview-redis:/data/dump.rdb ./redis-backup.rdb
+
+恢复 Redis:
+  docker cp ./redis-backup.rdb interview-redis:/data/dump.rdb
+  docker-compose restart interview-redis
+
+【安全建议】
+────────────────────────────────────────────────────────────────────
+
+1. 更改所有默认密码
+   - Redis 密码
+   - API Key
+   - 如使用 SSL: 更改证书密码
+
+2. 限制网络访问
+   - 只允许必要的 IP 访问
+   - 禁止公网直接访问生产数据库
+
+3. 启用认证
+   - Spring Security
+   - API Key 验证
+
+4. 定期备份
+   - 每天备份一次
+   - 定期测试恢复流程
+
+5. 监控日志
+   - 定期检查错误日志
+   - 设置告警规则
+
+【性能优化】
+────────────────────────────────────────────────────────────────────
+
+JVM 内存调优:
+  高流量: -Xms2048m -Xmx4096m -XX:+UseG1GC
+  低内存: -Xms256m -Xmx512m -XX:+UseSerialGC
+
+Redis 优化:
+  maxmemory 512mb
+  maxmemory-policy allkeys-lru
+
+连接池优化:
+  max-active=20
+  max-idle=10
+  min-idle=5
+
+【部署检查清单】
+────────────────────────────────────────────────────────────────────
+
+部署前:
+  ☐ Docker 已安装
+  ☐ Docker Compose 已安装
+  ☐ 磁盘空间充足 (>20GB)
+  ☐ 内存充足 (>4GB)
+  ☐ 网络连接正常
+
+部署时:
+  ☐ 修改了所有密码
+  ☐ 检查了端口配置
+  ☐ 设置了日志轮转
+  ☐ 配置了健康检查
+
+部署后:
+  ☐ 健康检查通过
+  ☐ API 端点可访问
+  ☐ Redis 连接正常
+  ☐ 日志没有错误
+  ☐ 备份已配置
+
+【常见问题】
+────────────────────────────────────────────────────────────────────
+
+Q: 如何更新应用?
+A: docker-compose build && docker-compose up -d
+
+Q: 如何查看 Redis 数据?
+A: docker-compose exec interview-redis redis-cli -a password
+
+Q: 如何扩展内存?
+A: 修改 .env.prod 中的 JAVA_OPTS, 然后重启
+
+Q: 如何启用 HTTPS?
+A: 编辑 docker-compose-prod.yml 的 environment 部分
+
+Q: 生产环境是否需要改代码?
+A: 不需要，所有配置在 .env.prod 和 docker-compose-prod.yml
+
+【文件清单】
+────────────────────────────────────────────────────────────────────
+
+核心文件:
+  ✓ docker-compose-prod.yml     Docker 编排配置
+  ✓ Dockerfile.prod             生产 Docker 镜像
+  ✓ .env.prod                   生产环境变量
+  ✓ deploy-prod.sh              Linux/Mac 部署脚本
+  ✓ deploy-prod.bat             Windows 部署脚本
+
+文档:
+  ✓ DOCKER_DEPLOYMENT_GUIDE.md  详细部署指南
+  ✓ QUICK_REFERENCE.txt         快速参考（本文件）
+
+【技术栈】
+────────────────────────────────────────────────────────────────────
+
+应用层:
+  - Java 17
+  - Spring Boot 3.2.0
+  - Spring Security
+  - Spring Data Redis
+
+缓存层:
+  - Redis 7 (Alpine)
+  - Lettuce 连接池
+
+容器:
+  - Docker (多阶段构建)
+  - Docker Compose
+
+监控:
+  - Health Check
+  - Docker Stats
+  - 日志轮转
+
+【支持资源】
+────────────────────────────────────────────────────────────────────
+
+详细文档:
+  📄 DOCKER_DEPLOYMENT_GUIDE.md
+
+Docker 官方文档:
+  🌐 https://docs.docker.com
+
+Spring Boot 文档:
+  🌐 https://spring.io/projects/spring-boot
+
+Redis 文档:
+  🌐 https://redis.io/documentation
+
+【更新日志】
+────────────────────────────────────────────────────────────────────
+
+v1.0 (2025-10-27)
+  ✓ 生产级配置
+  ✓ 完整文档
+  ✓ 部署脚本
+  ✓ 故障排查
+  ✓ 性能优化
+
+【联系方式】
+────────────────────────────────────────────────────────────────────
+
+遇到问题:
+  1. 查看 DOCKER_DEPLOYMENT_GUIDE.md 的故障排查章节
+  2. 查看容器日志: docker-compose logs
+  3. 检查 Docker 状态: docker-compose ps
+
+╔════════════════════════════════════════════════════════════════════╗
+║              祝您部署顺利！有问题请查阅详细文档。                  ║
+╚════════════════════════════════════════════════════════════════════╝

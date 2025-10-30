@@ -1,0 +1,71 @@
+# =========================================
+# Interview Storage Service - Production Build
+# Multi-stage build: compile + runtime
+# =========================================
+
+# --- Build Stage ---
+FROM maven:3.9-eclipse-temurin-17-alpine AS builder
+
+WORKDIR /build
+
+# Configure Maven with Aliyun mirror for faster downloads in China
+RUN mkdir -p /root/.m2 && \
+    echo '<?xml version="1.0" encoding="UTF-8"?><settings><mirrors><mirror><id>aliyun</id><mirrorOf>*</mirrorOf><url>https://maven.aliyun.com/repository/public</url></mirror></mirrors></settings>' > /root/.m2/settings.xml
+
+# Copy project files
+COPY pom.xml .
+COPY src ./src
+
+# Build JAR with Maven
+RUN mvn clean package -DskipTests -q
+
+# --- Runtime Stage ---
+FROM eclipse-temurin:17-jdk-alpine
+
+LABEL maintainer="Interview System" \
+      description="Interview Storage Service - Production"
+
+WORKDIR /app
+
+# 安装必要的系统工具
+RUN apk add --no-cache \
+    curl \
+    tzdata \
+    bash \
+    ca-certificates && \
+    cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && \
+    echo "Asia/Shanghai" > /etc/timezone
+
+# 创建非 root 用户 (安全最佳实践)
+RUN addgroup -g 1001 -S appuser && \
+    adduser -S appuser -u 1001 -G appuser
+
+# 创建日志和数据目录
+RUN mkdir -p /app/logs /app/data && \
+    chown -R appuser:appuser /app && \
+    chmod -R 755 /app
+
+# 从 builder 阶段复制编译后的 JAR 文件
+COPY --from=builder --chown=appuser:appuser /build/target/*.jar /app/app.jar
+
+# 切换到非 root 用户
+USER appuser
+
+# 暴露应用端口
+EXPOSE 8081
+
+# 健康检查配置
+HEALTHCHECK --interval=30s --timeout=10s --retries=5 --start-period=40s \
+    CMD curl -f http://localhost:8081/api/sessions || exit 0
+
+# JVM 启动参数配置
+ENV JAVA_OPTS="-Xms256m -Xmx512m \
+    -XX:+UseG1GC \
+    -XX:MaxGCPauseMillis=200"
+
+# Spring 生产配置
+ENV SPRING_PROFILES_ACTIVE=prod \
+    SERVER_PORT=8081
+
+# 启动命令 - 运行 Spring Boot 应用
+CMD ["sh", "-c", "java ${JAVA_OPTS} -jar /app/app.jar"]

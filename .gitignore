@@ -15,9 +15,12 @@ out/
 .env.local
 .env.*.local
 .env.production
+.env.prod
 production/.env
 production/.env.production
 storage-service/.env
+storage-service/.env.prod
+storage-service/.env.local
 
 # Logs
 logs/
