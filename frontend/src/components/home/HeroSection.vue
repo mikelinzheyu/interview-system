@@ -63,12 +63,12 @@ const handleAction = (action) => {
 <style scoped>
 .hero-section {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  padding: 100px 40px;
+  padding: 60px 40px;
   border-radius: 20px;
   overflow: hidden;
   position: relative;
   text-align: center;
-  min-height: 320px;
+  min-height: 280px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -110,18 +110,20 @@ const handleAction = (action) => {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 24px;
+  gap: 20px;
   max-width: 700px;
   animation: slideUp 0.6s ease-out;
 }
 
 .hero-title {
-  font-size: 48px;
+  font-size: 42px;
   font-weight: 700;
   color: white;
-  line-height: 1.2;
+  line-height: 1.3;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   margin: 0;
+  word-break: break-word;
+  max-width: 100%;
 }
 
 .hero-subtitle {
@@ -161,11 +163,12 @@ const handleAction = (action) => {
 /* 响应式 */
 @media (max-width: 1200px) {
   .hero-section {
-    padding: 80px 40px;
+    padding: 50px 30px;
+    min-height: 260px;
   }
 
   .hero-title {
-    font-size: 40px;
+    font-size: 36px;
   }
 
   .decoration-circle-1 {
@@ -181,12 +184,14 @@ const handleAction = (action) => {
 
 @media (max-width: 768px) {
   .hero-section {
-    padding: 60px 24px;
+    padding: 40px 20px;
     border-radius: 16px;
+    min-height: 240px;
   }
 
   .hero-title {
-    font-size: 32px;
+    font-size: 28px;
+    line-height: 1.4;
   }
 
   .hero-subtitle {
@@ -196,6 +201,7 @@ const handleAction = (action) => {
   .hero-actions {
     flex-direction: column;
     width: 100%;
+    gap: 12px;
   }
 
   .hero-actions :deep(.el-button) {
@@ -203,15 +209,15 @@ const handleAction = (action) => {
   }
 
   .decoration-circle-1 {
-    width: 200px;
-    height: 200px;
+    width: 180px;
+    height: 180px;
     top: -80px;
     right: -80px;
   }
 
   .decoration-circle-2 {
-    width: 150px;
-    height: 150px;
+    width: 140px;
+    height: 140px;
     bottom: -50px;
     left: -50px;
   }
