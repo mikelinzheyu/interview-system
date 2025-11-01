@@ -314,9 +314,9 @@ onUnmounted(() => {
 <style scoped>
 .realtime-notification-panel {
   position: fixed;
-  top: 20px;
+  top: 80px;
   right: 20px;
-  z-index: 999;
+  z-index: 99;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
@@ -518,7 +518,7 @@ onUnmounted(() => {
   justify-content: center;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   transition: all 0.3s;
-  z-index: 998;
+  z-index: 99;
 }
 
 .settings-toggle:hover {
@@ -535,7 +535,7 @@ onUnmounted(() => {
   background: white;
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  z-index: 998;
+  z-index: 99;
   animation: slideUp 0.3s ease-out;
 }
 
@@ -638,9 +638,9 @@ onUnmounted(() => {
 }
 
 /* Responsive */
-@media (max-width: 480px) {
+@media (max-width: 768px) {
   .realtime-notification-panel {
-    top: 10px;
+    top: 70px;
     right: 10px;
     left: 10px;
   }
@@ -657,11 +657,44 @@ onUnmounted(() => {
     right: 10px;
     left: 10px;
     width: auto;
+    bottom: 70px;
   }
 
   .settings-toggle {
     bottom: 10px;
     right: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .realtime-notification-panel {
+    top: 60px;
+    right: 10px;
+    left: 10px;
+  }
+
+  .notifications-container {
+    width: 100%;
+  }
+
+  .notification-bubble {
+    width: 100%;
+    padding: 12px 12px;
+  }
+
+  .settings-panel {
+    right: 10px;
+    left: 10px;
+    width: auto;
+    bottom: 60px;
+  }
+
+  .settings-toggle {
+    bottom: 10px;
+    right: 10px;
+    width: 45px;
+    height: 45px;
+    font-size: 18px;
   }
 }
 </style>
