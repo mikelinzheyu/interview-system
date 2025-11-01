@@ -419,7 +419,7 @@ const notificationService = {
           title: '欢迎使用系统',
           content: '欢迎加入我们的学习平台',
           priority: this.PRIORITY_LEVELS.INFO,
-          read: false,
+          read: true,
           data: {},
           createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000),
           updatedAt: new Date(Date.now() - 2 * 60 * 60 * 1000)

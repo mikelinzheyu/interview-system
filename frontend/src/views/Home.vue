@@ -1,5 +1,8 @@
 ﻿<template>
   <div class="home-container">
+    <!-- 欢迎对话框 -->
+    <WelcomeDialog ref="welcomeDialog" />
+
     <!-- 顶部导航 -->
     <el-header class="header">
       <div class="header-content">
@@ -168,10 +171,13 @@ import WrongAnswersPreview from '@/components/home/WrongAnswersPreview.vue'
 import TrendAnalysis from '@/components/statistics/TrendAnalysis.vue'
 import NotificationCenter from '@/components/NotificationCenter.vue'
 import RecommendationFeed from '@/components/RecommendationFeed.vue'
+import WelcomeDialog from '@/components/home/WelcomeDialog.vue'
 
 const router = useRouter()
 const userStore = useUserStore()
 const statisticsStore = useStatisticsStore()
+
+const welcomeDialog = ref()
 
 const user = computed(() => userStore.user)
 const { formattedStats, loading } = statisticsStore
