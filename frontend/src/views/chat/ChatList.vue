@@ -1,5 +1,13 @@
 ﻿<template>
   <div class="chat-list-page chat-theme">
+    <!-- 返回社区导航 -->
+    <div class="chat-list-breadcrumb">
+      <el-button text @click="goToCommunity">
+        <el-icon><ArrowLeft /></el-icon>
+        返回社区
+      </el-button>
+    </div>
+
     <chat-list-header
       :stats="stats"
       :search-value="filters.search"
@@ -194,7 +202,7 @@ import { computed, onBeforeUnmount, onMounted, reactive, ref } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import { InfoFilled } from '@element-plus/icons-vue'
+import { InfoFilled, ArrowLeft } from '@element-plus/icons-vue'
 import ChatListHeader from '@/components/chat/ChatListHeader.vue'
 import ChatCategoryTabs from '@/components/chat/ChatCategoryTabs.vue'
 import ChatRoomCard from '@/components/chat/ChatRoomCard.vue'
@@ -356,6 +364,10 @@ function activityFromRoom(room) {
   return Math.round((room.memberCount / room.maxMembers) * 100)
 }
 
+function goToCommunity() {
+  router.push({ name: 'CommunityHub' })
+}
+
 function handleOnlineUsers(data) {
   if (data?.count !== undefined) {
     chatRoomsStore.setOnlineUsers(data.count)
@@ -373,6 +385,23 @@ onBeforeUnmount(() => {
 </script>
 
 <style scoped>
+.chat-list-breadcrumb {
+  padding: 12px 20px;
+  background: #f7f8fa;
+  border-bottom: 1px solid #ebeef5;
+  display: flex;
+  align-items: center;
+}
+
+.chat-list-breadcrumb :deep(.el-button) {
+  color: #5c6af0;
+  font-weight: 500;
+}
+
+.chat-list-breadcrumb :deep(.el-button:hover) {
+  color: #2f6bff;
+}
+
 .chat-list-page__filters {
   display: flex;
   justify-content: space-between;

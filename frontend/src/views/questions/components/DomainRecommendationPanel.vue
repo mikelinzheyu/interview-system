@@ -198,80 +198,110 @@ function formatNumber(value) {
 }
 
 .panel-section {
-  padding: 22px 24px;
+  padding: 28px;
   border-radius: 24px;
-  background: rgba(255, 255, 255, 0.85);
-  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.12);
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.08);
   backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.6);
 }
 
 .section-header {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  margin-bottom: 16px;
+  gap: 8px;
+  margin-bottom: 20px;
 }
 
 .section-header h2 {
   margin: 0;
-  font-size: 18px;
+  font-size: 20px;
   color: #0f172a;
   font-weight: 700;
+  letter-spacing: -0.02em;
 }
 
 .section-header p {
   margin: 0;
-  font-size: 13px;
+  font-size: 14px;
   color: #64748b;
+  font-weight: 500;
 }
 
+/* 推荐卡片网格 */
 .recommendation-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-  gap: 14px;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 16px;
 }
 
 .recommendation-card {
   border: none;
   border-radius: 20px;
-  padding: 18px 16px;
+  padding: 24px 20px;
   text-align: left;
   font-weight: 600;
   cursor: pointer;
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-height: 140px;
+  justify-content: flex-start;
+}
+
+.recommendation-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0) 100%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
 }
 
 .recommendation-card:hover,
 .recommendation-card:focus-visible {
-  transform: translateY(-4px);
+  transform: translateY(-6px);
   outline: none;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+}
+
+.recommendation-card:hover::before {
+  opacity: 1;
 }
 
 .card-icon {
-  font-size: 24px;
+  font-size: 32px;
   display: block;
-  margin-bottom: 12px;
 }
 
 .card-title {
   display: block;
-  font-size: 16px;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.4;
 }
 
 .card-subtitle {
   display: block;
+  font-size: 13px;
+  opacity: 0.9;
+  font-weight: 500;
   margin-top: 4px;
-  font-size: 12px;
-  opacity: 0.85;
 }
 
+/* 进度部分 */
 .progress-section {
-  background: linear-gradient(160deg, rgba(59, 130, 246, 0.15) 0%, rgba(14, 165, 233, 0.08) 100%);
+  background: linear-gradient(160deg, rgba(59, 130, 246, 0.12) 0%, rgba(14, 165, 233, 0.08) 100%);
+  border: 1px solid rgba(59, 130, 246, 0.2);
 }
 
 .progress-card {
   display: flex;
-  gap: 20px;
+  gap: 28px;
   align-items: center;
 }
 
@@ -280,7 +310,7 @@ function formatNumber(value) {
 }
 
 .progress-percentage {
-  font-size: 24px;
+  font-size: 28px;
   font-weight: 700;
   color: #0f172a;
 }
@@ -288,37 +318,50 @@ function formatNumber(value) {
 .progress-details {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 16px;
+  flex: 1;
 }
 
 .detail-group {
   display: grid;
-  grid-template-columns: repeat(3, minmax(80px, 1fr));
+  grid-template-columns: repeat(3, 1fr);
   gap: 12px;
 }
 
 .detail-item {
   display: flex;
   flex-direction: column;
-  padding: 12px 14px;
+  padding: 14px 16px;
   border-radius: 14px;
-  background: rgba(255, 255, 255, 0.72);
-  box-shadow: inset 0 0 0 1px rgba(148, 163, 184, 0.18);
+  background: rgba(255, 255, 255, 0.6);
+  box-shadow: inset 0 0 0 1px rgba(148, 163, 184, 0.15);
+  transition: all 0.2s ease;
+}
+
+.detail-item:hover {
+  background: rgba(255, 255, 255, 0.8);
+  box-shadow: inset 0 0 0 1px rgba(148, 163, 184, 0.25);
 }
 
 .detail-item .label {
   font-size: 12px;
   color: #64748b;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
 }
 
 .detail-item .value {
-  font-size: 18px;
+  font-size: 20px;
   font-weight: 700;
   color: #0f172a;
+  margin-top: 6px;
 }
 
+/* 建议部分 */
 .suggestion-section {
-  background: linear-gradient(160deg, rgba(16, 185, 129, 0.12) 0%, rgba(45, 212, 191, 0.12) 100%);
+  background: linear-gradient(160deg, rgba(16, 185, 129, 0.12) 0%, rgba(45, 212, 191, 0.08) 100%);
+  border: 1px solid rgba(16, 185, 129, 0.2);
 }
 
 .suggestion-list {
@@ -331,29 +374,47 @@ function formatNumber(value) {
 
 .suggestion-list li {
   display: flex;
-  gap: 12px;
-  align-items: center;
+  gap: 14px;
+  align-items: flex-start;
+  background: rgba(255, 255, 255, 0.7);
+  padding: 14px 16px;
+  border-radius: 14px;
+  transition: all 0.2s ease;
+  border: 1px solid rgba(16, 185, 129, 0.1);
+}
+
+.suggestion-list li:hover {
   background: rgba(255, 255, 255, 0.9);
-  padding: 12px 16px;
-  border-radius: 16px;
+  border-color: rgba(16, 185, 129, 0.3);
+  transform: translateX(4px);
 }
 
 .suggestion-list .bullet {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #34d399 0%, #22d3ee 100%);
+  background: linear-gradient(135deg, #10b981 0%, #14b8a6 100%);
+  flex-shrink: 0;
+  margin-top: 6px;
 }
 
 .suggestion-list .text {
   font-size: 14px;
   color: #0f172a;
+  line-height: 1.6;
+  font-weight: 500;
 }
 
 .panel-skeleton {
   min-height: 540px;
 }
 
+/* 空状态 */
+:deep(.el-empty) {
+  padding: 40px 20px;
+}
+
+/* 响应式设计 */
 @media (max-width: 1280px) {
   .recommendation-panel {
     flex-direction: row;
@@ -368,11 +429,70 @@ function formatNumber(value) {
     flex-direction: column;
     align-items: flex-start;
   }
+
+  .detail-group {
+    grid-template-columns: repeat(3, 1fr);
+    width: 100%;
+  }
 }
 
 @media (max-width: 960px) {
   .recommendation-panel {
     flex-direction: column;
+  }
+
+  .recommendation-grid {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  }
+
+  .progress-card {
+    flex-direction: column;
+  }
+
+  .detail-group {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .panel-section {
+    padding: 20px;
+  }
+
+  .section-header h2 {
+    font-size: 18px;
+  }
+
+  .recommendation-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+
+  .recommendation-card {
+    padding: 16px 14px;
+    min-height: 120px;
+    border-radius: 16px;
+  }
+
+  .card-icon {
+    font-size: 24px;
+  }
+
+  .card-title {
+    font-size: 14px;
+  }
+
+  .card-subtitle {
+    font-size: 12px;
+  }
+
+  .detail-group {
+    grid-template-columns: 1fr;
+  }
+
+  .suggestion-list li {
+    gap: 10px;
+    padding: 12px 14px;
   }
 }
 </style>

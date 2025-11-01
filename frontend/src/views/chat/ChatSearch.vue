@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="chat-search">
     <div class="chat-search__header">
       <el-button @click="goBack" :icon="Back">返回</el-button>
@@ -170,7 +170,7 @@
                 <el-icon><DocumentCopy /></el-icon> 文件: {{ message.fileName }}
               </div>
               <div v-else-if="message.type === 'voice'" class="chat-search__media">
-                <el-icon><Headphone /></el-icon> 语音消息
+                <el-icon><Headset /></el-icon> 语音消息
               </div>
               <div v-else-if="message.type === 'video'" class="chat-search__media">
                 <el-icon><VideoPlay /></el-icon> 视频消息
@@ -212,7 +212,7 @@ import {
   ArrowDown,
   Picture,
   DocumentCopy,
-  Headphone,
+  Headset,
   VideoPlay
 } from '@element-plus/icons-vue'
 
@@ -584,3 +584,5 @@ function formatFieldName(field) {
   flex-wrap: wrap;
 }
 </style>
+
+

@@ -1,0 +1,59 @@
+# Node.js 后端 - 生产级多阶段构建
+# =================================
+
+# 阶段1: 依赖安装
+FROM node:18-alpine AS dependencies
+
+WORKDIR /app
+
+# 复制package文件
+COPY package*.json ./
+
+# 设置npm镜像源并安装依赖
+RUN npm config set registry https://registry.npmmirror.com && \
+    npm ci --only=production && \
+    npm cache clean --force
+
+# 阶段2: 生产镜像
+FROM node:18-alpine
+
+WORKDIR /app
+
+# 安装系统依赖
+RUN apk add --no-cache \
+    curl \
+    tzdata \
+    bash \
+    dumb-init && \
+    cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && \
+    echo "Asia/Shanghai" > /etc/timezone
+
+# 创建非root用户
+RUN addgroup -g 1001 -S nodejs && \
+    adduser -S nodeuser -u 1001 -G nodejs
+
+# 从依赖阶段复制node_modules
+COPY --from=dependencies --chown=nodeuser:nodejs /app/node_modules ./node_modules
+
+# 复制应用文件
+COPY --chown=nodeuser:nodejs package*.json ./
+COPY --chown=nodeuser:nodejs mock-server.js ./
+COPY --chown=nodeuser:nodejs websocket-server.js ./
+COPY --chown=nodeuser:nodejs redis-client.js ./
+
+# 创建日志和上传目录
+RUN mkdir -p /app/logs /app/uploads && \
+    chown -R nodeuser:nodejs /app
+
+# 切换到非root用户
+USER nodeuser
+
+# 暴露端口
+EXPOSE 3001
+
+# 健康检查
+HEALTHCHECK --interval=30s --timeout=10s --retries=5 --start-period=40s \
+    CMD curl -f http://localhost:3001/api/health || exit 1
+
+# 启动命令
+CMD ["node", "mock-server.js"]

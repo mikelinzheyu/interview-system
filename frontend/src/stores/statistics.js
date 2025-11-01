@@ -97,10 +97,10 @@ export const useStatisticsStore = defineStore('statistics', () => {
         icon: getTrendIcon(trendData.scoreTrend)
       },
       rank: {
-        ...formatted.rank,
+        ...(userStats.value.formatted?.rank || { level: 'N/A', formatted: 'N/A' }),
         trend: 'stable', // 排名趋势需要更复杂的计算
         trendText: '',
-        color: getRankColor(formatted.rank.level),
+        color: getRankColor((userStats.value.formatted?.rank?.level) || 'N/A'),
         icon: 'Trophy'
       }
     }

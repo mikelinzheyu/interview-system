@@ -1,0 +1,169 @@
+================================================================================
+"再答一次" BUTTON - COMPLETE CODE SNIPPETS REFERENCE
+================================================================================
+
+1. BUTTON DEFINITION
+   File: frontend/src/components/WrongAnswerReview/ReviewActionBar.vue
+   Lines: 12-19
+
+   <el-button
+     type="primary"
+     size="large"
+     icon="VideoPlay"
+     @click="$emit('retry')"
+   >
+     再答一次
+   </el-button>
+
+   Purpose: Emits 'retry' event when clicked
+
+================================================================================
+
+2. BUTTON HANDLER (ROUTING LOGIC)
+   File: frontend/src/views/chat/WrongAnswerReviewRoom.vue
+   Lines: 198-222
+
+   const retryAnswer = async () => {
+     let targetRoomId = chatStore.activeConversationId
+     
+     try {
+       if (!targetRoomId) {
+         if (!chatStore.conversationsLoaded) {
+           await chatStore.fetchConversations()
+         }
+         targetRoomId = chatStore.conversations?.[0]?.id || 1
+       }
+     } catch (e) {
+       targetRoomId = 1
+     }
+
+     router.push({
+       name: 'ChatRoom',
+       params: { roomId: targetRoomId },
+       query: {
+         mode: 'practice',
+         recordId: wrongAnswerId.value
+       }
+     })
+   }
+
+   Key Points:
+   - Gets roomId from chatStore
+   - Falls back to API or defaults to 1
+   - Uses router.push() with route NAME (not path)
+   - Passes mode='practice' and recordId in query params
+
+================================================================================
+
+3. ROUTER CONFIGURATION
+   File: frontend/src/router/index.js
+   Lines: 186-192, 207-213
+
+   Route Definition:
+   {
+     path: '/chat/room/:roomId',
+     name: 'ChatRoom',
+     component: () => import('@/views/chat/ChatRoom.vue'),
+     meta: { requiresAuth: true },
+     props: true
+   }
+
+   Current Location:
+   {
+     path: '/wrong-answers/:recordId',
+     name: 'WrongAnswerDetail',
+     component: () => import('@/views/chat/WrongAnswerReviewRoom.vue'),
+     meta: { requiresAuth: true },
+     props: true
+   }
+
+   Resolution: 'ChatRoom' name -> /chat/room/:roomId path
+
+================================================================================
+
+4. PRACTICE MODE DETECTION
+   File: frontend/src/composables/usePracticeMode.js
+   Lines: 26-44
+
+   const initPracticeMode = () => {
+     if (route.query.mode === 'practice') {
+       isPracticeMode.value = true
+       practiceWrongAnswerId.value = route.query.recordId || route.params.recordId
+       
+       if (route.query.questionIds) {
+         practiceQuestionIds.value = route.query.questionIds.split(',')
+       } else if (practiceWrongAnswerId.value) {
+         practiceQuestionIds.value = [practiceWrongAnswerId.value]
+       }
+       
+       ElMessage.success('进入练习模式，开始巩固你的答案吧！')
+     }
+   }
+
+   Purpose: Detects practice mode from query parameters and activates it
+
+================================================================================
+
+5. PRACTICE MODE UI
+   File: frontend/src/views/chat/ChatRoom.vue
+   Lines: 6-31
+
+   <div v-if="isPracticeMode" class="practice-mode-banner">
+     <el-alert type="success" :closable="false" show-icon>
+       <template #default>
+         <div class="practice-mode-content">
+           <strong>{{ practiceModeTitle }}</strong>
+           <el-progress
+             :percentage="practiceProgress"
+             :format="p => `进度: ${p}%`"
+             style="width: 200px;"
+           />
+           <el-button type="danger" size="small" @click="exitPracticeMode">
+             退出练习
+           </el-button>
+         </div>
+       </template>
+     </el-alert>
+   </div>
+
+   Purpose: Shows practice mode progress indicator
+
+================================================================================
+
+COMPLETE NAVIGATION FLOW:
+
+1. /wrong-answers/:recordId (WrongAnswerReviewRoom.vue)
+2. User clicks "再答一次" button
+3. ReviewActionBar emits 'retry' event
+4. WrongAnswerReviewRoom catches @retry="retryAnswer"
+5. retryAnswer() executes router.push() to ChatRoom
+6. URL changes to: /chat/room/1?mode=practice&recordId=...
+7. ChatRoom.vue mounts
+8. usePracticeMode() detects route.query.mode === 'practice'
+9. isPracticeMode = true
+10. ChatRoom displays practice-mode-banner
+11. User enters practice mode within ChatRoom interface
+
+================================================================================
+
+KEY FINDINGS:
+
+1. The redirect to /chat/room IS INTENTIONAL
+2. It switches from review interface to practice interface
+3. Context is preserved via query parameters (mode, recordId)
+4. This is NOT a bug - it's working as designed
+5. The route change is a necessary part of the UX flow
+
+================================================================================
+
+FILES INVOLVED:
+
+1. ReviewActionBar.vue          - Button definition
+2. WrongAnswerReviewRoom.vue    - Routing handler (retryAnswer function)
+3. router/index.js              - Route definitions
+4. usePracticeMode.js           - Mode detection logic
+5. ChatRoom.vue                 - Practice mode UI
+
+TOTAL: 5 files, ~200 lines of relevant code
+
+================================================================================

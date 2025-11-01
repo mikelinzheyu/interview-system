@@ -1,10 +1,12 @@
-import { createRouter, createWebHistory } from 'vue-router'
+﻿import { createRouter, createWebHistory } from 'vue-router'
 import { useUserStore } from '@/stores/user'
 
 const routes = [
   {
     path: '/',
-    redirect: '/home'
+    name: 'Landing',
+    component: () => import('@/views/marketing/Landing.vue'),
+    meta: { requiresAuth: false }
   },
   {
     path: '/login',
@@ -41,6 +43,18 @@ const routes = [
     name: 'DomainSelector',
     component: () => import('@/views/questions/DomainSelector.vue'),
     meta: { requiresAuth: true }
+  },
+  {
+    path: '/questions/explore',
+    name: 'DomainExplorer',
+    component: () => import('@/views/questions/DomainExplorer.vue'),
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/onboarding/fields',
+    name: 'FieldOnboarding',
+    component: () => import('@/views/onboarding/FieldOnboarding.vue'),
+    meta: { requiresAuth: false }
   },
   {
     path: '/questions/:domainSlug',
@@ -195,6 +209,29 @@ const routes = [
     meta: { requiresAuth: true }
   },
 
+  // Phase 2.1: 错题集管理
+  {
+    path: '/wrong-answers',
+    name: 'WrongAnswers',
+    component: () => import('@/views/chat/WrongAnswersPage.vue'),
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/wrong-answers/:recordId',
+    name: 'WrongAnswerDetail',
+    component: () => import('@/views/chat/WrongAnswerReviewRoom.vue'),
+    meta: { requiresAuth: true },
+    props: true
+  },
+
+  // Phase 3: 分析仪表板和高级功能
+  {
+    path: '/wrong-answers/analytics/dashboard',
+    name: 'AnalyticsDashboard',
+    component: () => import('@/views/chat/AnalyticsDashboard.vue'),
+    meta: { requiresAuth: true }
+  },
+
   // Phase 3: 关注系统
   {
     path: '/community/follow-list',
@@ -319,6 +356,11 @@ router.beforeEach((to, from, next) => {
   const userStore = useUserStore()
   const isAuthenticated = userStore.isAuthenticated
 
+  if (to.name === 'Landing' && isAuthenticated) {
+    next('/home')
+    return
+  }
+
   if (to.meta.requiresAuth && !isAuthenticated) {
     next('/login')
   } else if (to.meta.requiresGuest && isAuthenticated) {
@@ -329,3 +371,4 @@ router.beforeEach((to, from, next) => {
 })
 
 export default router
+

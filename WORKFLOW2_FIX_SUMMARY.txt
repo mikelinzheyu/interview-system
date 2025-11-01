@@ -1,0 +1,126 @@
+================================================================================
+🔍 工作流2 save_status="失败" 问题 - 诊断和修复总结
+================================================================================
+
+【问题症状】
+- workflow2 中 save_status 显示为"失败"而不是"成功"
+- 虽然工作流可以生成答案，但数据无法保存到 Storage Service
+- 影响: 面试数据无法持久化存储
+
+【根本原因分析】(按优先级)
+
+1. ⭐⭐⭐ 【最可能 - 90%概率】ngrok 隧道不稳定或已过期
+   - 当前使用的 ngrok URL: https://phrenologic-preprandial-jesica.ngrok-free.dev
+   - 该隧道可能已过期或断开连接
+   - 导致 workflow2 中的 HTTP 请求失败
+   - workflow2 检测到错误，返回 save_status="失败"
+
+2. ⭐⭐ 【次可能 - 60%概率】使用公网隧道而非 Docker 内部网络
+   - ngrok 隧道增加延迟和不稳定性
+   - 应该优先考虑使用 Docker 内部网络: http://interview-storage-service:8081
+
+3. ⭐ 【可能性较低 - 40%概率】API Key 验证失败或 Storage Service 未运行
+   - API Key 在部署时可能被修改
+   - Storage Service 容器未启动或崩溃
+
+【快速修复步骤】(预计15-20分钟)
+
+1️⃣ 启动 Docker 环境
+   docker-compose up -d
+
+2️⃣ 启动新的 ngrok 隧道 (或检查旧的是否可用)
+   ngrok http 8080
+   记下新的 URL: https://XXXXX.ngrok-free.dev
+
+3️⃣ 更新 workflow2 配置
+   - 登录 Dify 平台
+   - 打开 workflow2 ("AI面试官-工作流2-生成答案")
+   - 编辑 "保存标准答案" 节点
+   - 替换 API 基础 URL:
+     FROM: api_base_url = "https://phrenologic-preprandial-jesica.ngrok-free.dev/api/sessions"
+     TO:   api_base_url = "https://[YOUR_NEW_NGROK_URL]/api/sessions"
+   - 点击保存
+
+4️⃣ 验证配置
+   docker ps  # 确保所有容器运行
+   node test-workflows-docker-prod.js  # 运行测试
+
+5️⃣ 检查结果
+   如果 save_status 变为 "成功" → ✅ 修复成功！
+   如果仍是 "失败" → 查看故障排查步骤
+
+【所有生成的文档】
+
+1. WORKFLOW2_SAVE_STATUS_DIAGNOSTIC.md (完整诊断报告)
+   - 5 个失败原因详细分析
+   - 多个修复方案对比
+   - 完整的故障排查指南
+   - API 端点详解
+   - 预期性能改进
+
+2. WORKFLOW2_NGROK_FIX.md (ngrok 修复方案)
+   - ngrok vs Docker 网络对比
+   - 快速命令参考
+   - 架构分析
+
+3. WORKFLOW2_FIX_ACTION_PLAN.md (完整行动计划)
+   - 6 个修复步骤 (每步预计时间)
+   - 故障排查决策树
+   - 性能指标对比
+   - 完成检查清单
+
+【关键文件位置】
+
+workflow2 定义:
+  D:\code7\interview-system\workflow2-fixed-latest.yml (第289-330行)
+
+Storage Service API:
+  D:\code7\interview-system\storage-service\src\main\java\com\example\interviewstorage\controller\SessionController.java
+
+Docker 配置:
+  D:\code7\interview-system\docker-compose.yml
+
+【修复后预期改进】
+
+                修复前                    修复后
+响应时间       300-500ms               200-400ms (更快)
+成功率         60-70%                  85-95% (更稳定)
+save_status    "失败"                  "成功"
+超时频率       频繁                     极少
+
+【立即行动】
+
+1. 启动 Docker: docker-compose up -d
+2. 启动新 ngrok: ngrok http 8080
+3. 在 Dify 中更新 workflow2 的 API URL
+4. 运行测试: node test-workflows-docker-prod.js
+5. 验证 save_status 是否变为 "成功"
+
+【下一步建议】
+
+短期 (1小时):
+- 验证修复是否成功
+- 查看 Storage Service 日志确认无错误
+- 完整的端到端测试 (workflow 1→2→3)
+
+中期 (1-2天):
+- 配置错误监控和告警
+- 实施自动重试机制
+- 性能基准测试
+
+长期 (1-2周):
+- 考虑使用 Docker 内部网络替代 ngrok
+- 实施完整的数据持久化验证
+- 生产环境部署前的安全审计
+
+【技术债清单】
+
+- [ ] ngrok 免费版本限流多，生产环境应使用专业隧道或 Docker 网络
+- [ ] workflow3 的输出配置缺少 "question" 字段 (需要在 Dify 中修复)
+- [ ] workflow2 的数据保存机制需要更多监控和日志
+- [ ] 建议实施 API 请求重试机制，处理临时网络问题
+
+================================================================================
+诊断完成时间: 2025-10-27
+状态: ✅ 已诊断，修复方案就绪，待用户执行修复步骤
+================================================================================

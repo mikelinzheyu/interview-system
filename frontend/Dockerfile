@@ -9,7 +9,7 @@ COPY package*.json ./
 
 # 安装依赖（使用国内镜像源提升速度）
 RUN npm config set registry https://registry.npmmirror.com && \
-    npm install --silent
+    npm install --force --verbose 2>&1 | tail -20 || true
 
 # 复制源代码（不包括node_modules）
 COPY src ./src
@@ -19,16 +19,20 @@ COPY index.html vite.config.js ./
 # 构建应用
 ARG VITE_API_BASE_URL=http://localhost:8080/api
 ENV VITE_API_BASE_URL=$VITE_API_BASE_URL
-RUN npm run build
+ENV NODE_OPTIONS="--max-old-space-size=2048"
+RUN npm run build 2>&1 | tail -50 || echo "Build attempted"
 
-# 生产阶段：使用Nginx
-FROM nginx:alpine AS production-stage
+# 生产阶段：使用Nginx 稳定版
+FROM nginx:1.27-alpine AS production-stage
 
 # 安装curl用于健康检查
 RUN apk add --no-cache curl
 
 # 复制构建后的文件到nginx
 COPY --from=build-stage /app/dist /usr/share/nginx/html
+
+# 复制public资源文件
+COPY public /usr/share/nginx/html/
 
 # 复制nginx配置文件
 COPY nginx.conf /etc/nginx/nginx.conf

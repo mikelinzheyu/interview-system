@@ -1,0 +1,317 @@
+[
+  {
+    "id": 100,
+    "name": "工学",
+    "slug": "engineering",
+    "level": "discipline",
+    "icon": "🏗️",
+    "parentId": null,
+    "description": "工程应用与技术创新",
+    "children": [
+      {
+        "id": 101,
+        "name": "计算机类",
+        "slug": "computer",
+        "level": "field",
+        "icon": "💻",
+        "parentId": 100,
+        "description": "计算机科学与技术",
+        "children": [
+          {
+            "id": 1,
+            "name": "计算机科学与技术",
+            "slug": "computer-science",
+            "level": "major",
+            "icon": "💻",
+            "parentId": 101,
+            "shortDescription": "算法、系统与软件工程的核心能力",
+            "description": "系统化掌握算法设计、操作系统、网络与软件工程，构建全栈技术与工程实践能力。",
+            "stats": {
+              "easy": 48,
+              "medium": 56,
+              "hard": 32
+            },
+            "categoryCount": 12,
+            "questionCount": 136,
+            "tags": ["算法设计", "分布式系统", "工程实践"],
+            "highlights": [
+              "覆盖数据结构、操作系统与网络核心模块",
+              "强调工程化落地与代码质量体系",
+              "配套 AI 算法与大数据专题路径"
+            ],
+            "coreCourses": ["数据结构", "算法基础", "操作系统", "计算机网络"],
+            "suggestions": [
+              "先完成数据结构模块再进入系统设计",
+              "结合项目实战巩固算法应用"
+            ],
+            "isRecommended": true,
+            "recommendedScore": 0.95,
+            "active": true
+          },
+          {
+            "id": 11,
+            "name": "软件工程",
+            "slug": "software-engineering",
+            "level": "major",
+            "icon": "⚙️",
+            "parentId": 101,
+            "shortDescription": "软件开发与项目管理能力",
+            "description": "从需求分析到部署运维的全周期软件工程能力。",
+            "stats": {
+              "easy": 35,
+              "medium": 42,
+              "hard": 18
+            },
+            "categoryCount": 8,
+            "questionCount": 95,
+            "tags": ["软件设计", "项目管理", "质量保证"],
+            "coreCourses": ["软件设计模式", "软件项目管理", "测试理论", "DevOps"],
+            "suggestions": [
+              "掌握常见设计模式",
+              "学习敏捷开发方法论"
+            ],
+            "isRecommended": true,
+            "recommendedScore": 0.88
+          },
+          {
+            "id": 12,
+            "name": "网络工程",
+            "slug": "network-engineering",
+            "level": "major",
+            "icon": "🌐",
+            "parentId": 101,
+            "shortDescription": "网络设计与安全防护",
+            "description": "深入理解网络协议与安全机制。",
+            "stats": {
+              "easy": 32,
+              "medium": 38,
+              "hard": 20
+            },
+            "categoryCount": 7,
+            "questionCount": 90,
+            "tags": ["网络协议", "网络安全", "云计算"],
+            "coreCourses": ["TCP/IP协议", "网络安全", "云平台部署", "边界防护"],
+            "suggestions": [
+              "熟悉OSI七层模型",
+              "学习主流云平台架构"
+            ],
+            "isRecommended": false,
+            "recommendedScore": 0.75
+          }
+        ]
+      },
+      {
+        "id": 102,
+        "name": "电子信息类",
+        "slug": "electronics",
+        "level": "field",
+        "icon": "🔌",
+        "parentId": 100,
+        "description": "电子与通信技术",
+        "children": [
+          {
+            "id": 13,
+            "name": "电子信息工程",
+            "slug": "electronic-info",
+            "level": "major",
+            "icon": "🔌",
+            "parentId": 102,
+            "shortDescription": "电子电路与信号处理",
+            "description": "电路设计、信号处理与嵌入式系统。",
+            "stats": {
+              "easy": 38,
+              "medium": 44,
+              "hard": 22
+            },
+            "categoryCount": 9,
+            "questionCount": 104,
+            "tags": ["电路设计", "信号处理", "嵌入式"],
+            "coreCourses": ["电路分析", "信号与系统", "数字电子", "嵌入式C"],
+            "suggestions": [
+              "深入学习模拟电路基础",
+              "掌握常见嵌入式平台"
+            ],
+            "isRecommended": false,
+            "recommendedScore": 0.72
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": 200,
+    "name": "经济学",
+    "slug": "economics",
+    "level": "discipline",
+    "icon": "💰",
+    "parentId": null,
+    "description": "经济理论与应用",
+    "children": [
+      {
+        "id": 201,
+        "name": "经济学类",
+        "slug": "economic",
+        "level": "field",
+        "icon": "📊",
+        "parentId": 200,
+        "description": "经济学专业",
+        "children": [
+          {
+            "id": 2,
+            "name": "金融学",
+            "slug": "finance",
+            "level": "major",
+            "icon": "💰",
+            "parentId": 201,
+            "shortDescription": "投融资与风险管理的系统框架",
+            "description": "围绕金融市场、资产定价、风险控制与金融科技应用，构建现代金融分析能力。",
+            "stats": {
+              "easy": 36,
+              "medium": 40,
+              "hard": 18
+            },
+            "categoryCount": 10,
+            "questionCount": 94,
+            "tags": ["资产定价", "金融工程", "风控模型"],
+            "highlights": [
+              "涵盖投融资、衍生品与公司金融专题",
+              "提供金融建模与量化分析实战路径",
+              "结合监管动向与金融科技场景"
+            ],
+            "coreCourses": ["金融市场", "公司金融", "投资学", "风险管理"],
+            "suggestions": [
+              "结合真实市场数据练习量化建模",
+              "关注监管与合规框架变化"
+            ],
+            "isRecommended": true,
+            "recommendedScore": 0.9
+          },
+          {
+            "id": 21,
+            "name": "经济学",
+            "slug": "economics-major",
+            "level": "major",
+            "icon": "📈",
+            "parentId": 201,
+            "shortDescription": "经济理论与政策分析",
+            "description": "宏观与微观经济学理论、政策分析与评估。",
+            "stats": {
+              "easy": 40,
+              "medium": 45,
+              "hard": 20
+            },
+            "categoryCount": 9,
+            "questionCount": 105,
+            "tags": ["宏观经济", "微观经济", "政策分析"],
+            "coreCourses": ["微观经济学", "宏观经济学", "计量经济学", "政治经济学"],
+            "suggestions": [
+              "掌握经济学基本分析方法",
+              "关注经济热点与政策变化"
+            ],
+            "isRecommended": false,
+            "recommendedScore": 0.78
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": 300,
+    "name": "医学",
+    "slug": "medicine",
+    "level": "discipline",
+    "icon": "⚕️",
+    "parentId": null,
+    "description": "医学专业",
+    "children": [
+      {
+        "id": 301,
+        "name": "临床医学类",
+        "slug": "clinical",
+        "level": "field",
+        "icon": "🏥",
+        "parentId": 300,
+        "description": "临床医学与诊疗",
+        "children": [
+          {
+            "id": 3,
+            "name": "医学",
+            "slug": "medicine-major",
+            "level": "major",
+            "icon": "⚕️",
+            "parentId": 301,
+            "shortDescription": "基础理论到临床诊疗的全链条能力",
+            "description": "覆盖生理病理、影像诊断、临床技能与循证医学，提升临床决策与诊疗协作能力。",
+            "stats": {
+              "easy": 40,
+              "medium": 46,
+              "hard": 20
+            },
+            "categoryCount": 11,
+            "questionCount": 106,
+            "tags": ["循证医学", "临床思维", "多学科协作"],
+            "highlights": [
+              "分阶段提升基础、诊断与治疗能力",
+              "结合真实病例训练临床推理",
+              "支持多学科会诊与患者管理场景"
+            ],
+            "coreCourses": ["生理学", "病理学", "诊断学", "临床内科"],
+            "suggestions": [
+              "注重临床病例分析",
+              "建立循证医学思维"
+            ],
+            "isRecommended": true,
+            "recommendedScore": 0.85
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": 400,
+    "name": "文学",
+    "slug": "literature",
+    "level": "discipline",
+    "icon": "📚",
+    "parentId": null,
+    "description": "文学与语言艺术",
+    "children": [
+      {
+        "id": 401,
+        "name": "中国语言文学类",
+        "slug": "chinese-literature",
+        "level": "field",
+        "icon": "🈯",
+        "parentId": 400,
+        "description": "汉语言与中国文学",
+        "children": [
+          {
+            "id": 31,
+            "name": "汉语言文学",
+            "slug": "chinese-literature-major",
+            "level": "major",
+            "icon": "📚",
+            "parentId": 401,
+            "shortDescription": "古今中外文学鉴赏与创作",
+            "description": "深入学习中国古代、现代、当代文学及国外文学，培养文学素养与批评能力。",
+            "stats": {
+              "easy": 45,
+              "medium": 42,
+              "hard": 18
+            },
+            "categoryCount": 8,
+            "questionCount": 105,
+            "tags": ["文学创作", "文学批评", "语言学"],
+            "coreCourses": ["中国古代文学", "现代汉语", "外国文学", "文学理论"],
+            "suggestions": [
+              "广泛阅读经典著作",
+              "培养文学批评思维"
+            ],
+            "isRecommended": false,
+            "recommendedScore": 0.68
+          }
+        ]
+      }
+    ]
+  }
+]

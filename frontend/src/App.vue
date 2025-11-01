@@ -36,6 +36,8 @@ onMounted(() => {
   }
 })
 
+// 已移除重复初始化逻辑，依赖上方 watch({ immediate: true }) 进行首次连接
+
 onUnmounted(() => {
   // 应用卸载时断开连接
   socketService.disconnect()

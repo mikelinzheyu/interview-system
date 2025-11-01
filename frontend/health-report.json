@@ -1,5 +1,5 @@
 {
-  "timestamp": "2025-09-25T03:43:10.637Z",
+  "timestamp": "2025-10-23T07:03:02.261Z",
   "version": "1.0.0",
   "results": {
     "environment": {
@@ -8,8 +8,8 @@
         "status": "ok"
       },
       "npm": {
-        "status": "error",
-        "error": "Command failed: npm --version\n'npm' �����ڲ����ⲿ���Ҳ���ǿ����еĳ���\r\n���������ļ���\r\n"
+        "version": "10.9.3",
+        "status": "ok"
       },
       "os": {
         "platform": "win32",
@@ -24,8 +24,8 @@
     "dependencies": {
       "packageJson": {
         "status": "ok",
-        "dependencies": 9,
-        "devDependencies": 10
+        "dependencies": 15,
+        "devDependencies": 11
       },
       "nodeModules": {
         "exists": true,
@@ -51,22 +51,42 @@
         {
           "name": "Backend API",
           "url": "http://localhost:8080/api/actuator/health",
-          "status": "unhealthy",
-          "statusCode": 404,
+          "method": "GET",
+          "status": "error",
+          "error": "",
           "critical": true,
-          "responseTime": 15
+          "responseTime": 24
         },
         {
           "name": "Frontend Dev Server",
           "url": "http://localhost:5174",
+          "method": "GET",
+          "status": "unhealthy",
+          "statusCode": 404,
+          "critical": false,
+          "responseTime": 7
+        },
+        {
+          "name": "Basic Analysis API",
+          "url": "http://localhost:8080/api/interview/analyze",
+          "method": "POST",
+          "status": "error",
+          "error": "",
+          "critical": true,
+          "responseTime": 6
+        },
+        {
+          "name": "Advanced Analysis API",
+          "url": "http://localhost:8080/api/interview/analyze-advanced",
+          "method": "POST",
           "status": "error",
           "error": "",
           "critical": false,
-          "responseTime": 5
+          "responseTime": 6
         }
       ],
       "healthy": 0,
-      "total": 2,
+      "total": 4,
       "status": "error"
     },
     "configuration": {
@@ -98,14 +118,14 @@
       },
       "ports": {
         "3306": {
-          "inUse": false,
+          "inUse": true,
           "status": "ok",
-          "process": ""
+          "process": "TCP    0.0.0.0:3306           0.0.0.0:0              LISTENING       10344"
         },
         "5174": {
-          "inUse": false,
+          "inUse": true,
           "status": "ok",
-          "process": ""
+          "process": "TCP    0.0.0.0:5174           0.0.0.0:0              LISTENING       30392"
         },
         "8080": {
           "inUse": false,
@@ -116,9 +136,9 @@
     },
     "overall": "fair",
     "score": {
-      "current": 51,
+      "current": 61,
       "max": 100,
-      "percentage": 51
+      "percentage": 61
     }
   }
 }

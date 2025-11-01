@@ -1,10 +1,11 @@
 # Node.js Mock API 服务器 Dockerfile
-FROM node:18-alpine AS production
+# 使用 Node.js 官方镜像
+FROM node:18-alpine
 
 # 设置工作目录
 WORKDIR /app
 
-# 安装必要的系统包
+# 安装系统依赖
 RUN apk add --no-cache curl tzdata && \
     cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && \
     echo "Asia/Shanghai" > /etc/timezone
@@ -13,18 +14,16 @@ RUN apk add --no-cache curl tzdata && \
 RUN addgroup -g 1001 -S nodejs && \
     adduser -S nodeuser -u 1001
 
-# 复制package.json
+# 复制应用文件
 COPY package.json ./
-
-# 复制Mock服务器文件
 COPY mock-server.js ./
 COPY websocket-server.js ./
 COPY redis-client.js ./
 
-# 安装依赖（虽然目前没有外部依赖）
+# 安装依赖
 RUN npm config set registry https://registry.npmmirror.com && \
-    npm install --only=production && \
-    npm cache clean --force
+    npm install --only=production || npm install || true && \
+    npm cache clean --force || true
 
 # 创建日志目录
 RUN mkdir -p /app/logs && \

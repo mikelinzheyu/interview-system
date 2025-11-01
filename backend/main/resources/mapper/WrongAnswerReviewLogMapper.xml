@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.interview.mapper.WrongAnswerReviewLogMapper">
+
+    <resultMap id="WrongAnswerReviewLogMap" type="com.interview.entity.WrongAnswerReviewLog">
+        <id column="id" property="id"/>
+        <result column="user_id" property="userId"/>
+        <result column="wrong_answer_id" property="wrongAnswerId"/>
+        <result column="result" property="result"/>
+        <result column="time_spent_sec" property="timeSpentSec"/>
+        <result column="previous_status" property="previousStatus"/>
+        <result column="new_status" property="newStatus"/>
+        <result column="notes" property="notes"/>
+        <result column="review_at" property="reviewAt"/>
+    </resultMap>
+
+    <insert id="insert" parameterType="com.interview.entity.WrongAnswerReviewLog" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO wrong_answer_review_logs (
+            user_id, wrong_answer_id, result, time_spent_sec,
+            previous_status, new_status, notes, review_at
+        ) VALUES (
+            #{userId}, #{wrongAnswerId}, #{result}, #{timeSpentSec},
+            #{previousStatus}, #{newStatus}, #{notes}, #{reviewAt}
+        )
+    </insert>
+
+    <select id="selectByUserAndRecord" resultMap="WrongAnswerReviewLogMap">
+        SELECT * FROM wrong_answer_review_logs
+        WHERE user_id = #{userId} AND wrong_answer_id = #{wrongAnswerId}
+        ORDER BY review_at DESC
+    </select>
+
+    <select id="selectByUserAndRecordFiltered" resultMap="WrongAnswerReviewLogMap">
+        SELECT * FROM wrong_answer_review_logs
+        WHERE user_id = #{userId}
+          AND wrong_answer_id = #{wrongAnswerId}
+        <if test="result != null and result != ''">
+          AND result = #{result}
+        </if>
+        <if test="from != null">
+          AND review_at &gt;= #{from}
+        </if>
+        <if test="to != null">
+          AND review_at &lt;= #{to}
+        </if>
+        ORDER BY review_at DESC
+        LIMIT #{size} OFFSET #{offset}
+    </select>
+
+    <select id="countByUserAndRecordFiltered" resultType="long">
+        SELECT COUNT(*) FROM wrong_answer_review_logs
+        WHERE user_id = #{userId}
+          AND wrong_answer_id = #{wrongAnswerId}
+        <if test="result != null and result != ''">
+          AND result = #{result}
+        </if>
+        <if test="from != null">
+          AND review_at &gt;= #{from}
+        </if>
+        <if test="to != null">
+          AND review_at &lt;= #{to}
+        </if>
+    </select>
+
+</mapper>

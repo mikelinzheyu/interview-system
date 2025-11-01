@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div
     class="message-bubble"
     :class="{
@@ -33,6 +33,16 @@
         <!-- 文本消息 -->
         <div v-if="message.contentType === 'text'" class="message-bubble__text">
           {{ message.content }}
+        </div>
+
+        <!-- 编辑标记 -->
+        <div v-if="message.editCount && message.editCount > 0" class="message-bubble__edit-badge">
+          已编辑({{ message.editCount }})
+        </div>
+
+        <!-- 撤回时间显示 -->
+        <div v-if="message.isOwn && canRecall(message)" class="message-bubble__recall-timer">
+          可撤回 {{ getRecallTimeString(message) }}
         </div>
 
         <!-- 图片消息 -->
@@ -148,8 +158,11 @@
                   <div class="message-bubble__menu-item" @click="handleCopy">
                     复制
                   </div>
-                  <div v-if="message.isOwn" class="message-bubble__menu-item" @click="handleRecall">
-                    撤回
+                  <div v-if="message.isOwn && canRecall(message)" class="message-bubble__menu-item" @click="handleRecall">
+                    撤回 ({{ getRecallTimeString(message) }})
+                  </div>
+                  <div v-if="message.isOwn && message.editCount && message.editCount > 0" class="message-bubble__menu-item" @click="handleEditHistory">
+                    编辑历史 ({{ message.editCount }})
                   </div>
                   <div class="message-bubble__menu-item" @click="handleTranslate">
                     翻译
@@ -184,7 +197,7 @@
           <Check />
         </el-icon>
         <el-icon v-else-if="message.status === 'read'" class="message-bubble__status-icon is-read">
-          <DoubleArrowRight />
+          <DArrowRight />
         </el-icon>
         <el-icon
           v-else-if="message.status === 'failed'"
@@ -219,7 +232,7 @@ import {
   Document,
   Delete,
   Check,
-  DoubleArrowRight,
+  DArrowRight,
   Loading,
   Close
 } from '@element-plus/icons-vue'
@@ -252,15 +265,57 @@ const emit = defineEmits([
   'copy',
   'translate',
   'collect',
-  'preview-image'
+  'preview-image',
+  'edit-history',
+  'show-recall-timer'
 ])
 
 const showActions = ref(false)
 
 const colors = ['#409EFF', '#67C23A', '#E6A23C', '#F56C6C', '#909399', '#845EC2']
 
+// 撤回时间限制配置
+const RECALL_TIMEOUT = 2 * 60 * 1000 // 2 分钟
+
 function getAvatarColor(id) {
   return colors[id % colors.length]
+}
+
+/**
+ * 检查消息是否可以撤回
+ */
+function canRecall(message) {
+  if (!message || message.isRecalled) return false
+  if (!message.isOwn) return false
+
+  const now = Date.now()
+  const messageTime = message.timestamp || message.createdAt
+  if (!messageTime) return false
+
+  const elapsed = now - messageTime
+  return elapsed <= RECALL_TIMEOUT
+}
+
+/**
+ * 获取剩余撤回时间字符串
+ */
+function getRecallTimeString(message) {
+  if (!canRecall(message)) return '已过期'
+
+  const now = Date.now()
+  const messageTime = message.timestamp || message.createdAt
+  const elapsed = now - messageTime
+  const remaining = RECALL_TIMEOUT - elapsed
+
+  const seconds = Math.ceil(remaining / 1000)
+  const minutes = Math.floor(seconds / 60)
+  const secs = seconds % 60
+
+  if (minutes > 0) {
+    return `${minutes}m${secs}s`
+  } else {
+    return `${secs}s`
+  }
 }
 
 function formatFileSize(bytes) {
@@ -287,6 +342,10 @@ function handleReply() {
 
 function handleEdit() {
   emit('edit', props.message)
+}
+
+function handleEditHistory() {
+  emit('edit-history', props.message)
 }
 
 function handleResend() {
@@ -401,6 +460,43 @@ function downloadFile(file) {
 .message-bubble__text {
   line-height: 1.5;
   white-space: pre-wrap;
+}
+
+.message-bubble__edit-badge {
+  display: inline-block;
+  font-size: 10px;
+  color: #909399;
+  margin-top: 4px;
+  margin-left: 4px;
+  padding: 2px 6px;
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 3px;
+}
+
+.message-bubble--own .message-bubble__edit-badge {
+  background: rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.message-bubble__recall-timer {
+  display: inline-block;
+  font-size: 10px;
+  color: #f56c6c;
+  margin-top: 4px;
+  margin-left: 4px;
+  padding: 2px 6px;
+  background: rgba(245, 108, 108, 0.1);
+  border-radius: 3px;
+  animation: pulse 1s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
 }
 
 .message-bubble__images {
@@ -618,3 +714,5 @@ function downloadFile(file) {
   }
 }
 </style>
+
+

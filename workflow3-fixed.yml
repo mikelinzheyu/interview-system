@@ -1,0 +1,432 @@
+app:
+  description: 根据标准答案评估候选人的回答并给出综合评分
+  icon: woman-pouting
+  icon_background: '#FFF4E6'
+  mode: workflow
+  name: AI面试官-工作流3-评分
+  use_icon_as_answer_icon: false
+dependencies:
+- current_identifier: null
+  type: marketplace
+  value:
+    marketplace_plugin_unique_identifier: langgenius/openai:0.2.6@e2665624a156f52160927bceac9e169bd7e5ae6b936ae82575e14c90af390e6e
+    version: null
+kind: app
+version: 0.4.0
+workflow:
+  conversation_variables: []
+  environment_variables: []
+  features:
+    file_upload:
+      allowed_file_extensions:
+      - .JPG
+      - .JPEG
+      - .PNG
+      - .GIF
+      - .WEBP
+      - .SVG
+      allowed_file_types:
+      - image
+      allowed_file_upload_methods:
+      - local_file
+      - remote_url
+      enabled: false
+      fileUploadConfig:
+        audio_file_size_limit: 50
+        batch_count_limit: 5
+        file_size_limit: 15
+        image_file_size_limit: 10
+        video_file_size_limit: 100
+        workflow_file_upload_limit: 10
+      image:
+        enabled: false
+        number_limits: 3
+        transfer_methods:
+        - local_file
+        - remote_url
+      number_limits: 3
+    opening_statement: ''
+    retriever_resource:
+      enabled: true
+    sensitive_word_avoidance:
+      enabled: false
+    speech_to_text:
+      enabled: false
+    suggested_questions: []
+    suggested_questions_after_answer:
+      enabled: false
+    text_to_speech:
+      enabled: false
+      language: ''
+      voice: ''
+  graph:
+    edges:
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: start
+        targetType: code
+      id: start-load_answer-target
+      source: start
+      sourceHandle: source
+      target: load_answer
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: code
+        targetType: llm
+      id: load_answer-source-evaluation-target
+      source: load_answer
+      sourceHandle: source
+      target: evaluation
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: llm
+        targetType: code
+      id: evaluation-source-parse_score-target
+      source: evaluation
+      sourceHandle: source
+      target: parse_score
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: code
+        targetType: end
+      id: parse_score-source-end_output-target
+      source: parse_score
+      sourceHandle: source
+      target: end_output
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    nodes:
+    - data:
+        selected: false
+        title: 开始
+        type: start
+        variables:
+        - default: ''
+          hint: 从工作流1获取的会话ID
+          label: 会话ID
+          max_length: 128
+          options: []
+          required: true
+          type: text-input
+          variable: session_id
+        - default: ''
+          hint: 需要评分的问题ID
+          label: 问题ID
+          max_length: 128
+          options: []
+          required: true
+          type: text-input
+          variable: question_id
+        - default: ''
+          hint: 候选人对该问题的回答
+          label: 候选人回答
+          max_length: 2000
+          options: []
+          required: true
+          type: paragraph
+          variable: candidate_answer
+      height: 139
+      id: start
+      position:
+        x: -325.74116390185384
+        y: 297.5351346538998
+      positionAbsolute:
+        x: -325.74116390185384
+        y: 297.5351346538998
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 241
+    - data:
+        code: "import json\nimport urllib.request\nimport urllib.error\nimport ssl\n\
+          \ndef main(session_id: str, question_id: str, comprehensive_evaluation:\
+          \ str = \"\", overall_score: int = 0) -> dict:\n    \"\"\"\n    从存储API获取标准答案，用于评分对比\n\
+          \    \"\"\"\n\n    # ============ 配置 ============\n    api_base_url = \"\
+          https://phrenologic-preprandial-jesica.ngrok-free.dev\"\n    api_key = \"\
+          ak_live_a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0\"\n\n    try:\n       \
+          \ # ============ 获取会话数据 ============\n        get_url = f\"{api_base_url}/{session_id}\"\
+          \n        get_req = urllib.request.Request(\n            get_url,\n    \
+          \        headers={\n                'Authorization': f'Bearer {api_key}',\n\
+          \                'Content-Type': 'application/json'\n            },\n  \
+          \          method='GET'\n        )\n\n        ctx = ssl.create_default_context()\n\
+          \        ctx.check_hostname = False\n        ctx.verify_mode = ssl.CERT_NONE\n\
+          \n        with urllib.request.urlopen(get_req, context=ctx, timeout=30)\
+          \ as response:\n            session_data = json.loads(response.read().decode('utf-8'))\n\
+          \n        # ============ 查找问题的标准答案 ============\n        standard_answer\
+          \ = \"\"\n        if 'questions' in session_data and isinstance(session_data['questions'],\
+          \ list):\n            for question in session_data['questions']:\n     \
+          \           if question.get('id') == question_id:\n                    standard_answer\
+          \ = question.get('answer', '')\n                    break\n\n        # ============\
+          \ 返回评分结果 ============\n        return {\n            \"overall_score\":\
+          \ overall_score if overall_score > 0 else 75,\n            \"comprehensive_evaluation\"\
+          : comprehensive_evaluation if comprehensive_evaluation else \"无评价\",\n \
+          \           \"standard_answer\": standard_answer,\n            \"error\"\
+          : \"\"\n        }\n\n    except Exception as e:\n        return {\n    \
+          \        \"overall_score\": 0,\n            \"comprehensive_evaluation\"\
+          : f\"错误: {str(e)}\",\n            \"standard_answer\": \"\",\n         \
+          \   \"error\": f\"获取失败: {str(e)}\"\n        }\n"
+        code_language: python3
+        desc: 从会话存储中加载标准答案
+        outputs:
+          error:
+            type: string
+          question:
+            type: string
+          standard_answer:
+            type: string
+        selected: false
+        title: 加载标准答案
+        type: code
+        variables:
+        - value_selector:
+          - start
+          - session_id
+          value_type: string
+          variable: session_id
+        - value_selector:
+          - start
+          - question_id
+          value_type: string
+          variable: question_id
+      height: 79
+      id: load_answer
+      position:
+        x: 152.80064309196166
+        y: 282
+      positionAbsolute:
+        x: 152.80064309196166
+        y: 282
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 241
+    - data:
+        context:
+          enabled: false
+          variable_selector: []
+        model:
+          completion_params:
+            temperature: 0.6
+          mode: chat
+          name: gpt-4o-mini-2024-07-18
+          provider: langgenius/openai/openai
+        prompt_template:
+        - id: prompt1
+          role: system
+          text: 你是一名资深的面试官,将对候选人的回答进行专业且富有建设性的评估。
+        - id: prompt2
+          role: user
+          text: '你正在评估一位候选人对面试问题的回答。
+
+
+            **面试问题:**
+
+            "{{#load_answer.question#}}"
+
+
+            **标准答案:**
+
+            "{{#load_answer.standard_answer#}}"
+
+
+            **候选人的回答:**
+
+            "{{#start.candidate_answer#}}"
+
+
+            请你作为一位资深面试官,根据标准答案和候选人的回答,提供一段**不少于200字,不超过500字**的综合性、叙述式评价。同时,请为本次回答给出一个**总分(0-100分)**。
+
+
+            你的评价应该包含以下几个方面:
+
+            1. **整体表现概括:** 对回答的整体印象,例如回答的完整性、逻辑性、切题度。
+
+            2. **优点阐述:** 具体指出回答中表现优秀、值得肯定的部分,可以结合技术点深度、表达流畅度、思路清晰度等。
+
+            3. **改进建议:** 明确指出回答中可以提升的方面,并提供具体的改进方向、补充信息或更优的表达方式。
+
+            4. **重要提示:** 请保持语气专业、积极向上,旨在帮助候选人提升。
+
+
+            请严格按照以下JSON格式输出:
+
+            { "comprehensive_evaluation": "评价内容...", "overall_score": 85 }
+
+
+            重要:只输出JSON,不要有任何其他文字。
+
+            '
+        retry_config:
+          max_retries: 3
+          retry_enabled: true
+          retry_interval: 1000
+        selected: false
+        structured_output:
+          schema:
+            additionalProperties: false
+            properties:
+              comprehensive_evaluation:
+                description: 综合评价文本
+                type: string
+              overall_score:
+                description: 总分(0-100)
+                type: integer
+            required:
+            - comprehensive_evaluation
+            - overall_score
+            type: object
+        structured_output_enabled: true
+        title: 综合评价与打分
+        type: llm
+        vision:
+          enabled: false
+      height: 116
+      id: evaluation
+      position:
+        x: 616.721146882107
+        y: 282
+      positionAbsolute:
+        x: 616.721146882107
+        y: 282
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 241
+    - data:
+        code: "import json\nimport re\n\ndef main(evaluation_json: str) -> dict:\n\
+          \    \"\"\"\n    解析评价结果,提取综合评价和总分\n    \n    由于使用了结构化输出,LLM应该直接返回JSON格式\n\
+          \    但为了健壮性,仍然保留多种解析方式\n    \"\"\"\n    try:\n        # 方法1:尝试直接解析(结构化输出应该是纯JSON)\n\
+          \        try:\n            data = json.loads(evaluation_json)\n        \
+          \    if \"comprehensive_evaluation\" in data and \"overall_score\" in data:\n\
+          \                return {\n                    \"comprehensive_evaluation\"\
+          : data[\"comprehensive_evaluation\"],\n                    \"overall_score\"\
+          : int(data[\"overall_score\"])\n                }\n        except json.JSONDecodeError:\n\
+          \            pass\n        \n        # 方法2:提取JSON代码块\n        json_match\
+          \ = re.search(r'```json\\s*(\\{.*?\\})\\s*```', evaluation_json, re.DOTALL)\n\
+          \        if json_match:\n            data = json.loads(json_match.group(1))\n\
+          \            return {\n                \"comprehensive_evaluation\": data.get(\"\
+          comprehensive_evaluation\", \"\"),\n                \"overall_score\": int(data.get(\"\
+          overall_score\", 0))\n            }\n        \n        # 方法3:提取花括号内容\n \
+          \       json_match = re.search(r'\\{.*\\}', evaluation_json, re.DOTALL)\n\
+          \        if json_match:\n            data = json.loads(json_match.group(0))\n\
+          \            return {\n                \"comprehensive_evaluation\": data.get(\"\
+          comprehensive_evaluation\", \"\"),\n                \"overall_score\": int(data.get(\"\
+          overall_score\", 0))\n            }\n        \n        # 如果都失败,返回原始内容\n\
+          \        return {\n            \"comprehensive_evaluation\": f\"JSON解析失败,原始输出:\\\
+          n{evaluation_json}\",\n            \"overall_score\": 0\n        }\n   \
+          \     \n    except Exception as e:\n        return {\n            \"comprehensive_evaluation\"\
+          : f\"解析失败: {str(e)}\\n\\n原始输出:\\n{evaluation_json}\",\n            \"overall_score\"\
+          : 0\n        }"
+        code_language: python3
+        desc: 解析评分结果
+        outputs:
+          comprehensive_evaluation:
+            type: string
+          overall_score:
+            type: number
+        selected: false
+        title: 解析评分结果
+        type: code
+        variables:
+        - value_selector:
+          - evaluation
+          - text
+          value_type: string
+          variable: evaluation_json
+      height: 79
+      id: parse_score
+      position:
+        x: 1054.140538615599
+        y: 292.9659774027528
+      positionAbsolute:
+        x: 1054.140538615599
+        y: 292.9659774027528
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 241
+    - data:
+        outputs:
+        # 基本字段
+        - variable: session_id
+          value_selector:
+          - start
+          - session_id
+          value_type: string
+        - variable: question_id
+          value_selector:
+          - start
+          - question_id
+          value_type: string
+        - variable: candidate_answer
+          value_selector:
+          - start
+          - candidate_answer
+          value_type: string
+        # 关键字段 (必须有)
+        - variable: question
+          value_selector:
+          - load_answer
+          - question
+          value_type: string
+        - variable: standard_answer
+          value_selector:
+          - load_answer
+          - standard_answer
+          value_type: string
+        # 评分字段
+        - variable: comprehensive_evaluation
+          value_selector:
+          - parse_score
+          - comprehensive_evaluation
+          value_type: string
+        - variable: overall_score
+          value_selector:
+          - parse_score
+          - overall_score
+          value_type: number
+        # 错误处理
+        - variable: error
+          value_selector:
+          - load_answer
+          - error
+          value_type: string
+        selected: true
+        title: 输出评分结果
+        type: end
+      height: 165
+      id: end_output
+      position:
+        x: 1504.3535706523035
+        y: 282
+      positionAbsolute:
+        x: 1504.3535706523035
+        y: 282
+      selected: true
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 241
+    viewport:
+      x: -1107.574831647837
+      y: -161.32867596302117
+      zoom: 1.515716566510398
+  rag_pipeline_variables: []

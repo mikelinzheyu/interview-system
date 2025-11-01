@@ -1,8 +1,10 @@
 ﻿import { defineStore } from 'pinia'
-import { ref, computed } from 'vue'
+import { ref, computed, reactive } from 'vue'
 import { ElMessage } from 'element-plus'
 import api from '@/api'
 import mockDomains from '@/data/mock-domains.json'
+import mockDomainsHierarchical from '@/data/mock-domains-hierarchical.json'
+import recommendationService from '@/services/recommendationService'
 
 const FALLBACK_RECOMMENDED_COUNT = 6
 const FALLBACK_PROGRESS = Object.freeze({ completion: 0, easy: 0, medium: 0, hard: 0, total: 0 })
@@ -259,6 +261,30 @@ export const useDomainStore = defineStore('domain', () => {
   const progressLoading = ref(false)
   const progressError = ref(null)
 
+  // P1新增：层级树状数据
+  const hierarchicalDomains = ref([])
+  const expandedNodes = ref(new Set())
+  const viewMode = ref('flat') // 'flat' | 'tree'
+
+  // P2新增：推荐引擎相关状态
+  const recommendations = ref([])
+  const recommendationsLoading = ref(false)
+  const recommendationsError = ref(null)
+
+  const userProfile = ref(null)
+  const userProfileLoading = ref(false)
+
+  const similarDomains = ref({})
+  const collectionItems = ref([])
+
+  // 智能过滤器状态
+  const filterOptions = reactive({
+    difficulty: [], // ['beginner', 'intermediate', 'advanced']
+    timeInvestment: [], // ['1-3h', '5-10h', '15+h']
+    popularity: 'all', // 'all' | 'trending' | 'top-rated'
+    sortBy: 'recommendation' // 'recommendation' | 'popularity' | 'difficulty' | 'time-required'
+  })
+
   async function loadDomains(options = {}) {
     loading.value = true
     error.value = null
@@ -513,6 +539,492 @@ export const useDomainStore = defineStore('domain', () => {
     return fallback
   })
 
+  // ============ P1 新增：层级菜单相关函数 ============
+
+  /**
+   * 加载层级数据
+   */
+  async function loadHierarchicalDomains(options = {}) {
+    try {
+      // 优先使用后端API，否则使用mock数据
+      try {
+        const response = await api.get('/domains/hierarchical')
+        const payload = response.data || {}
+        const list = Array.isArray(payload) ? payload : payload.data || mockDomainsHierarchical
+        hierarchicalDomains.value = list
+        return list
+      } catch {
+        // 后端不支持，使用mock数据
+        hierarchicalDomains.value = mockDomainsHierarchical
+        return mockDomainsHierarchical
+      }
+    } catch (err) {
+      console.error('Failed to load hierarchical domains:', err)
+      hierarchicalDomains.value = mockDomainsHierarchical
+      return mockDomainsHierarchical
+    }
+  }
+
+  /**
+   * 切换节点展开/折叠
+   */
+  function toggleNodeExpanded(nodeId) {
+    if (expandedNodes.value.has(nodeId)) {
+      expandedNodes.value.delete(nodeId)
+    } else {
+      expandedNodes.value.add(nodeId)
+    }
+  }
+
+  /**
+   * 展开所有节点
+   */
+  function expandAllNodes() {
+    const walk = (nodes) => {
+      if (!Array.isArray(nodes)) return
+      nodes.forEach(node => {
+        expandedNodes.value.add(node.id)
+        if (node.children) {
+          walk(node.children)
+        }
+      })
+    }
+    walk(hierarchicalDomains.value)
+  }
+
+  /**
+   * 折叠所有节点
+   */
+  function collapseAllNodes() {
+    expandedNodes.value.clear()
+  }
+
+  /**
+   * 在层级树中查找Major级别的专业
+   */
+  function findAllMajors(nodes = hierarchicalDomains.value) {
+    const majors = []
+    const walk = (items) => {
+      if (!Array.isArray(items)) return
+      items.forEach(item => {
+        if (item.level === 'major') {
+          majors.push(item)
+        }
+        if (item.children) {
+          walk(item.children)
+        }
+      })
+    }
+    walk(nodes)
+    return majors
+  }
+
+  /**
+   * 从层级数据中提取所有可选择的项（Major级别）
+   */
+  const selectableDomains = computed(() => {
+    if (hierarchicalDomains.value.length === 0) {
+      return domains.value
+    }
+    return findAllMajors()
+  })
+
+  /**
+   * 切换视图模式
+   */
+  function setViewMode(mode) {
+    viewMode.value = mode // 'flat' | 'tree'
+  }
+
+  // ============ P2 新增：推荐引擎相关函数 ============
+
+  /**
+   * 构建用户档案并生成推荐
+   */
+  async function buildUserProfileAndRecommend(profileData) {
+    userProfileLoading.value = true
+    try {
+      const profile = recommendationService.buildUserProfile(profileData)
+      userProfile.value = profile
+
+      // 生成推荐
+      const domainList = domains.value.length ? domains.value : fallbackDomainsFromMock()
+      const recs = recommendationService.generateRecommendations(profile, domainList, 6)
+
+      recommendations.value = recs
+      recommendationsError.value = null
+      return recs
+    } catch (err) {
+      console.error('Failed to build user profile and generate recommendations:', err)
+      recommendationsError.value = err
+      return []
+    } finally {
+      userProfileLoading.value = false
+    }
+  }
+
+  /**
+   * 为指定域生成推荐
+   */
+  async function generateRecommendations(count = 5) {
+    if (!userProfile.value) {
+      // 如果没有用户档案，使用默认档案
+      const defaultProfile = recommendationService.buildUserProfile({
+        userId: 'anonymous',
+        interests: [],
+        goals: [],
+        learningStyle: 'balanced',
+        timePerWeek: '5-10h'
+      })
+      userProfile.value = defaultProfile
+    }
+
+    recommendationsLoading.value = true
+    try {
+      const domainList = domains.value.length ? domains.value : fallbackDomainsFromMock()
+      const recs = recommendationService.generateRecommendations(userProfile.value, domainList, count)
+      recommendations.value = recs
+      recommendationsError.value = null
+      return recs
+    } catch (err) {
+      console.error('Failed to generate recommendations:', err)
+      recommendationsError.value = err
+      return []
+    } finally {
+      recommendationsLoading.value = false
+    }
+  }
+
+  /**
+   * 获取相似的域
+   */
+  function loadSimilarDomains(domainId, count = 5) {
+    const domainList = domains.value.length ? domains.value : fallbackDomainsFromMock()
+    const similar = recommendationService.getSimilarDomains(domainId, domainList, count)
+    similarDomains.value[domainId] = similar
+    return similar
+  }
+
+  /**
+   * 获取热门域
+   */
+  function loadPopularDomains(count = 5) {
+    const domainList = domains.value.length ? domains.value : fallbackDomainsFromMock()
+    return recommendationService.getPopularDomains(domainList, count)
+  }
+
+  /**
+   * 获取学习路径
+   */
+  function getlearningPath(interest) {
+    const domainList = domains.value.length ? domains.value : fallbackDomainsFromMock()
+    return recommendationService.getLearningPath(interest, domainList)
+  }
+
+  /**
+   * 获取域的前置条件
+   */
+  function getDomainPrerequisites(domainId) {
+    const domainList = domains.value.length ? domains.value : fallbackDomainsFromMock()
+    return recommendationService.getPrerequisites(domainId, domainList)
+  }
+
+  /**
+   * 更新用户档案
+   */
+  function updateUserProfile(updates) {
+    if (!userProfile.value) {
+      userProfile.value = recommendationService.buildUserProfile({})
+    }
+    userProfile.value = { ...userProfile.value, ...updates }
+  }
+
+  /**
+   * 添加域到用户的喜欢列表
+   */
+  function addLikedDomain(domainId) {
+    if (!userProfile.value) {
+      userProfile.value = recommendationService.buildUserProfile({})
+    }
+    if (!userProfile.value.likedDomainIds.includes(domainId)) {
+      userProfile.value.likedDomainIds.push(domainId)
+    }
+  }
+
+  /**
+   * 移除域从喜欢列表
+   */
+  function removeLikedDomain(domainId) {
+    if (userProfile.value) {
+      userProfile.value.likedDomainIds = userProfile.value.likedDomainIds.filter(id => id !== domainId)
+    }
+  }
+
+  /**
+   * 标记域为已完成
+   */
+  function markDomainAsCompleted(domainId) {
+    if (!userProfile.value) {
+      userProfile.value = recommendationService.buildUserProfile({})
+    }
+    if (!userProfile.value.completedDomains.includes(domainId)) {
+      userProfile.value.completedDomains.push(domainId)
+      // 移除from in-progress
+      userProfile.value.inProgressDomains = userProfile.value.inProgressDomains.filter(id => id !== domainId)
+    }
+  }
+
+  /**
+   * 标记域为进行中
+   */
+  function markDomainAsInProgress(domainId) {
+    if (!userProfile.value) {
+      userProfile.value = recommendationService.buildUserProfile({})
+    }
+    if (!userProfile.value.inProgressDomains.includes(domainId)) {
+      userProfile.value.inProgressDomains.push(domainId)
+    }
+  }
+
+  /**
+   * 应用过滤器
+   */
+  function applyFilters(options) {
+    filterOptions.difficulty = options.difficulty || []
+    filterOptions.timeInvestment = options.timeInvestment || []
+    filterOptions.popularity = options.popularity || 'all'
+    filterOptions.sortBy = options.sortBy || 'recommendation'
+  }
+
+  /**
+   * 获取过滤和排序后的域
+   */
+  const filteredAndSortedDomains = computed(() => {
+    let result = domains.value.slice()
+
+    // 应用难度过滤
+    if (filterOptions.difficulty.length > 0) {
+      result = result.filter(d =>
+        filterOptions.difficulty.includes(d.difficulty)
+      )
+    }
+
+    // 应用热度过滤
+    if (filterOptions.popularity !== 'all') {
+      if (filterOptions.popularity === 'trending') {
+        result = result.filter(d => (d.popularity || 0) >= 75)
+      } else if (filterOptions.popularity === 'top-rated') {
+        result = result.filter(d => (d.rating || 0) >= 4.5)
+      }
+    }
+
+    // 应用排序
+    const sorted = [...result].sort((a, b) => {
+      switch (filterOptions.sortBy) {
+        case 'popularity':
+          return (b.popularity || 0) - (a.popularity || 0)
+        case 'difficulty':
+          const diffOrder = { beginner: 0, intermediate: 1, advanced: 2 }
+          return (diffOrder[a.difficulty] || 0) - (diffOrder[b.difficulty] || 0)
+        case 'time-required':
+          return (a.timeRequired || 0) - (b.timeRequired || 0)
+        case 'recommendation':
+        default:
+          return (b.recommendedScore || 0) - (a.recommendedScore || 0)
+      }
+    })
+
+    return sorted
+  })
+
+  /**
+   * 重置过滤器
+   */
+  function resetFilters() {
+    filterOptions.difficulty = []
+    filterOptions.timeInvestment = []
+    filterOptions.popularity = 'all'
+    filterOptions.sortBy = 'recommendation'
+  }
+
+  // ===================== P2D: 学习分析状态 =====================
+
+  /**
+   * 学习分析状态
+   */
+  const activities = ref([])
+  const progressMetrics = ref({})
+  const learningGoals = ref({
+    domainsToComplete: 10,
+    targetAccuracy: 85,
+    dailyHours: 2
+  })
+  const insights = ref([])
+  const analyticsLoading = ref(false)
+  const analyticsError = ref(null)
+
+  /**
+   * 记录用户活动
+   */
+  function trackActivity(domainId, activityType, metrics = {}) {
+    const analyticsService = import('@/services/analyticsService').then(m => m.default)
+    analyticsService.then(service => {
+      const activity = service.trackActivity(domainId, activityType, metrics)
+      activities.value.push(activity)
+      // 保存到localStorage
+      localStorage.setItem('activities', JSON.stringify(activities.value))
+    })
+  }
+
+  /**
+   * 获取域的进度指标
+   */
+  function getProgressMetrics(domainId) {
+    const analyticsService = import('@/services/analyticsService').then(m => m.default)
+    analyticsService.then(service => {
+      const startDate = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
+      const metrics = service.calculateProgressMetrics(domainId, activities.value, startDate)
+      progressMetrics.value = metrics
+      return metrics
+    })
+  }
+
+  /**
+   * 获取所有域的进度指标
+   */
+  function getAllProgressMetrics() {
+    const analyticsService = import('@/services/analyticsService').then(m => m.default)
+    return analyticsService.then(service => {
+      const startDate = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
+      const allMetrics = domains.value.map(domain =>
+        service.calculateProgressMetrics(domain.id, activities.value, startDate)
+      )
+      return allMetrics
+    })
+  }
+
+  /**
+   * 生成学习洞察
+   */
+  function generateAnalyticsInsights(metrics, velocity) {
+    const analyticsService = import('@/services/analyticsService').then(m => m.default)
+    analyticsService.then(service => {
+      insights.value = service.generateInsights(metrics, velocity)
+      // 保存到localStorage
+      localStorage.setItem('insights', JSON.stringify(insights.value))
+    })
+  }
+
+  /**
+   * 获取完成日期预测
+   */
+  function predictCompletion(metrics, velocity) {
+    const analyticsService = import('@/services/analyticsService').then(m => m.default)
+    return analyticsService.then(service => {
+      return service.predictCompletionDate(metrics, velocity)
+    })
+  }
+
+  /**
+   * 获取学习速度
+   */
+  function calculateVelocity(metrics) {
+    const analyticsService = import('@/services/analyticsService').then(m => m.default)
+    return analyticsService.then(service => {
+      return service.calculateLearningVelocity(metrics, activities.value)
+    })
+  }
+
+  /**
+   * 获取域统计摘要
+   */
+  function getDomainStatisticsSummary() {
+    const analyticsService = import('@/services/analyticsService').then(m => m.default)
+    return analyticsService.then(service => {
+      const startDate = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
+      const allMetrics = domains.value.map(domain =>
+        service.calculateProgressMetrics(domain.id, activities.value, startDate)
+      )
+      return service.getDomainStatisticsSummary(allMetrics)
+    })
+  }
+
+  /**
+   * 获取周统计
+   */
+  function getWeeklyStats(weeks = 4) {
+    const analyticsService = import('@/services/analyticsService').then(m => m.default)
+    return analyticsService.then(service => {
+      return service.calculateWeeklyStats(activities.value, weeks)
+    })
+  }
+
+  /**
+   * 获取表现最好的域
+   */
+  function getTopPerformingDomains(count = 5) {
+    const analyticsService = import('@/services/analyticsService').then(m => m.default)
+    return analyticsService.then(service => {
+      const startDate = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
+      const allMetrics = domains.value.map(domain =>
+        service.calculateProgressMetrics(domain.id, activities.value, startDate)
+      )
+      return service.getTopPerformingDomains(allMetrics, count)
+    })
+  }
+
+  /**
+   * 获取需要关注的域
+   */
+  function getDomainsNeedingAttention(count = 5) {
+    const analyticsService = import('@/services/analyticsService').then(m => m.default)
+    return analyticsService.then(service => {
+      const startDate = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
+      const allMetrics = domains.value.map(domain =>
+        service.calculateProgressMetrics(domain.id, activities.value, startDate)
+      )
+      return service.getDomainsNeedingAttention(allMetrics, count)
+    })
+  }
+
+  /**
+   * 保存学习目标
+   */
+  function saveLearningGoals(goals) {
+    learningGoals.value = { ...goals }
+    localStorage.setItem('learningGoals', JSON.stringify(learningGoals.value))
+  }
+
+  /**
+   * 加载学习目标
+   */
+  function loadLearningGoals() {
+    const saved = localStorage.getItem('learningGoals')
+    if (saved) {
+      learningGoals.value = JSON.parse(saved)
+    }
+  }
+
+  /**
+   * 加载活动
+   */
+  function loadActivities() {
+    const saved = localStorage.getItem('activities')
+    if (saved) {
+      activities.value = JSON.parse(saved)
+    }
+  }
+
+  /**
+   * 加载洞察
+   */
+  function loadInsights() {
+    const saved = localStorage.getItem('insights')
+    if (saved) {
+      insights.value = JSON.parse(saved)
+    }
+  }
+
   return {
     loading,
     error,
@@ -530,6 +1042,21 @@ export const useDomainStore = defineStore('domain', () => {
     recommendedDomains,
     derivedProgress,
     domainHighlights,
+    // P1新增导出
+    hierarchicalDomains,
+    expandedNodes,
+    viewMode,
+    selectableDomains,
+    // P2新增导出 - 推荐引擎
+    recommendations,
+    recommendationsLoading,
+    recommendationsError,
+    userProfile,
+    userProfileLoading,
+    similarDomains,
+    collectionItems,
+    filterOptions,
+    filteredAndSortedDomains,
     loadDomains,
     loadDomainDetail,
     loadFieldConfig,
@@ -538,7 +1065,50 @@ export const useDomainStore = defineStore('domain', () => {
     findDomainBySlug,
     findDomainById,
     setCurrentDomain,
-    setUserProgress
+    setUserProgress,
+    // P1新增方法
+    loadHierarchicalDomains,
+    toggleNodeExpanded,
+    expandAllNodes,
+    collapseAllNodes,
+    findAllMajors,
+    setViewMode,
+    // P2新增方法 - 推荐引擎
+    buildUserProfileAndRecommend,
+    generateRecommendations,
+    loadSimilarDomains,
+    loadPopularDomains,
+    getlearningPath,
+    getDomainPrerequisites,
+    updateUserProfile,
+    addLikedDomain,
+    removeLikedDomain,
+    markDomainAsCompleted,
+    markDomainAsInProgress,
+    applyFilters,
+    resetFilters,
+    // P2D新增状态 - 学习分析
+    activities,
+    progressMetrics,
+    learningGoals,
+    insights,
+    analyticsLoading,
+    analyticsError,
+    // P2D新增方法 - 学习分析
+    trackActivity,
+    getProgressMetrics,
+    getAllProgressMetrics,
+    generateAnalyticsInsights,
+    predictCompletion,
+    calculateVelocity,
+    getDomainStatisticsSummary,
+    getWeeklyStats,
+    getTopPerformingDomains,
+    getDomainsNeedingAttention,
+    saveLearningGoals,
+    loadLearningGoals,
+    loadActivities,
+    loadInsights
   }
 })
 

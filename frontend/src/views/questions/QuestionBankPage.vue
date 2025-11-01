@@ -346,7 +346,8 @@ watch(() => route.params.domainSlug, async (newSlug) => {
 })
 
 function backToDomainSelector() {
-  router.push({ name: 'DomainSelector' })
+  // Use replace so the history back does not return to this domain page
+  router.replace({ name: 'DomainSelector' })
 }
 
 function handleSearch() {

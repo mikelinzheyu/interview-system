@@ -1,0 +1,68 @@
+{
+  "disciplines": [
+    {
+      "id": "science",
+      "name": "理学",
+      "fields": [
+        { "id": "computer", "name": "计算机类", "majors": [ { "slug": "computer-science", "aliases": ["计算机科学", "CS", "jisuanji"] }, { "slug": "software-engineering", "aliases": ["软件工程", "SE", "ruanjian"] }, { "slug": "data-science", "aliases": ["数据科学", "大数据"] } ] },
+        { "id": "mathematics", "name": "数学类", "majors": [ { "slug": "mathematics", "aliases": ["数学", "math", "shuxue"] }, { "slug": "applied-mathematics", "aliases": ["应用数学"] } ] },
+        { "id": "physics", "name": "物理学类", "majors": [ { "slug": "physics", "aliases": ["物理学", "物理"] } ] },
+        { "id": "chemistry", "name": "化学类", "majors": [ { "slug": "chemistry", "aliases": ["化学"] } ] },
+        { "id": "statistics", "name": "统计学类", "majors": [ { "slug": "statistics", "aliases": ["统计学", "tongji"] } ] }
+      ]
+    },
+    {
+      "id": "engineering",
+      "name": "工学",
+      "fields": [
+        { "id": "electronics", "name": "电子信息类", "majors": [ { "slug": "electronic-information", "aliases": ["电子信息", "EE"] }, { "slug": "communication-engineering", "aliases": ["通信工程", "通信"] } ] },
+        { "id": "automation", "name": "自动化类", "majors": [ { "slug": "automation", "aliases": ["自动化", "control"] } ] },
+        { "id": "mechanical", "name": "机械类", "majors": [ { "slug": "mechanical-engineering", "aliases": ["机械工程", "机械"] } ] },
+        { "id": "civil", "name": "土木类", "majors": [ { "slug": "civil-engineering", "aliases": ["土木工程", "土木"] } ] },
+        { "id": "materials", "name": "材料类", "majors": [ { "slug": "materials-science", "aliases": ["材料科学", "材料"] } ] }
+      ]
+    },
+    {
+      "id": "medicine",
+      "name": "医学",
+      "fields": [
+        { "id": "clinical", "name": "临床医学类", "majors": [ { "slug": "medicine", "aliases": ["医学", "临床", "yixue"] } ] },
+        { "id": "pharmacy", "name": "药学类", "majors": [ { "slug": "pharmacy", "aliases": ["药学", "yaoxue"] } ] },
+        { "id": "public-health", "name": "公共卫生", "majors": [ { "slug": "public-health", "aliases": ["公共卫生", "gongweisheng"] } ] }
+      ]
+    },
+    {
+      "id": "law",
+      "name": "法学",
+      "fields": [
+        { "id": "law-general", "name": "法学类", "majors": [ { "slug": "law", "aliases": ["法学", "法律", "faxue"] } ] },
+        { "id": "politics", "name": "政治学类", "majors": [ { "slug": "political-science", "aliases": ["政治学", "zhengzhi"] } ] }
+      ]
+    },
+    {
+      "id": "economics",
+      "name": "经济学",
+      "fields": [
+        { "id": "finance", "name": "金融学类", "majors": [ { "slug": "finance", "aliases": ["金融学", "金融", "quant", "jinrong"] } ] },
+        { "id": "economics-general", "name": "经济学类", "majors": [ { "slug": "economics", "aliases": ["经济学", "economics", "jingjixue"] } ] }
+      ]
+    },
+    { "id": "management", "name": "管理学", "fields": [ { "id": "business-admin", "name": "工商管理类", "majors": [ { "slug": "business-administration", "aliases": ["工商管理", "MBA"] } ] }, { "id": "accounting", "name": "会计学类", "majors": [ { "slug": "accounting", "aliases": ["会计", "会计学", "kuaiji"] } ] } ] },
+    { "id": "education", "name": "教育学", "fields": [ { "id": "education-general", "name": "教育学类", "majors": [ { "slug": "education", "aliases": ["教育学", "jiaoyuxue"] } ] } ] },
+    { "id": "literature", "name": "文学", "fields": [ { "id": "chinese", "name": "中国语言文学类", "majors": [ { "slug": "chinese-language", "aliases": ["汉语言文学", "汉语言", "hanyu"] } ] }, { "id": "foreign", "name": "外国语言文学类", "majors": [ { "slug": "english", "aliases": ["英语", "yingyu"] } ] } ] },
+    { "id": "history", "name": "历史学", "fields": [ { "id": "history-general", "name": "历史学类", "majors": [ { "slug": "history", "aliases": ["历史学", "lishi"] } ] } ] },
+    { "id": "philosophy", "name": "哲学", "fields": [ { "id": "philosophy-general", "name": "哲学类", "majors": [ { "slug": "philosophy", "aliases": ["哲学", "zhexue"] } ] } ] },
+    {
+      "id": "agriculture",
+      "name": "农学",
+      "fields": [
+        { "id": "horticulture", "name": "园艺类", "majors": [ { "slug": "horticulture", "aliases": ["园艺", "yuanyi"] } ] },
+        { "id": "animal-science", "name": "动物科学类", "majors": [ { "slug": "animal-science", "aliases": ["动物科学", "dongwu"] }, { "slug": "veterinary-medicine", "aliases": ["兽医学", "兽医", "shouyi"] }, { "slug": "aquaculture", "aliases": ["水产养殖", "水产", "shuichan"] } ] },
+        { "id": "agronomy", "name": "农学类", "majors": [ { "slug": "agronomy", "aliases": ["农学", "nongxue"] } ] }
+      ]
+    },
+    { "id": "art", "name": "艺术学", "fields": [ { "id": "design", "name": "设计学类", "majors": [ { "slug": "industrial-design", "aliases": ["工业设计", "设计"] } ] }, { "id": "fine-art", "name": "美术学类", "majors": [ { "slug": "fine-arts", "aliases": ["美术学", "美术"] } ] } ] },
+    { "id": "military", "name": "军事学", "fields": [ { "id": "command", "name": "军事指挥", "majors": [ { "slug": "military-command", "aliases": ["军事指挥", "指挥", "junshi"] } ] } ] }
+  ]
+}
+

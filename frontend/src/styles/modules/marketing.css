@@ -1,0 +1,85 @@
+﻿:root {
+  --landing-gradient-start: #4f73ff;
+  --landing-gradient-mid: #38c9ff;
+  --landing-gradient-end: #61e7ff;
+  --landing-hero-glow: rgba(97, 231, 255, 0.32);
+  --landing-nav-height: 72px;
+}
+
+.landing-hero-bg {
+  position: relative;
+  background: linear-gradient(120deg, rgba(79, 115, 255, 1) 0%, rgba(56, 201, 255, 1) 55%, rgba(97, 231, 255, 1) 100%);
+  color: #fff;
+  overflow: hidden;
+}
+
+.landing-hero-bg::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% 20%, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0) 55%);
+  pointer-events: none;
+}
+
+.landing-hero-bg::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0;
+  height: 280px;
+  background: url('/assets/marketing/wave.svg') bottom center / cover no-repeat;
+  opacity: 0.85;
+  pointer-events: none;
+}
+
+.landing-card {
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: var(--chat-radius-lg, 18px);
+  backdrop-filter: blur(20px);
+  box-shadow: 0 18px 40px rgba(23, 63, 154, 0.25);
+}
+
+.landing-button-glow {
+  position: relative;
+  overflow: hidden;
+}
+
+.landing-button-glow::after {
+  content: "";
+  position: absolute;
+  inset: -30%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.55) 0%, rgba(255, 255, 255, 0) 70%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.landing-button-glow:hover::after {
+  opacity: 0.8;
+}
+
+.landing-sticky-nav {
+  transition: background 0.3s ease, box-shadow 0.3s ease, height 0.3s ease;
+}
+
+.landing-sticky-nav.is-condensed {
+  background: rgba(15, 28, 84, 0.85);
+  backdrop-filter: blur(16px);
+  box-shadow: 0 12px 28px rgba(17, 43, 134, 0.18);
+  height: 60px;
+}
+
+@media (max-width: 1024px) {
+  .landing-hero-bg::after {
+    height: 200px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .landing-button-glow::after {
+    transition: none;
+  }
+  .landing-sticky-nav {
+    transition: none;
+  }
+}

@@ -74,6 +74,18 @@ ai:
     base-url: ${OPENAI_BASE_URL:https://api.openai.com}
     model: gpt-3.5-turbo
     timeout: 30000
+  dify:
+    api-key: ${DIFY_API_KEY:test-key-12345}
+    workflow-url: https://api.dify.ai/v1/workflows/run
+    workflow:
+      generate-id: rBRtFrkEqD9QuvcW
+      answer-id: ${DIFY_ANSWER_WORKFLOW_ID:test-answer-workflow}
+      score-id: ${DIFY_SCORE_WORKFLOW_ID:test-score-workflow}
+    timeout-seconds: 90
+    session-storage:
+      base-url: http://localhost:8081
+      api-key: ${DIFY_SESSION_STORAGE_API_KEY:}
+      enabled: false
 
 # 文件存储配置
 file:

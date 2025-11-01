@@ -1,0 +1,267 @@
+================================================================================
+        Workflow3 "加载标准答案"节点 报错 - 完整诊断和修复方案
+================================================================================
+
+报告日期: 2025-10-27
+诊断状态: ✅ 已诊断 - 问题明确
+修复方案: ✅ 已准备 - 可立即实施
+
+================================================================================
+                           问题诊断
+================================================================================
+
+错误现象:
+"Output question is missing."
+
+问题位置:
+"加载标准答案" (load_answer) 节点 - 第155-218行
+
+根本原因:
+节点定义了3个输出字段 (line 185-191):
+  - error (type: string)
+  - question (type: string)  ← 已定义但未返回！
+  - standard_answer (type: string)
+
+但是返回的代码 (line 175-182) 只返回了2个字段:
+  {
+    "overall_score": ...,
+    "comprehensive_evaluation": ...,
+    "standard_answer": ...,
+    "error": ""
+  }
+
+缺失的字段: question
+
+影响范围:
+1. "加载标准答案"节点执行失败
+2. "综合评价与打分"节点无法使用 {{#load_answer.question#}} 变量
+3. 整个 Workflow3 失败，返回 "Output question is missing."
+
+================================================================================
+                         修复方案
+================================================================================
+
+修复步骤:
+
+1. 在"加载标准答案"节点的 Python 代码中添加 question 字段
+
+找到代码的这部分 (第170-174行):
+    # ============ 查找问题的标准答案 ============
+    standard_answer = ""
+    if 'questions' in session_data and isinstance(session_data['questions'], list):
+        for question in session_data['questions']:
+            if question.get('id') == question_id:
+                standard_answer = question.get('answer', '')
+                break
+
+修改为:
+    # ============ 查找问题的标准答案 ============
+    question_text = ""
+    standard_answer = ""
+    if 'questions' in session_data and isinstance(session_data['questions'], list):
+        for q in session_data['questions']:
+            if q.get('id') == question_id:
+                question_text = q.get('question', '')  ← 添加这行
+                standard_answer = q.get('answer', '')
+                break
+
+2. 更新返回语句 (第175-182行)
+
+将:
+    return {
+        "overall_score": overall_score if overall_score > 0 else 75,
+        "comprehensive_evaluation": comprehensive_evaluation if comprehensive_evaluation else "无评价",
+        "standard_answer": standard_answer,
+        "error": ""
+    }
+
+改为:
+    return {
+        "question": question_text,  ← 添加这行
+        "standard_answer": standard_answer,
+        "error": ""
+    }
+
+================================================================================
+                     完整修复后的代码
+================================================================================
+
+import json
+import urllib.request
+import urllib.error
+import ssl
+
+def main(session_id: str, question_id: str, comprehensive_evaluation: str = "", overall_score: int = 0) -> dict:
+    """
+    从存储API获取标准答案，用于评分对比
+    """
+
+    # ============ 配置 ============
+    api_base_url = "https://phrenologic-preprandial-jesica.ngrok-free.dev"
+    api_key = "ak_live_a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0"
+
+    try:
+        # ============ 获取会话数据 ============
+        get_url = f"{api_base_url}/api/sessions/{session_id}"
+        get_req = urllib.request.Request(
+            get_url,
+            headers={
+                'Authorization': f'Bearer {api_key}',
+                'Content-Type': 'application/json'
+            },
+            method='GET'
+        )
+
+        ctx = ssl.create_default_context()
+        ctx.check_hostname = False
+        ctx.verify_mode = ssl.CERT_NONE
+
+        with urllib.request.urlopen(get_req, context=ctx, timeout=30) as response:
+            response_data = json.loads(response.read().decode('utf-8'))
+            
+            # 处理响应格式 - API可能返回 data.questions 或 questions
+            if 'data' in response_data:
+                session_data = response_data['data']
+            else:
+                session_data = response_data
+
+        # ============ 查找问题的标准答案和问题文本 ============
+        question_text = ""
+        standard_answer = ""
+        
+        if 'questions' in session_data and isinstance(session_data['questions'], list):
+            for q in session_data['questions']:
+                if q.get('id') == question_id:
+                    question_text = q.get('question', '')  # ← 获取问题文本
+                    standard_answer = q.get('answer', '')
+                    break
+
+        # ============ 返回结果 ============
+        return {
+            "question": question_text,  # ← 必须返回此字段
+            "standard_answer": standard_answer,
+            "error": ""
+        }
+
+    except Exception as e:
+        return {
+            "question": "",
+            "standard_answer": "",
+            "error": f"获取失败: {str(e)}"
+        }
+
+================================================================================
+                      实施步骤 (在 Dify 中)
+================================================================================
+
+步骤1: 打开 Workflow3 编辑器
+- 登录 Dify: https://cloud.dify.ai
+- 打开 "AI面试官-工作流3-评分"
+- 进入编辑模式
+
+步骤2: 编辑"加载标准答案"节点
+- 双击 "加载标准答案" 节点
+- 进入 Python 代码编辑器
+
+步骤3: 替换代码
+- 复制上面"完整修复后的代码"部分
+- 完全替换节点中的 Python 代码
+
+步骤4: 保存并发布
+- 保存节点 (Ctrl+S)
+- 返回工作流编辑视图
+- 点击右上角"发布"按钮
+- 选择"更新已发布的版本"
+- 等待发布成功
+
+步骤5: 验证修复
+运行测试命令:
+  node test-workflow3-focused.js
+
+预期结果:
+  ✅ Workflow3 调用成功！
+  - 总体评分: 85 (或其他分数)
+  - 综合评价长度: 500+ 字符
+  - 返回所有8个字段 ✅
+
+================================================================================
+                        关键修改总结
+================================================================================
+
+修改项目:
+1. 变量重命名: 循环变量从 'question' 改为 'q'
+   - 原因: 避免与返回字段名冲突
+   
+2. 添加 question_text 变量:
+   - 获取问题的文本内容
+   - 类似于获取 standard_answer
+
+3. 更新返回字典:
+   - 添加 "question": question_text
+   - 移除不必要的 overall_score 和 comprehensive_evaluation
+   
+4. 改进错误处理:
+   - 处理 API 返回格式差异
+   - 完整的异常捕获
+
+================================================================================
+                        验证检查清单
+================================================================================
+
+修复前:
+❌ 输出缺少 question 字段
+❌ 节点执行失败
+❌ 返回 "Output question is missing." 错误
+❌ Workflow3 无法继续执行
+
+修复后:
+✅ 输出包含 question 字段
+✅ 节点成功执行
+✅ 返回所有必需字段
+✅ Workflow3 完整执行链
+✅ 最终输出包含8个字段:
+   1. session_id
+   2. question_id
+   3. candidate_answer
+   4. question ← 已修复
+   5. standard_answer
+   6. comprehensive_evaluation
+   7. overall_score
+   8. error
+
+================================================================================
+                          预期效果
+================================================================================
+
+修复前的 Workflow3 执行结果:
+{
+  "status": "failed",
+  "error": "Output question is missing.",
+  "outputs": {}
+}
+
+修复后的 Workflow3 执行结果:
+{
+  "status": "succeeded",
+  "outputs": {
+    "session_id": "fae4a2cf-4435-4201-a4ad-180fedbcb922",
+    "question_id": "fae4a2cf-4435-4201-a4ad-180fedbcb922-q1",
+    "candidate_answer": "...",
+    "question": "请描述你在生产环境中设计并实现一个基于Java的微服务系统...",
+    "standard_answer": "...",
+    "comprehensive_evaluation": "候选人的回答显示了...",
+    "overall_score": 85,
+    "error": ""
+  }
+}
+
+================================================================================
+                          修复难度
+================================================================================
+
+修复复杂度: ⭐ 非常简单
+修改行数: 8行代码
+修复时间: 3-5分钟
+风险等级: 🟢 无风险
+
+================================================================================

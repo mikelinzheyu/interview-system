@@ -1,0 +1,314 @@
+# Prometheus 告警规则配置
+
+groups:
+  # ========== 容器监控告警 ==========
+  - name: container_alerts
+    interval: 30s
+    rules:
+      # 容器CPU使用率过高
+      - alert: ContainerHighCPUUsage
+        expr: |
+          (sum(rate(container_cpu_usage_seconds_total[5m])) by (container_name) /
+           sum(container_spec_cpu_quota / container_spec_cpu_period) by (container_name)) > 0.8
+        for: 5m
+        labels:
+          severity: warning
+          component: container
+        annotations:
+          summary: "容器 {{ $labels.container_name }} CPU使用率过高"
+          description: "容器 {{ $labels.container_name }} 当前CPU使用率为 {{ $value | humanizePercentage }}"
+          runbook_url: "http://localhost:3000/d/container-monitoring"
+
+      # 容器内存使用率过高
+      - alert: ContainerHighMemoryUsage
+        expr: |
+          (sum(container_memory_usage_bytes) by (container_name) /
+           sum(container_spec_memory_limit_bytes) by (container_name)) > 0.9
+        for: 5m
+        labels:
+          severity: critical
+          component: container
+        annotations:
+          summary: "容器 {{ $labels.container_name }} 内存使用率过高"
+          description: "容器 {{ $labels.container_name }} 当前内存使用率为 {{ $value | humanizePercentage }}"
+
+      # 容器已停止
+      - alert: ContainerStopped
+        expr: up{job="cadvisor"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          component: container
+        annotations:
+          summary: "容器已停止: {{ $labels.container_name }}"
+          description: "容器 {{ $labels.container_name }} 已停止运行"
+
+  # ========== 宿主机监控告警 ==========
+  - name: node_alerts
+    interval: 30s
+    rules:
+      # 磁盘使用率过高
+      - alert: HighDiskUsage
+        expr: (node_filesystem_avail_bytes{device!~'tmpfs'} / node_filesystem_size_bytes) < 0.15
+        for: 5m
+        labels:
+          severity: warning
+          component: node
+        annotations:
+          summary: "磁盘使用率过高: {{ $labels.device }}"
+          description: "设备 {{ $labels.device }} 磁盘可用空间不足，剩余容量为 {{ $value | humanizePercentage }}"
+
+      # 磁盘即将满
+      - alert: CriticalDiskUsage
+        expr: (node_filesystem_avail_bytes{device!~'tmpfs'} / node_filesystem_size_bytes) < 0.05
+        for: 5m
+        labels:
+          severity: critical
+          component: node
+        annotations:
+          summary: "磁盘即将满: {{ $labels.device }}"
+          description: "设备 {{ $labels.device }} 磁盘即将用满，剩余容量为 {{ $value | humanizePercentage }}"
+
+      # 宿主机CPU使用率过高
+      - alert: HighNodeCPUUsage
+        expr: (1 - avg by(instance) (rate(node_cpu_seconds_total{mode="idle"}[5m]))) > 0.8
+        for: 5m
+        labels:
+          severity: warning
+          component: node
+        annotations:
+          summary: "宿主机CPU使用率过高"
+          description: "宿主机 {{ $labels.instance }} CPU使用率为 {{ $value | humanizePercentage }}"
+
+      # 宿主机内存使用率过高
+      - alert: HighNodeMemoryUsage
+        expr: |
+          (1 - (node_memory_MemFree_bytes + node_memory_Buffers_bytes + node_memory_Cached_bytes) /
+               node_memory_MemTotal_bytes) > 0.85
+        for: 5m
+        labels:
+          severity: warning
+          component: node
+        annotations:
+          summary: "宿主机内存使用率过高"
+          description: "宿主机 {{ $labels.instance }} 内存使用率为 {{ $value | humanizePercentage }}"
+
+      # 宿主机不可达
+      - alert: NodeDown
+        expr: up{job="node-exporter"} == 0
+        for: 2m
+        labels:
+          severity: critical
+          component: node
+        annotations:
+          summary: "宿主机离线: {{ $labels.instance }}"
+          description: "宿主机 {{ $labels.instance }} 无响应"
+
+  # ========== Redis 监控告警 ==========
+  - name: redis_alerts
+    interval: 30s
+    rules:
+      # Redis 连接失败
+      - alert: RedisDown
+        expr: up{job="redis"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          component: redis
+        annotations:
+          summary: "Redis 服务离线"
+          description: "Redis 服务无响应，无法连接"
+
+      # Redis 内存使用率过高
+      - alert: RedisHighMemoryUsage
+        expr: |
+          (redis_memory_used_bytes / redis_memory_max_bytes) > 0.85
+        for: 5m
+        labels:
+          severity: warning
+          component: redis
+        annotations:
+          summary: "Redis 内存使用率过高"
+          description: "Redis 内存使用率为 {{ $value | humanizePercentage }}"
+
+      # Redis 已用尽内存
+      - alert: RedisOutOfMemory
+        expr: |
+          (redis_memory_used_bytes / redis_memory_max_bytes) > 0.95
+        for: 1m
+        labels:
+          severity: critical
+          component: redis
+        annotations:
+          summary: "Redis 内存即将用尽"
+          description: "Redis 内存使用率为 {{ $value | humanizePercentage }}"
+
+      # Redis 连接数过多
+      - alert: RedisHighConnections
+        expr: redis_connected_clients > 1000
+        for: 5m
+        labels:
+          severity: warning
+          component: redis
+        annotations:
+          summary: "Redis 连接数过多"
+          description: "Redis 当前连接数为 {{ $value }}"
+
+      # Redis 持久化失败
+      - alert: RedisPersistenceFailed
+        expr: redis_rdb_last_bgsave_status == 0
+        for: 5m
+        labels:
+          severity: warning
+          component: redis
+        annotations:
+          summary: "Redis 持久化失败"
+          description: "Redis 后台保存（RDB）失败"
+
+  # ========== 应用服务监控告警 ==========
+  - name: app_alerts
+    interval: 30s
+    rules:
+      # 后端服务不可用
+      - alert: BackendServiceDown
+        expr: up{job="backend"} == 0
+        for: 2m
+        labels:
+          severity: critical
+          component: backend
+        annotations:
+          summary: "后端服务离线"
+          description: "后端API服务无响应"
+
+      # 后端服务响应时间过长
+      - alert: BackendHighResponseTime
+        expr: |
+          histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket[5m])) by (le)) > 1
+        for: 5m
+        labels:
+          severity: warning
+          component: backend
+        annotations:
+          summary: "后端响应时间过长"
+          description: "后端95分位响应时间为 {{ $value }}秒"
+
+      # 后端API错误率过高
+      - alert: BackendHighErrorRate
+        expr: |
+          (sum(rate(http_requests_total{status=~"5.."}[5m])) by (endpoint) /
+           sum(rate(http_requests_total[5m])) by (endpoint)) > 0.05
+        for: 5m
+        labels:
+          severity: warning
+          component: backend
+        annotations:
+          summary: "后端错误率过高: {{ $labels.endpoint }}"
+          description: "错误率为 {{ $value | humanizePercentage }}"
+
+      # 前端 Nginx 服务不可用
+      - alert: NginxServiceDown
+        expr: up{job="frontend"} == 0
+        for: 2m
+        labels:
+          severity: critical
+          component: frontend
+        annotations:
+          summary: "Nginx 服务离线"
+          description: "前端Nginx服务无响应"
+
+      # Nginx 错误率过高
+      - alert: NginxHighErrorRate
+        expr: |
+          (sum(rate(nginx_requests_total{status=~"5.."}[5m])) /
+           sum(rate(nginx_requests_total[5m]))) > 0.05
+        for: 5m
+        labels:
+          severity: warning
+          component: frontend
+        annotations:
+          summary: "Nginx 错误率过高"
+          description: "错误率为 {{ $value | humanizePercentage }}"
+
+  # ========== 数据库监控告警 ==========
+  - name: database_alerts
+    interval: 30s
+    rules:
+      # 数据库连接数过多
+      - alert: HighDatabaseConnections
+        expr: mysql_global_status_threads_connected > 80
+        for: 5m
+        labels:
+          severity: warning
+          component: database
+        annotations:
+          summary: "数据库连接数过多"
+          description: "当前连接数为 {{ $value }}"
+
+      # 慢查询过多
+      - alert: HighSlowQueries
+        expr: |
+          rate(mysql_global_status_slow_queries[5m]) > 10
+        for: 5m
+        labels:
+          severity: warning
+          component: database
+        annotations:
+          summary: "慢查询频率过高"
+          description: "每秒慢查询数为 {{ $value }}"
+
+  # ========== 系统监控告警 ==========
+  - name: system_alerts
+    interval: 30s
+    rules:
+      # 网络延迟过高
+      - alert: HighNetworkLatency
+        expr: |
+          (histogram_quantile(0.95, sum(rate(network_rtt_seconds_bucket[5m])) by (le))) > 0.1
+        for: 5m
+        labels:
+          severity: warning
+          component: network
+        annotations:
+          summary: "网络延迟过高"
+          description: "95分位延迟为 {{ $value }}秒"
+
+      # 进程检查
+      - alert: ProcessCrashed
+        expr: |
+          increase(process_crashes_total[5m]) > 0
+        for: 1m
+        labels:
+          severity: critical
+          component: process
+        annotations:
+          summary: "进程崩溃"
+          description: "进程 {{ $labels.process_name }} 在过去5分钟内崩溃"
+
+  # ========== Prometheus 自身告警 ==========
+  - name: prometheus_alerts
+    interval: 30s
+    rules:
+      # Prometheus 存储容量即将耗尽
+      - alert: PrometheusLocalStorageAlmostFull
+        expr: |
+          (prometheus_tsdb_symbol_table_size_bytes + prometheus_tsdb_index_segment_size_bytes)
+          / prometheus_tsdb_symbol_table_size_bytes > 0.9
+        for: 5m
+        labels:
+          severity: warning
+          component: prometheus
+        annotations:
+          summary: "Prometheus 存储容量即将耗尽"
+          description: "存储使用率为 {{ $value | humanizePercentage }}"
+
+      # Prometheus 采样丢弃
+      - alert: PrometheusDroppedScrapes
+        expr: |
+          rate(prometheus_tsdb_metric_chunks_created_total[5m]) > 1000
+        for: 5m
+        labels:
+          severity: warning
+          component: prometheus
+        annotations:
+          summary: "Prometheus 正在丢弃采样"
+          description: "采样丢弃率过高"

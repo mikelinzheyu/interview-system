@@ -1,54 +1,103 @@
-﻿<template>
+<template>
   <aside class="domain-sidebar">
+    <!-- 搜索头部 -->
     <header class="sidebar-header">
       <div class="sidebar-title">
-        <span class="title">探索领域</span>
-        <el-tag v-if="domains.length" size="small" effect="plain">{{ domains.length }}</el-tag>
+        <h3 class="title">探索领域</h3>
+        <el-tag v-if="domains.length" size="small" type="info" effect="plain">{{ domains.length }}</el-tag>
       </div>
-      <el-input
-        v-model="search"
-        class="sidebar-search"
-        placeholder="搜索领域"
-        clearable
-        size="small"
-        :prefix-icon="Search"
-      />
+
+      <!-- 增强搜索框 -->
+      <div class="search-wrapper">
+        <el-input
+          v-model="searchQuery"
+          class="sidebar-search"
+          placeholder="搜索领域、拼音..."
+          clearable
+          size="default"
+          :prefix-icon="Search"
+          @input="handleSearchInput"
+          @focus="showSuggestions = true"
+          @blur="closeSuggestions"
+        />
+        <!-- 搜索建议下拉 -->
+        <div v-if="showSuggestions && suggestions.length" class="search-suggestions">
+          <div v-for="item in suggestions" :key="item" class="suggestion-item" @click="selectSuggestion(item)">
+            <span class="suggestion-text">{{ item }}</span>
+          </div>
+        </div>
+      </div>
     </header>
 
+    <!-- 分组列表 -->
     <section class="sidebar-body">
       <el-skeleton v-if="loading" animated :rows="8" class="sidebar-skeleton" />
 
       <el-scrollbar v-else class="sidebar-scroll">
-        <template v-if="filteredDomains.length">
-          <ul class="domain-list">
-            <li
-              v-for="domain in filteredDomains"
-              :key="domain.id || domain.slug"
-              class="domain-item"
-              :class="{ active: domain.slug === selectedSlug }"
-              role="button"
-              tabindex="0"
-              @click="handleSelect(domain)"
-              @keyup.enter="handleSelect(domain)"
-            >
-              <div class="indicator" aria-hidden="true" />
-              <div class="item-content">
-                <div class="item-title">
-                  <span v-if="domain.icon" class="icon">{{ domain.icon }}</span>
-                  <span class="name">{{ domain.name }}</span>
+        <!-- 搜索结果 -->
+        <div v-if="searchQuery.trim()" class="search-results">
+          <template v-if="filteredDomains.length">
+            <ul class="domain-list">
+              <li
+                v-for="domain in filteredDomains"
+                :key="`${domain.id}-${domain.slug}`"
+                class="domain-item"
+                :class="{ active: domain.slug === selectedSlug }"
+                role="button"
+                tabindex="0"
+                @click="selectDomain(domain)"
+                @keyup.enter="selectDomain(domain)"
+              >
+                <div class="indicator" />
+                <div class="item-content">
+                  <div class="item-title">
+                    <span v-if="domain.icon" class="icon">{{ domain.icon }}</span>
+                    <span class="name">{{ domain.name }}</span>
+                  </div>
+                  <p v-if="domain.shortDescription" class="description">{{ domain.shortDescription }}</p>
                 </div>
-                <p v-if="domainSummary(domain)" class="description">{{ domainSummary(domain) }}</p>
+              </li>
+            </ul>
+          </template>
+          <div v-else class="empty-result">
+            <el-empty description="未找到匹配的领域" :image-size="100" />
+          </div>
+        </div>
+
+        <!-- 分组列表视图 -->
+        <div v-else class="grouped-list">
+          <template v-if="groupedDomains.length">
+            <div v-for="group in groupedDomains" :key="group.category" class="domain-group">
+              <div class="group-header">
+                <h4 class="group-title">{{ group.category }}</h4>
+                <el-tag size="small" effect="plain">{{ group.count }}</el-tag>
               </div>
-              <el-tooltip v-if="showTooltip(domain)" :content="tooltipContent(domain)" placement="left">
-                <el-icon class="meta-icon">
-                  <CollectionTag />
-                </el-icon>
-              </el-tooltip>
-            </li>
-          </ul>
-        </template>
-        <div v-else class="empty-result">
-          <el-empty description="鏈壘鍒板尮閰嶇殑棰嗗煙" :image-size="120" />
+              <ul class="domain-list">
+                <li
+                  v-for="domain in group.domains"
+                  :key="`${domain.id}-${domain.slug}`"
+                  class="domain-item"
+                  :class="{ active: domain.slug === selectedSlug }"
+                  role="button"
+                  tabindex="0"
+                  @click="selectDomain(domain)"
+                  @keyup.enter="selectDomain(domain)"
+                >
+                  <div class="indicator" />
+                  <div class="item-content">
+                    <div class="item-title">
+                      <span v-if="domain.icon" class="icon">{{ domain.icon }}</span>
+                      <span class="name">{{ domain.name }}</span>
+                    </div>
+                    <p v-if="domain.shortDescription" class="description">{{ domain.shortDescription }}</p>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </template>
+          <div v-else class="empty-result">
+            <el-empty description="暂无领域数据" :image-size="100" />
+          </div>
         </div>
       </el-scrollbar>
     </section>
@@ -57,72 +106,78 @@
 
 <script setup>
 import { computed, ref } from 'vue'
-import { Search, CollectionTag } from '@element-plus/icons-vue'
+import { Search } from '@element-plus/icons-vue'
+import { searchDomainsWithRanking, getSuggestions } from '@/services/domainSearchService'
 
 const props = defineProps({
-  domains: {
-    type: Array,
-    default: () => []
-  },
-  loading: {
-    type: Boolean,
-    default: false
-  },
-  selectedSlug: {
-    type: String,
-    default: ''
-  }
+  domains: { type: Array, default: () => [] },
+  loading: { type: Boolean, default: false },
+  selectedSlug: { type: String, default: '' }
 })
 
 const emit = defineEmits(['select'])
 
-const search = ref('')
+const searchQuery = ref('')
+const showSuggestions = ref(false)
 
 const filteredDomains = computed(() => {
-  if (!search.value) {
-    return props.domains
-  }
-
-  const keyword = search.value.trim().toLowerCase()
-  if (!keyword) {
-    return props.domains
-  }
-
-  return props.domains.filter(domain => {
-    const name = String(domain.name || '').toLowerCase()
-    const description = String(domain.description || '').toLowerCase()
-    const tags = Array.isArray(domain.tags) ? domain.tags.join(' ') : ''
-    return [name, description, tags.toLowerCase()].some(text => text.includes(keyword))
-  })
+  if (!searchQuery.value.trim()) return []
+  return searchDomainsWithRanking(props.domains, searchQuery.value)
 })
 
-function handleSelect(domain) {
+const suggestions = computed(() => {
+  if (searchQuery.value.length < 1) return []
+  return getSuggestions(props.domains, searchQuery.value)
+})
+
+const groupedDomains = computed(() => {
+  if (!props.domains.length) return []
+
+  // 如果没有category字段，按首字母分组
+  const groups = {}
+
+  props.domains.forEach(domain => {
+    const category = domain.category || domain.type || '其他'
+    if (!groups[category]) {
+      groups[category] = []
+    }
+    groups[category].push(domain)
+  })
+
+  return Object.entries(groups)
+    .map(([category, items]) => ({
+      category,
+      domains: items,
+      count: items.length
+    }))
+    .sort((a, b) => a.category.localeCompare(b.category, 'zh-CN'))
+})
+
+function handleSearchInput(value) {
+  searchQuery.value = value
+  if (!value.trim()) {
+    showSuggestions.value = false
+  }
+}
+
+function selectSuggestion(suggestion) {
+  searchQuery.value = suggestion
+  showSuggestions.value = false
+  const matched = props.domains.find(d => d.name === suggestion)
+  if (matched) {
+    selectDomain(matched)
+  }
+}
+
+function selectDomain(domain) {
   emit('select', domain)
+  searchQuery.value = ''
 }
 
-function showTooltip(domain) {
-  return Boolean(domain.questionCount || domain.categoryCount)
-}
-
-function domainSummary(domain) {
-  if (!domain) {
-    return ''
-  }
-
-  return domain.shortDescription || domain.description || ''
-}
-
-function tooltipContent(domain) {
-  const parts = []
-  if (domain.questionCount) {
-    parts.push(`棰樼洰 ${domain.questionCount}`)
-  }
-
-  if (domain.categoryCount) {
-    parts.push(`鍒嗙被 ${domain.categoryCount}`)
-  }
-
-  return parts.join(' 路 ')
+function closeSuggestions() {
+  setTimeout(() => {
+    showSuggestions.value = false
+  }, 150)
 }
 </script>
 
@@ -130,42 +185,87 @@ function tooltipContent(domain) {
 .domain-sidebar {
   display: flex;
   flex-direction: column;
-  background: linear-gradient(180deg, rgba(30, 41, 59, 0.92) 0%, rgba(30, 41, 59, 0.85) 100%);
-  color: #fff;
-  border-radius: 24px;
-  padding: 20px 18px;
-  box-shadow: 0 20px 40px rgba(15, 23, 42, 0.35);
-  backdrop-filter: blur(18px);
-  height: clamp(480px, 74vh, 680px);
-  overflow: hidden;
+  gap: 12px;
+  padding: 16px;
+  border-radius: 16px;
+  background: linear-gradient(180deg, rgba(15, 23, 42, 0.55) 0%, rgba(15, 23, 42, 0.75) 100%);
+  color: #e2e8f0;
+  box-shadow: 0 10px 24px rgba(2, 6, 23, 0.28);
 }
 
 .sidebar-header {
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  margin-bottom: 12px;
+  gap: 12px;
 }
 
 .sidebar-title {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 8px;
 }
 
-.title {
-  font-size: 18px;
-  font-weight: 600;
+.sidebar-title .title {
+  font-weight: 700;
+  color: #f8fafc;
+  font-size: 16px;
+  margin: 0;
+}
+
+.search-wrapper {
+  position: relative;
 }
 
 .sidebar-search :deep(.el-input__wrapper) {
-  background: rgba(148, 163, 184, 0.16);
-  border-color: transparent;
-  color: #e2e8f0;
+  background: rgba(148, 163, 184, 0.12);
+  box-shadow: none;
+  border-radius: 10px;
+  transition: all 0.25s ease;
 }
 
-.sidebar-search :deep(.el-input__inner) {
-  color: inherit;
+.sidebar-search :deep(.el-input__wrapper:hover) {
+  background: rgba(148, 163, 184, 0.18);
+}
+
+.sidebar-search :deep(.el-input__wrapper.is-focus) {
+  background: rgba(148, 163, 184, 0.25);
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3);
+}
+
+.search-suggestions {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  margin-top: 4px;
+  background: rgba(15, 23, 42, 0.95);
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(2, 6, 23, 0.4);
+  z-index: 10;
+  overflow: hidden;
+  backdrop-filter: blur(10px);
+}
+
+.suggestion-item {
+  padding: 10px 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+}
+
+.suggestion-item:last-child {
+  border-bottom: none;
+}
+
+.suggestion-item:hover {
+  background: rgba(59, 130, 246, 0.2);
+}
+
+.suggestion-text {
+  color: #e2e8f0;
+  font-size: 14px;
 }
 
 .sidebar-body {
@@ -179,12 +279,34 @@ function tooltipContent(domain) {
   max-height: 100%;
   padding-right: 4px;
 }
-.sidebar-scroll :deep(.el-scrollbar__wrap) {
-  max-height: 100%;
+
+.grouped-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
-.sidebar-scroll :deep(.el-scrollbar__view) {
-  width: 100%;
+.domain-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.group-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 4px;
+  gap: 8px;
+}
+
+.group-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(226, 232, 240, 0.6);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 0;
 }
 
 .domain-list {
@@ -219,11 +341,6 @@ function tooltipContent(domain) {
   box-shadow: 0 12px 30px rgba(14, 165, 233, 0.32);
 }
 
-.domain-item.active .indicator {
-  opacity: 1;
-  transform: translateX(0);
-}
-
 .indicator {
   width: 4px;
   height: 30px;
@@ -234,10 +351,16 @@ function tooltipContent(domain) {
   transition: all 0.3s ease;
 }
 
+.domain-item.active .indicator {
+  opacity: 1;
+  transform: translateX(0);
+}
+
 .item-content {
   flex: 1;
   display: flex;
   flex-direction: column;
+  min-width: 0;
 }
 
 .item-title {
@@ -254,21 +377,21 @@ function tooltipContent(domain) {
   font-size: 12px;
   color: rgba(226, 232, 240, 0.68);
   line-height: 1.5;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .icon {
   font-size: 18px;
-}
-
-.meta-icon {
-  color: rgba(148, 163, 184, 0.8);
+  flex-shrink: 0;
 }
 
 .empty-result {
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 320px;
+  min-height: 200px;
 }
 
 @media (max-width: 1024px) {
@@ -285,9 +408,4 @@ function tooltipContent(domain) {
   }
 }
 </style>
-
-
-
-
-
 

@@ -5,9 +5,10 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview",
+    "preview": "vite preview --port 5174",
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs --fix --ignore-path .gitignore",
     "dev:full": "concurrently \"npm run backend:start\" \"npm run dev\"",
+    "dev:mock": "concurrently \"npm run mock:start\" \"npm run dev\"",
     "dev:check": "node scripts/check-services.js && npm run dev",
     "dev:debug": "cross-env DEBUG=1 vite --mode development",
     "backend:start": "cd ../backend && mvn spring-boot:run",
@@ -17,6 +18,7 @@
     "health:backend": "curl -f http://localhost:8080/api/actuator/health || echo 'Backend not running'",
     "start:prod": "npm run build && npm run preview",
     "start:with-backend": "concurrently \"npm run backend:start\" \"npm run start:prod\"",
+    "mock:start": "node mock-server.js",
     "clean": "rimraf dist node_modules/.vite",
     "clean:all": "npm run clean && rimraf node_modules",
     "reset": "npm run clean:all && npm install",
@@ -26,10 +28,13 @@
   "dependencies": {
     "@element-plus/icons-vue": "^2.1.0",
     "axios": "^1.5.0",
+    "canvg": "^4.0.3",
     "dayjs": "^1.11.9",
     "echarts": "^5.4.3",
     "element-plus": "^2.3.14",
     "highlight.js": "^11.8.0",
+    "html2canvas": "^1.4.1",
+    "jspdf": "^3.0.3",
     "marked": "^9.1.6",
     "mavon-editor": "^2.10.4",
     "pinia": "^2.1.6",
@@ -37,6 +42,7 @@
     "socket.io-client": "^4.8.1",
     "vue": "^3.3.4",
     "vue-router": "^4.2.4",
+    "vue-virtual-scroller": "^2.0.0-beta.8",
     "vue3-puzzle-vcode": "^1.1.7"
   },
   "devDependencies": {

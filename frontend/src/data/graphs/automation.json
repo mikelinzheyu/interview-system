@@ -1,0 +1,14 @@
+{
+  "nodes": [
+    { "id": "auto", "label": "自动化", "type": "topic", "link": "/questions/automation" },
+    { "id": "cap:control", "label": "控制理论", "type": "capability" },
+    { "id": "cap:plc", "label": "PLC 与工业控制", "type": "capability" },
+    { "id": "course:ctrl101", "label": "控制工程基础", "type": "course", "link": "/learning-paths/ctrl101" }
+  ],
+  "edges": [
+    { "source": "auto", "target": "cap:control" },
+    { "source": "auto", "target": "cap:plc" },
+    { "source": "cap:control", "target": "course:ctrl101" }
+  ]
+}
+

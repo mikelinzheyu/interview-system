@@ -1,0 +1,18 @@
+{
+  "nodes": [
+    { "id": "ee", "label": "电子信息", "type": "topic", "link": "/questions/electronic-information" },
+    { "id": "cap:signal", "label": "信号与系统", "type": "capability" },
+    { "id": "cap:comm", "label": "通信原理", "type": "capability" },
+    { "id": "cap:embed", "label": "嵌入式", "type": "capability" },
+    { "id": "course:comm101", "label": "通信基础", "type": "course", "link": "/learning-paths/comm101" },
+    { "id": "q:mod", "label": "调制解调", "type": "question", "link": "/questions/electronic-information?tag=modulation" }
+  ],
+  "edges": [
+    { "source": "ee", "target": "cap:signal" },
+    { "source": "ee", "target": "cap:comm" },
+    { "source": "ee", "target": "cap:embed" },
+    { "source": "cap:comm", "target": "course:comm101" },
+    { "source": "cap:comm", "target": "q:mod" }
+  ]
+}
+

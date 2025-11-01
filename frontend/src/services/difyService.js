@@ -221,6 +221,20 @@ export class DifyService {
     return match?.answer || ''
   }
 
+  extractKeywords(profession = '') {
+    // Extract relevant keywords from profession/role name for context
+    if (!profession) return []
+
+    // Split profession into words and filter out common words
+    const commonWords = ['engineer', 'developer', 'specialist', 'expert', 'manager', 'lead', 'senior', 'junior', 'the', 'a', 'and', 'or']
+    const keywords = profession
+      .toLowerCase()
+      .split(/[\s-_/]+/)
+      .filter(word => word.length > 2 && !commonWords.includes(word))
+
+    return keywords
+  }
+
   extractSuggestions(evaluation = '') {
     if (!evaluation) return []
     const segments = evaluation.split(/[\n;-]/).map(text => text.trim()).filter(Boolean)

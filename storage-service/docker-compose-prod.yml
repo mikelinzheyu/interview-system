@@ -11,9 +11,9 @@ services:
       - redis-data:/data
     environment:
       - TZ=Asia/Shanghai
-    command: redis-server --appendonly yes --requirepass redis-password-prod
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:-redis-password-prod}
     healthcheck:
-      test: ["CMD", "redis-cli", "-a", "redis-password-prod", "ping"]
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD:-redis-password-prod}", "ping"]
       interval: 30s
       timeout: 10s
       retries: 5
@@ -49,13 +49,13 @@ services:
       # Redis 配置
       SPRING_REDIS_HOST: "interview-redis"
       SPRING_REDIS_PORT: "6379"
-      SPRING_REDIS_PASSWORD: "redis-password-prod"
+      SPRING_REDIS_PASSWORD: "${REDIS_PASSWORD:-redis-password-prod}"
       SPRING_REDIS_TIMEOUT: "3000ms"
       SPRING_REDIS_LETTUCE_POOL_MAX_ACTIVE: "8"
       SPRING_REDIS_LETTUCE_POOL_MAX_IDLE: "8"
 
       # API Key 配置
-      SESSION_STORAGE_API_KEY: "ak_live_a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0"
+      SESSION_STORAGE_API_KEY: "${STORAGE_API_KEY:-ak_live_a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0}"
 
       # 日志配置
       LOGGING_LEVEL_COM_EXAMPLE_INTERVIEWSTORAGE: "INFO"

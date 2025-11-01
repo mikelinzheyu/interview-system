@@ -42,97 +42,77 @@
     <!-- 主要内容区域 -->
     <el-main class="main-content">
       <div class="content-wrapper">
-        <!-- 欢迎区域 -->
-        <div class="welcome-section">
-          <h1 class="welcome-title">
-            欢迎回来{{ user?.real_name || user?.username }}！
-          </h1>
-          <p class="welcome-subtitle">
-            准备好开始您的下一次面试了吗？
-          </p>
-        </div>
+        <!-- Hero Section - 英雄区 -->
+        <HeroSection />
 
         <!-- 统计卡片区域 -->
         <div class="stats-grid">
-          <EnhancedStatsCard
-            type="interviews"
+          <StatsCard
             label="面试次数"
             :value="formattedStats.interviewCount.value"
-            :value-unit="'次'"
+            unit="次"
             :icon="VideoCamera"
             icon-color="#409eff"
-            :loading="loading"
-            :show-trend="true"
-            :trend-data="formattedStats.interviewCount"
-            :clickable="true"
-            @click="handleStatsClick('interviews')"
+            :trend="{ direction: 'up', percent: 12, period: '月' }"
+            clickable
+            route="/interview/history"
           />
 
-          <EnhancedStatsCard
-            type="time"
+          <StatsCard
             label="总练习时长"
             :value="formattedStats.practiceTime.formatted"
             :icon="Clock"
             icon-color="#67c23a"
-            :loading="loading"
-            :show-trend="true"
-            :trend-data="formattedStats.practiceTime"
-            :clickable="true"
-            @click="handleStatsClick('time')"
+            :trend="{ direction: 'up', percent: 8, period: '月' }"
+            clickable
+            route="/analysis/time"
           />
 
-          <EnhancedStatsCard
-            type="score"
+          <StatsCard
             label="平均分数"
             :value="formattedStats.averageScore.value"
-            :value-unit="'分'"
+            unit="分"
             :icon="Trophy"
             icon-color="#e6a23c"
-            :loading="loading"
-            :show-trend="true"
-            :trend-data="formattedStats.averageScore"
-            :clickable="true"
-            @click="handleStatsClick('score')"
+            :trend="{ direction: 'up', percent: 5, period: '月' }"
+            clickable
+            route="/analysis/score"
           />
 
-          <EnhancedStatsCard
-            type="rank"
+          <StatsCard
             label="当前排名"
             :value="formattedStats.rank.level"
             :subtitle="formattedStats.rank.formatted"
             :icon="Star"
             icon-color="#f56c6c"
-            :loading="loading"
-            :show-trend="false"
-            :clickable="true"
-            @click="handleStatsClick('rank')"
+            :trend="null"
+            clickable
+            route="/achievements"
           />
         </div>
+
+        <!-- 错题集统计卡片已移除，保留“我的错题集”预览 -->
 
         <!-- 功能入口区域 -->
         <div class="feature-section">
           <h2 class="section-title">功能入口</h2>
           <div class="feature-grid">
-            <el-card 
-              v-for="feature in features" 
-              :key="feature.key" 
-              class="feature-card"
-              @click="handleFeatureClick(feature)"
-            >
-              <div class="feature-content">
-                <div class="feature-icon">
-                  <el-icon :size="48" :color="feature.color">
-                    <component :is="feature.icon" />
-                  </el-icon>
-                </div>
-                <h3 class="feature-title">{{ feature.title }}</h3>
-                <p class="feature-description">{{ feature.description }}</p>
-                <el-button type="primary" size="small" plain>
-                  {{ feature.buttonText }}
-                </el-button>
-              </div>
-            </el-card>
+            <FeatureCard
+              v-for="feature in filteredFeatures"
+              :key="feature.key"
+              :title="feature.title"
+              :description="feature.description"
+              :button-text="feature.buttonText"
+              :icon="feature.icon"
+              :icon-color="feature.color"
+              :route="feature.route"
+            />
           </div>
+        </div>
+
+        <!-- 错题集功能展示区域 -->
+        <div class="wrong-answers-feature-section">
+          <WrongAnswersPreview />
         </div>
 
         <!-- 趋势分析和推荐 -->
@@ -181,7 +161,10 @@ import {
   Document, DataAnalysis, User,
   Edit, PieChart, MagicStick, VideoCamera, Clock, Trophy, Star
 } from '@element-plus/icons-vue'
-import EnhancedStatsCard from '@/components/statistics/EnhancedStatsCard.vue'
+import HeroSection from '@/components/home/HeroSection.vue'
+import StatsCard from '@/components/home/StatsCard.vue'
+import FeatureCard from '@/components/home/FeatureCard.vue'
+import WrongAnswersPreview from '@/components/home/WrongAnswersPreview.vue'
 import TrendAnalysis from '@/components/statistics/TrendAnalysis.vue'
 import NotificationCenter from '@/components/NotificationCenter.vue'
 import RecommendationFeed from '@/components/RecommendationFeed.vue'
@@ -250,17 +233,11 @@ const features = ref([
     icon: markRaw(PieChart),
     color: '#e6a23c',
     route: '/ability/profile'
-  },
-  {
-    key: 'ai-generate',
-    title: 'AI生成题目',
-    description: '使用AI自动生成题目，快速扩充题库内容',
-    buttonText: '开始生成',
-    icon: markRaw(MagicStick),
-    color: '#3498db',
-    route: '/ai/generate'
   }
 ])
+
+// 过滤功能列表 - 排除AI生成题目
+const filteredFeatures = computed(() => features.value.filter(f => f.key !== 'ai-generate'))
 
 // 最近活动
 const activities = ref([
@@ -417,24 +394,7 @@ onMounted(() => {
   padding: 40px 20px;
 }
 
-.welcome-section {
-  text-align: center;
-  margin-bottom: 40px;
-}
-
-.welcome-title {
-  font-size: 32px;
-  font-weight: 700;
-  color: #ffffff;
-  margin-bottom: 8px;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.welcome-subtitle {
-  font-size: 16px;
-  color: rgba(255, 255, 255, 0.8);
-  margin: 0;
-}
+/* Hero Section 已在组件中定义，此处移除旧样式 */
 
 .stats-grid {
   display: grid;
@@ -453,6 +413,11 @@ onMounted(() => {
   text-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
+/* Hero Section 后的边距 */
+:deep(.hero-section) {
+  margin-bottom: 40px;
+}
+
 .feature-section {
   margin-bottom: 40px;
 }
@@ -463,50 +428,21 @@ onMounted(() => {
   gap: 20px;
 }
 
-.feature-card {
-  border-radius: 12px;
-  border: none;
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
-  cursor: pointer;
-  transition: all 0.3s ease;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
-}
-
-.feature-card:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.25);
-  background: rgba(255, 255, 255, 1);
-}
-
-.feature-content {
-  text-align: center;
-  padding: 20px;
-}
-
-.feature-icon {
-  margin-bottom: 16px;
-}
-
-.feature-title {
-  font-size: 18px;
-  font-weight: 600;
-  color: #303133;
-  margin-bottom: 12px;
-}
-
-.feature-description {
-  font-size: 14px;
-  color: #909399;
-  margin-bottom: 20px;
-  line-height: 1.6;
-}
+/* 功能卡片样式已在 FeatureCard.vue 组件中定义 */
 
 .trend-section {
   margin-bottom: 40px;
 }
 
 .recommendation-section {
+  margin-bottom: 40px;
+}
+
+.wrong-answers-section {
+  margin-bottom: 40px;
+}
+
+.wrong-answers-feature-section {
   margin-bottom: 40px;
 }
 
@@ -549,14 +485,6 @@ onMounted(() => {
     padding: 20px 12px;
   }
 
-  .welcome-title {
-    font-size: 24px;
-  }
-
-  .welcome-subtitle {
-    color: rgba(255, 255, 255, 0.9);
-  }
-
   .stats-grid {
     grid-template-columns: 1fr;
     gap: 16px;
@@ -577,10 +505,6 @@ onMounted(() => {
 
   .username {
     display: none;
-  }
-
-  .feature-card {
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
   }
 }
 </style>

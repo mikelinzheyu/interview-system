@@ -2,11 +2,17 @@
   <div class="domain-selector-page">
     <div class="background-blur" aria-hidden="true" />
 
-    <header class="page-header">
-      <span class="page-eyebrow">学习路径引导</span>
-      <h1>选择学习领域</h1>
-      <p>挑选感兴趣的专业方向，系统化掌握核心知识与实战能力。</p>
+    <header class="page-header">
+      <span class="page-eyebrow">学习路径引导</span>
+      <h1>选择学习领域</h1>
+      <p>挑选感兴趣的专业方向，系统化掌握核心知识与实战能力</p>
     </header>
+
+    <div class="page-actions">
+      <el-link type="primary" :underline="false" @click="goExplorer">按学科层级浏览</el-link>
+      <span class="divider">·</span>
+      <el-link type="default" :underline="false" @click="goOnboarding">智能引导选领域</el-link>
+    </div>
 
     <el-alert
       v-if="error"
@@ -60,8 +66,10 @@ import DomainHeroCard from './components/DomainHeroCard.vue'
 import DomainRecommendationPanel from './components/DomainRecommendationPanel.vue'
 
 const router = useRouter()
-const domainStore = useDomainStore()
+function goExplorer() { router.push({ name: 'DomainExplorer' }) }
+function goOnboarding() { router.push({ name: 'FieldOnboarding' }) }
 
+const domainStore = useDomainStore()
 const {
   loading,
   error,
@@ -80,12 +88,8 @@ const activeDomain = computed(() => currentDomain.value || null)
 
 const statsForHero = computed(() => {
   const domain = activeDomain.value
-  if (!domain) {
-    return {}
-  }
-
+  if (!domain) return {}
   const stats = domain.stats || {}
-
   return {
     easy: toNumber(stats.easyCount),
     medium: toNumber(stats.mediumCount),
@@ -98,30 +102,19 @@ const highlightChips = computed(() => domainHighlights.value || [])
 
 const suggestionList = computed(() => {
   const domain = activeDomain.value
-  if (!domain) {
-    return []
-  }
-
+  if (!domain) return []
   const candidates = [domain.suggestions, domain.learningRecommendations, domain.recommendedTopics, highlightChips.value]
-
   for (const candidate of candidates) {
     if (Array.isArray(candidate) && candidate.length) {
       return candidate.filter(Boolean).slice(0, 5)
     }
   }
-
-  if (domain.description) {
-    return [domain.description]
-  }
-
+  if (domain.description) return [domain.description]
   return []
 })
 
 const isInitialLoading = computed(() => loading.value && !domains.value.length)
-
-const panelLoading = computed(() => {
-  return isInitialLoading.value || recommendedLoading.value || progressLoading.value
-})
+const panelLoading = computed(() => isInitialLoading.value || recommendedLoading.value || progressLoading.value)
 
 onMounted(async () => {
   if (!domains.value.length) {
@@ -131,205 +124,55 @@ onMounted(async () => {
       console.error('Failed to load domains:', err)
     }
   }
-
-  domainStore.loadRecommendedDomains().catch(err => {
-    console.warn('Failed to prefetch recommended domains:', err)
-  })
+  domainStore.loadRecommendedDomains().catch(err => console.warn('Prefetch recommended failed:', err))
 
   if (currentDomain.value) {
     selectedSlug.value = currentDomain.value.slug || String(currentDomain.value.id || '')
-    domainStore.loadUserProgress(currentDomain.value).catch(err => {
-      console.warn('Failed to prefetch user progress:', err)
-    })
+    domainStore.loadUserProgress(currentDomain.value).catch(err => console.warn('Prefetch progress failed:', err))
   }
 })
 
-watch(
-  () => currentDomain.value,
-  value => {
-    if (!value) {
-      selectedSlug.value = ''
-      return
-    }
-
-    selectedSlug.value = value.slug || String(value.id || '')
-
-    domainStore.loadUserProgress(value).catch(err => {
-      console.warn('Failed to load user progress:', err)
-    })
-  },
-  { immediate: true }
-)
+watch(() => currentDomain.value, value => { if (value?.slug) selectedSlug.value = value.slug })
 
 function handleSelectDomain(domain) {
-  if (!domain) {
-    return
-  }
-
-  selectedSlug.value = domain.slug || String(domain.id || '')
+  if (!domain) return
   domainStore.setCurrentDomain(domain)
-  domainStore.loadUserProgress(domain).catch(err => {
-    console.warn('Failed to load user progress after selection:', err)
-  })
 }
 
-function handleEnterDomain(domain) {
-  if (!domain) {
-    return
-  }
-
-  domainStore.setCurrentDomain(domain)
-  domainStore.loadUserProgress(domain).catch(err => {
-    console.warn('Failed to refresh user progress before entering domain:', err)
-  })
-
-  const target = domain.slug || domain.id
-  if (!target) {
-    return
-  }
-
-  router.push({
-    name: 'QuestionBankPage',
-    params: { domainSlug: target }
-  })
+function handleEnterDomain() {
+  const slug = currentDomain.value?.slug
+  if (slug) router.push({ name: 'QuestionBankPage', params: { domainSlug: slug } })
 }
 
-function toNumber(value) {
-  const numeric = Number(value)
-  return Number.isFinite(numeric) ? numeric : 0
-}
+function toNumber(v) { const n = Number(v); return Number.isFinite(n) ? n : 0 }
 </script>
 
 <style scoped>
-.domain-selector-page {
-  position: relative;
-  padding: 48px clamp(16px, 6vw, 64px) 64px;
-  min-height: 100vh;
-  background: radial-gradient(circle at top left, rgba(59, 130, 246, 0.12), transparent 45%),
-    linear-gradient(180deg, #f8fafc 0%, #e0f2fe 100%);
-  overflow: hidden;
-}
-
-.background-blur {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background: radial-gradient(circle at 20% 15%, rgba(59, 130, 246, 0.18), transparent 55%),
-    radial-gradient(circle at 80% 0%, rgba(16, 185, 129, 0.12), transparent 60%);
-  filter: blur(40px);
-  opacity: 0.7;
-  z-index: 0;
-}
-
-.page-header {
-  position: relative;
-  z-index: 1;
-  text-align: center;
-  margin-bottom: 40px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.page-eyebrow {
-  font-size: 13px;
-  font-weight: 600;
-  letter-spacing: 0.32em;
-  text-transform: uppercase;
-  color: #3b82f6;
-}
-
-.page-header h1 {
-  margin: 0;
-  font-size: clamp(32px, 5vw, 42px);
-  font-weight: 700;
-  color: #0f172a;
-}
-
-.page-header p {
-  margin: 0;
-  color: #475569;
-  font-size: 16px;
-}
-
-.error-banner {
-  margin: 0 auto 24px;
-  max-width: 960px;
-}
-
-.page-layout {
-  position: relative;
-  z-index: 1;
-  display: grid;
-  grid-template-columns: 280px minmax(0, 1fr) 280px;
-  gap: 28px;
-  align-items: start;
-}
-
-.layout-sidebar,
-.layout-hero,
-.layout-panel {
-  min-width: 0;
-}
-
-.page-layout.is-loading {
-  opacity: 0.75;
-}
-
-@media (max-width: 1440px) {
-  .page-layout {
-    grid-template-columns: 260px minmax(0, 1fr) 260px;
-    gap: 24px;
-  }
-}
-
+.domain-selector-page { position: relative; padding: 48px 24px 72px; }
+.background-blur { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(circle at 20% 15%, rgba(59,130,246,.18), transparent 55%), radial-gradient(circle at 80% 0%, rgba(16,185,129,.12), transparent 60%); filter: blur(40px); opacity: .7; z-index: 0; }
+.page-header { position: relative; z-index: 1; text-align: center; margin-bottom: 40px; display: flex; flex-direction: column; gap: 12px; }
+.page-eyebrow { font-size: 13px; font-weight: 600; letter-spacing: .32em; text-transform: uppercase; color: #3b82f6; }
+.page-header h1 { margin: 0; font-size: clamp(32px, 5vw, 42px); font-weight: 700; color: #0f172a; }
+.page-header p { margin: 0; color: #475569; font-size: 16px; }
+.error-banner { margin: 0 auto 24px; max-width: 960px; }
+.page-actions { position: relative; z-index: 1; margin: 0 auto 16px; max-width: 960px; display: flex; justify-content: flex-end; align-items: center; gap: 8px; }
+.page-actions .divider { color: #94a3b8; }
+.page-layout { position: relative; z-index: 1; display: grid; grid-template-columns: 280px minmax(0, 1fr) 280px; gap: 28px; align-items: start; }
+.layout-sidebar, .layout-hero, .layout-panel { min-width: 0; }
+.page-layout.is-loading { opacity: .75; }
+@media (max-width: 1440px) { .page-layout { grid-template-columns: 260px minmax(0, 1fr) 260px; gap: 24px; } }
 @media (max-width: 1280px) {
-  .page-layout {
-    grid-template-columns: 260px minmax(0, 1fr);
-    grid-template-areas:
-      'sidebar hero'
-      'sidebar panel';
-  }
-
-  .layout-sidebar {
-    grid-area: sidebar;
-  }
-
-  .layout-hero {
-    grid-area: hero;
-  }
-
-  .layout-panel {
-    grid-area: panel;
-  }
+  .page-layout { grid-template-columns: 260px minmax(0, 1fr); grid-template-areas: 'sidebar hero' 'sidebar panel'; }
+  .layout-sidebar { grid-area: sidebar; }
+  .layout-hero { grid-area: hero; }
+  .layout-panel { grid-area: panel; }
 }
-
 @media (max-width: 1024px) {
-  .page-layout {
-    grid-template-columns: minmax(0, 1fr);
-    grid-template-areas: 'hero' 'panel' 'sidebar';
-  }
-
-  .layout-sidebar {
-    order: 3;
-  }
-
-  .layout-panel {
-    order: 2;
-  }
-
-  .layout-hero {
-    order: 1;
-  }
+  .page-layout { grid-template-columns: minmax(0, 1fr); grid-template-areas: 'hero' 'panel' 'sidebar'; }
+  .layout-sidebar { order: 3; }
+  .layout-panel { order: 2; }
+  .layout-hero { order: 1; }
 }
-
-@media (max-width: 640px) {
-  .domain-selector-page {
-    padding: 32px 16px 48px;
-  }
-
-  .page-header {
-    margin-bottom: 28px;
-  }
-}
+@media (max-width: 640px) { .domain-selector-page { padding: 32px 16px 48px; } .page-header { margin-bottom: 28px; } }
 </style>
+

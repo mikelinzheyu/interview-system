@@ -1,0 +1,16 @@
+{
+  "nodes": [
+    { "id": "econ", "label": "经济学", "type": "topic", "link": "/questions/economics" },
+    { "id": "cap:micro", "label": "微观经济学", "type": "capability" },
+    { "id": "cap:macro", "label": "宏观经济学", "type": "capability" },
+    { "id": "course:eco101", "label": "经济学原理", "type": "course", "link": "/learning-paths/eco101" },
+    { "id": "q:supply", "label": "供需分析", "type": "question", "link": "/questions/economics?tag=supply-demand" }
+  ],
+  "edges": [
+    { "source": "econ", "target": "cap:micro" },
+    { "source": "econ", "target": "cap:macro" },
+    { "source": "cap:micro", "target": "course:eco101" },
+    { "source": "cap:micro", "target": "q:supply" }
+  ]
+}
+

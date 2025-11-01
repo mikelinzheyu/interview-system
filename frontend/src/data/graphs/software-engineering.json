@@ -1,0 +1,18 @@
+{
+  "nodes": [
+    { "id": "se", "label": "软件工程", "type": "topic", "link": "/questions/software-engineering" },
+    { "id": "cap:req", "label": "需求分析", "type": "capability" },
+    { "id": "cap:design", "label": "架构设计", "type": "capability" },
+    { "id": "cap:test", "label": "测试与质量", "type": "capability" },
+    { "id": "course:se101", "label": "软件工程导论", "type": "course", "link": "/learning-paths/se101" },
+    { "id": "q:oop", "label": "面向对象设计", "type": "question", "link": "/questions/software-engineering?tag=oop" }
+  ],
+  "edges": [
+    { "source": "se", "target": "cap:req" },
+    { "source": "se", "target": "cap:design" },
+    { "source": "se", "target": "cap:test" },
+    { "source": "cap:design", "target": "course:se101" },
+    { "source": "cap:design", "target": "q:oop" }
+  ]
+}
+

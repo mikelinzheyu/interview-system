@@ -1,0 +1,16 @@
+{
+  "nodes": [
+    { "id": "law", "label": "法学", "type": "domain" },
+    { "id": "civil", "label": "民法" },
+    { "id": "criminal", "label": "刑法" },
+    { "id": "proc", "label": "诉讼法" },
+    { "id": "const", "label": "宪法" }
+  ],
+  "edges": [
+    { "source": "law", "target": "civil" },
+    { "source": "law", "target": "criminal" },
+    { "source": "law", "target": "proc" },
+    { "source": "law", "target": "const" }
+  ]
+}
+

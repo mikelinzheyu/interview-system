@@ -1,0 +1,164 @@
+================================================================================
+🎉 Workflow2 save_status 问题 - 最终修复方案
+================================================================================
+
+【问题诊断】
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+❌ 现象: workflow2 输出 save_status="失败"，数据无法保存
+❌ 错误: POST /api/sessions 返回 404 Not Found
+❌ 根本原因: Storage Service 无法启动（Dockerfile 配置错误）
+
+【根本原因】
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. Storage Service Dockerfile.prod 的启动命令错误
+   - 只在容器中打印消息然后休眠，没有启动 Java 应用
+   - 无法处理任何 API 请求
+
+2. 无法编译 Java 源代码生成 JAR 文件
+   - Maven Docker 镜像无法从国内源拉取
+   - 没有预编译的 JAR 文件
+
+3. 结果: Storage Service 容器标记为 unhealthy，无法响应 API
+
+【修复方案】
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ 不依赖 Storage Service Java 应用
+✅ 改为通过 ngrok 隧道调用 Backend API
+✅ Backend (Node.js) 访问 Redis 保存数据
+✅ 简单、可靠、快速
+
+【实施步骤】(预计 5 分钟)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1️⃣ Backend 已经修改完成 ✅
+   - 新增 POST /api/sessions/save 端点
+   - 可以接收 session_id, question_id, answer
+   - 保存到 Redis（TTL 24 小时）
+   - 已重启 backend 容器
+
+2️⃣ 在 Dify 中更新 workflow2 的 "保存标准答案" 节点
+   
+   查看文件: WORKFLOW2_PYTHON_CODE_UPDATE.md
+   
+   快速步骤:
+   1. 打开 workflow2
+   2. 编辑 "保存标准答案" 节点
+   3. 复制 WORKFLOW2_PYTHON_CODE_UPDATE.md 中的 Python 代码
+   4. 替换 YOUR_NGROK_URL 为你的实际 ngrok URL
+   5. 点击保存
+
+3️⃣ 测试修复
+   
+   cd D:\code7\interview-system
+   node test-workflows-docker-prod.js
+   
+   查找输出中的 save_status 字段
+   - ✅ "成功" → 修复成功！
+   - ❌ "失败" → 查看错误信息
+
+【关键修改】
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+backend/mock-server.js:
+✅ 新增 POST:/api/sessions/save 端点
+   - 接收: { session_id, question_id, answer }
+   - 读取 Redis 中的会话数据
+   - 更新指定问题的答案
+   - 保存回 Redis
+   - 返回 { status: "success" }
+
+【架构流程】
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Dify (workflow2)
+    ↓ HTTP POST (通过 ngrok)
+ngrok 隧道 (https://xxx.ngrok-free.dev)
+    ↓ HTTP POST /api/sessions/save
+Backend Container (Node.js)
+    ↓ 访问 Redis
+Redis Container
+    ↓ 存储会话数据
+✅ 返回成功
+
+【文件清单】
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+已修改:
+✅ backend/mock-server.js - 新增 /api/sessions/save 端点
+
+已生成文档:
+📄 WORKFLOW2_PYTHON_CODE_UPDATE.md - 在 Dify 中的修改步骤和代码
+
+【立即行动】
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. 打开浏览器，登录 Dify
+2. 打开 workflow2 ("AI面试官-工作流2-生成答案")
+3. 编辑 "保存标准答案" 节点
+4. 查看 WORKFLOW2_PYTHON_CODE_UPDATE.md 获取新代码
+5. 复制代码，替换 YOUR_NGROK_URL
+6. 保存 workflow2
+7. 运行测试: node test-workflows-docker-prod.js
+
+【预期结果】
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+修复前:
+{
+  "save_status": "失败",
+  "error_message": "HTTP 404 Not Found"
+}
+
+修复后:
+{
+  "save_status": "成功",
+  "error_message": ""
+}
+
+【故障排查】
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+如果仍然失败:
+
+1. ❌ ngrok 隧道无法访问?
+   - 确保 ngrok http 8080 仍在运行
+   - 确保 URL 没有拼写错误
+   
+2. ❌ Backend 无法访问?
+   - 检查: docker ps | grep backend
+   - 查看日志: docker logs interview-backend -f
+   
+3. ❌ Redis 连接失败?
+   - 检查: docker exec interview-redis redis-cli ping
+   - 应该返回 PONG
+
+【时间估计】
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+后端代码修改: ✅ 完成 (0 分钟)
+Dify 中手动更新: 5 分钟
+测试验证: 2 分钟
+总计: 7 分钟
+
+【重要提醒】
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+⚠️  ngrok URL 会改变
+   - 每次重启 ngrok，URL 都会变（免费版特性）
+   - 需要在 Dify 中重新更新 API URL
+
+⚠️  保持服务运行
+   - ngrok 窗口不要关闭
+   - Docker 容器保持运行
+
+✅ 数据持久化
+   - 答案保存在 Redis，TTL 24 小时
+   - 可在 Redis 中查看: docker exec interview-redis redis-cli keys "*"
+
+================================================================================
+✅ 修复方案完成 - 可立即执行
+================================================================================
+

@@ -246,6 +246,86 @@ const routes = {
     sendResponse(res, 200, mockData.health)
   },
 
+  // Sessions list for WrongAnswersPage sidebar
+  'GET:/api/sessions': (req, res) => {
+    const sessions = [
+      { sessionId: 'ai-2024-10-001', jobTitle: '前端开发工程师面试（AI）' },
+      { sessionId: 'ai-2024-10-002', jobTitle: '全栈工程师面试（AI）' },
+      { sessionId: 'ai-2024-10-003', jobTitle: '后端工程师面试（AI）' }
+    ]
+    sendResponse(res, 200, sessions, '获取会话列表成功')
+  },
+
+  // Wrong answers core endpoints for preview/list pages
+  'GET:/api/wrong-answers': (req, res) => {
+    const now = Date.now()
+    const items = [
+      {
+        id: 'wa-001',
+        questionTitle: '什么是闭包？在实际项目中如何应用？',
+        questionContent: '请解释JavaScript闭包的概念，并给出两个常见使用场景。',
+        errorType: 'knowledge',
+        mastery: 45,
+        wrongCount: 3,
+        correctCount: 1,
+        difficulty: 'medium',
+        reviewStatus: 'reviewing',
+        source: 'ai_interview',
+        sessionId: 'ai-2024-10-001',
+        lastWrongTime: new Date(now - 1000 * 60 * 60 * 20).toISOString(),
+        nextReviewTime: new Date(now + 1000 * 60 * 60 * 6).toISOString()
+      },
+      {
+        id: 'wa-002',
+        questionTitle: 'Vue3中的响应式原理是怎样的？',
+        questionContent: '基于Proxy的依赖收集与触发机制，简述核心流程。',
+        errorType: 'logic',
+        mastery: 62,
+        wrongCount: 2,
+        correctCount: 3,
+        difficulty: 'hard',
+        reviewStatus: 'unreviewed',
+        source: 'question_bank',
+        sessionId: null,
+        lastWrongTime: new Date(now - 1000 * 60 * 60 * 48).toISOString(),
+        nextReviewTime: new Date(now + 1000 * 60 * 60 * 24).toISOString()
+      },
+      {
+        id: 'wa-003',
+        questionTitle: 'HTTP缓存控制策略有哪些？',
+        questionContent: '对比强缓存与协商缓存，说明适用场景与常见Header。',
+        errorType: 'incomplete',
+        mastery: 30,
+        wrongCount: 5,
+        correctCount: 0,
+        difficulty: 'medium',
+        reviewStatus: 'unreviewed',
+        source: 'ai_interview',
+        sessionId: 'ai-2024-10-002',
+        lastWrongTime: new Date(now - 1000 * 60 * 60 * 3).toISOString(),
+        nextReviewTime: new Date(now + 1000 * 60 * 60 * 2).toISOString()
+      }
+    ]
+    sendResponse(res, 200, items, '获取错题列表成功')
+  },
+
+  'GET:/api/wrong-answers/statistics': (req, res) => {
+    const stats = {
+      totalWrongCount: 10,
+      totalCorrectCount: 25,
+      masteredCount: 4,
+      reviewingCount: 3,
+      unreviewedCount: 3,
+      masteredPercentage: 40
+    }
+    sendResponse(res, 200, stats, '获取错题统计成功')
+  },
+
+  'POST:/api/wrong-answers/generate-review-plan': (req, res) => {
+    // Simulate plan generation
+    sendResponse(res, 200, { ok: true, generatedAt: new Date().toISOString() }, '复习计划已生成')
+  },
+
   // 用户相关
   'GET:/api/users/me': (req, res) => {
     sendResponse(res, 200, mockData.users[0])
@@ -565,6 +645,26 @@ const server = http.createServer((req, res) => {
   const method = req.method
   const path = parsedUrl.pathname
   const routeKey = `${method}:${path}`
+
+  // dynamic route: /api/domains/:slug/graph
+  const graphMatch = path && path.match(/^\/api\/domains\/([^/]+)\/graph$/)
+  if (method === 'GET' && graphMatch) {
+    try {
+      const slug = graphMatch[1]
+      const fs = require('fs')
+      const p = require('path')
+      const file = p.resolve(__dirname, 'src', 'data', 'graphs', `${slug}.json`)
+      if (fs.existsSync(file)) {
+        const data = JSON.parse(fs.readFileSync(file, 'utf8'))
+        sendResponse(res, 200, data, 'ok')
+      } else {
+        sendResponse(res, 404, null, 'Graph not found')
+      }
+    } catch (e) {
+      sendResponse(res, 500, null, 'Graph load error')
+    }
+    return
+  }
 
   console.log(`[${new Date().toISOString()}] ${method} ${path}`)
 

@@ -1,0 +1,19 @@
+{
+  "nodes": [
+    { "id": "fin", "label": "金融学", "type": "topic", "link": "/questions/finance" },
+    { "id": "cap:ap", "label": "资产定价", "type": "capability" },
+    { "id": "cap:rm", "label": "风险管理", "type": "capability" },
+    { "id": "cap:qe", "label": "量化分析", "type": "capability" },
+    { "id": "cap:fm", "label": "金融市场", "type": "capability" },
+    { "id": "course:qe101", "label": "量化基础", "type": "course", "link": "/learning-paths/qe101" },
+    { "id": "q:value", "label": "估值模型", "type": "question", "link": "/questions/finance?tag=valuation" }
+  ],
+  "edges": [
+    { "source": "fin", "target": "cap:ap" },
+    { "source": "fin", "target": "cap:rm" },
+    { "source": "fin", "target": "cap:qe" },
+    { "source": "fin", "target": "cap:fm" },
+    { "source": "cap:qe", "target": "course:qe101" },
+    { "source": "cap:ap", "target": "q:value" }
+  ]
+}

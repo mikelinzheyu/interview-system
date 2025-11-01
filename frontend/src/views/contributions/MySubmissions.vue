@@ -234,11 +234,11 @@ function handleSizeChange() {
 }
 
 function viewDetail(id) {
-  router.push(`/contributions/submissions/${id}`)
+  router.push({ name: 'QuestionDetail', params: { id } })
 }
 
 function reviseSubmission(id) {
-  router.push(`/contributions/submissions/${id}`)
+  router.push({ name: 'QuestionDetail', params: { id } })
 }
 
 function getDomainName(domainId) {

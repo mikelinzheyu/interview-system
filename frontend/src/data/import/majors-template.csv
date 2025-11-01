@@ -1,0 +1,27 @@
+discipline_name,field_name,major_slug,major_name,aliases,pinyin,abbr,alt_en,popularity
+理学,计算机类,computer-science,计算机科学与技术,计算机科学;CS;jisuanji,jisuanji kexue yu jishu,CS,computer science,95
+理学,计算机类,software-engineering,软件工程,软件;SE;ruanjian,ruanjian gongcheng,SE,software engineering,88
+理学,数学类,mathematics,数学,math;shuxue,shuxue,MATH,80
+理学,统计学类,statistics,统计学,tongji, tongji xue,STAT,70
+工学,电子信息类,electronic-information,电子信息工程,电子信息;EE,dianzi xinxi gongcheng,EE,electronic information,85
+工学,自动化类,automation,自动化,control;zidonghua,zidonghua,AUTO,automation,78
+工学,机械类,mechanical-engineering,机械工程,机械;jixie,jixie gongcheng,ME,mechanical engineering,72
+工学,土木类,civil-engineering,土木工程,土木;tumu,tumu gongcheng,CE,civil engineering,71
+医学,临床医学类,medicine,临床医学,医学;yixue,linchuang yixue,MED,clinical medicine,90
+医学,药学类,pharmacy,药学,yaoxue,yao xue,PHARM,pharmacy,75
+法学,法学类,law,法学,法律;faxue,fa xue,LAW,law,78
+经济学,金融学类,finance,金融学,金融;jinrong;quant,jin rong xue,FIN,finance,82
+经济学,经济学类,economics,经济学,jingjixue,jing ji xue,ECON,economics,80
+管理学,工商管理类,business-administration,工商管理,MBA;gongshang guanli,gong shang guan li,BADM,business administration,76
+管理学,会计学类,accounting,会计学,会计;kuaiji,kuai ji xue,ACCT,accounting,74
+教育学,教育学类,education,教育学,jiaoyuxue,jiao yu xue,EDU,education,68
+文学,中国语言文学类,chinese-language,汉语言文学,汉语言;hanyuyan,han yu yan wen xue,ZH-CN,chinese language & literature,70
+文学,外国语言文学类,english,英语,yingyu,ying yu,EN,english,69
+历史学,历史学类,history,历史学,lishi,li shi xue,HIST,history,65
+哲学,哲学类,philosophy,哲学,zhexue,zhe xue,PHIL,philosophy,64
+农学,园艺类,horticulture,园艺,yuanyi,yuan yi,HORT,horticulture,60
+农学,动物科学类,animal-science,动物科学,dongwu,dong wu ke xue,ANSC,animal science,62
+农学,动物科学类,veterinary-medicine,兽医学,兽医;shouyi,shou yi xue,VET,veterinary medicine,61
+农学,动物科学类,aquaculture,水产养殖,水产;shuichan,shui chan yang zhi,AQUA,aquaculture,59
+艺术学,设计学类,industrial-design,工业设计,设计;sheji,gong ye she ji,ID,industrial design,63
+军事学,军事指挥,military-command,军事指挥,指挥;junshi,jun shi zhi hui,COMMAND,military command,58

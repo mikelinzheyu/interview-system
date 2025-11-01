@@ -1,8 +1,10 @@
 import { defineConfig, loadEnv } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import { resolve } from 'path'
+import fs from 'fs'
 
-const DEFAULT_PROXY_TARGET = 'http://localhost:3001'
+// 默认代理目标，使用localhost而不是Docker主机名
+const DEFAULT_PROXY_TARGET = process.env.VITE_DEV_PROXY_TARGET || 'http://localhost:3001'
 
 const ensureTrimmed = (value) => value ? value.trim() : ''
 
@@ -41,36 +43,96 @@ const resolveProxyTarget = (env) => {
   return DEFAULT_PROXY_TARGET
 }
 
+// SPA fallback plugin
+const spaFallbackPlugin = {
+  name: 'spa-fallback',
+  apply: 'serve',
+  enforce: 'post',
+  configureServer(server) {
+    return () => {
+      server.middlewares.use((req, res, next) => {
+        // 只处理GET请求
+        if (req.method !== 'GET') {
+          return next()
+        }
+
+        // 排除API和资源请求
+        const url = req.url || '/'
+        if (url.startsWith('/api') ||
+            url.startsWith('/@') ||  // Vite internal requests
+            url.startsWith('/node_modules') ||
+            url.match(/\.(js|css|json|wasm|png|jpg|jpeg|gif|svg|ico|woff|woff2|ttf|eot)($|\?)/)) {
+          return next()
+        }
+
+        // 如果URL以/src/开头，让Vite处理模块
+        if (url.startsWith('/src/')) {
+          return next()
+        }
+
+        // 所有其他GET请求返回index.html
+        try {
+          const indexPath = resolve(__dirname, 'index.html')
+          const html = fs.readFileSync(indexPath, 'utf-8')
+          res.setHeader('Content-Type', 'text/html')
+          res.end(html)
+        } catch (error) {
+          console.error('[VITE SPA] Error serving index.html:', error.message)
+          next()
+        }
+      })
+    }
+  }
+}
+
 export default defineConfig(({ mode }) => {
-  const env = loadEnv(mode, process.cwd(), '')
-  const proxyTarget = resolveProxyTarget(env)
+  // Load envs relative to the frontend directory regardless of CWD
+  const env = loadEnv(mode, __dirname, '')
+
+  // 对于本地开发，始终使用localhost
+  const proxyTarget = 'http://localhost:3001'
 
   console.log(`[VITE] API proxy target: ${proxyTarget}`)
 
   return {
-    plugins: [vue()],
+    // Ensure Vite resolves paths relative to the frontend directory
+    root: __dirname,
+    publicDir: resolve(__dirname, 'public'),
+    plugins: [vue(), spaFallbackPlugin],
+    optimizeDeps: {
+      include: ['canvg']
+    },
     resolve: {
       alias: {
         '@': resolve(__dirname, 'src')
       }
     },
+    build: {
+      commonjsOptions: {
+        transformMixedEsModules: true
+      }
+    },
     server: {
-      host: '0.0.0.0', // 监听所有网络接口
-      port: 5174, // 修正为日志中显示的端口
+      host: '0.0.0.0',
+      port: 5174,
       open: false,
+      middlewareMode: false,
+      hmr: {
+        host: 'localhost',
+        port: 5174,
+        protocol: 'ws'
+      },
       proxy: {
         '/api': {
           target: proxyTarget,
           changeOrigin: true,
           secure: false,
-          // 不需要重写路径，直接转发到后端的/api
           rewrite: (path) => {
             const timestamp = new Date().toISOString()
             console.log(`[${timestamp}] [PROXY] 转发: ${path} -> ${path}`)
             return path
           },
           configure: (proxy, options) => {
-            // 统一日志格式
             const formatLog = (level, type, message) => {
               const timestamp = new Date().toISOString()
               return `[${timestamp}] [${level}] [${type}] ${message}`

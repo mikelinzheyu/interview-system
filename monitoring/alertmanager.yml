@@ -1,0 +1,166 @@
+# Alertmanager 配置文件
+# 负责告警路由、分组和通知
+
+global:
+  # 默认SMTP设置
+  smtp_smarthost: 'smtp.gmail.com:587'
+  smtp_from: 'alerts@interview-system.com'
+  smtp_auth_username: 'your-email@gmail.com'
+  smtp_auth_password: 'your-app-password'
+  # Slack webhook（可选）
+  slack_api_url: ''
+  # PagerDuty key（可选）
+  # pagerduty_url: 'https://events.pagerduty.com/v2/enqueue'
+  # 告警解除超时时间
+  resolve_timeout: 5m
+  # HTTP 超时
+  http_config:
+    tls_config:
+      insecure_skip_verify: true
+
+# 告警模板
+templates:
+  - '/etc/alertmanager/templates/*.tmpl'
+
+# 告警路由树（必须）
+route:
+  # 根路由
+  receiver: 'default'
+  group_by: ['alertname', 'cluster', 'service']
+  group_wait: 10s
+  group_interval: 10s
+  repeat_interval: 1h
+
+  # 子路由
+  routes:
+    # 关键告警 - 立即通知
+    - match:
+        severity: critical
+      receiver: 'critical-alerts'
+      group_wait: 0s
+      group_interval: 1m
+      repeat_interval: 15m
+      continue: true
+
+    # 警告告警 - 稍等10秒后通知（避免过度通知）
+    - match:
+        severity: warning
+      receiver: 'warning-alerts'
+      group_wait: 10s
+      group_interval: 30m
+      repeat_interval: 4h
+      continue: true
+
+    # 容器相关告警
+    - match:
+        component: 'container'
+      receiver: 'container-alerts'
+      continue: true
+
+    # Redis 相关告警
+    - match:
+        component: 'redis'
+      receiver: 'redis-alerts'
+      continue: true
+
+    # 后端服务告警
+    - match:
+        component: 'backend'
+      receiver: 'backend-alerts'
+      continue: true
+
+    # 基础设施告警
+    - match:
+        component: node
+      receiver: 'infrastructure-alerts'
+      continue: true
+
+# 接收器定义
+receivers:
+  # 默认接收器
+  - name: 'default'
+    email_configs:
+      - to: 'ops-team@example.com'
+        headers:
+          Subject: '[告警] {{ .GroupLabels.alertname }}'
+
+  # 关键告警接收器 - 多种通知方式
+  - name: 'critical-alerts'
+    email_configs:
+      - to: 'critical-alerts@example.com'
+        headers:
+          Subject: '[严重告警] {{ .GroupLabels.alertname }}'
+        html: |
+          {{ range .Alerts.Firing }}
+          <h3>{{ .Labels.alertname }}</h3>
+          <p><strong>实例：</strong> {{ .Labels.instance }}</p>
+          <p><strong>描述：</strong> {{ .Annotations.description }}</p>
+          <p><strong>时间：</strong> {{ .StartsAt }}</p>
+          {{ end }}
+
+    # Webhook 通知（可用于企业微信、钉钉等）
+    webhook_configs:
+      - url: 'http://localhost:5000/webhook/critical'
+        send_resolved: true
+
+    # PagerDuty 集成（高优先级告警）
+    # pagerduty_configs:
+    #   - service_key: 'your-pagerduty-service-key'
+    #     description: '{{ .GroupLabels.alertname }}'
+    #     details:
+    #       firing: '{{ template "pagerduty.default.instances" .Alerts.Firing }}'
+    #       resolved: '{{ template "pagerduty.default.instances" .Alerts.Resolved }}'
+
+  # 警告告警接收器
+  - name: 'warning-alerts'
+    email_configs:
+      - to: 'warnings@example.com'
+        headers:
+          Subject: '[告警] {{ .GroupLabels.alertname }}'
+
+  # 容器告警接收器
+  - name: 'container-alerts'
+    slack_configs:
+      - api_url: '{{ env "SLACK_WEBHOOK_CONTAINER" }}'
+        channel: '#container-alerts'
+        title: '容器告警'
+        text: '{{ range .Alerts.Firing }}{{ .Annotations.summary }}\n{{ end }}'
+        send_resolved: true
+
+  # Redis 告警接收器
+  - name: 'redis-alerts'
+    slack_configs:
+      - api_url: '{{ env "SLACK_WEBHOOK_REDIS" }}'
+        channel: '#redis-alerts'
+        title: 'Redis 告警'
+        text: '{{ range .Alerts.Firing }}{{ .Annotations.summary }}\n{{ end }}'
+
+  # 后端服务告警接收器
+  - name: 'backend-alerts'
+    slack_configs:
+      - api_url: '{{ env "SLACK_WEBHOOK_BACKEND" }}'
+        channel: '#backend-alerts'
+        title: '后端服务告警'
+        text: '{{ range .Alerts.Firing }}{{ .Annotations.summary }}\n{{ end }}'
+
+  # 基础设施告警接收器
+  - name: 'infrastructure-alerts'
+    email_configs:
+      - to: 'infrastructure@example.com'
+    slack_configs:
+      - api_url: '{{ env "SLACK_WEBHOOK_INFRA" }}'
+        channel: '#infrastructure-alerts'
+        title: '基础设施告警'
+        text: '{{ range .Alerts.Firing }}{{ .Annotations.summary }}\n{{ end }}'
+
+# 告警分组
+groups:
+  - name: 'default'
+    rules: []
+
+# 外部告警标签
+external_labels:
+  cluster: 'interview-system'
+  environment: 'production'
+  service: 'ai-interview'
+  team: 'ops'

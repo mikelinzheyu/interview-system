@@ -80,7 +80,13 @@
       </div>
 
       <div class="interview-main">
-        <!-- 智能专业题目生成版块 - 放在最顶部，独占一行 -->
+        <el-row style="margin-bottom: 20px;">
+          <el-col :span="24">
+            <WrongAnswerStatisticsCard />
+          </el-col>
+        </el-row>
+
+        <!-- 智能专业题目生成版块 -->
         <el-row style="margin-bottom: 20px;">
           <el-col :span="24">
             <el-card class="profession-search-card">
@@ -173,6 +179,10 @@
                 <div class="card-header">
                   <span>面试问题</span>
                   <div class="question-actions">
+                    <!-- 题目进度显示 -->
+                    <el-tag v-if="questionQueue.length > 0" size="small" type="info">
+                      第 {{ currentQuestionIndex + 1 }} / {{ questionQueue.length }} 题
+                    </el-tag>
                     <el-button
                       v-if="currentQuestion && currentQuestion.generatedBy === 'dify_workflow'"
                       size="small"
@@ -182,13 +192,14 @@
                       <el-icon><Star /></el-icon>
                       AI智能生成
                     </el-button>
+                    <!-- 下一题/生成新题按钮 -->
                     <el-button
                       type="primary"
                       size="small"
                       :loading="questionLoading"
-                      @click="generateNewQuestion"
+                      @click="handleNextQuestion"
                     >
-                      下一题
+                      {{ hasMoreQuestions ? '下一题' : '生成新题' }}
                     </el-button>
                   </div>
                 </div>
@@ -269,9 +280,9 @@
               <template #header>
                 <div class="card-header">
                   <span>AI分析结果</span>
-                  <div v-if="interviewSession.questions.length > 0" class="question-counter">
+                  <div v-if="questionQueue.length > 0" class="question-counter">
                     <el-tag size="small" type="info">
-                      第 {{ interviewSession.questions.length }} 题
+                      已回答 {{ interviewSession.answers.length }} / {{ questionQueue.length }} 题
                     </el-tag>
                   </div>
                 </div>
@@ -392,6 +403,7 @@ import aiAnalysisService from '@/services/aiAnalysisService'
 import difyService from '@/services/difyService'
 import LoadingSpinner from '@/components/common/LoadingSpinner.vue'
 import ErrorBoundary from '@/components/common/ErrorBoundary.vue'
+import WrongAnswerStatisticsCard from '@/components/home/WrongAnswerStatisticsCard.vue'
 
 export default {
   name: 'AIInterviewSession',
@@ -456,6 +468,8 @@ export default {
     // 面试数据
     const currentQuestion = ref(null)
     const analysisResult = ref(null)
+    const currentQuestionIndex = ref(0) // 当前题目在队列中的索引
+    const questionQueue = ref([]) // 题目队列（从工作流获取的5道题）
     const interviewSession = reactive({
       id: Date.now(),
       sessionId: null,
@@ -580,6 +594,11 @@ export default {
     // 保持向后兼容
     const statusTagType = computed(() => statusButtonType.value)
 
+    // 是否还有更多题目
+    const hasMoreQuestions = computed(() => {
+      return currentQuestionIndex.value < questionQueue.value.length - 1
+    })
+
     // 摄像头控制
     const toggleCamera = async () => {
       try {
@@ -676,7 +695,7 @@ export default {
       return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`
     }
 
-    // 生成新问题
+    // 生成新问题（获取一批5道题目）
     const generateNewQuestion = async () => {
       questionLoading.value = true
       hasError.value = false
@@ -706,38 +725,64 @@ export default {
         if (result.success && result.data) {
           const questionData = result.data
 
-          interviewSession.sessionId = questionData.sessionId || interviewSession.sessionId
+          // 验证必需字段
+          if (!questionData.question) {
+            throw new Error('后端返回的题目文本为空')
+          }
+
+          // 更新会话信息
+          interviewSession.sessionId = questionData.sessionId || `session-${Date.now()}`
           interviewSession.jobTitle = questionData.jobTitle || selectedProfession.value
-          interviewSession.allQuestions = questionData.allQuestions || []
 
-          const questionEntry = {
-            id: questionData.questionId || Date.now(),
-            question: questionData.question,
-            expectedAnswer: questionData.expectedAnswer,
-            keywords: questionData.keywords || [],
-            category: questionData.category || selectedProfession.value,
-            difficulty: questionData.difficulty || selectedDifficulty.value,
-            generatedBy: questionData.generatedBy || 'dify_workflow',
-            confidenceScore: questionData.confidenceScore || 0.9,
-            smartGeneration: true,
-            profession: selectedProfession.value,
-            searchSource: questionData.searchSource || 'dify_rag',
-            sourceUrls: questionData.sourceUrls || [],
-            workflowId: result.metadata?.workflowRunId,
-            sessionId: questionData.sessionId || interviewSession.sessionId,
-            hasAnswer: questionData.hasAnswer
-          }
+          // 处理题目队列：如果有allQuestions就用，否则只用当前题目
+          let questionsToUse = []
 
-          currentQuestion.value = questionEntry
-
-          const exists = interviewSession.questions.find(item => item.id === questionEntry.id)
-          if (!exists) {
-            interviewSession.questions.push(questionEntry)
+          if (questionData.allQuestions && Array.isArray(questionData.allQuestions) && questionData.allQuestions.length > 0) {
+            // Dify工作流返回的5道题目
+            questionsToUse = questionData.allQuestions
+            interviewSession.allQuestions = questionData.allQuestions
+            console.log(`✅ 从Dify工作流获取${questionData.allQuestions.length}道题目`)
           } else {
-            Object.assign(exists, questionEntry)
+            // 只有当前题目
+            questionsToUse = [questionData]
           }
 
-          if (interviewSession.questions.length === 1 && interviewSession.status !== 'active') {
+          // 清空题目队列并重新填充
+          questionQueue.value = questionsToUse.map((q, index) => {
+            return {
+              id: q.questionId || q.id || `q_${index}_${Date.now()}`,
+              question: q.question,
+              expectedAnswer: q.expectedAnswer || q.answer || '',
+              keywords: q.keywords || q.tags || [],
+              category: q.category || q.categoryId || selectedProfession.value,
+              difficulty: q.difficulty || selectedDifficulty.value,
+              generatedBy: q.generatedBy || 'dify_workflow',
+              confidenceScore: q.confidenceScore || 0.9,
+              smartGeneration: true,
+              profession: selectedProfession.value,
+              searchSource: q.searchSource || 'dify_rag',
+              sourceUrls: q.sourceUrls || [],
+              workflowId: result.metadata?.workflowRunId,
+              sessionId: questionData.sessionId || interviewSession.sessionId,
+              hasAnswer: q.hasAnswer !== undefined ? q.hasAnswer : true,
+              explanation: q.explanation,
+              estimatedTime: q.estimatedTime
+            }
+          })
+
+          // 重置索引到第一题
+          currentQuestionIndex.value = 0
+          currentQuestion.value = questionQueue.value[0]
+
+          // 添加到会话questions（用于回答记录）
+          questionQueue.value.forEach(q => {
+            const exists = interviewSession.questions.find(item => item.id === q.id)
+            if (!exists) {
+              interviewSession.questions.push(q)
+            }
+          })
+
+          if (interviewSession.questions.length > 0 && interviewSession.status !== 'active') {
             startTimer()
             interviewSession.startTime = new Date()
             interviewSession.status = 'active'
@@ -745,11 +790,14 @@ export default {
 
           const processingTime = result.metadata?.processingTime || 0
           ElMessage.success({
-            message: `?? ?????????(????: ${processingTime}ms)`,
+            message: `🎉 获取${questionQueue.value.length}道题目成功! (处理时间: ${processingTime}ms)`,
             duration: 3000
           })
 
-          console.log('Dify????????:', currentQuestion.value)
+          console.log('题目队列初始化:', {
+            count: questionQueue.value.length,
+            current: currentQuestion.value
+          })
 
         } else {
           throw new Error(result.message || result.error || '生成问题失败')
@@ -759,14 +807,61 @@ export default {
         hasError.value = true
 
         // 如果所有方法都失败，使用默认问题
-        if (!currentQuestion.value) {
-          currentQuestion.value = getDefaultQuestion()
+        if (questionQueue.value.length === 0) {
+          const defaultQ = getDefaultQuestion()
+          questionQueue.value = [defaultQ]
+          currentQuestionIndex.value = 0
+          currentQuestion.value = defaultQ
           ElMessage.warning('使用默认问题，请检查网络连接')
         } else {
           ElMessage.error(error.value)
         }
       } finally {
         questionLoading.value = false
+      }
+    }
+
+    // 下一题处理函数（新增）
+    const handleNextQuestion = async () => {
+      if (hasMoreQuestions.value) {
+        // 如果还有更多题目，直接显示下一道
+        await showNextQuestion()
+      } else {
+        // 如果没有更多题目，生成新一批题目
+        await generateNewQuestion()
+      }
+    }
+
+    // 显示下一题（从队列中取）
+    const showNextQuestion = async () => {
+      // 先保存当前题目的答案
+      if (finalTranscript.value && currentQuestion.value) {
+        const alreadySaved = interviewSession.answers.find(
+          a => a.questionId === currentQuestion.value.id
+        )
+        if (!alreadySaved) {
+          // 如果还没有分析，提示先分析
+          if (!analysisResult.value) {
+            ElMessage.warning('请先分析当前题目的回答后再进入下一题')
+            return
+          }
+        }
+      }
+
+      // 清空当前回答数据
+      finalTranscript.value = ''
+      interimTranscript.value = ''
+      analysisResult.value = null
+
+      // 显示下一题
+      currentQuestionIndex.value++
+      if (currentQuestionIndex.value < questionQueue.value.length) {
+        currentQuestion.value = questionQueue.value[currentQuestionIndex.value]
+        ElMessage.success({
+          message: `📝 已切换到第 ${currentQuestionIndex.value + 1} 题`,
+          duration: 2000
+        })
+        console.log(`切换到第 ${currentQuestionIndex.value + 1} 题:`, currentQuestion.value.question)
       }
     }
 
@@ -1347,6 +1442,102 @@ export default {
           showClose: true
         })
       }, 1000)
+
+      // 暴露全局 demo 方法供演示脚本使用
+      window.runAIInterviewDemo = async () => {
+        console.clear()
+        console.log('%c🎬 AI面试系统演示开始...', 'font-size: 20px; font-weight: bold; color: #667eea;')
+
+        function sleep(ms) {
+          return new Promise(resolve => setTimeout(resolve, ms))
+        }
+
+        // 第一步：选择专业
+        console.log('%c📌 第一步：选择专业和难度', 'font-size: 14px; font-weight: bold; color: #409eff; margin-top: 15px;')
+        selectedProfession.value = '前端开发工程师'
+        selectedDifficulty.value = '中级'
+        console.log('✅ 已选择: 前端开发工程师 (中级难度)')
+        await sleep(1000)
+
+        // 第二步：生成题目
+        console.log('%c📌 第二步：生成AI面试题', 'font-size: 14px; font-weight: bold; color: #409eff; margin-top: 15px;')
+        console.log('🔄 正在生成题目...')
+
+        currentQuestion.value = {
+          id: Date.now(),
+          question: '请详细解释React中虚拟DOM的工作原理，以及为什么虚拟DOM能够提高应用的性能？',
+          expectedAnswer: '虚拟DOM是React的核心概念，它在内存中创建真实DOM的轻量级副本。当状态变化时，React会创建新的虚拟DOM树，通过Diff算法比较新旧树的差异，最后只更新必要的真实DOM元素。',
+          keywords: ['虚拟DOM', 'Diff算法', '性能优化'],
+          category: '前端开发',
+          difficulty: '中级',
+          generatedBy: 'dify_workflow',
+          confidenceScore: 0.92,
+          smartGeneration: true
+        }
+
+        console.log('✅ 题目生成成功！')
+        console.log('📝 问题: ' + currentQuestion.value.question)
+        await sleep(1500)
+
+        // 第三步：语音识别
+        console.log('%c📌 第三步：模拟语音识别', 'font-size: 14px; font-weight: bold; color: #409eff; margin-top: 15px;')
+
+        const mockTexts = ['虚拟DOM是', '虚拟DOM是React的一个', '虚拟DOM是React的一个重要概念']
+        for (const text of mockTexts) {
+          interimTranscript.value = text
+          console.log('  [实时识别] ' + text + '...')
+          await sleep(500)
+        }
+
+        finalTranscript.value = '虚拟DOM是React的一个重要概念。它在内存中创建真实DOM的轻量级副本。当状态变化时，React会创建新的虚拟DOM树，通过Diff算法比较新旧树的差异，最后只更新那些确实发生了变化的DOM元素，这样就减少了对真实DOM的操作次数。虚拟DOM能够提高应用的性能主要有三个原因：第一，减少了直接操作真实DOM的开销；第二，虚拟DOM支持跨平台应用的开发；第三，方便实现服务端渲染。'
+        interimTranscript.value = ''
+
+        console.log('✅ 语音识别完成！')
+        console.log('📄 识别文本已显示在左下角语音识别卡片')
+        await sleep(1000)
+
+        // 第四步：AI分析
+        console.log('%c📌 第四步：AI分析回答', 'font-size: 14px; font-weight: bold; color: #409eff; margin-top: 15px;')
+        analysisLoading.value = true
+
+        const progresses = ['▁', '▃', '▄', '▅', '▆']
+        for (let i = 0; i < progresses.length; i++) {
+          console.log('  [进度] ' + (i * 25) + '% ' + progresses[i])
+          await sleep(400)
+        }
+
+        // 第五步：显示分析结果
+        analysisResult.value = {
+          overallScore: 82,
+          summary: '回答整体思路清晰，概念理解准确。能够全面阐述虚拟DOM的核心作用和优势。',
+          suggestions: [
+            '可以深入讨论Diff算法的具体实现机制',
+            '可以举具体代码示例来说明虚拟DOM与真实DOM的关系',
+            '可以补充讲解Fiber架构如何优化React的性能'
+          ],
+          technicalScore: 85,
+          communicationScore: 80,
+          logicalScore: 82,
+          processingTime: 2847,
+          strengths: ['概念理解深入', '表达清晰流畅', '逻辑思路完整'],
+          weaknesses: ['缺少代码示例', '未涉及Fiber架构']
+        }
+
+        analysisLoading.value = false
+        console.log('✅ AI分析完成！')
+
+        console.log('%c📊 分析结果', 'font-size: 14px; font-weight: bold; color: #409eff; margin-top: 15px;')
+        console.log('总体评分: 82分 | 技术: 85分 | 表达: 80分 | 逻辑: 82分')
+        console.log('处理时间: 2,847ms')
+
+        console.log('%c💡 改进建议', 'font-size: 14px; font-weight: bold; color: #409eff; margin-top: 10px;')
+        analysisResult.value.suggestions.forEach((s, i) => console.log('  ' + (i + 1) + '. ' + s))
+
+        await sleep(500)
+
+        console.log('%c🎬 演示完成！', 'font-size: 18px; font-weight: bold; color: #67c23a; margin-top: 20px;')
+        console.log('✅ 所有数据已显示在右下角的分析结果卡片中')
+      }
     })
 
     onBeforeUnmount(() => {
@@ -1387,9 +1578,12 @@ export default {
 
       // 面试数据
       currentQuestion,
+      currentQuestionIndex,
+      questionQueue,
       analysisResult,
       interviewSession,
       interviewTimer,
+      hasMoreQuestions,
 
       // 引导流程状态
       flowState,
@@ -1402,6 +1596,8 @@ export default {
       toggleCamera,
       toggleSpeechRecognition,
       generateNewQuestion,
+      handleNextQuestion,
+      showNextQuestion,
       analyzeAnswer,
       clearTranscript,
       getScoreColor,

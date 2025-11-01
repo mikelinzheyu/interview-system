@@ -1,0 +1,14 @@
+{
+  "nodes": [
+    { "id": "acct", "label": "会计学", "type": "topic", "link": "/questions/accounting" },
+    { "id": "cap:fa", "label": "财务会计", "type": "capability" },
+    { "id": "cap:ma", "label": "管理会计", "type": "capability" },
+    { "id": "course:acct101", "label": "会计基础", "type": "course", "link": "/learning-paths/acct101" }
+  ],
+  "edges": [
+    { "source": "acct", "target": "cap:fa" },
+    { "source": "acct", "target": "cap:ma" },
+    { "source": "cap:fa", "target": "course:acct101" }
+  ]
+}
+

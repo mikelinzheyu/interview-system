@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI面试系统 - 演示工具</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 600px;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .section {
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+        }
+
+        .section-title::before {
+            content: '';
+            display: inline-block;
+            width: 4px;
+            height: 16px;
+            background: #667eea;
+            margin-right: 10px;
+            border-radius: 2px;
+        }
+
+        .code-block {
+            background: #f5f5f5;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            padding: 15px;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 13px;
+            overflow-x: auto;
+            margin-bottom: 10px;
+            color: #333;
+            line-height: 1.4;
+        }
+
+        .code-block code {
+            color: #667eea;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            flex: 1;
+            min-width: 150px;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+            border: 1px solid #ddd;
+        }
+
+        .btn-secondary:hover {
+            background: #e8e8e8;
+        }
+
+        .btn-danger {
+            background: #ff6b6b;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #ee5a52;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(255, 107, 107, 0.4);
+        }
+
+        .info-box {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            font-size: 14px;
+            color: #1565c0;
+        }
+
+        .success-box {
+            background: #e8f5e9;
+            border-left: 4px solid #4caf50;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            font-size: 14px;
+            color: #2e7d32;
+        }
+
+        .warning-box {
+            background: #fff3e0;
+            border-left: 4px solid #ff9800;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            font-size: 14px;
+            color: #e65100;
+        }
+
+        .step-list {
+            list-style: none;
+        }
+
+        .step-list li {
+            padding: 10px 0;
+            padding-left: 30px;
+            position: relative;
+            font-size: 14px;
+            color: #555;
+            line-height: 1.6;
+        }
+
+        .step-list li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: #4caf50;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .status {
+            display: none;
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 20px;
+            font-size: 14px;
+        }
+
+        .status.show {
+            display: block;
+        }
+
+        .status.loading {
+            background: #e3f2fd;
+            color: #1565c0;
+        }
+
+        .status.success {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .status.error {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        .link {
+            color: #667eea;
+            text-decoration: none;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .link:hover {
+            color: #764ba2;
+            text-decoration: underline;
+        }
+
+        .emoji {
+            font-size: 20px;
+            margin-right: 8px;
+        }
+
+        @media (max-width: 600px) {
+            .header {
+                padding: 20px;
+            }
+
+            .header h1 {
+                font-size: 22px;
+            }
+
+            .content {
+                padding: 20px;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            .btn {
+                min-width: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎬 AI面试系统演示工具</h1>
+            <p>在 http://localhost:5174/interview/ai 页面运行演示</p>
+        </div>
+
+        <div class="content">
+            <!-- 快速开始 -->
+            <div class="section">
+                <div class="section-title">快速开始</div>
+                <div class="info-box">
+                    <strong>📌 注意：</strong> 请先在另一个标签页打开 <a href="http://localhost:5174/interview/ai" class="link" target="_blank">AI面试页面</a>，然后返回此页面执行演示。
+                </div>
+                <div class="button-group">
+                    <button class="btn btn-primary" onclick="runDemo('quick')">
+                        <span class="emoji">⚡</span>
+                        快速演示（5秒）
+                    </button>
+                    <button class="btn btn-primary" onclick="runDemo('full')">
+                        <span class="emoji">🎬</span>
+                        完整演示（10秒）
+                    </button>
+                </div>
+            </div>
+
+            <!-- 演示步骤 -->
+            <div class="section">
+                <div class="section-title">演示流程</div>
+                <ol class="step-list">
+                    <li><strong>选择专业</strong>：前端开发工程师</li>
+                    <li><strong>选择难度</strong>：中级</li>
+                    <li><strong>生成题目</strong>：AI生成的面试题</li>
+                    <li><strong>语音识别</strong>：模拟用户回答</li>
+                    <li><strong>AI分析</strong>：生成评分和建议</li>
+                    <li><strong>显示结果</strong>：完整的分析报告</li>
+                </ol>
+            </div>
+
+            <!-- 高级选项 -->
+            <div class="section">
+                <div class="section-title">高级选项</div>
+                <div class="button-group">
+                    <button class="btn btn-secondary" onclick="openConsole()">
+                        <span class="emoji">🖥️</span>
+                        打开控制台
+                    </button>
+                    <button class="btn btn-secondary" onclick="resetDemo()">
+                        <span class="emoji">🔄</span>
+                        重置演示
+                    </button>
+                </div>
+            </div>
+
+            <!-- 状态提示 -->
+            <div id="status" class="status">
+                <span id="statusText"></span>
+            </div>
+
+            <!-- 复制代码 -->
+            <div class="section">
+                <div class="section-title">手动运行代码</div>
+                <p style="font-size: 13px; color: #666; margin-bottom: 10px;">
+                    如果自动运行不生效，在 AI面试页面 的控制台中手动执行：
+                </p>
+                <div class="code-block">
+                    <code>
+// 快速演示<br>
+fetch('/demo-runner.js').then(r => r.text()).then(code => eval(code))
+                    </code>
+                </div>
+            </div>
+
+            <!-- 使用说明 -->
+            <div class="section">
+                <div class="section-title">使用说明</div>
+                <p style="font-size: 13px; color: #666; line-height: 1.8;">
+                    ✓ 点击上方按钮自动执行演示<br>
+                    ✓ 演示会自动填充所有数据并更新UI<br>
+                    ✓ 你可以在页面上看到实时的评分和反馈<br>
+                    ✓ 支持重复运行演示多次<br>
+                    ✓ 刷新页面可重置所有演示数据
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const baseURL = 'http://localhost:5174'
+        const interviewPageURL = `${baseURL}/interview/ai`
+
+        function showStatus(message, type = 'loading') {
+            const statusDiv = document.getElementById('status')
+            const statusText = document.getElementById('statusText')
+
+            statusDiv.className = `status show ${type}`
+            statusText.textContent = message
+
+            if (type === 'success' || type === 'error') {
+                setTimeout(() => {
+                    statusDiv.className = 'status'
+                }, 5000)
+            }
+        }
+
+        function openConsole() {
+            window.open(interviewPageURL)
+        }
+
+        async function runDemo(type) {
+            showStatus('🔄 正在连接到面试页面...', 'loading')
+
+            try {
+                // 打开面试页面
+                const interviewWindow = window.open(interviewPageURL, 'interviewWindow')
+
+                // 等待页面加载
+                await new Promise(resolve => setTimeout(resolve, 2000))
+
+                if (!interviewWindow) {
+                    throw new Error('无法打开面试页面，请检查弹窗是否被阻止')
+                }
+
+                showStatus('⏳ 正在执行演示脚本...', 'loading')
+
+                // 向面试页面发送演示指令
+                const message = {
+                    type: 'runDemo',
+                    demoType: type,
+                    timestamp: Date.now()
+                }
+
+                interviewWindow.postMessage(message, baseURL)
+
+                // 等待演示完成
+                await new Promise(resolve => setTimeout(resolve, type === 'quick' ? 5000 : 10000))
+
+                showStatus(`✅ ${type === 'quick' ? '快速' : '完整'}演示已完成！请查看面试页面的结果。`, 'success')
+            } catch (error) {
+                showStatus(`❌ 演示执行失败: ${error.message}`, 'error')
+                console.error('演示错误:', error)
+            }
+        }
+
+        function resetDemo() {
+            showStatus('🔄 正在重置演示状态...', 'loading')
+
+            const message = {
+                type: 'resetDemo',
+                timestamp: Date.now()
+            }
+
+            if (window.opener) {
+                window.opener.postMessage(message, baseURL)
+            }
+
+            // 广播给所有打开的面试页面
+            const windows = window.open(interviewPageURL, 'interviewWindow')
+            if (windows) {
+                windows.postMessage(message, baseURL)
+            }
+
+            setTimeout(() => {
+                showStatus('✅ 演示已重置', 'success')
+            }, 500)
+        }
+
+        // 监听来自面试页面的消息
+        window.addEventListener('message', (event) => {
+            if (event.origin !== baseURL) return
+
+            if (event.data.type === 'demoComplete') {
+                showStatus('✅ 演示完成！', 'success')
+            } else if (event.data.type === 'demoError') {
+                showStatus(`❌ 演示出错: ${event.data.message}`, 'error')
+            }
+        })
+
+        // 页面加载完成后的提示
+        window.addEventListener('load', () => {
+            showStatus('✅ 演示工具已就绪，点击按钮开始演示', 'success')
+        })
+    </script>
+</body>
+</html>

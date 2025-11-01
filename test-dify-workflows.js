@@ -10,25 +10,36 @@ const http = require('http');
 const WORKFLOWS = {
   workflow1: {
     name: '工作流1 - 生成问题',
-    apiKey: 'app-dTgOwbWnQQ6rZzTRoPUK7Lz0',
-    apiUrl: 'https://api.dify.ai/v1/workflows/run'
+    apiKey: 'app-hHvF3glxCRhtfkyX7Pg9i9kb',
+    workflowId: '560EB9DDSwOFc8As',
+    apiUrl: 'https://api.dify.ai/v1/workflows/560EB9DDSwOFc8As/run'
   },
   workflow2: {
     name: '工作流2 - 生成答案',
-    apiKey: 'app-tl7iWaJSNIam5tA3lAYf2zL8',
-    apiUrl: 'https://api.dify.ai/v1/workflows/run'
+    apiKey: 'app-TEw1j6rBUw0ZHHlTdJvJFfPB',
+    workflowId: '5X6RBtTFMCZr0r4R',
+    apiUrl: 'https://api.dify.ai/v1/workflows/5X6RBtTFMCZr0r4R/run'
   },
   workflow3: {
     name: '工作流3 - 评分',
-    apiKey: 'app-wYqlMORyoUpBkW32BAcRe9lc',
-    apiUrl: 'https://api.dify.ai/v1/workflows/run'
+    apiKey: 'app-Omq7PcI6P5g1CfyDnT8CNiua',
+    workflowId: '7C4guOpDk2GfmIFy',
+    apiUrl: 'https://api.dify.ai/v1/workflows/7C4guOpDk2GfmIFy/run'
   }
 };
 
 // 外部存储服务配置
-const STORAGE_API = {
-  baseUrl: 'http://localhost:8080',
-  apiKey: 'ak_live_a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0'
+// 注意：工作流1使用 chestier-unremittently-willis.ngrok-free.dev
+// 工作流2和3使用 phrenologic-preprandial-jesica.ngrok-free.dev
+const STORAGE_APIS = {
+  workflow1: {
+    baseUrl: 'https://chestier-unremittently-willis.ngrok-free.dev',
+    apiKey: 'ak_live_a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0'
+  },
+  workflow23: {
+    baseUrl: 'https://phrenologic-preprandial-jesica.ngrok-free.dev',
+    apiKey: 'ak_live_a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0'
+  }
 };
 
 // 通用HTTP请求函数

@@ -132,7 +132,7 @@
 
       <div class="stat-item">
         <div class="stat-icon">
-          <el-icon :color="'#409eff'"><Gem /></el-icon>
+          <el-icon :color="'#409eff'"><Trophy /></el-icon>
         </div>
         <div class="stat-content">
           <span class="stat-value">{{ rarityStats.rare || 0 }}</span>
@@ -157,7 +157,7 @@
 import { computed } from 'vue'
 import {
   Trophy, Lock, TrendCharts,
-  Medal, Star, CircleCheck, GoldMedal, Gem
+  Medal, Star, CircleCheck, GoldMedal
 } from '@element-plus/icons-vue'
 
 const iconRegistry = {
@@ -167,8 +167,7 @@ const iconRegistry = {
   Medal,
   Star,
   CircleCheck,
-  GoldMedal,
-  Gem
+  GoldMedal
 }
 
 const resolveIcon = (iconName, fallback) => {
@@ -520,3 +519,6 @@ const handleStatsClick = (type) => {
   }
 }
 </style>
+
+
+

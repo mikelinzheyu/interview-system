@@ -1,0 +1,21 @@
+{
+  "nodes": [
+    { "id": "cs", "label": "计算机科学", "type": "topic", "link": "/questions/computer-science" },
+    { "id": "cap:ds", "label": "数据结构", "type": "capability" },
+    { "id": "cap:os", "label": "操作系统", "type": "capability" },
+    { "id": "cap:net", "label": "计算机网络", "type": "capability" },
+    { "id": "cap:db", "label": "数据库", "type": "capability" },
+    { "id": "cap:algo", "label": "算法设计", "type": "capability" },
+    { "id": "course:ds101", "label": "数据结构基础", "type": "course", "link": "/learning-paths/ds101" },
+    { "id": "q:stack", "label": "栈与队列", "type": "question", "link": "/questions/computer-science?tag=stack" }
+  ],
+  "edges": [
+    { "source": "cs", "target": "cap:ds", "relation": "covers" },
+    { "source": "cs", "target": "cap:os", "relation": "covers" },
+    { "source": "cs", "target": "cap:net", "relation": "covers" },
+    { "source": "cs", "target": "cap:db", "relation": "covers" },
+    { "source": "cs", "target": "cap:algo", "relation": "covers" },
+    { "source": "cap:ds", "target": "course:ds101", "relation": "teaches" },
+    { "source": "cap:ds", "target": "q:stack", "relation": "practice" }
+  ]
+}

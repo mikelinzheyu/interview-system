@@ -1,0 +1,16 @@
+{
+  "nodes": [
+    { "id": "med", "label": "医学", "type": "domain" },
+    { "id": "anat", "label": "解剖学" },
+    { "id": "phys", "label": "生理学" },
+    { "id": "diag", "label": "诊断学" },
+    { "id": "int", "label": "内科学" }
+  ],
+  "edges": [
+    { "source": "med", "target": "anat" },
+    { "source": "med", "target": "phys" },
+    { "source": "med", "target": "diag" },
+    { "source": "med", "target": "int" }
+  ]
+}
+

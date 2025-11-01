@@ -2,7 +2,47 @@
 <template>
   <div class="message-panel">
     <header class="message-panel__header">
+      <div class="message-panel__connection-status">
+        <div class="message-panel__connection-indicator" :class="`is-${connectionStatus}`">
+          <el-icon v-if="connectionStatus === 'connected'" class="message-panel__status-icon is-connected">
+            <CircleCheckFilled />
+          </el-icon>
+          <el-icon v-else-if="connectionStatus === 'connecting'" class="message-panel__status-icon is-connecting">
+            <Loading />
+          </el-icon>
+          <el-icon v-else-if="connectionStatus === 'reconnecting'" class="message-panel__status-icon is-reconnecting">
+            <RefreshRight />
+          </el-icon>
+          <el-icon v-else class="message-panel__status-icon is-disconnected">
+            <CircleCloseFilled />
+          </el-icon>
+          <span class="message-panel__connection-text">{{ connectionStatusText }}</span>
+        </div>
+      </div>
       <slot name="header" />
+      <!-- Phase 3: Message Search -->
+      <div class="message-panel__search-bar" v-if="showSearchBar">
+        <el-input
+          v-model="searchQuery"
+          placeholder="搜索消息... (Ctrl+F)"
+          size="small"
+          clearable
+          @keyup.enter="handleSearch"
+          class="message-panel__search-input"
+        >
+          <template #prefix>
+            <el-icon><Search /></el-icon>
+          </template>
+        </el-input>
+        <div v-if="searchResults.length" class="message-panel__search-stats">
+          {{ currentSearchIndex + 1 }} / {{ searchResults.length }}
+        </div>
+        <el-button-group>
+          <el-button size="small" icon="ArrowUp" @click="handlePreviousResult" :disabled="!searchResults.length" />
+          <el-button size="small" icon="ArrowDown" @click="handleNextResult" :disabled="!searchResults.length" />
+        </el-button-group>
+        <el-button size="small" @click="toggleSearchBar">关闭</el-button>
+      </div>
     </header>
 
     <div ref="scrollContainerRef" class="message-panel__scroll" @scroll="handleScroll">
@@ -57,8 +97,10 @@
                 <template v-else>
                   <div
                     class="message-panel__item"
-                    :class="{ 'message-panel__item--own': item.message.isOwn }"
+                    :class="{ 'message-panel__item--own': item.message.isOwn, 'message-panel__item--hovered': hoveredMessageId === item.message.id }"
                     @contextmenu.prevent="handleMessageContextMenu($event, item.message)"
+                    @mouseenter="hoveredMessageId = item.message.id"
+                    @mouseleave="hoveredMessageId = null"
                   >
                     <el-avatar
                       v-if="!item.message.isOwn"
@@ -149,8 +191,9 @@
                       </div>
 
                       <div
-                        v-if="item.message.isOwn"
+                        v-if="hoveredMessageId === item.message.id || item.message.status === 'failed'"
                         class="message-panel__actions"
+                        :class="{ 'message-panel__actions--hover': hoveredMessageId === item.message.id }"
                       >
                         <el-button
                           v-if="item.message.status === 'failed'"
@@ -159,18 +202,40 @@
                           size="small"
                           :loading="isActionLoading(item.message.id, 'resend')"
                           @click.stop="handleResend(item.message)"
+                          title="Resend"
                         >
-                          重新发送
+                          Resend
                         </el-button>
                         <el-button
-                          v-else-if="allowRecall && !item.message.isRecalled && ['delivered', 'read'].includes(item.message.status)"
+                          v-if="hoveredMessageId === item.message.id && item.message.contentType === 'text'"
+                          type="info"
+                          link
+                          size="small"
+                          @click.stop="handleCopyMessage(item.message)"
+                          title="Copy"
+                        >
+                          Copy
+                        </el-button>
+                        <el-button
+                          v-if="hoveredMessageId === item.message.id"
+                          type="info"
+                          link
+                          size="small"
+                          @click.stop="handleReplyMessage(item.message)"
+                          title="Reply"
+                        >
+                          Reply
+                        </el-button>
+                        <el-button
+                          v-if="allowRecall && !item.message.isRecalled && ['delivered', 'read'].includes(item.message.status) && hoveredMessageId === item.message.id && item.message.isOwn"
                           type="danger"
                           link
                           size="small"
                           :loading="isActionLoading(item.message.id, 'recall')"
                           @click.stop="handleRecall(item.message)"
+                          title="Recall"
                         >
-                          撤回
+                          Recall
                         </el-button>
                       </div>
                     </div>
@@ -238,7 +303,7 @@
 import dayjs from 'dayjs'
 import { computed, nextTick, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
 import { ElMessage, ElNotification } from 'element-plus'
-import { Loading, Document, CircleClose, ArrowDown, ArrowRight, Check, Right, Close, DocumentCopy, ChatLineRound, Share, Delete, DeleteFilled } from '@element-plus/icons-vue'
+import { Loading, Document, CircleClose, ArrowDown, ArrowRight, Check, Right, Close, DocumentCopy, ChatLineRound, Share, Delete, DeleteFilled, Search, CircleCheckFilled, CircleCloseFilled, RefreshRight } from '@element-plus/icons-vue'
 
 const DEFAULT_ROW_HEIGHT = 116
 const DIVIDER_ROW_HEIGHT = 56
@@ -282,6 +347,18 @@ const props = defineProps({
 
 const emit = defineEmits(['load-previous', 'resend-message', 'recall-message', 'toggle-day'])
 
+// Connection status for real-time chat
+const connectionStatus = ref('disconnected')
+const connectionStatusText = computed(() => {
+  const statusMap = {
+    connected: '已连接',
+    connecting: '连接中...',
+    reconnecting: '重新连接中...',
+    disconnected: '已断开'
+  }
+  return statusMap[connectionStatus.value] || '未知状态'
+})
+
 const scrollContainerRef = ref(null)
 const spacerRef = ref(null)
 
@@ -303,6 +380,127 @@ let resizeObserver = null
 const visibleRange = reactive({ start: 0, end: 0 })
 
 const collapsedDays = reactive({})
+
+const hoveredMessageId = ref(null)
+
+// Phase 3: Message search functionality
+const showSearchBar = ref(false)
+const searchQuery = ref('')
+const searchResults = ref([])
+const currentSearchIndex = ref(0)
+const searchHistory = ref([])
+
+// Load search history from localStorage
+function loadSearchHistory() {
+  try {
+    const stored = localStorage.getItem('chat_search_history')
+    if (stored) {
+      searchHistory.value = JSON.parse(stored).slice(0, 10)
+    }
+  } catch (e) {
+    console.error('Failed to load search history:', e)
+  }
+}
+
+// Save search query to history
+function saveSearchQuery(query) {
+  if (!query || !query.trim()) return
+  try {
+    const filtered = searchHistory.value.filter(q => q !== query)
+    filtered.unshift(query)
+    searchHistory.value = filtered.slice(0, 10)
+    localStorage.setItem('chat_search_history', JSON.stringify(searchHistory.value))
+  } catch (e) {
+    console.error('Failed to save search query:', e)
+  }
+}
+
+// Toggle search bar visibility
+function toggleSearchBar() {
+  showSearchBar.value = !showSearchBar.value
+  if (!showSearchBar.value) {
+    searchQuery.value = ''
+    searchResults.value = []
+    currentSearchIndex.value = 0
+  }
+}
+
+// Perform message search
+function handleSearch() {
+  if (!searchQuery.value.trim()) {
+    searchResults.value = []
+    return
+  }
+
+  saveSearchQuery(searchQuery.value)
+
+  const query = searchQuery.value.toLowerCase()
+  searchResults.value = sortedMessages.value
+    .map((msg, index) => ({ message: msg, originalIndex: index }))
+    .filter(item => {
+      if (item.message.isRecalled) return false
+      if (item.message.contentType === 'text' && item.message.content?.toLowerCase().includes(query)) return true
+      if (item.message.senderName?.toLowerCase().includes(query)) return true
+      return false
+    })
+    .map(item => item.originalIndex)
+
+  currentSearchIndex.value = 0
+
+  if (searchResults.value.length > 0) {
+    scrollToMessage(searchResults.value[0])
+    ElMessage.success(`找到 ${searchResults.value.length} 条消息`)
+  } else {
+    ElMessage.info('未找到匹配的消息')
+  }
+}
+
+// Navigate to next search result
+function handleNextResult() {
+  if (!searchResults.value.length) return
+  currentSearchIndex.value = (currentSearchIndex.value + 1) % searchResults.value.length
+  scrollToMessage(searchResults.value[currentSearchIndex.value])
+}
+
+// Navigate to previous search result
+function handlePreviousResult() {
+  if (!searchResults.value.length) return
+  currentSearchIndex.value = (currentSearchIndex.value - 1 + searchResults.value.length) % searchResults.value.length
+  scrollToMessage(searchResults.value[currentSearchIndex.value])
+}
+
+// Scroll to a specific message
+function scrollToMessage(messageIndex) {
+  nextTick(() => {
+    const rows = spacerRef.value?.querySelectorAll('.message-panel__row')
+    if (rows && rows[messageIndex]) {
+      rows[messageIndex].scrollIntoView({ behavior: 'smooth', block: 'center' })
+    }
+  })
+}
+
+// Initialize search history on component mount
+loadSearchHistory()
+
+// Ctrl+F keyboard shortcut
+function handleKeydown(event) {
+  if ((event.ctrlKey || event.metaKey) && event.key === 'f') {
+    event.preventDefault()
+    showSearchBar.value = true
+    nextTick(() => {
+      const input = document.querySelector('.message-panel__search-input input')
+      input?.focus()
+    })
+  }
+}
+
+onMounted(() => {
+  document.addEventListener('keydown', handleKeydown)
+})
+
+onBeforeUnmount(() => {
+  document.removeEventListener('keydown', handleKeydown)
+})
 
 const sortedMessages = computed(() => {
   return [...props.messages].sort((a, b) => {
@@ -478,6 +676,20 @@ function isActionLoading(messageId, type) {
 function handleResend(message) {
   if (!message?.id && !message?.tempId) return
   emit('resend-message', message)
+}
+
+function handleCopyMessage(message) {
+  if (!message?.content) return
+  navigator.clipboard.writeText(message.content).then(() => {
+    ElMessage.success('Copied to clipboard')
+  }).catch(() => {
+    ElMessage.error('Failed to copy')
+  })
+}
+
+function handleReplyMessage(message) {
+  // Placeholder for reply functionality
+  ElMessage.info('Reply to: ' + message.senderName)
 }
 
 function handleRecall(message) {
@@ -785,14 +997,73 @@ function copyToClipboard() {
 }
 
 .message-panel__header {
-  padding: 20px 28px 12px;
+  padding: 12px 28px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.message-panel__connection-status {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  order: -1;
+}
+
+.message-panel__connection-indicator {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.message-panel__connection-indicator.is-connected {
+  background: rgba(103, 194, 58, 0.1);
+  color: #67c23a;
+}
+
+.message-panel__connection-indicator.is-connecting {
+  background: rgba(230, 162, 60, 0.1);
+  color: #e6a23c;
+}
+
+.message-panel__connection-indicator.is-reconnecting {
+  background: rgba(240, 144, 12, 0.1);
+  color: #f09008;
+}
+
+.message-panel__connection-indicator.is-disconnected {
+  background: rgba(255, 99, 114, 0.1);
+  color: #ff6372;
+}
+
+.message-panel__status-icon {
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+}
+
+.message-panel__status-icon.is-connecting,
+.message-panel__status-icon.is-reconnecting {
+  animation: spin 1s linear infinite;
+}
+
+.message-panel__connection-text {
+  font-size: 12px;
 }
 
 .message-panel__scroll {
   flex: 1;
   overflow-y: auto;
-  padding: 16px 24px 24px;
+  padding: 12px 20px 16px;
   position: relative;
 }
 
@@ -838,12 +1109,14 @@ function copyToClipboard() {
   box-shadow: 0 6px 18px rgba(79, 118, 255, 0.12);
   cursor: pointer;
   user-select: none;
-  transition: background 0.2s ease, color 0.2s ease;
+  transition: all 0.2s ease;
 }
 
 .message-panel__divider:hover {
   background: rgba(92, 106, 240, 0.15);
   color: #34406a;
+  transform: scale(1.02);
+  box-shadow: 0 8px 20px rgba(79, 118, 255, 0.15);
 }
 
 .message-panel__divider.is-collapsed {
@@ -855,6 +1128,11 @@ function copyToClipboard() {
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: transform 0.2s ease;
+}
+
+.message-panel__divider.is-collapsed .message-panel__divider-icon {
+  transform: rotate(-90deg);
 }
 
 .message-panel__divider-label {
@@ -872,6 +1150,13 @@ function copyToClipboard() {
   align-items: flex-start;
   max-width: 80%;
   margin: 18px 0;
+  padding: 8px 12px;
+  border-radius: 12px;
+  transition: background-color 0.2s ease;
+}
+
+.message-panel__item:hover {
+  background-color: rgba(92, 106, 240, 0.06);
 }
 
 .message-panel__item--own {
@@ -923,8 +1208,8 @@ function copyToClipboard() {
 }
 
 .message-panel__item:hover .message-panel__bubble {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
-  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
 }
 
 .message-panel__item--own .message-panel__bubble {
@@ -935,7 +1220,8 @@ function copyToClipboard() {
 }
 
 .message-panel__item--own:hover .message-panel__bubble {
-  box-shadow: 0 6px 16px rgba(92, 106, 240, 0.35);
+  box-shadow: 0 8px 20px rgba(92, 106, 240, 0.4);
+  transform: translateY(-2px);
 }
 
 .message-panel__bubble--pending {
@@ -1082,8 +1368,24 @@ function copyToClipboard() {
 
 .message-panel__actions {
   display: flex;
-  gap: 12px;
-  margin-top: 4px;
+  gap: 8px;
+  margin-top: 6px;
+  opacity: 0;
+  transform: translateY(-4px);
+  transition: all 0.2s ease;
+  pointer-events: none;
+}
+
+.message-panel__actions--hover {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.message-panel__item--hovered .message-panel__actions {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
 }
 
 .message-panel__item--own .message-panel__actions {
@@ -1127,6 +1429,59 @@ function copyToClipboard() {
   }
 }
 
+/* Phase 3: Message search styles */
+.message-panel__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 12px 20px;
+  border-bottom: 1px solid rgba(224, 229, 255, 0.5);
+  background: rgba(255, 255, 255, 0.8);
+}
+
+.message-panel__search-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 8px 12px;
+  background: rgba(92, 106, 240, 0.06);
+  border: 1px solid rgba(92, 106, 240, 0.2);
+  border-radius: 8px;
+  animation: slideDown 0.2s ease;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.message-panel__search-input {
+  flex: 1;
+  min-width: 200px;
+}
+
+.message-panel__search-input :deep(.el-input__inner) {
+  border-radius: 6px;
+  font-size: 13px;
+  padding: 6px 10px;
+}
+
+.message-panel__search-stats {
+  font-size: 12px;
+  color: #a0a5bd;
+  white-space: nowrap;
+  padding: 0 8px;
+}
+
 @media (max-width: 960px) {
   .message-panel__scroll {
     padding: 12px 16px 20px;
@@ -1134,6 +1489,10 @@ function copyToClipboard() {
 
   .message-panel__item {
     max-width: 90%;
+  }
+
+  .message-panel__search-input {
+    min-width: 120px;
   }
 }
 </style>

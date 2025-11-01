@@ -35,6 +35,7 @@ class SocketService {
     this.socket = null
     this.socketUrl = DEFAULT_WS_URL
     this.connected = false
+    this.connecting = false
     this.reconnectAttempts = 0
     this.maxReconnectAttempts = 5
     this.reconnectDelay = 3000 // 3秒
@@ -47,13 +48,14 @@ class SocketService {
    * @param {string} url - WebSocket 服务器地址
    */
   connect(token, url) {
-    if (this.socket && this.connected) {
-      console.log('[Socket] 已经连接，无需重复连接')
+    if (this.connected || this.connecting || (this.socket && this.socket.connected)) {
+      console.log('[Socket] 已在连接中或已连接，跳过重复连接')
       return
     }
 
     const targetUrl = resolveWebSocketUrl(url)
     this.socketUrl = targetUrl
+    this.connecting = true
 
     console.log('[Socket] 正在连接到 WebSocket 服务器...', targetUrl)
 
@@ -70,6 +72,7 @@ class SocketService {
     // 连接成功
     this.socket.on('connect', () => {
       this.connected = true
+      this.connecting = false
       this.reconnectAttempts = 0
       console.log('[Socket] WebSocket 已连接', this.socket.id, '->', this.socketUrl)
 
@@ -88,6 +91,7 @@ class SocketService {
     this.socket.on('connect_error', (error) => {
       console.error('[Socket] 连接错误 ->', this.socketUrl, error)
       this.connected = false
+      this.connecting = false
 
       if (this.reconnectAttempts < this.maxReconnectAttempts) {
         this.reconnectAttempts++
@@ -105,6 +109,7 @@ class SocketService {
     // 断开连接
     this.socket.on('disconnect', (reason) => {
       this.connected = false
+      this.connecting = false
       console.log('[Socket] 连接已断开:', reason, '->', this.socketUrl)
 
       if (reason === 'io server disconnect') {

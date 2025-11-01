@@ -19,22 +19,25 @@ const CURRENT_USER_ID = 1
 
 // ============ Dify API 配置 ============
 const DIFY_CONFIG = {
-  apiKey: process.env.DIFY_API_KEY || 'app-vZlc0w5Dio2gnrTkdlblcPXG',
+  apiKey: process.env.DIFY_API_KEY || 'app-WhLg4w9QxdY7vUqbWbYWBWYi',
   baseURL: process.env.DIFY_API_BASE_URL || 'https://api.dify.ai/v1',
-  workflowURL: process.env.DIFY_WORKFLOW_URL || 'https://udify.app/workflow/u4Pzho5oyj5HIOn8',
+  workflowURL: process.env.DIFY_WORKFLOW_URL || 'https://api.dify.ai/v1/workflows/run',
   // 具体工作流配置（三个工作流，每个有独立的API Key）
   workflows: {
     generate_questions: {
-      id: '560EB9DDSwOFc8As',
-      apiKey: 'app-hHvF3glxCRhtfkyX7Pg9i9kb'
+      id: process.env.DIFY_WORKFLOW_1_ID || '560EB9DDSwOFc8As',
+      apiKey: process.env.DIFY_API_KEY || 'app-WhLg4w9QxdY7vUqbWbYWBWYi',
+      url: process.env.DIFY_WORKFLOW_1_URL || 'https://udify.app/workflow/560EB9DDSwOFc8As'
     },
     generate_answer: {
-      id: '5X6RBtTFMCZr0r4R',
-      apiKey: 'app-TEw1j6rBUw0ZHHlTdJvJFfPB'
+      id: process.env.DIFY_WORKFLOW_2_ID || '5X6RBtTFMCZr0r4R',
+      apiKey: process.env.DIFY_WORKFLOW_2_API_KEY || 'app-TEw1j6rBUw0ZHHlTdJvJFfPB',
+      url: process.env.DIFY_WORKFLOW_2_URL || 'https://udify.app/workflow/5X6RBtTFMCZr0r4R'
     },
     score_answer: {
-      id: '7C4guOpDk2GfmIFy',
-      apiKey: 'app-Omq7PcI6P5g1CfyDnT8CNiua'
+      id: process.env.DIFY_WORKFLOW_3_ID || '7C4guOpDk2GfmIFy',
+      apiKey: process.env.DIFY_WORKFLOW_3_API_KEY || 'app-Omq7PcI6P5g1CfyDnT8CNiua',
+      url: process.env.DIFY_WORKFLOW_3_URL || 'https://udify.app/workflow/7C4guOpDk2GfmIFy'
     }
   }
 }
@@ -112,6 +115,9 @@ const mockData = {
   mediaIdCounter: 1,
   mediaLibrary: [],
   mediaLookup: new Map(),
+  // 错题集（内存模拟）
+  wrongAnswers: [],
+  wrongAnswerReviewLogs: [],
   users: [
     {
       id: 1,
@@ -2567,6 +2573,71 @@ function parseQuestions(questionsData) {
   }
 }
 
+// ========== Wrong Answers helpers ==========
+function ensureWrongAnswersSeeded() {
+  if (!Array.isArray(mockData.wrongAnswers)) mockData.wrongAnswers = []
+  if (mockData.wrongAnswers.length > 0) return
+
+  const baseQuestions = Array.isArray(mockData.questions) && mockData.questions.length
+    ? mockData.questions.slice(0, 8)
+    : [
+        { id: 101, title: 'Java 内存模型可见性', content: 'volatile 保证了什么？', difficulty: 'medium', domainId: 1, knowledgePoints: ['JMM','并发'] },
+        { id: 102, title: 'HTTP 状态码', content: '502 与 504 区别？', difficulty: 'easy', domainId: 1, knowledgePoints: ['HTTP','网关'] },
+        { id: 103, title: 'MySQL 索引', content: '覆盖索引的原理？', difficulty: 'hard', domainId: 1, knowledgePoints: ['索引','存储引擎'] }
+      ]
+
+  mockData.wrongAnswers = baseQuestions.map((q, idx) => ({
+    id: idx + 1,
+    questionId: q.id,
+    questionTitle: q.title || `Question ${idx + 1}`,
+    questionContent: q.content || 'Content',
+    knowledgePoints: q.knowledgePoints || ['基础'],
+    difficulty: q.difficulty || 'medium',
+    source: 'ai_interview',
+    reviewStatus: idx % 3 === 0 ? 'mastered' : 'reviewing',
+    masteryLevel: idx % 3 === 0 ? '已掌握' : '部分掌握',
+    boxLevel: idx % 3 === 0 ? 4 : 2,
+    nextReviewAt: new Date(Date.now() + (idx % 3 === 0 ? 3 : -1) * 24 * 3600 * 1000).toISOString(),
+    lastReviewedAt: null,
+    wrongCount: Math.floor(Math.random() * 3) + 1,
+    correctCount: Math.floor(Math.random() * 2),
+    userNotes: '',
+    createdAt: new Date(Date.now() - (idx + 1) * 86400000).toISOString(),
+    updatedAt: new Date().toISOString()
+  }))
+}
+
+// Review scheduling (Leitner-like)
+const REVIEW_INTERVALS_DAYS = [0, 1, 2, 4, 7, 15] // index = boxLevel (1..5)
+
+function clamp(n, min, max) { return Math.max(min, Math.min(max, n)) }
+
+function deriveMastery(boxLevel) {
+  if (boxLevel >= 4) return '已掌握'
+  if (boxLevel >= 2) return '部分掌握'
+  return '未掌握'
+}
+
+function scheduleOnResult(record, result) {
+  const now = Date.now()
+  const currentBox = Number(record.boxLevel || 1)
+  let nextBox = currentBox
+
+  if (result === 'pass') nextBox = clamp(currentBox + 1, 1, 5)
+  else if (result === 'fail') nextBox = 1
+  else if (result === 'doubt') nextBox = clamp(currentBox, 1, 5)
+
+  const days = REVIEW_INTERVALS_DAYS[nextBox] || 1
+  const next = new Date(now + days * 24 * 3600 * 1000)
+
+  record.boxLevel = nextBox
+  record.masteryLevel = deriveMastery(nextBox)
+  record.nextReviewAt = next.toISOString()
+  record.lastReviewedAt = new Date(now).toISOString()
+  record.reviewStatus = record.masteryLevel === '已掌握' ? 'mastered' : 'reviewing'
+  record.updatedAt = record.lastReviewedAt
+}
+
 const routes = {
   // 健康检查
   'GET:/api/actuator/health': (req, res) => {
@@ -2575,6 +2646,198 @@ const routes = {
 
   'GET:/api/health': (req, res) => {
     sendResponse(res, 200, mockData.health)
+  },
+
+  // 兼容：用户进度（示例数据）
+  'GET:/api/user/progress': (req, res) => {
+    try {
+      const query = url.parse(req.url, true).query
+      const domain = query.domain || 'general'
+      const completed = Math.floor(Math.random() * 60) + 20
+      const total = 100
+      const progressRate = Number((completed / total).toFixed(2))
+      const data = {
+        domain,
+        completed,
+        total,
+        progressRate,
+        recentActivity: [
+          { date: new Date(Date.now() - 86400000 * 1).toISOString(), count: 5 },
+          { date: new Date(Date.now() - 86400000 * 2).toISOString(), count: 7 },
+          { date: new Date(Date.now() - 86400000 * 3).toISOString(), count: 4 }
+        ]
+      }
+      sendResponse(res, 200, data)
+    } catch (e) {
+      sendResponse(res, 500, null, `progress 生成失败: ${e.message}`)
+    }
+  },
+
+  // 兼容：推荐领域（从现有 domains 取前 N 个）
+  'GET:/api/domains/recommended': (req, res) => {
+    try {
+      const top = (mockData.domains || []).filter(d => d.active).slice(0, 6)
+      sendResponse(res, 200, top)
+    } catch (e) {
+      sendResponse(res, 500, null, `recommended 生成失败: ${e.message}`)
+    }
+  },
+
+  // 会话管理 API
+  'POST:/api/sessions/save': async (req, res) => {
+    try {
+      let body = ''
+      req.on('data', chunk => { body += chunk.toString() })
+      req.on('end', async () => {
+        const data = JSON.parse(body)
+        const { session_id, question_id, answer } = data
+
+        if (!session_id || !question_id || !answer) {
+          sendResponse(res, 400, null, '缺少必要参数: session_id, question_id, answer')
+          return
+        }
+
+        try {
+          // 从 Redis 读取会话数据
+          const sessionData = await redisClient.loadSession(session_id)
+
+          if (!sessionData) {
+            sendResponse(res, 404, null, `会话 ${session_id} 不存在`)
+            return
+          }
+
+          // 查找并更新问题的答案
+          let found = false
+          if (sessionData.questions && Array.isArray(sessionData.questions)) {
+            for (const q of sessionData.questions) {
+              if (q.id === question_id) {
+                q.answer = answer
+                q.hasAnswer = true
+                found = true
+                break
+              }
+            }
+          }
+
+          if (!found) {
+            sendResponse(res, 404, null, `问题 ${question_id} 不存在`)
+            return
+          }
+
+          // 保存更新后的会话数据回 Redis
+          await redisClient.saveSession(session_id, sessionData)
+
+          sendResponse(res, 200, { status: 'success' }, '答案保存成功')
+        } catch (error) {
+          console.error('Redis 操作失败:', error)
+          sendResponse(res, 500, null, `Redis 操作失败: ${error.message}`)
+        }
+      })
+    } catch (error) {
+      console.error('API 处理失败:', error)
+      sendResponse(res, 500, null, `API 处理失败: ${error.message}`)
+    }
+  },
+
+  // 获取所有会话列表 - 前端查询
+  'GET:/api/sessions': async (req, res) => {
+    try {
+      // 返回空列表，因为这是模拟服务器
+      // 在实际应用中，应该从数据库查询当前用户的所有会话
+      sendResponse(res, 200, [], '会话列表查询成功')
+    } catch (error) {
+      console.error('API 处理失败:', error)
+      sendResponse(res, 500, null, `API 处理失败: ${error.message}`)
+    }
+  },
+
+  // 加载会话数据 - workflow2、workflow3 调用
+  'GET:/api/sessions/:session_id': async (req, res) => {
+    try {
+      const parsedUrl = url.parse(req.url, true)
+      const segments = parsedUrl.pathname.split('/')
+      const session_id = segments[segments.length - 1]
+
+      if (!session_id) {
+        sendResponse(res, 400, null, '缺少会话ID参数')
+        return
+      }
+
+      try {
+        // 从 Redis 读取会话数据
+        const sessionData = await redisClient.loadSession(session_id)
+
+        if (!sessionData) {
+          sendResponse(res, 404, null, `会话 ${session_id} 不存在`)
+          return
+        }
+
+        sendResponse(res, 200, sessionData, '会话数据加载成功')
+      } catch (error) {
+        console.error('Redis 操作失败:', error)
+        sendResponse(res, 500, null, `Redis 操作失败: ${error.message}`)
+      }
+    } catch (error) {
+      console.error('API 处理失败:', error)
+      sendResponse(res, 500, null, `API 处理失败: ${error.message}`)
+    }
+  },
+
+  // 创建新的会话 - workflow1 调用
+  'POST:/api/sessions/create': async (req, res) => {
+    try {
+      let body = ''
+      req.on('data', chunk => { body += chunk.toString() })
+      req.on('end', async () => {
+        try {
+          const data = JSON.parse(body)
+          const { session_id, job_title, questions } = data
+
+          if (!session_id || !job_title) {
+            sendResponse(res, 400, null, '缺少必要参数: session_id, job_title')
+            return
+          }
+
+          if (!Array.isArray(questions) || questions.length === 0) {
+            sendResponse(res, 400, null, '缺少必要参数: questions 必须是非空数组')
+            return
+          }
+
+          try {
+            // 准备会话数据
+            const sessionData = {
+              session_id,
+              job_title,
+              questions: questions.map(q => ({
+                id: q.id,
+                text: q.text,
+                answer: q.answer || '',
+                hasAnswer: q.hasAnswer || false
+              })),
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString()
+            }
+
+            // 保存到 Redis
+            await redisClient.saveSession(session_id, sessionData)
+
+            sendResponse(res, 200, {
+              status: 'success',
+              session_id
+            }, '会话创建成功')
+          } catch (error) {
+            console.error('Redis 操作失败:', error)
+            sendResponse(res, 500, null, `Redis 操作失败: ${error.message}`)
+          }
+        } catch (parseError) {
+          console.error('JSON 解析失败:', parseError)
+          sendResponse(res, 400, null, `JSON 解析失败: ${parseError.message}`)
+        }
+      })
+    } catch (error) {
+      console.error('API 处理失败:', error)
+      sendResponse(res, 500, null, `API 处理失败: ${error.message}`)
+    }
   },
 
   // 用户相关
@@ -4971,53 +5234,131 @@ const routes = {
       body += chunk.toString()
     })
 
-    req.on('end', () => {
+    req.on('end', async () => {
       try {
         const requestData = JSON.parse(body)
-        console.log('智能问题生成请求:', requestData)
+        console.log('🎯 智能问题生成请求:', requestData)
+        console.log('📡 现在调用你的 Dify 工作流 (560EB9DDSwOFc8As)...')
 
-        // 获取随机题目作为当前题目
-        const rawQuestion = mockData.questions[Math.floor(Math.random() * mockData.questions.length)]
+        // 调用 Dify 工作流来生成真实题目
+        const difyResult = await callDifyWorkflow({
+          requestType: 'generate_questions',
+          jobTitle: requestData.position || '前端开发工程师',
+          userId: 'user-' + Date.now()
+        })
 
-        // 获取额外的题目作为选择题列表
-        const allQuestions = mockData.questions
-          .filter(q => q.id !== rawQuestion.id)
-          .slice(0, 4)
-        allQuestions.unshift(rawQuestion)
+        if (difyResult.success) {
+          console.log('✅ Dify 工作流调用成功')
 
-        // 标准化格式以匹配前端期望
-        const standardizedQuestion = {
-          questionId: rawQuestion.id,
-          question: rawQuestion.question,
-          expectedAnswer: rawQuestion.answer,
-          keywords: rawQuestion.tags || [],
-          category: rawQuestion.categoryId,
-          difficulty: rawQuestion.difficulty,
-          explanation: rawQuestion.explanation,
-          estimatedTime: rawQuestion.estimatedTime,
-          generatedBy: 'dify_workflow',
-          confidenceScore: 0.85 + Math.random() * 0.15,
-          smartGeneration: true,
-          searchSource: 'dify_rag',
-          sourceUrls: [],
-          sessionId: `session-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-          hasAnswer: true,
-          allQuestions: allQuestions.map(q => ({
-            id: q.id,
-            question: q.question,
-            difficulty: q.difficulty,
-            category: q.categoryId,
-            tags: q.tags
-          })),
-          generatedAt: new Date().toISOString(),
-          source: 'mock_smart_api',
-          algorithmVersion: 'v2.0'
+          // 从 Dify 返回的 generated_questions 中提取题目
+          let questionsFromDify = difyResult.data?.generated_questions || []
+
+          // 如果 Dify 没有返回足够的题目，用 mock 数据补充
+          if (!Array.isArray(questionsFromDify) || questionsFromDify.length === 0) {
+            console.log('⚠️ Dify 未返回题目')
+            console.log('⚠️ 原因: Dify 工作流可能未配置正确或未返回题目数据')
+            console.log('⚠️ 检查项:')
+            console.log('   1. 确保 Dify 工作流 ID 正确: 560EB9DDSwOFc8As')
+            console.log('   2. 确保 API Key 有权访问该工作流')
+            console.log('   3. 确保工作流输出字段包含 questions 或 generated_questions')
+            console.log('⚠️ 暂时使用 mock 数据补充...')
+            questionsFromDify = mockData.questions.slice(0, 5)
+          }
+
+          // 确保有5道题
+          while (questionsFromDify.length < 5) {
+            const randomQ = mockData.questions[Math.floor(Math.random() * mockData.questions.length)]
+            if (!questionsFromDify.some(q => q.id === randomQ.id)) {
+              questionsFromDify.push(randomQ)
+            }
+          }
+          questionsFromDify = questionsFromDify.slice(0, 5)
+
+          // 使用第一道题作为当前题目
+          const currentQuestion = questionsFromDify[0]
+
+          // 判断题目来源
+          const isDifyQuestions = difyResult.data?.generated_questions && difyResult.data.generated_questions.length > 0
+
+          // 标准化格式以匹配前端期望
+          const standardizedQuestion = {
+            questionId: currentQuestion.id,
+            question: currentQuestion.question,
+            expectedAnswer: currentQuestion.answer || currentQuestion.expectedAnswer,
+            keywords: currentQuestion.tags || currentQuestion.keywords || [],
+            category: currentQuestion.categoryId || currentQuestion.category,
+            difficulty: currentQuestion.difficulty,
+            explanation: currentQuestion.explanation,
+            estimatedTime: currentQuestion.estimatedTime,
+            generatedBy: isDifyQuestions ? 'dify_workflow' : 'mock_data',
+            confidenceScore: isDifyQuestions ? (0.85 + Math.random() * 0.15) : 0.5,
+            smartGeneration: true,
+            searchSource: isDifyQuestions ? 'dify_rag' : 'mock_database',
+            sourceUrls: [],
+            sessionId: difyResult.data?.session_id || `session-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+            hasAnswer: true,
+            allQuestions: questionsFromDify.map(q => ({
+              id: q.id,
+              question: q.question,
+              difficulty: q.difficulty,
+              category: q.categoryId || q.category,
+              tags: q.tags || q.keywords,
+              source: isDifyQuestions ? 'dify_workflow' : 'mock_data'
+            })),
+            generatedAt: new Date().toISOString(),
+            source: isDifyQuestions ? 'dify_workflow' : 'mock_data_fallback',
+            algorithmVersion: 'v2.0',
+            difyMetadata: difyResult.data?.metadata,
+            usingFallback: !isDifyQuestions
+          }
+
+          console.log(`🎉 成功返回 ${standardizedQuestion.allQuestions.length} 道题目`)
+          sendResponse(res, 200, standardizedQuestion, '智能问题生成成功')
+        } else {
+          // Dify 调用失败，降级到 mock 数据
+          console.warn('⚠️ Dify 工作流调用失败:', difyResult.error)
+          console.log('⚠️ 降级到 mock 数据')
+
+          const mockQuestion = mockData.questions[Math.floor(Math.random() * mockData.questions.length)]
+          const allQuestions = mockData.questions
+            .filter(q => q.id !== mockQuestion.id)
+            .slice(0, 4)
+          allQuestions.unshift(mockQuestion)
+
+          const standardizedQuestion = {
+            questionId: mockQuestion.id,
+            question: mockQuestion.question,
+            expectedAnswer: mockQuestion.answer,
+            keywords: mockQuestion.tags || [],
+            category: mockQuestion.categoryId,
+            difficulty: mockQuestion.difficulty,
+            explanation: mockQuestion.explanation,
+            estimatedTime: mockQuestion.estimatedTime,
+            generatedBy: 'mock_fallback',
+            confidenceScore: 0.7,
+            smartGeneration: false,
+            searchSource: 'local_database',
+            sourceUrls: [],
+            sessionId: `session-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+            hasAnswer: true,
+            allQuestions: allQuestions.map(q => ({
+              id: q.id,
+              question: q.question,
+              difficulty: q.difficulty,
+              category: q.categoryId,
+              tags: q.tags
+            })),
+            generatedAt: new Date().toISOString(),
+            source: 'mock_fallback',
+            algorithmVersion: 'v2.0',
+            notice: 'Dify工作流调用失败，使用本地mock数据'
+          }
+
+          sendResponse(res, 200, standardizedQuestion, '使用本地数据生成问题（Dify暂不可用）')
         }
-
-        sendResponse(res, 200, standardizedQuestion, '智能问题生成成功')
       } catch (error) {
-        console.error('智能问题生成错误:', error)
-        sendResponse(res, 400, null, '请求数据格式错误')
+        console.error('❌ 智能问题生成错误:', error)
+        sendResponse(res, 400, null, '请求处理失败: ' + error.message)
       }
     })
   },
@@ -7952,6 +8293,139 @@ const payload = { ...paginatedResult, items }
       }
     }
     sendResponse(res, 200, statistics, '获取错题统计成功')
+  },
+  // 错题管理 API - 列表
+  'GET:/api/wrong-answers': (req, res) => {
+    ensureWrongAnswersSeeded()
+    sendResponse(res, 200, mockData.wrongAnswers, '获取错题列表成功')
+  },
+  // 错题管理 API - 到期复习集合
+  'GET:/api/wrong-answers/due-for-review': (req, res) => {
+    ensureWrongAnswersSeeded()
+    const now = new Date()
+    const due = mockData.wrongAnswers.filter(item => {
+      if (!item.nextReviewAt) return true
+      try { return new Date(item.nextReviewAt) <= now } catch { return true }
+    })
+    sendResponse(res, 200, due, '获取待复习错题成功')
+  },
+  // 错题管理 API - 复习一次并调度
+  'POST:/api/wrong-answers/:id/review': async (req, res) => {
+    ensureWrongAnswersSeeded()
+    const id = Number(req.params.id)
+    const record = mockData.wrongAnswers.find(r => r.id === id)
+    if (!record) return sendResponse(res, 404, null, '记录不存在')
+
+    let body = ''
+    req.on('data', chunk => { body += chunk })
+    req.on('end', () => {
+      try {
+        const { result = 'pass', timeSpentSec = 0, notes = '' } = body ? JSON.parse(body) : {}
+        if (result === 'pass') record.correctCount = (record.correctCount || 0) + 1
+        else if (result === 'fail') record.wrongCount = (record.wrongCount || 0) + 1
+        // 'doubt' 不增减计数，仅调度
+
+        scheduleOnResult(record, result)
+
+        if (!Array.isArray(mockData.wrongAnswerReviewLogs)) mockData.wrongAnswerReviewLogs = []
+        mockData.wrongAnswerReviewLogs.push({
+          id: mockData.wrongAnswerReviewLogs.length + 1,
+          wrongAnswerId: id,
+          userId: CURRENT_USER_ID,
+          result,
+          timeSpentSec,
+          notes,
+          boxLevel: record.boxLevel,
+          masteryLevel: record.masteryLevel,
+          createdAt: new Date().toISOString()
+        })
+
+        sendResponse(res, 200, record, '复习记录已保存')
+      } catch (e) {
+        sendResponse(res, 400, null, '请求体格式错误')
+      }
+    })
+  },
+  // 错题管理 API - 标记已掌握（等价于 review: pass）
+  'PUT:/api/wrong-answers/:id/mark-mastered': async (req, res) => {
+    ensureWrongAnswersSeeded()
+    const id = Number(req.params.id)
+    const record = mockData.wrongAnswers.find(r => r.id === id)
+    if (!record) return sendResponse(res, 404, null, '记录不存在')
+    record.correctCount = (record.correctCount || 0) + 1
+    scheduleOnResult(record, 'pass')
+    sendResponse(res, 200, record, '已标记为已掌握')
+  },
+  // 错题管理 API - 标记继续复习（等价于 review: fail）
+  'PUT:/api/wrong-answers/:id/mark-reviewing': async (req, res) => {
+    ensureWrongAnswersSeeded()
+    const id = Number(req.params.id)
+    const record = mockData.wrongAnswers.find(r => r.id === id)
+    if (!record) return sendResponse(res, 404, null, '记录不存在')
+    record.wrongCount = (record.wrongCount || 0) + 1
+    scheduleOnResult(record, 'fail')
+    sendResponse(res, 200, record, '已标记为继续复习')
+  },
+  // 错题管理 API - 复习日志
+  'GET:/api/wrong-answers/review/logs': (req, res) => {
+    const parsedUrl = url.parse(req.url, true)
+    const q = parsedUrl.query || {}
+    const recordId = q.recordId ? Number(q.recordId) : null
+    const items = (mockData.wrongAnswerReviewLogs || [])
+      .filter(l => !recordId || l.wrongAnswerId === recordId)
+      .sort((a, b) => (a.createdAt > b.createdAt ? -1 : 1))
+    sendResponse(res, 200, { items, total: items.length }, '获取复习日志成功')
+  },
+  // 错题管理 API - 列表
+  'GET:/api/wrong-answers': (req, res) => {
+    ensureWrongAnswersSeeded()
+    sendResponse(res, 200, mockData.wrongAnswers, '获取错题列表成功')
+  },
+  // 错题管理 API - 到期复习集合
+  'GET:/api/wrong-answers/due-for-review': (req, res) => {
+    ensureWrongAnswersSeeded()
+    const due = mockData.wrongAnswers.filter(item => item.reviewStatus !== 'mastered')
+    sendResponse(res, 200, due, '获取待复习错题成功')
+  },
+  // 错题管理 API - 生成复习计划（将未掌握题目按当前间隔重新调度下一次复习时间）
+  'POST:/api/wrong-answers/generate-review-plan': (req, res) => {
+    ensureWrongAnswersSeeded()
+    try {
+      const now = new Date().toISOString()
+      mockData.wrongAnswers.forEach(record => {
+        if (record && record.reviewStatus !== 'mastered') {
+          // 使用“保留间隔”的方式更新下一次复习时间，不提升也不降级盒子
+          scheduleOnResult(record, 'doubt')
+          record.updatedAt = now
+        }
+      })
+      // 计划生成后，返回一个简单的确认对象，保持与前端期望一致
+      sendResponse(res, 200, { status: 'ok' }, '复习计划已生成')
+    } catch (e) {
+      sendResponse(res, 500, null, `生成复习计划失败: ${e.message}`)
+    }
+  },
+  // 错题管理 API - 标记已掌握
+  'PUT:/api/wrong-answers/:id/mark-mastered': async (req, res) => {
+    ensureWrongAnswersSeeded()
+    const id = Number(req.params.id)
+    const record = mockData.wrongAnswers.find(r => r.id === id)
+    if (!record) return sendResponse(res, 404, null, '记录不存在')
+    record.reviewStatus = 'mastered'
+    record.correctCount = (record.correctCount || 0) + 1
+    record.updatedAt = new Date().toISOString()
+    sendResponse(res, 200, record, '已标记为已掌握')
+  },
+  // 错题管理 API - 标记继续复习
+  'PUT:/api/wrong-answers/:id/mark-reviewing': async (req, res) => {
+    ensureWrongAnswersSeeded()
+    const id = Number(req.params.id)
+    const record = mockData.wrongAnswers.find(r => r.id === id)
+    if (!record) return sendResponse(res, 404, null, '记录不存在')
+    record.reviewStatus = 'reviewing'
+    record.wrongCount = (record.wrongCount || 0) + 1
+    record.updatedAt = new Date().toISOString()
+    sendResponse(res, 200, record, '已标记为继续复习')
   },
 
   // 默认404处理

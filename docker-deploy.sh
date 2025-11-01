@@ -1,93 +1,95 @@
 #!/bin/bash
-# AI面试系统 Docker 生产环境部署脚本
 
-echo "🚀 AI面试系统 Docker 生产环境部署"
-echo "=================================="
+# AI 面试系统完整 Docker 部署脚本
+set -e
 
-# 检查Docker是否可用
-if ! command -v docker &> /dev/null; then
-    echo "❌ 错误: 未找到Docker，请先安装Docker"
-    exit 1
-fi
+# 颜色定义
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m'
 
-if ! docker info &> /dev/null; then
-    echo "❌ 错误: Docker守护进程未运行，请启动Docker Desktop"
-    exit 1
-fi
+COMPOSE_FILE="docker-compose-full.yml"
 
-if ! command -v docker-compose &> /dev/null; then
-    echo "❌ 错误: 未找到docker-compose，请先安装"
-    exit 1
-fi
+print_header() {
+    echo -e "\n${BLUE}╔════════════════════════════════════════════════════════════╗${NC}"
+    echo -e "${BLUE}║${NC} $1"
+    echo -e "${BLUE}╚════════════════════════════════════════════════════════════╝${NC}\n"
+}
 
-# 创建必要的目录
-echo "📁 创建必要的目录..."
-mkdir -p logs/{frontend,backend,redis,proxy}
-mkdir -p data/redis
-mkdir -p nginx/ssl
+print_success() {
+    echo -e "${GREEN}✓${NC} $1"
+}
 
-# 检查环境文件
-if [[ ! -f .env.production ]]; then
-    echo "❌ 错误: 未找到 .env.production 文件"
-    echo "请复制 .env.example 为 .env.production 并配置必要的参数"
-    exit 1
-fi
+print_info() {
+    echo -e "${YELLOW}ℹ${NC} $1"
+}
 
-# 停止已存在的容器
-echo "🛑 停止现有容器..."
-docker-compose --env-file .env.production down --remove-orphans
+check_docker() {
+    if ! command -v docker &> /dev/null; then
+        echo "Docker 未安装"
+        exit 1
+    fi
+    print_success "Docker 已安装"
+}
 
-# 构建镜像
-echo "🔨 构建Docker镜像..."
-echo "  构建后端镜像..."
-docker-compose --env-file .env.production build --no-cache backend
+check_docker_compose() {
+    if ! command -v docker-compose &> /dev/null; then
+        echo "Docker Compose 未安装"
+        exit 1
+    fi
+    print_success "Docker Compose 已安装"
+}
 
-echo "  构建前端镜像..."
-docker-compose --env-file .env.production build --no-cache frontend
+main() {
+    case "${1:-help}" in
+        start)
+            print_header "启动所有服务"
+            print_info "检查前置条件..."
+            check_docker
+            check_docker_compose
+            print_info "构建镜像..."
+            docker-compose -f $COMPOSE_FILE build
+            print_info "启动容器..."
+            docker-compose -f $COMPOSE_FILE up -d
+            print_info "等待服务启动..."
+            sleep 60
+            print_info "验证容器状态..."
+            docker-compose -f $COMPOSE_FILE ps
+            print_success "所有服务已启动"
+            ;;
+        stop)
+            print_header "停止所有服务"
+            print_info "停止容器..."
+            docker-compose -f $COMPOSE_FILE down
+            print_success "所有服务已停止"
+            ;;
+        restart)
+            print_header "重启所有服务"
+            print_info "重启容器..."
+            docker-compose -f $COMPOSE_FILE restart
+            sleep 30
+            docker-compose -f $COMPOSE_FILE ps
+            print_success "所有服务已重启"
+            ;;
+        logs)
+            print_header "显示服务日志"
+            if [ -z "$2" ]; then
+                docker-compose -f $COMPOSE_FILE logs -f
+            else
+                docker-compose -f $COMPOSE_FILE logs -f "$2"
+            fi
+            ;;
+        status)
+            print_header "容器状态"
+            docker-compose -f $COMPOSE_FILE ps
+            ;;
+        *)
+            echo "AI 面试系统 Docker 部署脚本"
+            echo "使用: $0 [start|stop|restart|logs|status]"
+            ;;
+    esac
+}
 
-# 启动服务
-echo "🚀 启动服务..."
-docker-compose --env-file .env.production up -d
-
-# 等待服务启动
-echo "⏳ 等待服务启动..."
-sleep 30
-
-# 健康检查
-echo "🔍 进行健康检查..."
-
-# 检查后端
-echo "  检查后端服务..."
-if curl -f http://localhost:8080/api/health &> /dev/null; then
-    echo "  ✅ 后端服务正常"
-else
-    echo "  ❌ 后端服务异常"
-fi
-
-# 检查前端
-echo "  检查前端服务..."
-if curl -f http://localhost:80/health &> /dev/null; then
-    echo "  ✅ 前端服务正常"
-else
-    echo "  ❌ 前端服务异常"
-fi
-
-# 显示状态
-echo ""
-echo "📊 服务状态:"
-docker-compose --env-file .env.production ps
-
-echo ""
-echo "🎉 部署完成！"
-echo ""
-echo "📱 访问地址:"
-echo "  前端应用: http://localhost"
-echo "  API服务: http://localhost:8080"
-echo "  健康检查: http://localhost/health"
-echo ""
-echo "📝 常用命令:"
-echo "  查看日志: docker-compose --env-file .env.production logs -f"
-echo "  停止服务: docker-compose --env-file .env.production down"
-echo "  重启服务: docker-compose --env-file .env.production restart"
-echo ""
-echo "🔧 如果遇到问题，请检查日志或联系技术支持"
+main "$@"

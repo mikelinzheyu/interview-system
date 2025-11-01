@@ -27,6 +27,7 @@
           <p class="hero-description">{{ domain.description || '开始探索该领域的核心知识体系，逐步构建专业能力。' }}</p>
         </header>
 
+        <!-- 数据指标 -->
         <section class="hero-metrics">
           <article v-if="isPresent(domain.questionCount)" class="metric">
             <span class="metric-label">题目数量</span>
@@ -42,6 +43,7 @@
           </article>
         </section>
 
+        <!-- 难度标签 -->
         <section v-if="difficultyTags.length" class="difficulty-tags">
           <el-tag
             v-for="item in difficultyTags"
@@ -54,16 +56,37 @@
           </el-tag>
         </section>
 
-        <section v-if="highlights.length" class="hero-highlights">
-          <h2>核心亮点</h2>
-          <ul>
-            <li v-for="highlight in highlights" :key="highlight">{{ highlight }}</li>
+        <!-- 核心课程 -->
+        <section v-if="coreCourses.length" class="core-courses">
+          <h3 class="section-title">核心课程</h3>
+          <div class="courses-grid">
+            <div v-for="course in coreCourses" :key="course" class="course-item">
+              <span class="course-icon">📖</span>
+              <span class="course-name">{{ course }}</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- 学习路径 -->
+        <section v-if="highlights.length" class="learning-path">
+          <h3 class="section-title">学习建议</h3>
+          <ul class="path-list">
+            <li v-for="highlight in highlights" :key="highlight" class="path-item">
+              <span class="path-icon">→</span>
+              <span class="path-text">{{ highlight }}</span>
+            </li>
           </ul>
         </section>
 
-        <el-button type="primary" size="large" class="hero-cta" @click="handleEnter">
-          进入该领域
-        </el-button>
+        <!-- 操作按钮 -->
+        <div class="hero-actions">
+          <el-button type="primary" size="large" class="hero-cta" @click="handleEnter">
+            进入该领域
+          </el-button>
+          <el-button plain size="large" class="hero-secondary-cta">
+            保存收藏
+          </el-button>
+        </div>
       </div>
       <el-empty v-else description="请选择一个领域开始学习" />
     </template>
@@ -106,6 +129,13 @@ const displayIcon = computed(() => {
   }
 
   return '🎓'
+})
+
+const coreCourses = computed(() => {
+  if (props.domain?.coreCourses && Array.isArray(props.domain.coreCourses)) {
+    return props.domain.coreCourses.slice(0, 4)
+  }
+  return []
 })
 
 const difficultyTags = computed(() => {
@@ -164,14 +194,14 @@ function handleEnter() {
   background: linear-gradient(145deg, #ffffff 0%, #f1f5f9 100%);
   box-shadow: 0 25px 60px rgba(15, 23, 42, 0.12);
   overflow: hidden;
-  min-height: 560px;
+  min-height: 600px;
   display: flex;
 }
 
 .hero-content {
   display: flex;
   flex-direction: column;
-  gap: 22px;
+  gap: 24px;
   width: 100%;
 }
 
@@ -283,35 +313,111 @@ function handleEnter() {
   font-weight: 600;
 }
 
-.hero-highlights {
+/* 核心课程 */
+.core-courses {
   background: rgba(15, 23, 42, 0.03);
   border-radius: 18px;
-  padding: 18px 22px;
+  padding: 20px 24px;
 }
 
-.hero-highlights h2 {
-  margin: 0 0 12px;
+.section-title {
+  margin: 0 0 16px;
   font-size: 16px;
   font-weight: 600;
   color: #0f172a;
 }
 
-.hero-highlights ul {
-  margin: 0;
-  padding-left: 20px;
-  color: #475569;
+.courses-grid {
   display: grid;
-  gap: 6px;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
 }
 
-.hero-cta {
-  align-self: flex-start;
+.course-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 12px;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  transition: all 0.25s ease;
+}
+
+.course-item:hover {
+  background: rgba(59, 130, 246, 0.1);
+  border-color: rgba(59, 130, 246, 0.3);
+}
+
+.course-icon {
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.course-name {
+  font-size: 14px;
+  color: #0f172a;
+  font-weight: 500;
+  word-break: break-word;
+}
+
+/* 学习路径 */
+.learning-path {
+  background: linear-gradient(160deg, rgba(16, 185, 129, 0.08) 0%, rgba(45, 212, 191, 0.08) 100%);
+  border-radius: 18px;
+  padding: 20px 24px;
+  border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.path-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.path-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 10px 0;
+}
+
+.path-icon {
+  font-size: 16px;
+  color: #10b981;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.path-text {
+  font-size: 14px;
+  color: #0f172a;
+  line-height: 1.6;
+}
+
+/* 操作按钮 */
+.hero-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding-top: 8px;
+}
+
+.hero-cta,
+.hero-secondary-cta {
   padding: 12px 28px;
   font-size: 16px;
   border-radius: 14px;
+}
+
+.hero-cta {
   box-shadow: 0 16px 32px rgba(59, 130, 246, 0.25);
 }
 
+/* 骨架屏 */
 .hero-skeleton {
   width: 100%;
 }
@@ -337,6 +443,7 @@ function handleEnter() {
   margin-top: 12px;
 }
 
+/* 响应式布局 */
 @media (max-width: 1280px) {
   .domain-hero-card {
     min-height: 520px;
@@ -371,6 +478,19 @@ function handleEnter() {
 
   .hero-metrics {
     grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  }
+
+  .courses-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .hero-actions {
+    flex-direction: column;
+  }
+
+  .hero-cta,
+  .hero-secondary-cta {
+    width: 100%;
   }
 }
 </style>

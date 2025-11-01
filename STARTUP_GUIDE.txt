@@ -1,0 +1,256 @@
+╔════════════════════════════════════════════════════════════════╗
+║                  系统启动指南 - STARTUP GUIDE                    ║
+║                                                                 ║
+║                    AI 面试官系统完整启动                         ║
+╚════════════════════════════════════════════════════════════════╝
+
+【快速启动 - 三步搞定】
+
+第1步：打开3个终端窗口
+
+第2步：按顺序运行以下命令
+
+========== 终端1：启动后端 ==========
+cd D:\code7\interview-system
+node backend/mock-server.js
+
+预期输出：
+✅ WebSocket 服务器已初始化
+🔧 Dify 配置: { apiKey: 'app-wYqlMO...', baseURL: 'https://api.dify.ai/v1' }
+
+========== 终端2：启动前端 ==========
+cd D:\code7\interview-system\frontend
+npm run dev
+
+预期输出：
+  VITE v5.x.x  ready in xxx ms
+  ➜  Local:   http://localhost:5173/
+  ➜  press h to show help
+
+========== 终端3：启动 Redis（可选） ==========
+docker-compose up redis -d
+
+或者如果没有 Docker：
+# 跳过这个，系统可以不用 Redis 运行（仅会话存储受影响）
+
+========================================================
+
+【验证系统是否启动成功】
+
+✅ 后端检查
+  访问：http://localhost:3001/api/health
+  预期：返回 200 状态码
+
+✅ 前端检查
+  访问：http://localhost:5173
+  预期：看到面试系统界面
+
+✅ Dify 工作流
+  检查：已配置三个工作流
+  - Workflow1: 560EB9DDSwOFc8As ✅
+  - Workflow2: 5X6RBtTFMCZr0r4R ✅
+  - Workflow3: 7C4guOpDk2GfmIFy ✅
+
+========================================================
+
+【系统架构】
+
+┌──────────────────────┐
+│   浏览器             │
+│ http://localhost:5173 │
+└──────────────┬───────┘
+               │
+         ┌─────▼─────┐
+         │  前端     │
+         │ Vue.js    │
+         └─────┬─────┘
+               │
+         ┌─────▼─────────────────┐
+         │    后端               │
+         │  http://localhost:3001 │
+         └─────┬─────────────────┘
+               │
+         ┌─────▼──────────────────────┐
+         │  Dify Cloud                │
+         │  api.dify.ai/v1            │
+         └──────────────────────────┘
+
+========================================================
+
+【功能验证步骤】
+
+1️⃣  在浏览器中打开 http://localhost:5173
+
+2️⃣  输入职位名称
+   例如：Python后端开发工程师
+
+3️⃣  点击"生成问题"按钮
+   预期：看到 5 个面试问题
+
+4️⃣  输入答案
+   点击某个问题，输入你的答案
+
+5️⃣  点击"提交并评分"
+   预期：看到评分和反馈
+
+6️⃣  如果所有步骤都成功
+   ✅ 系统完整集成成功！
+
+========================================================
+
+【常见问题排查】
+
+Q: 后端启动失败（Port 3001 already in use）
+A: 杀死占用进程
+   powershell -Command "Stop-Process -Id <PID> -Force"
+   或重启电脑
+
+Q: 前端启动失败（找不到 node）
+A: 检查 npm 是否安装
+   npm --version
+   重新安装 Node.js if needed
+
+Q: 浏览器看不到页面
+A: 等待 30 秒，刷新浏览器（F5）
+   检查浏览器开发者工具的 Console 标签看错误
+
+Q: 无法生成问题
+A: 检查：
+   1. 后端日志中是否有错误
+   2. 浏览器开发者工具的 Network 标签
+   3. Dify 工作流是否正常运行
+
+Q: Redis 连接失败
+A: 这是可选的，系统可以不用 Redis 运行
+   如果需要持久化会话，运行：
+   docker-compose up redis -d
+
+========================================================
+
+【重要文件位置】
+
+后端：
+- D:\code7\interview-system\backend\mock-server.js (主文件)
+- 第 20-40 行：工作流配置
+- 第 2371 行：工作流调用函数
+
+前端：
+- D:\code7\interview-system\frontend\src\views\interview\AIInterviewSession.vue (主界面)
+- D:\code7\interview-system\frontend\src\services\difyService.js (Dify 服务)
+- D:\code7\interview-system\frontend\src\api\ai.js (API 客户端)
+
+========================================================
+
+【日志文件位置】
+
+后端日志：
+  在终端1中实时查看
+
+前端日志：
+  在终端2中实时查看
+  或查看浏览器开发者工具 (F12)
+
+错误排查：
+  后端：查看 backend-server.log
+  前端：按 F12 打开开发者工具 > Console 标签
+
+========================================================
+
+【快速命令参考】
+
+# 启动后端
+node D:\code7\interview-system\backend\mock-server.js
+
+# 启动前端
+cd D:\code7\interview-system\frontend && npm run dev
+
+# 测试后端 API
+curl http://localhost:3001/api/health
+
+# 查看后端日志
+tail -f D:\code7\interview-system\backend-server.log
+
+# 杀死进程
+taskkill /PID <PID> /F
+
+========================================================
+
+【Dify 工作流 ID 参考】
+
+Workflow1 - 生成问题
+  ID: 560EB9DDSwOFc8As
+  API Key: app-hHvF3glxCRhtfkyX7Pg9i9kb
+  作用：根据职位生成 5 个面试问题
+
+Workflow2 - 生成答案
+  ID: 5X6RBtTFMCZr0r4R
+  API Key: app-TEw1j6rBUw0ZHHlTdJvJFfPB
+  作用：为每个问题生成标准答案
+
+Workflow3 - 评分
+  ID: 7C4guOpDk2GfmIFy
+  API Key: app-Omq7PcI6P5g1CfyDnT8CNiua
+  作用：评分候选人的答案
+
+========================================================
+
+【性能提示】
+
+✅ 第一次运行会比较慢（10-30 秒）
+  - Dify 在处理 AI 请求
+  - 耐心等待，不要刷新
+
+✅ 之后的请求会快一些（5-10 秒）
+  - 取决于网络和 Dify 负载
+
+✅ 如果超过 2 分钟没响应
+  - 检查网络连接
+  - 检查 Dify 服务状态
+
+========================================================
+
+【成功标志】
+
+✅ 后端启动成功的标志：
+   - 看到 "WebSocket 服务器已初始化"
+   - Port 3001 正在监听
+
+✅ 前端启动成功的标志：
+   - 看到 "VITE v5.x.x ready in xxx ms"
+   - 显示 "Local: http://localhost:5173/"
+
+✅ 系统运行成功的标志：
+   - 能输入职位名称
+   - 能生成 5 个问题
+   - 能输入答案并得到评分
+
+========================================================
+
+【联系和支持】
+
+遇到问题时的检查清单：
+□ 已启动后端（Port 3001）
+□ 已启动前端（Port 5173）
+□ 已等待足够长的时间（30 秒）
+□ 刷新了浏览器
+□ 检查了终端输出中的错误
+□ 检查了浏览器控制台（F12）
+
+相关文档：
+- INTEGRATION_QUICK_REFERENCE.md （快速参考）
+- FRONTEND_BACKEND_INTEGRATION_STATUS.md （状态报告）
+- INTEGRATION_SESSION_SUMMARY.md （会话总结）
+
+========================================================
+
+【享受系统！】
+
+系统已准备就绪！
+按照上面的步骤启动，大约 5 分钟即可完全运行。
+
+祝使用愉快！ 🎉
+
+========================================================
+
+Generated: 2025-10-24
+Status: 🟢 Ready to Launch
