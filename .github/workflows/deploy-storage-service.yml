@@ -169,11 +169,15 @@ jobs:
             if timeout 3 bash -c "echo > /dev/tcp/localhost/8081" 2>/dev/null; then
               echo "✅ 服务端口已就绪，尝试 API 调用..."
               # 一旦端口就绪，再试一次 API 调用
-              if curl -s --max-time 3 -H "Authorization: Bearer $STORAGE_API_KEY" "http://localhost:8081/api/sessions" 2>/dev/null | head -c 1 | grep -q .; then
-                echo "✅ 服务健康检查通过！"
+              # 注意：GET /api/sessions 不需要API Key，但提供也不会有害
+              HTTP_STATUS=$(curl -s -w "%{http_code}" --max-time 3 -o /tmp/response.json "http://localhost:8081/api/sessions" 2>/dev/null)
+
+              if [ "$HTTP_STATUS" = "200" ]; then
+                echo "✅ 服务健康检查通过！(HTTP $HTTP_STATUS)"
                 break
+              else
+                echo "API返回状态码: $HTTP_STATUS，继续重试..."
               fi
-              # 如果 API 调用失败，继续重试（应用可能还在初始化）
             fi
 
             RETRY_COUNT=$((RETRY_COUNT + 1))
