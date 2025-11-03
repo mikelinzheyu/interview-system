@@ -61,31 +61,67 @@ jobs:
           STORAGE_API_KEY: ${{ secrets.STORAGE_API_KEY }}
           REDIS_PASSWORD: ${{ secrets.REDIS_PASSWORD }}
           DOMAIN_NAME: ${{ secrets.DOMAIN_NAME }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          echo "================================================================"
+          echo "验证部署所需的 Secrets..."
+          echo "================================================================"
+
+          # 检查关键 secrets 是否存在
+          if [ -z "$CLOUD_SERVER_USER" ]; then
+            echo "❌ 错误：CLOUD_SERVER_USER 未配置"
+            exit 1
+          fi
+
+          if [ -z "$CLOUD_SERVER_KEY" ]; then
+            echo "❌ 错误：CLOUD_SERVER_KEY 未配置"
+            exit 1
+          fi
+
+          echo "✅ Secrets 验证通过"
+          echo "正在连接到服务器: $CLOUD_SERVER_IP (用户: $CLOUD_SERVER_USER)"
+          echo "================================================================"
+
           # 创建 SSH 密钥
           mkdir -p ~/.ssh
           echo "$CLOUD_SERVER_KEY" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H $CLOUD_SERVER_IP >> ~/.ssh/known_hosts
+          ssh-keyscan -H $CLOUD_SERVER_IP >> ~/.ssh/known_hosts 2>/dev/null || true
+
+          # 测试 SSH 连接
+          echo "测试 SSH 连接..."
+          if ! ssh -i ~/.ssh/id_rsa -o ConnectTimeout=10 "$CLOUD_SERVER_USER@$CLOUD_SERVER_IP" echo "✅ SSH 连接成功"; then
+            echo "❌ SSH 连接失败"
+            exit 1
+          fi
+
+          echo ""
+          echo "================================================================"
+          echo "开始部署服务..."
+          echo "================================================================"
 
           # 部署脚本
-          ssh -i ~/.ssh/id_rsa $CLOUD_SERVER_USER@$CLOUD_SERVER_IP << 'EOF'
+          # 注意：通过 export 显式传递 GITHUB_TOKEN，保证变量在远程环境中可用
+          ssh -i ~/.ssh/id_rsa "$CLOUD_SERVER_USER@$CLOUD_SERVER_IP" "export GITHUB_TOKEN='$GITHUB_TOKEN'; bash -s" << 'REMOTE_EOF'
           set -e
 
-          # 进入项目目录
-          cd /home/interview-system || mkdir -p /home/interview-system && cd /home/interview-system
+          echo "远程服务器：准备部署环境..."
 
-          # 克隆或更新仓库
-          if [ -d ".git" ]; then
-            git pull origin main
-          else
-            git clone https://github.com/${{ github.repository }}.git .
-          fi
+          # 彻底清理部署目录 - 删除后重建
+          echo "清理并重建部署目录..."
+          rm -rf /home/interview-system
+          mkdir -p /home/interview-system
+
+          cd /home/interview-system
+
+          echo "克隆仓库..."
+          # 使用 HTTPS + GitHub Token 认证
+          git clone https://x-access-token:$GITHUB_TOKEN@github.com/${{ github.repository }}.git .
 
           # 进入存储服务目录
           cd storage-service
 
-          # 配置环境变量
+          echo "创建环境配置文件..."
           cat > .env.prod << ENDENV
           REDIS_PASSWORD=$REDIS_PASSWORD
           STORAGE_API_KEY=$STORAGE_API_KEY
@@ -97,18 +133,70 @@ jobs:
           JAVA_OPTS=-Xms512m -Xmx1024m -XX:+UseG1GC
           ENDENV
 
-          # 重新构建 Docker 镜像（使用云服务器的maven缓存）
+          echo "构建 Docker 镜像..."
           docker-compose -f docker-compose-prod.yml build
+
+          echo "清理旧的容器和网络..."
+          docker-compose -f docker-compose-prod.yml down -v || true
+
+          # 强制清理可能的孤立容器和网络
+          docker container prune -f 2>/dev/null || true
+          docker network prune -f 2>/dev/null || true
+
+          echo "等待端口释放..."
+          sleep 5
+
+          echo "启动服务..."
           docker-compose -f docker-compose-prod.yml up -d
 
-          # 等待服务启动
-          sleep 10
+          echo "服务启动中，请等待初始化..."
+          # 先等待一个固定的时间，让应用有足够时间初始化
+          sleep 15
 
-          # 健康检查
-          curl -f -H "Authorization: Bearer $STORAGE_API_KEY" http://localhost:8081/api/sessions || exit 1
+          echo "开始健康检查..."
+          RETRY_COUNT=0
+          MAX_RETRIES=20
+
+          while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
+            # 先检查容器状态
+            if ! docker-compose -f docker-compose-prod.yml ps interview-storage-service | grep -q "Up"; then
+              echo "❌ 存储服务容器已停止，部署失败"
+              docker-compose -f docker-compose-prod.yml logs --tail=50
+              exit 1
+            fi
+
+            # 检查应用端口是否在监听（最可靠的方式）
+            if timeout 3 bash -c "echo > /dev/tcp/localhost/8081" 2>/dev/null; then
+              echo "✅ 服务端口已就绪，尝试 API 调用..."
+              # 一旦端口就绪，再试一次 API 调用
+              if curl -s --max-time 3 -H "Authorization: Bearer $STORAGE_API_KEY" "http://localhost:8081/api/sessions" 2>/dev/null | head -c 1 | grep -q .; then
+                echo "✅ 服务健康检查通过！"
+                break
+              fi
+              # 如果 API 调用失败，继续重试（应用可能还在初始化）
+            fi
+
+            RETRY_COUNT=$((RETRY_COUNT + 1))
+            if [ $RETRY_COUNT -lt $MAX_RETRIES ]; then
+              echo "服务初始化中，5秒后重试... (尝试次数: $RETRY_COUNT/$MAX_RETRIES)"
+              sleep 5
+            fi
+          done
+
+          if [ $RETRY_COUNT -eq $MAX_RETRIES ]; then
+            echo "❌ 服务在限定时间内未能启动，部署失败。"
+            echo "容器日志（最后 100 行）："
+            docker-compose -f docker-compose-prod.yml logs --tail=100
+            exit 1
+          fi
 
           echo "✅ 存储服务已成功部署！"
-          EOF
+          REMOTE_EOF
+
+          echo ""
+          echo "================================================================"
+          echo "✅ 部署完成！"
+          echo "================================================================"
 
       # 6. 健康检查
       - name: Health check
