@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="question-bank-page">
     <section class="page-header">
       <div>
@@ -7,10 +7,10 @@
             v-if="currentDomain"
             link
             class="back-btn"
-            @click="backToDomainSelector"
+            @click="backToLearningHub"
           >
             <el-icon><ArrowLeft /></el-icon>
-            返回领域选择
+            返回学习中心
           </el-button>
         </div>
         <div v-if="currentDomain" class="domain-info">
@@ -18,7 +18,9 @@
           <h1>{{ currentDomain.name }} - 题库练习</h1>
         </div>
         <h1 v-else>题库练习</h1>
-        <p class="subtitle">{{ currentDomain?.description || '按岗位、难度筛选题目，系统化巩固知识点' }}</p>
+        <p class="subtitle">
+          {{ currentDomain?.description || '按岗位、难度筛选题目，系统化巩固知识点' }}
+        </p>
       </div>
       <div class="header-actions">
         <el-button :loading="store.loading" @click="refreshList">
@@ -47,9 +49,18 @@
               :props="treeProps"
               @node-click="handleCategoryClick"
             />
-            <el-empty v-else description="分类加载中" :image-size="80" />
+            <el-empty
+              v-else
+              description="分类加载中"
+              :image-size="80"
+            />
             <div class="filter-actions">
-              <el-button v-if="store.filters.categoryId" text size="small" @click="clearCategory">
+              <el-button
+                v-if="store.filters.categoryId"
+                text
+                size="small"
+                @click="clearCategory"
+              >
                 清除分类
               </el-button>
               <el-switch
@@ -64,12 +75,18 @@
             <h4>难度</h4>
             <div class="tag-group">
               <el-check-tag
-                v-for="item in difficultyOptions"
-                :key="item"
-                :checked="store.filters.difficulty.includes(item)"
-                @change="() => toggleDifficulty(item)"
+                v-for="option in difficultyOptions"
+                :key="optionKey(option)"
+                :checked="store.filters.difficulty.includes(optionKey(option))"
+                @change="() => toggleDifficulty(optionKey(option))"
               >
-                {{ difficultyLabel(item) }}
+                {{ optionLabel(option, difficultyLabel) }}
+                <span
+                  v-if="option.count"
+                  class="option-count"
+                >
+                  ({{ option.count }})
+                </span>
               </el-check-tag>
             </div>
           </div>
@@ -78,12 +95,12 @@
             <h4>题型</h4>
             <div class="tag-group">
               <el-check-tag
-                v-for="item in typeOptions"
-                :key="item"
-                :checked="store.filters.type.includes(item)"
-                @change="() => toggleType(item)"
+                v-for="option in typeOptions"
+                :key="optionKey(option)"
+                :checked="store.filters.type.includes(optionKey(option))"
+                @change="() => toggleType(optionKey(option))"
               >
-                {{ typeLabel(item) }}
+                {{ optionLabel(option, typeLabel) }}
               </el-check-tag>
             </div>
           </div>
@@ -93,11 +110,11 @@
             <div class="tag-group">
               <el-check-tag
                 v-for="tag in tagOptions"
-                :key="tag"
-                :checked="store.filters.tags.includes(tag)"
-                @change="() => toggleTag(tag)"
+                :key="optionKey(tag)"
+                :checked="store.filters.tags.includes(optionKey(tag))"
+                @change="() => toggleTag(optionKey(tag))"
               >
-                {{ tag }}
+                {{ optionLabel(tag) }}
               </el-check-tag>
             </div>
           </div>
@@ -109,7 +126,7 @@
           <div class="list-toolbar">
             <el-input
               v-model="keywordInput"
-              placeholder="搜索题目关键词，例如 闭包 / 线程池 / 算法"
+              placeholder="搜索题目关键词，例如 闭包 / 线程 / 算法"
               clearable
               @keyup.enter="handleSearch"
             >
@@ -130,6 +147,14 @@
               <el-option label="难度升序" value="difficulty" />
               <el-option label="难度降序" value="difficulty_desc" />
             </el-select>
+
+            <el-button
+              :loading="exporting"
+              @click="handleExport"
+            >
+              <el-icon><Download /></el-icon>
+              导出 CSV
+            </el-button>
           </div>
 
           <div v-if="store.hasActiveFilters" class="active-filters">
@@ -142,20 +167,20 @@
               分类 · {{ activeCategoryName }}
             </el-tag>
             <el-tag
-              v-for="item in store.filters.difficulty"
-              :key="`diff-${item}`"
+              v-for="value in store.filters.difficulty"
+              :key="`diff-${value}`"
               closable
-              @close="() => removeDifficulty(item)"
+              @close="() => removeDifficulty(value)"
             >
-              难度 · {{ difficultyLabel(item) }}
+              难度 · {{ difficultyLabel(value) }}
             </el-tag>
             <el-tag
-              v-for="item in store.filters.type"
-              :key="`type-${item}`"
+              v-for="value in store.filters.type"
+              :key="`type-${value}`"
               closable
-              @close="() => removeType(item)"
+              @close="() => removeType(value)"
             >
-              题型 · {{ typeLabel(item) }}
+              题型 · {{ typeLabel(value) }}
             </el-tag>
             <el-tag
               v-for="tag in store.filters.tags"
@@ -170,18 +195,25 @@
 
           <div v-if="store.summary" class="summary-cards">
             <div class="summary-card">
-              <p class="summary-title">共收录</p>
-              <p class="summary-value">{{ store.summary.total }} 道题目</p>
+              <p class="summary-title">题目总数</p>
+              <p class="summary-value">{{ store.summary.total }} 道</p>
             </div>
             <div class="summary-card">
               <p class="summary-title">热门标签</p>
               <p class="summary-value">
-                <span v-for="tag in store.summary.tagCloud.slice(0, 3)" :key="tag.tag">#{{ tag.tag }} </span>
+                <span
+                  v-for="tag in (store.summary.tagCloud || []).slice(0, 3)"
+                  :key="tag.tag"
+                >
+                  #{{ tag.tag }}
+                </span>
               </p>
             </div>
             <div class="summary-card">
               <p class="summary-title">预计练习时长</p>
-              <p class="summary-value">约 {{ Math.ceil((store.summary.estimatedTotalPracticeTime || 0) / 60) }} 小时</p>
+              <p class="summary-value">
+                约 {{ Math.ceil((store.summary.estimatedTotalPracticeTime || 0) / 60) }} 小时
+              </p>
             </div>
           </div>
 
@@ -247,14 +279,14 @@
       </el-col>
     </el-row>
 
-    <QuestionDetailDrawer
+<QuestionDetailDrawer
       :visible="detailVisible"
       :question="store.currentQuestion"
       :loading="store.currentQuestionLoading"
       :practice-records="store.practiceRecords"
       :recommendations="store.recommendations"
       :submitting="store.submitting"
-      @close="detailVisible = false"
+      @close="handleCloseDetail"
       @submit="handleSubmitAnswer"
       @view-question="openQuestion"
     />
@@ -264,9 +296,11 @@
 <script setup>
 import { computed, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { Refresh, Search, ArrowLeft } from '@element-plus/icons-vue'
+import { Refresh, Search, ArrowLeft, Download } from '@element-plus/icons-vue'
+import { ElMessage } from 'element-plus'
 import { useQuestionBankStore } from '@/stores/questions'
 import { useDomainStore } from '@/stores/domain'
+import { exportQuestions } from '@/api/questions'
 import QuestionDetailDrawer from '@/views/questions/components/QuestionDetailDrawer.vue'
 
 const props = defineProps({
@@ -280,10 +314,12 @@ const route = useRoute()
 const router = useRouter()
 const store = useQuestionBankStore()
 const domainStore = useDomainStore()
+
 const detailVisible = ref(false)
 const activeQuestionId = ref(null)
 const keywordInput = ref('')
 const currentDomain = ref(null)
+const exporting = ref(false)
 
 const treeProps = {
   label: 'name',
@@ -297,9 +333,23 @@ const includeDescendants = computed({
   set: value => store.setIncludeDescendants(value)
 })
 
-const difficultyOptions = computed(() => store.availableFilters.difficulties.length ? store.availableFilters.difficulties : ['easy', 'medium', 'hard'])
-const typeOptions = computed(() => store.availableFilters.types.length ? store.availableFilters.types : ['short_answer', 'multiple_choice', 'coding'])
-const tagOptions = computed(() => store.availableFilters.tags.length ? store.availableFilters.tags : store.tags.map(tag => tag.tag))
+const difficultyOptions = computed(() =>
+  store.availableFilters.difficulties.length
+    ? store.availableFilters.difficulties
+    : ['easy', 'medium', 'hard']
+)
+
+const typeOptions = computed(() =>
+  store.availableFilters.types.length
+    ? store.availableFilters.types
+    : ['short_answer', 'multiple_choice', 'coding']
+)
+
+const tagOptions = computed(() =>
+  store.availableFilters.tags.length
+    ? store.availableFilters.tags
+    : (store.tags || []).map(tag => tag.tag || tag)
+)
 
 const activeCategoryName = computed(() => {
   if (!store.filters.categoryId) return ''
@@ -308,46 +358,63 @@ const activeCategoryName = computed(() => {
 })
 
 onMounted(async () => {
-  // 根据 domainSlug 初始化
-  if (props.domainSlug || route.params.domainSlug) {
-    const slug = props.domainSlug || route.params.domainSlug
-    const domain = domainStore.findDomainBySlug(slug)
-
-    if (!domain) {
-      // 如果 domains 还未加载,先加载
-      await domainStore.loadDomains()
-      currentDomain.value = domainStore.findDomainBySlug(slug)
-    } else {
-      currentDomain.value = domain
-    }
-
-    if (currentDomain.value) {
-      await store.initializeWithDomain(currentDomain.value.id)
-      // 加载领域的字段配置
-      await domainStore.loadFieldConfig(currentDomain.value.id)
-    }
-  } else {
-    await store.initialize()
-  }
-
+  await preloadDomainContext()
   keywordInput.value = store.filters.keyword
-})
-
-// 监听 domain 变化
-watch(() => route.params.domainSlug, async (newSlug) => {
-  if (newSlug && newSlug !== currentDomain.value?.slug) {
-    const domain = domainStore.findDomainBySlug(newSlug)
-    if (domain) {
-      currentDomain.value = domain
-      await store.initializeWithDomain(domain.id)
-      await domainStore.loadFieldConfig(domain.id)
-    }
+  if (route.query.questionId) {
+    await openQuestion(route.query.questionId)
   }
 })
 
-function backToDomainSelector() {
-  // Use replace so the history back does not return to this domain page
-  router.replace({ name: 'DomainSelector' })
+watch(
+  () => route.params.domainSlug,
+  async newSlug => {
+    if (newSlug !== currentDomain.value?.slug) {
+      await preloadDomainContext(newSlug)
+    }
+  }
+)
+
+watch(
+  () => route.query.questionId,
+  async newId => {
+    if (!newId) {
+      detailVisible.value = false
+      return
+    }
+    if (Number(newId) !== Number(activeQuestionId.value)) {
+      await openQuestion(newId)
+    }
+  }
+)
+
+async function preloadDomainContext(slug = props.domainSlug || route.params.domainSlug) {
+  try {
+    if (!domainStore.domains.length) {
+      await domainStore.loadDomains({ selectFirst: false })
+    }
+
+    if (slug) {
+      const domain = domainStore.findDomainBySlug(slug)
+      if (domain) {
+        currentDomain.value = domain
+        await store.initializeWithDomain(domain.id)
+        await domainStore.loadFieldConfig(domain.id)
+        domainStore.setCurrentDomain(domain)
+        await domainStore.loadUserProgress(domain)
+        return
+      }
+    }
+
+    currentDomain.value = null
+    await store.initialize()
+  } catch (error) {
+    console.error('Failed to preload domain context', error)
+    ElMessage.error('题库数据加载失败，请稍后重试')
+  }
+}
+
+function backToLearningHub() {
+  router.replace({ name: 'LearningHub' })
 }
 
 function handleSearch() {
@@ -356,7 +423,7 @@ function handleSearch() {
 }
 
 function refreshList() {
-  store.loadQuestions()
+  store.loadQuestions({ page: store.pagination.page })
 }
 
 function handleResetFilters() {
@@ -407,40 +474,161 @@ function handleIncludeDescendants() {
   store.applyFilters({ resetPage: true })
 }
 
+function optionKey(option) {
+  if (option == null) return ''
+  if (typeof option === 'string' || typeof option === 'number') {
+    return option
+  }
+  return option.key ?? option.value ?? option.id ?? ''
+}
+
+function optionLabel(option, fallback) {
+  if (option == null) return ''
+  if (typeof option === 'object') {
+    return option.label || option.name || (fallback ? fallback(optionKey(option)) : optionKey(option))
+  }
+  return fallback ? fallback(option) : option
+}
+
 function difficultyLabel(value) {
   const map = { easy: '基础', medium: '进阶', hard: '挑战' }
+  if (typeof value === 'object') {
+    return value.label || map[value.key] || value.key || ''
+  }
   return map[value] || value || '难度'
 }
 
 function difficultyTagType(value) {
   const map = { easy: 'success', medium: 'warning', hard: 'danger' }
-  return map[value] || 'info'
+  const key = typeof value === 'object' ? value.key : value
+  return map[key] || 'info'
 }
 
 function typeLabel(value) {
-  const map = { short_answer: '简答题', multiple_choice: '多选题', coding: '编程题' }
+  const map = {
+    short_answer: '简答题',
+    multiple_choice: '多选题',
+    single_choice: '单选题',
+    coding: '编程题',
+    essay: '论述题'
+  }
+  if (typeof value === 'object') {
+    return value.label || map[value.key] || value.key || ''
+  }
   return map[value] || value || '题型'
 }
 
 function formatRate(stats = {}) {
-  if (!stats.attempts) return '—'
-  const rate = stats.correctCount ? (stats.correctCount / stats.attempts) * 100 : 0
+  if (!stats || !stats.attempts) {
+    return '--'
+  }
+  const correct = Number(stats.correctCount || 0)
+  const attempts = Number(stats.attempts || 0)
+  if (!attempts) {
+    return '--'
+  }
+  const rate = (correct / attempts) * 100
   return `${rate.toFixed(0)}%`
 }
 
 async function openQuestion(id) {
+  if (!id) return
   activeQuestionId.value = id
   detailVisible.value = true
   try {
     await store.fetchQuestionDetailData(id)
+    updateQuestionQuery(id)
   } catch (error) {
+    console.error('Failed to open question detail', error)
     detailVisible.value = false
+    updateQuestionQuery(null)
   }
 }
 
 function handleSubmitAnswer(payload) {
   if (!activeQuestionId.value) return
   store.submitAnswer(activeQuestionId.value, payload)
+}
+
+function handleCloseDetail() {
+  detailVisible.value = false
+  updateQuestionQuery(null)
+}
+
+function buildExportParams() {
+  const params = {
+    page: store.pagination.page,
+    size: store.pagination.size,
+    sort: store.filters.sort
+  }
+
+  if (store.filters.keyword) {
+    params.keyword = store.filters.keyword
+  }
+  if (store.filters.domainId) {
+    params.domain_id = store.filters.domainId
+  }
+  if (store.filters.categoryId) {
+    params.category_id = store.filters.categoryId
+  }
+  if (!store.filters.includeDescendants) {
+    params.include_descendants = false
+  }
+  if (store.filters.difficulty.length) {
+    params.difficulty = store.filters.difficulty.join(',')
+  }
+  if (store.filters.type.length) {
+    params.type = store.filters.type.join(',')
+  }
+  if (store.filters.tags.length) {
+    params.tags = store.filters.tags.join(',')
+  }
+
+  Object.keys(store.filters.metadata || {}).forEach(key => {
+    const value = store.filters.metadata[key]
+    if (value !== null && value !== undefined && value !== '') {
+      params[`metadata.${key}`] = value
+    }
+  })
+
+  return params
+}
+
+async function handleExport() {
+  exporting.value = true
+  try {
+    const params = buildExportParams()
+    const response = await exportQuestions(params)
+    const blob = new Blob([response.data], { type: 'text/csv;charset=utf-8;' })
+    const url = window.URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    const suffix = currentDomain.value ? `-${currentDomain.value.slug}` : ''
+    link.download = `question-bank${suffix}-${Date.now()}.csv`
+    link.click()
+    window.URL.revokeObjectURL(url)
+    ElMessage.success('题目导出成功')
+  } catch (error) {
+    console.error('题目导出失败', error)
+    ElMessage.error('导出失败，请稍后重试')
+  } finally {
+    exporting.value = false
+  }
+}
+
+function updateQuestionQuery(questionId) {
+  const query = { ...route.query }
+  if (questionId) {
+    query.questionId = questionId
+  } else {
+    delete query.questionId
+  }
+
+  router.replace({
+    name: route.name || 'QuestionBankPage',
+    params: route.params,
+    query
+  }).catch(() => {})
 }
 </script>
 
@@ -532,6 +720,12 @@ function handleSubmitAnswer(payload) {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
+}
+
+.option-count {
+  color: #909399;
+  font-size: 12px;
+  margin-left: 4px;
 }
 
 .list-panel {

@@ -35,26 +35,14 @@ const routes = [
   {
     path: '/questions',
     name: 'QuestionBankRoot',
-    redirect: '/questions/domains',
+    redirect: '/questions/hub',
     meta: { requiresAuth: true }
   },
   {
-    path: '/questions/domains',
-    name: 'DomainSelector',
-    component: () => import('@/views/questions/DomainSelector.vue'),
+    path: '/questions/hub',
+    name: 'LearningHub',
+    component: () => import('@/views/questions/LearningHubDashboard.vue'),
     meta: { requiresAuth: true }
-  },
-  {
-    path: '/questions/explore',
-    name: 'DomainExplorer',
-    component: () => import('@/views/questions/DomainExplorer.vue'),
-    meta: { requiresAuth: true }
-  },
-  {
-    path: '/onboarding/fields',
-    name: 'FieldOnboarding',
-    component: () => import('@/views/onboarding/FieldOnboarding.vue'),
-    meta: { requiresAuth: false }
   },
   {
     path: '/questions/:domainSlug',

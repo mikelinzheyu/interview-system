@@ -4,6 +4,9 @@
  */
 import { ElNotification } from 'element-plus'
 import fallbackManager from '@/utils/fallback.js'
+// 环境变量控制通知行为
+const HEALTH_NOTIFY_AUTO_CLOSE = (import.meta.env?.VITE_HEALTH_NOTIFY_AUTO_CLOSE ?? 'true') === 'true'
+const HEALTH_NOTIFY_DURATION = Number.parseInt(import.meta.env?.VITE_HEALTH_NOTIFY_DURATION ?? '8000', 10)
 
 /**
  * 系统健康监控器
@@ -514,7 +517,8 @@ export class SystemHealthMonitor {
       title: '网络状态变化',
       message,
       type,
-      duration: 5000
+      duration: HEALTH_NOTIFY_AUTO_CLOSE ? HEALTH_NOTIFY_DURATION : 0,
+      showClose: true
     })
 
     // 网络恢复时执行健康检查

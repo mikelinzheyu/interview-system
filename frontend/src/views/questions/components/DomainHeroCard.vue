@@ -83,8 +83,15 @@
           <el-button type="primary" size="large" class="hero-cta" @click="handleEnter">
             进入该领域
           </el-button>
-          <el-button plain size="large" class="hero-secondary-cta">
-            保存收藏
+          <el-button
+            :plain="!isLiked"
+            :type="isLiked ? 'success' : undefined"
+            :disabled="isLiked"
+            size="large"
+            class="hero-secondary-cta"
+            @click="handleSave"
+          >
+            {{ isLiked ? '已收藏' : '保存收藏' }}
           </el-button>
         </div>
       </div>
@@ -95,6 +102,8 @@
 
 <script setup>
 import { computed } from 'vue'
+import { ElMessage } from 'element-plus'
+import { useDomainStore } from '@/stores/domain'
 
 const numberFormatter = new Intl.NumberFormat('en-US')
 
@@ -122,6 +131,7 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['enter'])
+const domainStore = useDomainStore()
 
 const displayIcon = computed(() => {
   if (props.domain?.icon) {
@@ -157,6 +167,16 @@ const difficultyTags = computed(() => {
   return tags
 })
 
+const isLiked = computed(() => {
+  const d = props.domain
+  const profile = domainStore.userProfile && domainStore.userProfile.value
+  const liked = (profile && Array.isArray(profile.likedDomainIds)) ? profile.likedDomainIds : []
+  if (!d || !liked.length) return false
+  const id = d.id
+  const slug = d.slug
+  return liked.includes(id) || liked.includes(slug) || liked.includes(String(id)) || liked.includes(String(slug))
+})
+
 function formatNumber(value) {
   if (!isPresent(value)) {
     return '0'
@@ -183,6 +203,29 @@ function handleEnter() {
   }
 
   emit('enter', props.domain)
+}
+
+function handleSave() {
+  if (!props.domain) return
+
+  if (isLiked.value) {
+    ElMessage.info('已在收藏列表中')
+    return
+  }
+
+  const id = props.domain.id ?? null
+  const idOrSlug = id ?? props.domain.slug
+  if (!idOrSlug) {
+    ElMessage.warning('当前领域无效，无法收藏')
+    return
+  }
+
+  try {
+    domainStore.addLikedDomain(idOrSlug)
+    ElMessage.success('已加入收藏')
+  } catch (e) {
+    ElMessage.error('收藏失败，请稍后重试')
+  }
 }
 </script>
 

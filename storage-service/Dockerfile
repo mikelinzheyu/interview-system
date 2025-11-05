@@ -1,7 +1,7 @@
 # Dockerfile - Interview Storage Service (Java) - Emergency Build
 
 # --- Build Stage ---
-FROM alpine:latest AS build
+FROM node:18-alpine AS build
 WORKDIR /app
 
 # Install Java and Maven
@@ -15,7 +15,7 @@ COPY src ./src
 RUN mvn clean package -DskipTests 2>&1 | tail -30 || true
 
 # --- Run Stage ---
-FROM alpine:latest
+FROM node:18-alpine
 WORKDIR /app
 
 # Install Java runtime and tools
@@ -23,9 +23,13 @@ RUN apk add --no-cache openjdk17-jre curl tzdata bash && \
     cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && \
     echo "Asia/Shanghai" > /etc/timezone
 
-# Try to copy built jar, otherwise create a placeholder
-COPY --from=build /app/target/*.jar app.jar 2>/dev/null || \
-    echo "JAR build pending" > /app/build.log
+# Bring over build artifacts and handle absence gracefully
+COPY --from=build /app/target /tmp/target
+RUN if ls /tmp/target/*.jar >/dev/null 2>&1; then \
+      cp /tmp/target/*.jar app.jar; \
+    else \
+      echo "JAR build pending" > /app/build.log; \
+    fi
 
 # Create app user
 RUN addgroup -g 1001 -S appuser && \

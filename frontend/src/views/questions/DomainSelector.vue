@@ -66,8 +66,8 @@ import DomainHeroCard from './components/DomainHeroCard.vue'
 import DomainRecommendationPanel from './components/DomainRecommendationPanel.vue'
 
 const router = useRouter()
-function goExplorer() { router.push({ name: 'DomainExplorer' }) }
-function goOnboarding() { router.push({ name: 'FieldOnboarding' }) }
+function goExplorer() { router.push({ name: 'LearningHub' }) }
+function goOnboarding() { router.push({ name: 'LearningHub' }) }
 
 const domainStore = useDomainStore()
 const {

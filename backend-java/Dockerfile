@@ -4,9 +4,12 @@
 # ====================================================
 
 # ==================== 构建阶段 ====================
-FROM maven:3.9-eclipse-temurin-17 AS build
+FROM node:18-alpine AS build
 
 WORKDIR /build
+
+# Install JDK and Maven on Alpine
+RUN apk add --no-cache openjdk17 maven bash curl git
 
 # 首先复制pom.xml以利用Docker缓存
 COPY pom.xml /build/
@@ -16,7 +19,7 @@ RUN mkdir -p /root/.m2 && \
     printf '<?xml version="1.0" encoding="UTF-8"?>\n<settings>\n  <mirrors>\n    <mirror>\n      <id>aliyun</id>\n      <mirrorOf>central</mirrorOf>\n      <name>Aliyun Maven</name>\n      <url>https://maven.aliyun.com/repository/public</url>\n    </mirror>\n  </mirrors>\n</settings>' > /root/.m2/settings.xml
 
 # 下载依赖（利用Docker层缓存）
-RUN mvn dependency:go-offline -B || true
+RUN mvn -v && mvn dependency:go-offline -B || true
 
 # 复制源代码
 COPY src /build/src
@@ -25,20 +28,17 @@ COPY src /build/src
 RUN mvn clean package -DskipTests -Dmaven.test.skip=true
 
 # ==================== 运行阶段 ====================
-FROM eclipse-temurin:17-jre-jammy
+FROM node:18-alpine
 
 # 安装必要工具
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends curl && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+RUN apk add --no-cache openjdk17-jre curl
 
 # 设置时区
 ENV TZ=Asia/Shanghai
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 # 创建应用目录和用户
-RUN groupadd -r appuser && useradd -r -g appuser appuser
+RUN addgroup -g 1001 -S appuser && adduser -S appuser -u 1001 -G appuser
 WORKDIR /app
 
 # 从构建阶段复制JAR文件

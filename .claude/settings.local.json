@@ -73,7 +73,10 @@
       "Bash(\"C:\\Program Files\\nodejs\\node.exe\" test-workflows-complete.js)",
       "Bash(tee:*)",
       "Bash(docker --version:*)",
-      "Bash(docker pull:*)"
+      "Bash(docker pull:*)",
+      "Bash(git add:*)",
+      "Bash(git commit -m \"$(cat <<''EOF''\ntest: Phase 4 Unit Tests - NotificationWebSocketHandler (100% Coverage)\n\n- Complete test coverage for WebSocket real-time notification system\n- 100+ test cases across all components:\n  - Connection management (connect, disconnect, reconnection)\n  - Message routing for 9+ event types\n  - Event subscription/unsubscription system\n  - Reconnection logic with exponential backoff\n  - Message sending with metadata injection\n  - AdminActivityWebSocketHandler admin-specific events\n  - SystemAlertHandler system alerts handling\n- Integration tests for complete notification workflows\n- Error handling and malformed message recovery\n- Mock WebSocket implementation for testing\n\nTest Coverage:\n- NotificationWebSocketHandler: Connect, send, events, reconnect\n- AdminActivityWebSocketHandler: Broadcast, moderation, user actions\n- SystemAlertHandler: Alert handling, status updates\n- All 9 message types: NOTIFICATION, ADMIN_ACTION, CONTENT, USER, SYSTEM, BROADCAST\n- Error cases: Connection failure, malformed JSON, listener errors\n- Event lifecycle: Subscribe, emit, unsubscribe\n\n🤖 Generated with Claude Code\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
+      "Bash(git commit:*)"
     ],
     "deny": [],
     "ask": []

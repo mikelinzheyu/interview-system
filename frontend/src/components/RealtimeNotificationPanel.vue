@@ -1,5 +1,5 @@
 <template>
-  <div class="realtime-notification-panel">
+  <div v-if="!isHidden" class="realtime-notification-panel">
     <!-- Floating Notifications Container -->
     <transition-group name="notification-list" tag="div" class="notifications-container">
       <div
@@ -93,10 +93,11 @@
       </div>
     </div>
 
-    <!-- Control Button -->
+    <!-- Control Buttons -->
     <button class="settings-toggle" @click="showSettings = !showSettings" title="通知设置">
       ⚙️
     </button>
+    <button class="hide-toggle" @click="hidePanel" title="隐藏通知">×</button>
   </div>
 </template>
 
@@ -113,6 +114,10 @@ const props = defineProps({
   }
 })
 
+// Feature flag + hide state
+const ENABLE_FLOATING = (import.meta.env?.VITE_ENABLE_FLOATING_NOTIFICATIONS ?? 'false') === 'true'
+const isHidden = ref(!ENABLE_FLOATING || localStorage.getItem('hideRealtimePanel') === '1')
+
 // Refs
 const notifications = ref([])
 const showSettings = ref(false)
@@ -126,6 +131,11 @@ const countdowns = ref({})
 let wsConnection = null
 let countdownInterval = null
 
+// Hide panel persistently
+const hidePanel = () => {
+  isHidden.value = true
+  try { localStorage.setItem('hideRealtimePanel', '1') } catch {}
+}
 // Computed
 const displayedNotifications = computed(() => {
   if (enableMinimize.value) {

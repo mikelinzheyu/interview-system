@@ -63,7 +63,7 @@ function handleStart() {
     农学: '农学'
   }
   academic.query = map[form.category] || ''
-  router.push({ name: 'DomainExplorer' })
+  router.push({ name: 'LearningHub' })
 }
 </script>
 

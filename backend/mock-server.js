@@ -2117,6 +2117,55 @@ function buildCategoryTree(categories, parentId = null) {
     }))
 }
 
+function handleQuestionCategoryRequest(req, res) {
+  const parsedUrl = url.parse(req.url, true)
+  const query = parsedUrl.query || {}
+  const domainId = query.domain_id ? Number(query.domain_id) : null
+
+  let categories = mockData.questionCategories || []
+
+  if (domainId) {
+    categories = categories.filter(c => c.domainId === domainId)
+  }
+
+  const categoryStats = categories.map(category => {
+    const questionCount = mockData.questions.filter(question => {
+      if (Array.isArray(question.categoryPath) && question.categoryPath.length) {
+        return question.categoryPath.includes(category.id)
+      }
+      return question.categoryId === category.id
+    }).length
+
+    const children = categories
+      .filter(child => child.parentId === category.id)
+      .map(child => child.id)
+
+    return {
+      ...category,
+      questionCount,
+      childCount: children.length,
+      children
+    }
+  })
+
+  const tree = buildCategoryTree(categoryStats.map(category => ({ ...category })))
+
+  sendResponse(res, 200, {
+    tree,
+    flat: categoryStats.map(category => ({
+      ...category,
+      children: undefined
+    })),
+    meta: {
+      total: categories.length,
+      lastUpdated: mockData.questions.reduce((latest, item) => {
+        if (!item.updatedAt) return latest
+        return !latest || item.updatedAt > latest ? item.updatedAt : latest
+      }, null)
+    }
+  }, '获取题库分类成功')
+}
+
 function buildQuestionListItem(question) {
   const stats = question.stats || {}
   return {
@@ -2680,6 +2729,167 @@ const routes = {
       sendResponse(res, 200, top)
     } catch (e) {
       sendResponse(res, 500, null, `recommended 生成失败: ${e.message}`)
+    }
+  },
+
+  // 新增：层级化域列表（用于分类浏览器）
+  'GET:/api/domains/hierarchical': (req, res) => {
+    try {
+      // 构建层级化数据
+      const hierarchical = [
+        {
+          id: 100,
+          name: '工学',
+          slug: 'engineering',
+          level: 'discipline',
+          icon: '🏗️',
+          parentId: null,
+          description: '工程应用与技术创新方向',
+          children: [
+            {
+              id: 101,
+              name: '计算机类',
+              slug: 'computer',
+              level: 'field',
+              icon: '💻',
+              parentId: 100,
+              description: '计算机科学与技术核心模块',
+              children: [
+                {
+                  id: 102,
+                  name: '前端工程',
+                  slug: 'frontend-engineering',
+                  level: 'domain',
+                  icon: '🌐',
+                  parentId: 101,
+                  description: '现代 Web 前端开发与工程化实践',
+                  questionCount: 116,
+                  children: [
+                    {
+                      id: 103,
+                      name: 'React 进阶',
+                      slug: 'react-advanced',
+                      level: 'track',
+                      parentId: 102,
+                      icon: '⚛️',
+                      description: '构建高可维护性的组件化前端应用',
+                      questionCount: 48
+                    },
+                    {
+                      id: 104,
+                      name: '性能优化专题',
+                      slug: 'frontend-performance',
+                      level: 'track',
+                      parentId: 102,
+                      icon: '⚡',
+                      description: '涵盖性能瓶颈定位与优化方案',
+                      questionCount: 38
+                    }
+                  ]
+                },
+                {
+                  id: 105,
+                  name: '后端开发',
+                  slug: 'backend-development',
+                  level: 'domain',
+                  icon: '🖥️',
+                  parentId: 101,
+                  description: '服务端应用与系统设计核心',
+                  questionCount: 98
+                }
+              ]
+            },
+            {
+              id: 106,
+              name: '电子信息类',
+              slug: 'electronics',
+              level: 'field',
+              icon: '📱',
+              parentId: 100,
+              description: '电子与通信技术应用',
+              children: [
+                {
+                  id: 107,
+                  name: '嵌入式系统',
+                  slug: 'embedded-systems',
+                  level: 'domain',
+                  icon: '🔌',
+                  parentId: 106,
+                  description: '微控制器与实时系统设计',
+                  questionCount: 52
+                }
+              ]
+            }
+          ]
+        },
+        {
+          id: 200,
+          name: '理学',
+          slug: 'sciences',
+          level: 'discipline',
+          icon: '🔬',
+          parentId: null,
+          description: '基础理论与科学研究方向',
+          children: [
+            {
+              id: 201,
+              name: '数学类',
+              slug: 'mathematics',
+              level: 'field',
+              icon: '📐',
+              parentId: 200,
+              description: '数学基础与应用数学',
+              children: [
+                {
+                  id: 202,
+                  name: '离散数学',
+                  slug: 'discrete-mathematics',
+                  level: 'domain',
+                  icon: '📊',
+                  parentId: 201,
+                  description: '算法与数据结构基础',
+                  questionCount: 64
+                }
+              ]
+            }
+          ]
+        }
+      ]
+      sendResponse(res, 200, hierarchical)
+    } catch (e) {
+      sendResponse(res, 500, null, `hierarchical 生成失败: ${e.message}`)
+    }
+  },
+
+  // 新增：问题聚合面向（facets） - 用于过滤器
+  'GET:/api/questions/facets': (req, res) => {
+    try {
+      const query = url.parse(req.url, true).query
+      // 从查询参数中可以获取 keyword, category_id, tags 等
+      // 这里简单示例，返回固定的 facets 数据
+      const facets = {
+        difficulties: [
+          { label: '基础', value: 'easy', count: 120 },
+          { label: '进阶', value: 'medium', count: 85 },
+          { label: '挑战', value: 'hard', count: 34 }
+        ],
+        categories: [
+          { label: '前端开发', value: 'frontend', count: 116 },
+          { label: '后端开发', value: 'backend', count: 98 },
+          { label: '系统设计', value: 'system-design', count: 52 },
+          { label: '数据库', value: 'database', count: 45 },
+          { label: '网络', value: 'network', count: 38 }
+        ],
+        types: [
+          { label: '单选题', value: 'single-choice', count: 180 },
+          { label: '多选题', value: 'multiple-choice', count: 95 },
+          { label: '填空题', value: 'fill-blank', count: 30 },
+          { label: '编程题', value: 'coding', count: 25 }
+        ]
+      }
+      sendResponse(res, 200, facets)
+    } catch (e) {
+      sendResponse(res, 500, null, `facets 生成失败: ${e.message}`)
     }
   },
 
@@ -3782,55 +3992,8 @@ const routes = {
   },
 
   // 题库分类与标签
-  'GET:/api/questions/categories': (req, res) => {
-    const parsedUrl = url.parse(req.url, true)
-    const query = parsedUrl.query || {}
-    const domainId = query.domain_id ? Number(query.domain_id) : null
-
-    let categories = mockData.questionCategories || []
-
-    // 按领域筛选
-    if (domainId) {
-      categories = categories.filter(c => c.domainId === domainId)
-    }
-
-    const categoryStats = categories.map(category => {
-      const questionCount = mockData.questions.filter(question => {
-        if (Array.isArray(question.categoryPath) && question.categoryPath.length) {
-          return question.categoryPath.includes(category.id)
-        }
-        return question.categoryId === category.id
-      }).length
-
-      const children = categories
-        .filter(child => child.parentId === category.id)
-        .map(child => child.id)
-
-      return {
-        ...category,
-        questionCount,
-        childCount: children.length,
-        children
-      }
-    })
-
-    const tree = buildCategoryTree(categoryStats.map(category => ({ ...category })))
-
-    sendResponse(res, 200, {
-      tree,
-      flat: categoryStats.map(category => ({
-        ...category,
-        children: undefined
-      })),
-      meta: {
-        total: categories.length,
-        lastUpdated: mockData.questions.reduce((latest, item) => {
-          if (!item.updatedAt) return latest
-          return !latest || item.updatedAt > latest ? item.updatedAt : latest
-        }, null)
-      }
-    }, '获取题库分类成功')
-  },
+  'GET:/api/categories': handleQuestionCategoryRequest,
+  'GET:/api/questions/categories': handleQuestionCategoryRequest,
 
   'GET:/api/questions/tags': (req, res) => {
     const tagCounter = {}

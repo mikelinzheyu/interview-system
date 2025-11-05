@@ -18,9 +18,13 @@
             <el-icon><Plus /></el-icon>
             开始面试
           </el-button>
-
-          <!-- 通知中心 -->
-          <NotificationCenter />
+          <!-- 通知入口按钮 + 悬浮面板，不影响原有布局 -->
+          <el-button class="notif-trigger" text @click="showNotification = !showNotification">
+            <el-icon><Bell /></el-icon>
+          </el-button>
+          <div v-if="showNotification" class="notification-popover">
+            <NotificationCenter />
+          </div>
 
           <el-dropdown @command="handleUserAction">
             <div class="user-info">
@@ -160,7 +164,7 @@ import { useUserStore } from '@/stores/user'
 import { useStatisticsStore } from '@/stores/statistics'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import {
-  ChatRound, Plus, ArrowDown,
+  ChatRound, Plus, ArrowDown, Bell,
   Document, DataAnalysis, User,
   Edit, PieChart, MagicStick, VideoCamera, Clock, Trophy, Star
 } from '@element-plus/icons-vue'
@@ -178,6 +182,7 @@ const userStore = useUserStore()
 const statisticsStore = useStatisticsStore()
 
 const welcomeDialog = ref()
+const showNotification = ref(false)
 
 const user = computed(() => userStore.user)
 const { formattedStats, loading } = statisticsStore
@@ -367,6 +372,22 @@ onMounted(() => {
   gap: 16px;
 }
 
+/* 通知悬浮层样式，仅定位在右上角 */
+.notif-trigger { margin-left: 8px; }
+.notification-popover {
+  position: fixed;
+  right: 16px;
+  top: 64px;
+  z-index: 3000;
+  width: min(860px, 94vw);
+  max-height: 74vh;
+  overflow: auto;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 12px 36px rgba(0,0,0,0.16);
+  padding: 12px;
+}
+
 .user-info {
   display: flex;
   align-items: center;
@@ -514,3 +535,7 @@ onMounted(() => {
   }
 }
 </style>
+
+
+
+
