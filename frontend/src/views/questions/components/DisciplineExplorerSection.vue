@@ -162,7 +162,7 @@ const currentLevel = computed(() => {
   } else if (disciplinesStore.currentMajor) {
     level = 'majorDetail'
   } else if (disciplinesStore.currentMajorGroup) {
-    level = 'majorGroup'
+    level = 'major'
   } else if (disciplinesStore.currentDiscipline) {
     level = 'majorGroup'
   }
