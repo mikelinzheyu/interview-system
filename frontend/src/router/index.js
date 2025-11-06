@@ -333,6 +333,30 @@ const routes = [
   //   component: () => import('@/views/ai/AIConfig.vue'),
   //   meta: { requiresAuth: true }
   // }
+
+  // Phase 4: AI推荐系统
+  {
+    path: '/recommendations',
+    name: 'RecommendationHub',
+    component: () => import('@/views/recommendations/RecommendationPage.vue'),
+    meta: { requiresAuth: false }
+  },
+
+  // Phase 4: 综合职业规划系统
+  {
+    path: '/career-planning',
+    name: 'CareerPlanningHub',
+    component: () => import('@/views/CareerPlanningHub.vue'),
+    meta: { requiresAuth: false }
+  },
+
+  // Phase 5: 职业生态系统
+  {
+    path: '/ecosystem',
+    name: 'EcosystemHub',
+    component: () => import('@/views/EcosystemHub.vue'),
+    meta: { requiresAuth: false }
+  }
 ]
 
 const router = createRouter({
