@@ -9,7 +9,7 @@
             <button
               class="breadcrumb-link home"
               @click="navigateTo('root')"
-              :aria-label="$t('breadcrumb.home') || '返回首页'"
+              :aria-label="'返回首页'"
             >
               <i class="el-icon-home"></i>
               <span>学科探索</span>
@@ -169,29 +169,32 @@ const navigateTo = (level, id) => {
   if (level === 'root') {
     disciplinesStore.goToRoot()
   } else if (level === 'discipline' && id) {
-    // 返回到学科层级
+    // 逐级返回直到找到目标学科
     while (
-      (disciplinesStore.currentSpecialization ||
+      disciplinesStore.currentDiscipline &&
+      disciplinesStore.currentDiscipline.id !== id &&
+      (disciplinesStore.currentMajorGroup ||
         disciplinesStore.currentMajor ||
-        disciplinesStore.currentMajorGroup) &&
-      disciplinesStore.currentDiscipline?.id !== id
+        disciplinesStore.currentSpecialization)
     ) {
       disciplinesStore.goBack()
     }
   } else if (level === 'majorGroup' && id) {
     // 返回到专业类层级
     while (
-      (disciplinesStore.currentSpecialization ||
-        disciplinesStore.currentMajor) &&
-      disciplinesStore.currentMajorGroup?.id !== id
+      disciplinesStore.currentMajorGroup &&
+      disciplinesStore.currentMajorGroup.id !== id &&
+      (disciplinesStore.currentMajor ||
+        disciplinesStore.currentSpecialization)
     ) {
       disciplinesStore.goBack()
     }
   } else if (level === 'major' && id) {
     // 返回到专业层级
     while (
-      disciplinesStore.currentSpecialization &&
-      disciplinesStore.currentMajor?.id !== id
+      disciplinesStore.currentMajor &&
+      disciplinesStore.currentMajor.id !== id &&
+      disciplinesStore.currentSpecialization
     ) {
       disciplinesStore.goBack()
     }

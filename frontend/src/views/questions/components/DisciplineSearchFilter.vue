@@ -347,6 +347,20 @@ function toggleTime(value) {
   emitFilterChange()
 }
 
+// 处理难度过滤（Dropdown command）
+function handleDifficultyFilter(command) {
+  if (command === 'all') {
+    // 已在 dropdown 中禁用，此方法作为备用
+    return
+  }
+  // toggleDifficulty 已经处理了
+}
+
+// 处理时间过滤（Dropdown command）
+function handleTimeFilter(command) {
+  toggleTime(command)
+}
+
 // 清除所有过滤
 function clearAllFilters() {
   sortBy.value = 'default'

@@ -190,28 +190,44 @@ function handleBreadcrumbNavigation(event) {
 
 // 选择学科处理
 async function selectDisciplineHandler(discipline) {
-  disciplinesStore.selectDiscipline(discipline)
-  // 预加载专业类
-  await disciplinesStore.loadMajorGroups(discipline.id)
+  try {
+    disciplinesStore.selectDiscipline(discipline)
+    // 预加载专业类
+    await disciplinesStore.loadMajorGroups(discipline.id)
+  } catch (err) {
+    console.error('Failed to select discipline:', err)
+  }
 }
 
 // 选择专业类处理
 async function selectMajorGroupHandler(majorGroup) {
-  disciplinesStore.selectMajorGroup(majorGroup)
+  try {
+    disciplinesStore.selectMajorGroup(majorGroup)
+  } catch (err) {
+    console.error('Failed to select major group:', err)
+  }
 }
 
 // 选择专业处理
 async function selectMajorHandler(major) {
-  await disciplinesStore.selectMajor(major)
-  // 加载专业详情
-  await disciplinesStore.loadMajorDetails(major.id)
+  try {
+    await disciplinesStore.selectMajor(major)
+    // 加载专业详情
+    await disciplinesStore.loadMajorDetails(major.id)
+  } catch (err) {
+    console.error('Failed to select major:', err)
+  }
 }
 
 // 选择细分方向处理
 async function selectSpecializationHandler(spec) {
-  await disciplinesStore.selectSpecialization(spec)
-  // 加载细分方向详情
-  await disciplinesStore.loadSpecializationDetails(spec.id)
+  try {
+    await disciplinesStore.selectSpecialization(spec)
+    // 加载细分方向详情
+    await disciplinesStore.loadSpecializationDetails(spec.id)
+  } catch (err) {
+    console.error('Failed to select specialization:', err)
+  }
 }
 
 // 返回上一层
