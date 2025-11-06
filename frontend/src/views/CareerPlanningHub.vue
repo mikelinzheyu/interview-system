@@ -87,7 +87,27 @@
           <CareerPlanningGuide />
         </section>
 
-        <!-- Tab 5: Quick Stats -->
+        <!-- Tab 5: Career Roadmap -->
+        <section v-show="activeTab === 'roadmap'" class="tab-panel">
+          <CareerRoadmap />
+        </section>
+
+        <!-- Tab 6: Skill Tracking -->
+        <section v-show="activeTab === 'skills'" class="tab-panel">
+          <SkillTracking />
+        </section>
+
+        <!-- Tab 7: Learning Path -->
+        <section v-show="activeTab === 'learning'" class="tab-panel">
+          <LearningPath />
+        </section>
+
+        <!-- Tab 8: Goal Milestones -->
+        <section v-show="activeTab === 'goals'" class="tab-panel">
+          <GoalMilestones />
+        </section>
+
+        <!-- Tab 9: Quick Stats -->
         <section v-show="activeTab === 'stats'" class="tab-panel">
           <QuickStatsPanel />
         </section>
@@ -118,6 +138,10 @@ import CareerPlanningGuide from '@/components/CareerPlanningGuide.vue'
 import QuickStatsPanel from '@/components/QuickStatsPanel.vue'
 import SalaryAnalysis from '@/components/SalaryAnalysis.vue'
 import CityComparison from '@/components/CityComparison.vue'
+import CareerRoadmap from '@/components/CareerRoadmap.vue'
+import SkillTracking from '@/components/SkillTracking.vue'
+import LearningPath from '@/components/LearningPath.vue'
+import GoalMilestones from '@/components/GoalMilestones.vue'
 
 const recommendationStore = useRecommendationStore()
 const jobMarketStore = useJobMarketStore()
@@ -134,7 +158,11 @@ const tabs = [
   { id: 'job-market', label: '就业数据', icon: '📊' },
   { id: 'salary', label: '薪资分析', icon: '💰' },
   { id: 'career-planning', label: '职业规划', icon: '🛤️' },
-  { id: 'stats', label: '数据统计', icon: '📈' }
+  { id: 'roadmap', label: '发展路线', icon: '🗺️' },
+  { id: 'skills', label: '技能追踪', icon: '📈' },
+  { id: 'learning', label: '学习路径', icon: '🎓' },
+  { id: 'goals', label: '目标管理', icon: '🎯' },
+  { id: 'stats', label: '数据统计', icon: '📊' }
 ]
 
 // Watch for recommendation changes
