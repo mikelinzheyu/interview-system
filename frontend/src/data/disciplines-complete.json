@@ -23,7 +23,26 @@
             "questionCount": 105,
             "difficulty": "hard",
             "popularity": 57,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 15000
           }
         ]
       },
@@ -108,7 +127,32 @@
                 ],
                 "questionCount": 40
               }
-            ]
+            ],
+            "coreCourses": [
+              "解剖学",
+              "生理学",
+              "诊断学",
+              "内科学",
+              "外科学",
+              "妇产科",
+              "儿科学"
+            ],
+            "relatedSkills": [
+              "临床诊断",
+              "体格检查",
+              "医学知识",
+              "患者沟通",
+              "应急处理"
+            ],
+            "careerPaths": [
+              "医生",
+              "医院管理者",
+              "医学研究员",
+              "公共卫生官员",
+              "医疗咨询师"
+            ],
+            "employmentRate": 0.9,
+            "averageSalary": 12000
           }
         ]
       },
@@ -128,7 +172,26 @@
             "questionCount": 135,
             "difficulty": "beginner",
             "popularity": 78,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 25000
           }
         ]
       },
@@ -148,7 +211,26 @@
             "questionCount": 111,
             "difficulty": "advanced",
             "popularity": 57,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 12000
           }
         ]
       },
@@ -168,7 +250,26 @@
             "questionCount": 92,
             "difficulty": "intermediate",
             "popularity": 64,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 18000
           }
         ]
       },
@@ -188,7 +289,26 @@
             "questionCount": 156,
             "difficulty": "hard",
             "popularity": 52,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 15000
           },
           {
             "id": "100702",
@@ -199,7 +319,26 @@
             "questionCount": 81,
             "difficulty": "advanced",
             "popularity": 68,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 35000
           }
         ]
       },
@@ -219,7 +358,26 @@
             "questionCount": 162,
             "difficulty": "intermediate",
             "popularity": 83,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 15000
           }
         ]
       },
@@ -239,7 +397,26 @@
             "questionCount": 90,
             "difficulty": "hard",
             "popularity": 61,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 25000
           },
           {
             "id": "101003",
@@ -250,7 +427,26 @@
             "questionCount": 142,
             "difficulty": "intermediate",
             "popularity": 73,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 18000
           }
         ]
       },
@@ -270,7 +466,26 @@
             "questionCount": 84,
             "difficulty": "beginner",
             "popularity": 83,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 35000
           }
         ]
       }
@@ -300,7 +515,26 @@
             "questionCount": 122,
             "difficulty": "intermediate",
             "popularity": 59,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 18000
           }
         ]
       }
@@ -330,7 +564,26 @@
             "questionCount": 128,
             "difficulty": "intermediate",
             "popularity": 47,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 18000
           },
           {
             "id": "120102",
@@ -341,7 +594,26 @@
             "questionCount": 153,
             "difficulty": "hard",
             "popularity": 40,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 15000
           },
           {
             "id": "120103",
@@ -352,7 +624,26 @@
             "questionCount": 114,
             "difficulty": "advanced",
             "popularity": 71,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 8000
           }
         ]
       },
@@ -421,7 +712,31 @@
                 ],
                 "questionCount": 47
               }
-            ]
+            ],
+            "coreCourses": [
+              "管理学原理",
+              "战略管理",
+              "组织行为学",
+              "财务管理",
+              "市场营销",
+              "生产管理"
+            ],
+            "relatedSkills": [
+              "战略规划",
+              "团队管理",
+              "决策分析",
+              "财务知识",
+              "Excel"
+            ],
+            "careerPaths": [
+              "管理顾问",
+              "企业经理",
+              "项目经理",
+              "战略规划师",
+              "运营总监"
+            ],
+            "employmentRate": 0.91,
+            "averageSalary": 12000
           },
           {
             "id": "120202",
@@ -432,7 +747,31 @@
             "questionCount": 171,
             "difficulty": "advanced",
             "popularity": 89,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "市场营销",
+              "消费者行为",
+              "品牌管理",
+              "数字营销",
+              "市场研究",
+              "销售管理"
+            ],
+            "relatedSkills": [
+              "营销策划",
+              "数据分析",
+              "PPT展示",
+              "SocialMedia",
+              "创意思维"
+            ],
+            "careerPaths": [
+              "营销经理",
+              "品牌策划",
+              "PR经理",
+              "市场研究员",
+              "销售总监"
+            ],
+            "employmentRate": 0.9,
+            "averageSalary": 8000
           },
           {
             "id": "120203",
@@ -443,7 +782,26 @@
             "questionCount": 146,
             "difficulty": "advanced",
             "popularity": 81,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 12000
           },
           {
             "id": "120204",
@@ -454,7 +812,26 @@
             "questionCount": 124,
             "difficulty": "intermediate",
             "popularity": 60,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 12000
           },
           {
             "id": "120205",
@@ -465,7 +842,26 @@
             "questionCount": 157,
             "difficulty": "advanced",
             "popularity": 69,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 35000
           }
         ]
       },
@@ -485,7 +881,26 @@
             "questionCount": 94,
             "difficulty": "intermediate",
             "popularity": 49,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 8000
           }
         ]
       },
@@ -505,7 +920,26 @@
             "questionCount": 141,
             "difficulty": "beginner",
             "popularity": 73,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 12000
           },
           {
             "id": "120402",
@@ -516,7 +950,26 @@
             "questionCount": 177,
             "difficulty": "hard",
             "popularity": 55,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 12000
           },
           {
             "id": "120403",
@@ -527,7 +980,26 @@
             "questionCount": 110,
             "difficulty": "advanced",
             "popularity": 67,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 35000
           }
         ]
       },
@@ -547,7 +1019,26 @@
             "questionCount": 108,
             "difficulty": "hard",
             "popularity": 69,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 15000
           },
           {
             "id": "120502",
@@ -558,7 +1049,26 @@
             "questionCount": 148,
             "difficulty": "beginner",
             "popularity": 91,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 35000
           }
         ]
       },
@@ -578,7 +1088,26 @@
             "questionCount": 177,
             "difficulty": "hard",
             "popularity": 66,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 12000
           }
         ]
       },
@@ -598,7 +1127,26 @@
             "questionCount": 139,
             "difficulty": "beginner",
             "popularity": 57,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 35000
           }
         ]
       },
@@ -618,7 +1166,26 @@
             "questionCount": 165,
             "difficulty": "intermediate",
             "popularity": 74,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 15000
           }
         ]
       },
@@ -638,7 +1205,26 @@
             "questionCount": 161,
             "difficulty": "intermediate",
             "popularity": 74,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 12000
           },
           {
             "id": "120902",
@@ -649,7 +1235,26 @@
             "questionCount": 81,
             "difficulty": "hard",
             "popularity": 69,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 25000
           }
         ]
       }
@@ -679,7 +1284,26 @@
             "questionCount": 142,
             "difficulty": "intermediate",
             "popularity": 83,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 18000
           }
         ]
       },
@@ -699,7 +1323,26 @@
             "questionCount": 117,
             "difficulty": "intermediate",
             "popularity": 79,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 12000
           },
           {
             "id": "130202",
@@ -710,7 +1353,26 @@
             "questionCount": 95,
             "difficulty": "beginner",
             "popularity": 81,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 12000
           },
           {
             "id": "130204",
@@ -721,7 +1383,26 @@
             "questionCount": 109,
             "difficulty": "hard",
             "popularity": 74,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 15000
           },
           {
             "id": "130205",
@@ -732,7 +1413,26 @@
             "questionCount": 84,
             "difficulty": "intermediate",
             "popularity": 67,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 12000
           }
         ]
       },
@@ -752,7 +1452,26 @@
             "questionCount": 123,
             "difficulty": "intermediate",
             "popularity": 81,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 15000
           },
           {
             "id": "130304",
@@ -763,7 +1482,26 @@
             "questionCount": 114,
             "difficulty": "hard",
             "popularity": 55,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 25000
           },
           {
             "id": "130305",
@@ -774,7 +1512,26 @@
             "questionCount": 168,
             "difficulty": "hard",
             "popularity": 41,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 8000
           },
           {
             "id": "130306",
@@ -785,7 +1542,26 @@
             "questionCount": 115,
             "difficulty": "intermediate",
             "popularity": 59,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 8000
           }
         ]
       },
@@ -805,7 +1581,26 @@
             "questionCount": 94,
             "difficulty": "intermediate",
             "popularity": 85,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 25000
           },
           {
             "id": "130402",
@@ -816,7 +1611,26 @@
             "questionCount": 177,
             "difficulty": "hard",
             "popularity": 55,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 12000
           },
           {
             "id": "130403",
@@ -827,7 +1641,26 @@
             "questionCount": 149,
             "difficulty": "advanced",
             "popularity": 89,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 12000
           }
         ]
       },
@@ -847,7 +1680,26 @@
             "questionCount": 99,
             "difficulty": "intermediate",
             "popularity": 85,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 8000
           },
           {
             "id": "130502",
@@ -923,7 +1775,31 @@
                 ],
                 "questionCount": 20
               }
-            ]
+            ],
+            "coreCourses": [
+              "平面设计基础",
+              "UI/UX设计",
+              "品牌设计",
+              "海报设计",
+              "排版设计",
+              "设计思维"
+            ],
+            "relatedSkills": [
+              "Photoshop/AI",
+              "设计审美",
+              "创意思维",
+              "用户研究",
+              "原型设计"
+            ],
+            "careerPaths": [
+              "平面设计师",
+              "UI设计师",
+              "品牌设计师",
+              "设计总监",
+              "创意总监"
+            ],
+            "employmentRate": 0.88,
+            "averageSalary": 35000
           },
           {
             "id": "130503",
@@ -934,7 +1810,26 @@
             "questionCount": 127,
             "difficulty": "hard",
             "popularity": 75,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 35000
           },
           {
             "id": "130504",
@@ -945,7 +1840,26 @@
             "questionCount": 136,
             "difficulty": "advanced",
             "popularity": 65,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 8000
           },
           {
             "id": "130505",
@@ -956,7 +1870,26 @@
             "questionCount": 162,
             "difficulty": "advanced",
             "popularity": 79,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 35000
           },
           {
             "id": "130508",
@@ -967,7 +1900,26 @@
             "questionCount": 117,
             "difficulty": "hard",
             "popularity": 68,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 35000
           }
         ]
       }
@@ -1094,7 +2046,31 @@
                 ],
                 "questionCount": 46
               }
-            ]
+            ],
+            "coreCourses": [
+              "伦理学原理",
+              "哲学史",
+              "逻辑学",
+              "认识论",
+              "形而上学",
+              "伦理学专题"
+            ],
+            "relatedSkills": [
+              "批判性思维",
+              "哲学论证",
+              "问题分析",
+              "文献研究",
+              "学术写作"
+            ],
+            "careerPaths": [
+              "教师",
+              "研究员",
+              "编辑",
+              "记者",
+              "咨询师"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 25000
           },
           {
             "id": "010102",
@@ -1105,7 +2081,26 @@
             "questionCount": 131,
             "difficulty": "hard",
             "popularity": 46,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 8000
           },
           {
             "id": "010103",
@@ -1116,7 +2111,26 @@
             "questionCount": 85,
             "difficulty": "intermediate",
             "popularity": 81,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 12000
           },
           {
             "id": "010104",
@@ -1127,7 +2141,26 @@
             "questionCount": 150,
             "difficulty": "hard",
             "popularity": 91,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 25000
           }
         ]
       }
@@ -1157,7 +2190,26 @@
             "questionCount": 90,
             "difficulty": "intermediate",
             "popularity": 83,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 12000
           },
           {
             "id": "020102",
@@ -1168,7 +2220,26 @@
             "questionCount": 139,
             "difficulty": "advanced",
             "popularity": 57,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 8000
           },
           {
             "id": "020103",
@@ -1179,7 +2250,26 @@
             "questionCount": 128,
             "difficulty": "intermediate",
             "popularity": 50,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 18000
           },
           {
             "id": "020104",
@@ -1190,7 +2280,26 @@
             "questionCount": 171,
             "difficulty": "beginner",
             "popularity": 56,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 35000
           },
           {
             "id": "020105",
@@ -1201,7 +2310,26 @@
             "questionCount": 117,
             "difficulty": "beginner",
             "popularity": 65,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 15000
           },
           {
             "id": "020106",
@@ -1212,7 +2340,26 @@
             "questionCount": 80,
             "difficulty": "beginner",
             "popularity": 46,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 8000
           }
         ]
       },
@@ -1232,7 +2379,26 @@
             "questionCount": 94,
             "difficulty": "beginner",
             "popularity": 92,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 12000
           },
           {
             "id": "020202",
@@ -1243,7 +2409,26 @@
             "questionCount": 142,
             "difficulty": "intermediate",
             "popularity": 65,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 12000
           }
         ]
       },
@@ -1328,7 +2513,31 @@
                 ],
                 "questionCount": 37
               }
-            ]
+            ],
+            "coreCourses": [
+              "金融学原理",
+              "公司金融",
+              "国际金融",
+              "金融市场",
+              "财务管理",
+              "风险管理"
+            ],
+            "relatedSkills": [
+              "财务分析",
+              "Excel建模",
+              "数据分析",
+              "英语沟通",
+              "金融知识"
+            ],
+            "careerPaths": [
+              "金融分析师",
+              "投资顾问",
+              "风险管理师",
+              "银行经理",
+              "融资顾问"
+            ],
+            "employmentRate": 0.92,
+            "averageSalary": 12000
           },
           {
             "id": "020302",
@@ -1339,7 +2548,26 @@
             "questionCount": 129,
             "difficulty": "beginner",
             "popularity": 52,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 35000
           },
           {
             "id": "020303",
@@ -1350,7 +2578,26 @@
             "questionCount": 138,
             "difficulty": "hard",
             "popularity": 84,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 12000
           },
           {
             "id": "020304",
@@ -1361,7 +2608,26 @@
             "questionCount": 131,
             "difficulty": "intermediate",
             "popularity": 52,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 35000
           },
           {
             "id": "020305",
@@ -1372,7 +2638,26 @@
             "questionCount": 125,
             "difficulty": "intermediate",
             "popularity": 54,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 8000
           },
           {
             "id": "020306",
@@ -1383,7 +2668,26 @@
             "questionCount": 83,
             "difficulty": "intermediate",
             "popularity": 75,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 8000
           },
           {
             "id": "020307",
@@ -1394,7 +2698,26 @@
             "questionCount": 102,
             "difficulty": "hard",
             "popularity": 57,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 8000
           }
         ]
       },
@@ -1414,7 +2737,26 @@
             "questionCount": 148,
             "difficulty": "beginner",
             "popularity": 60,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 35000
           },
           {
             "id": "020402",
@@ -1425,7 +2767,26 @@
             "questionCount": 132,
             "difficulty": "intermediate",
             "popularity": 88,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 25000
           }
         ]
       }
@@ -1536,7 +2897,32 @@
                 ],
                 "questionCount": 64
               }
-            ]
+            ],
+            "coreCourses": [
+              "法学导论",
+              "宪法",
+              "民法",
+              "刑法",
+              "商法",
+              "诉讼法",
+              "行政法"
+            ],
+            "relatedSkills": [
+              "法律分析",
+              "案例研究",
+              "条文理解",
+              "写作能力",
+              "沟通技巧"
+            ],
+            "careerPaths": [
+              "律师",
+              "法官",
+              "检察官",
+              "法务",
+              "仲裁员"
+            ],
+            "employmentRate": 0.88,
+            "averageSalary": 18000
           }
         ]
       },
@@ -1556,7 +2942,26 @@
             "questionCount": 81,
             "difficulty": "intermediate",
             "popularity": 42,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 8000
           },
           {
             "id": "030202",
@@ -1567,7 +2972,26 @@
             "questionCount": 91,
             "difficulty": "beginner",
             "popularity": 71,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 18000
           },
           {
             "id": "030203",
@@ -1578,7 +3002,26 @@
             "questionCount": 109,
             "difficulty": "beginner",
             "popularity": 70,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 25000
           }
         ]
       },
@@ -1598,7 +3041,26 @@
             "questionCount": 146,
             "difficulty": "hard",
             "popularity": 40,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 8000
           },
           {
             "id": "030302",
@@ -1609,7 +3071,26 @@
             "questionCount": 159,
             "difficulty": "hard",
             "popularity": 72,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 18000
           }
         ]
       },
@@ -1629,7 +3110,26 @@
             "questionCount": 103,
             "difficulty": "beginner",
             "popularity": 42,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 15000
           }
         ]
       },
@@ -1649,7 +3149,26 @@
             "questionCount": 97,
             "difficulty": "intermediate",
             "popularity": 76,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 35000
           },
           {
             "id": "030503",
@@ -1660,7 +3179,26 @@
             "questionCount": 87,
             "difficulty": "intermediate",
             "popularity": 55,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 8000
           },
           {
             "id": "030504",
@@ -1671,7 +3209,26 @@
             "questionCount": 131,
             "difficulty": "beginner",
             "popularity": 71,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 25000
           }
         ]
       },
@@ -1691,7 +3248,26 @@
             "questionCount": 101,
             "difficulty": "hard",
             "popularity": 52,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 8000
           },
           {
             "id": "030602",
@@ -1702,7 +3278,26 @@
             "questionCount": 91,
             "difficulty": "hard",
             "popularity": 65,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 15000
           },
           {
             "id": "030603",
@@ -1713,7 +3308,26 @@
             "questionCount": 103,
             "difficulty": "advanced",
             "popularity": 66,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 15000
           }
         ]
       }
@@ -1743,7 +3357,26 @@
             "questionCount": 177,
             "difficulty": "hard",
             "popularity": 83,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 18000
           },
           {
             "id": "040102",
@@ -1754,7 +3387,26 @@
             "questionCount": 106,
             "difficulty": "beginner",
             "popularity": 67,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 8000
           },
           {
             "id": "040104",
@@ -1765,7 +3417,26 @@
             "questionCount": 150,
             "difficulty": "beginner",
             "popularity": 61,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 15000
           },
           {
             "id": "040105",
@@ -1776,7 +3447,26 @@
             "questionCount": 163,
             "difficulty": "beginner",
             "popularity": 59,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 8000
           }
         ]
       },
@@ -1796,7 +3486,26 @@
             "questionCount": 176,
             "difficulty": "beginner",
             "popularity": 62,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 15000
           },
           {
             "id": "040202",
@@ -1807,7 +3516,26 @@
             "questionCount": 126,
             "difficulty": "hard",
             "popularity": 89,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 35000
           },
           {
             "id": "040203",
@@ -1818,7 +3546,26 @@
             "questionCount": 150,
             "difficulty": "advanced",
             "popularity": 78,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 15000
           }
         ]
       }
@@ -1848,7 +3595,26 @@
             "questionCount": 125,
             "difficulty": "intermediate",
             "popularity": 77,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 8000
           },
           {
             "id": "050102",
@@ -1859,7 +3625,26 @@
             "questionCount": 99,
             "difficulty": "advanced",
             "popularity": 43,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 18000
           },
           {
             "id": "050103",
@@ -1870,7 +3655,26 @@
             "questionCount": 87,
             "difficulty": "intermediate",
             "popularity": 62,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 12000
           }
         ]
       },
@@ -1890,7 +3694,26 @@
             "questionCount": 97,
             "difficulty": "intermediate",
             "popularity": 64,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 35000
           },
           {
             "id": "050202",
@@ -1901,7 +3724,26 @@
             "questionCount": 125,
             "difficulty": "beginner",
             "popularity": 94,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 25000
           },
           {
             "id": "050203",
@@ -1912,7 +3754,26 @@
             "questionCount": 113,
             "difficulty": "beginner",
             "popularity": 80,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 15000
           },
           {
             "id": "050204",
@@ -1923,7 +3784,26 @@
             "questionCount": 126,
             "difficulty": "beginner",
             "popularity": 83,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 35000
           },
           {
             "id": "050205",
@@ -1934,7 +3814,26 @@
             "questionCount": 160,
             "difficulty": "advanced",
             "popularity": 45,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 8000
           },
           {
             "id": "050207",
@@ -1945,7 +3844,26 @@
             "questionCount": 176,
             "difficulty": "hard",
             "popularity": 66,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 15000
           }
         ]
       },
@@ -1965,7 +3883,26 @@
             "questionCount": 141,
             "difficulty": "beginner",
             "popularity": 67,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 12000
           },
           {
             "id": "050302",
@@ -1976,7 +3913,26 @@
             "questionCount": 103,
             "difficulty": "beginner",
             "popularity": 42,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 12000
           },
           {
             "id": "050303",
@@ -1987,7 +3943,26 @@
             "questionCount": 169,
             "difficulty": "hard",
             "popularity": 45,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 8000
           },
           {
             "id": "050304",
@@ -1998,7 +3973,26 @@
             "questionCount": 115,
             "difficulty": "intermediate",
             "popularity": 74,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 18000
           },
           {
             "id": "050305",
@@ -2009,7 +4003,26 @@
             "questionCount": 157,
             "difficulty": "intermediate",
             "popularity": 58,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 25000
           },
           {
             "id": "050306",
@@ -2020,7 +4033,26 @@
             "questionCount": 156,
             "difficulty": "beginner",
             "popularity": 73,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 18000
           }
         ]
       }
@@ -2050,7 +4082,26 @@
             "questionCount": 111,
             "difficulty": "beginner",
             "popularity": 83,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 35000
           },
           {
             "id": "060102",
@@ -2061,7 +4112,26 @@
             "questionCount": 165,
             "difficulty": "intermediate",
             "popularity": 40,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 12000
           },
           {
             "id": "060103",
@@ -2072,7 +4142,26 @@
             "questionCount": 88,
             "difficulty": "advanced",
             "popularity": 65,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 35000
           },
           {
             "id": "060104",
@@ -2083,7 +4172,26 @@
             "questionCount": 127,
             "difficulty": "intermediate",
             "popularity": 74,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 15000
           }
         ]
       }
@@ -2113,7 +4221,26 @@
             "questionCount": 90,
             "difficulty": "hard",
             "popularity": 55,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 18000
           },
           {
             "id": "070102",
@@ -2124,7 +4251,26 @@
             "questionCount": 138,
             "difficulty": "advanced",
             "popularity": 58,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 12000
           }
         ]
       },
@@ -2144,7 +4290,26 @@
             "questionCount": 118,
             "difficulty": "advanced",
             "popularity": 53,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 18000
           },
           {
             "id": "070202",
@@ -2155,7 +4320,26 @@
             "questionCount": 102,
             "difficulty": "intermediate",
             "popularity": 53,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 35000
           }
         ]
       },
@@ -2175,7 +4359,26 @@
             "questionCount": 107,
             "difficulty": "advanced",
             "popularity": 60,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 35000
           },
           {
             "id": "070302",
@@ -2186,7 +4389,26 @@
             "questionCount": 94,
             "difficulty": "hard",
             "popularity": 67,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 8000
           }
         ]
       },
@@ -2206,7 +4428,26 @@
             "questionCount": 157,
             "difficulty": "advanced",
             "popularity": 46,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 18000
           }
         ]
       },
@@ -2226,7 +4467,26 @@
             "questionCount": 114,
             "difficulty": "beginner",
             "popularity": 59,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 18000
           },
           {
             "id": "070502",
@@ -2237,7 +4497,26 @@
             "questionCount": 170,
             "difficulty": "beginner",
             "popularity": 83,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 25000
           },
           {
             "id": "070503",
@@ -2248,7 +4527,26 @@
             "questionCount": 132,
             "difficulty": "hard",
             "popularity": 67,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 25000
           }
         ]
       },
@@ -2268,7 +4566,26 @@
             "questionCount": 115,
             "difficulty": "beginner",
             "popularity": 59,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 35000
           },
           {
             "id": "070602",
@@ -2279,7 +4596,26 @@
             "questionCount": 170,
             "difficulty": "hard",
             "popularity": 56,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 18000
           }
         ]
       },
@@ -2299,7 +4635,26 @@
             "questionCount": 152,
             "difficulty": "advanced",
             "popularity": 68,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 8000
           },
           {
             "id": "070702",
@@ -2310,7 +4665,26 @@
             "questionCount": 80,
             "difficulty": "hard",
             "popularity": 46,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 15000
           }
         ]
       },
@@ -2330,7 +4704,26 @@
             "questionCount": 122,
             "difficulty": "hard",
             "popularity": 92,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 25000
           }
         ]
       },
@@ -2350,7 +4743,26 @@
             "questionCount": 159,
             "difficulty": "beginner",
             "popularity": 90,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 12000
           },
           {
             "id": "070902",
@@ -2361,7 +4773,26 @@
             "questionCount": 95,
             "difficulty": "intermediate",
             "popularity": 66,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 18000
           }
         ]
       },
@@ -2381,7 +4812,26 @@
             "questionCount": 159,
             "difficulty": "intermediate",
             "popularity": 68,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 12000
           },
           {
             "id": "071002",
@@ -2392,7 +4842,26 @@
             "questionCount": 128,
             "difficulty": "beginner",
             "popularity": 68,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 25000
           }
         ]
       },
@@ -2412,7 +4881,26 @@
             "questionCount": 149,
             "difficulty": "intermediate",
             "popularity": 92,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 12000
           },
           {
             "id": "071102",
@@ -2423,7 +4911,26 @@
             "questionCount": 81,
             "difficulty": "hard",
             "popularity": 77,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 15000
           }
         ]
       },
@@ -2443,7 +4950,26 @@
             "questionCount": 166,
             "difficulty": "beginner",
             "popularity": 75,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 8000
           },
           {
             "id": "071202",
@@ -2454,7 +4980,26 @@
             "questionCount": 132,
             "difficulty": "beginner",
             "popularity": 80,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 15000
           }
         ]
       }
@@ -2484,7 +5029,26 @@
             "questionCount": 99,
             "difficulty": "hard",
             "popularity": 82,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 8000
           }
         ]
       },
@@ -2504,7 +5068,26 @@
             "questionCount": 159,
             "difficulty": "advanced",
             "popularity": 43,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 35000
           },
           {
             "id": "080202",
@@ -2515,7 +5098,26 @@
             "questionCount": 125,
             "difficulty": "hard",
             "popularity": 88,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 35000
           },
           {
             "id": "080204",
@@ -2526,7 +5128,26 @@
             "questionCount": 163,
             "difficulty": "advanced",
             "popularity": 48,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 8000
           }
         ]
       },
@@ -2546,7 +5167,26 @@
             "questionCount": 81,
             "difficulty": "intermediate",
             "popularity": 87,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 18000
           },
           {
             "id": "080402",
@@ -2557,7 +5197,26 @@
             "questionCount": 135,
             "difficulty": "advanced",
             "popularity": 82,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 18000
           },
           {
             "id": "080403",
@@ -2568,7 +5227,26 @@
             "questionCount": 112,
             "difficulty": "intermediate",
             "popularity": 52,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 18000
           }
         ]
       },
@@ -2588,7 +5266,26 @@
             "questionCount": 160,
             "difficulty": "advanced",
             "popularity": 69,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 25000
           }
         ]
       },
@@ -2608,7 +5305,26 @@
             "questionCount": 115,
             "difficulty": "advanced",
             "popularity": 40,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 18000
           },
           {
             "id": "080702",
@@ -2619,7 +5335,26 @@
             "questionCount": 154,
             "difficulty": "beginner",
             "popularity": 51,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 8000
           },
           {
             "id": "080703",
@@ -2630,7 +5365,26 @@
             "questionCount": 165,
             "difficulty": "hard",
             "popularity": 83,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 18000
           },
           {
             "id": "080705",
@@ -2641,7 +5395,26 @@
             "questionCount": 114,
             "difficulty": "advanced",
             "popularity": 56,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 35000
           },
           {
             "id": "080717",
@@ -2652,7 +5425,26 @@
             "questionCount": 163,
             "difficulty": "intermediate",
             "popularity": 89,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 8000
           }
         ]
       },
@@ -2672,7 +5464,26 @@
             "questionCount": 134,
             "difficulty": "beginner",
             "popularity": 84,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 12000
           }
         ]
       },
@@ -2773,7 +5584,32 @@
                 ],
                 "questionCount": 74
               }
-            ]
+            ],
+            "coreCourses": [
+              "数据结构",
+              "算法设计",
+              "操作系统",
+              "数据库",
+              "网络协议",
+              "编译原理",
+              "人工智能"
+            ],
+            "relatedSkills": [
+              "编程",
+              "算法设计",
+              "系统设计",
+              "Python/Java",
+              "数据分析"
+            ],
+            "careerPaths": [
+              "软件工程师",
+              "系统架构师",
+              "AI工程师",
+              "数据科学家",
+              "技术主管"
+            ],
+            "employmentRate": 0.95,
+            "averageSalary": 12000
           },
           {
             "id": "080902",
@@ -2865,7 +5701,31 @@
                 ],
                 "questionCount": 71
               }
-            ]
+            ],
+            "coreCourses": [
+              "软件工程",
+              "设计模式",
+              "项目管理",
+              "测试理论",
+              "敏捷开发",
+              "需求分析"
+            ],
+            "relatedSkills": [
+              "项目管理",
+              "系统设计",
+              "Java/Python",
+              "测试",
+              "DevOps"
+            ],
+            "careerPaths": [
+              "软件工程师",
+              "项目经理",
+              "QA工程师",
+              "DevOps工程师",
+              "产品经理"
+            ],
+            "employmentRate": 0.94,
+            "averageSalary": 25000
           },
           {
             "id": "080903",
@@ -2876,7 +5736,26 @@
             "questionCount": 105,
             "difficulty": "advanced",
             "popularity": 47,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 18000
           },
           {
             "id": "080904",
@@ -2887,7 +5766,26 @@
             "questionCount": 164,
             "difficulty": "advanced",
             "popularity": 67,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 12000
           },
           {
             "id": "080905",
@@ -2898,7 +5796,26 @@
             "questionCount": 177,
             "difficulty": "intermediate",
             "popularity": 65,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 18000
           },
           {
             "id": "080906",
@@ -2909,7 +5826,26 @@
             "questionCount": 116,
             "difficulty": "intermediate",
             "popularity": 70,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 18000
           },
           {
             "id": "080907",
@@ -2920,7 +5856,26 @@
             "questionCount": 96,
             "difficulty": "intermediate",
             "popularity": 92,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 18000
           },
           {
             "id": "080910",
@@ -2931,7 +5886,26 @@
             "questionCount": 103,
             "difficulty": "hard",
             "popularity": 83,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 8000
           }
         ]
       },
@@ -2951,7 +5925,26 @@
             "questionCount": 132,
             "difficulty": "hard",
             "popularity": 92,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 8000
           },
           {
             "id": "081003",
@@ -2962,7 +5955,26 @@
             "questionCount": 82,
             "difficulty": "beginner",
             "popularity": 83,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 12000
           }
         ]
       },
@@ -2982,7 +5994,26 @@
             "questionCount": 145,
             "difficulty": "advanced",
             "popularity": 92,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 25000
           },
           {
             "id": "081302",
@@ -2993,7 +6024,26 @@
             "questionCount": 159,
             "difficulty": "advanced",
             "popularity": 85,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 18000
           }
         ]
       },
@@ -3013,7 +6063,26 @@
             "questionCount": 167,
             "difficulty": "advanced",
             "popularity": 84,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 35000
           },
           {
             "id": "082502",
@@ -3024,7 +6093,26 @@
             "questionCount": 97,
             "difficulty": "hard",
             "popularity": 69,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 25000
           }
         ]
       }
@@ -3054,7 +6142,26 @@
             "questionCount": 159,
             "difficulty": "intermediate",
             "popularity": 48,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 12000
           },
           {
             "id": "090102",
@@ -3065,7 +6172,26 @@
             "questionCount": 179,
             "difficulty": "intermediate",
             "popularity": 81,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 25000
           }
         ]
       },
@@ -3085,7 +6211,26 @@
             "questionCount": 101,
             "difficulty": "advanced",
             "popularity": 51,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 25000
           }
         ]
       },
@@ -3105,7 +6250,26 @@
             "questionCount": 163,
             "difficulty": "advanced",
             "popularity": 72,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 12000
           }
         ]
       },
@@ -3125,7 +6289,26 @@
             "questionCount": 116,
             "difficulty": "hard",
             "popularity": 83,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 25000
           }
         ]
       },
@@ -3145,7 +6328,26 @@
             "questionCount": 146,
             "difficulty": "hard",
             "popularity": 70,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 15000
           }
         ]
       },
@@ -3165,7 +6367,26 @@
             "questionCount": 179,
             "difficulty": "intermediate",
             "popularity": 93,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 15000
           }
         ]
       },
@@ -3185,7 +6406,26 @@
             "questionCount": 126,
             "difficulty": "advanced",
             "popularity": 53,
-            "specializations": []
+            "specializations": [],
+            "coreCourses": [
+              "专业导论",
+              "基础理论",
+              "实践应用",
+              "毕业设计"
+            ],
+            "relatedSkills": [
+              "专业知识",
+              "实践能力",
+              "创新思维",
+              "沟通能力"
+            ],
+            "careerPaths": [
+              "相关工作者",
+              "研究员",
+              "教育工作者"
+            ],
+            "employmentRate": 0.85,
+            "averageSalary": 25000
           }
         ]
       }
