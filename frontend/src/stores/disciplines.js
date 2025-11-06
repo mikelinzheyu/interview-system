@@ -83,10 +83,12 @@ export const useDisciplinesStore = defineStore('disciplines', () => {
    * 选择学科
    */
   function selectDiscipline(discipline) {
+    console.log('[Disciplines] 选择学科:', discipline)
     currentDiscipline.value = discipline
     currentMajorGroup.value = null
     currentMajor.value = null
     currentSpecialization.value = null
+    console.log('[Disciplines] 当前状态 - currentDiscipline:', currentDiscipline.value)
     updateBreadcrumb()
   }
 
@@ -95,8 +97,11 @@ export const useDisciplinesStore = defineStore('disciplines', () => {
    * 加载某个学科的专业类列表
    */
   async function loadMajorGroups(disciplineId, options = {}) {
+    console.log('[Disciplines] 开始加载专业类，学科ID:', disciplineId)
+
     // 检查缓存
     if (majorGroupsCache[disciplineId] && !options.force) {
+      console.log('[Disciplines] 使用缓存数据，专业类:', majorGroupsCache[disciplineId])
       return majorGroupsCache[disciplineId]
     }
 
@@ -105,16 +110,25 @@ export const useDisciplinesStore = defineStore('disciplines', () => {
     }
 
     try {
+      console.log('[Disciplines] 发送API请求: /disciplines/' + disciplineId + '/major-groups')
       const response = await api.get(`/disciplines/${disciplineId}/major-groups`)
+      console.log('[Disciplines] API 响应:', response)
+
       const payload = response.data || response
       const list = Array.isArray(payload) ? payload : payload.data || []
 
+      console.log('[Disciplines] 解析后的专业类列表:', list)
+
       majorGroupsCache[disciplineId] = list
       majorGroupsError[disciplineId] = null
+
+      console.log('[Disciplines] 专业类加载成功，共', list.length, '个')
       return list
     } catch (err) {
       majorGroupsError[disciplineId] = err
-      console.error(`Failed to load major groups for discipline ${disciplineId}:`, err)
+      console.error(`[Disciplines] 加载失败 - 学科ID ${disciplineId}:`, err)
+      console.error('[Disciplines] 错误详情:', err.message, err.response?.data)
+      ElMessage.error(`加载专业类失败: ${err.message}`)
       return []
     } finally {
       majorGroupsLoading[disciplineId] = false

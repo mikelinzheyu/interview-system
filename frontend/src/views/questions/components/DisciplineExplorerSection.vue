@@ -8,6 +8,28 @@
       <p class="section-subtitle">4层递进式学习: 学科 → 专业类 → 专业 → 细分方向</p>
     </div>
 
+    <!-- 调试信息面板（开发环境） -->
+    <div v-if="true" class="debug-panel">
+      <div class="debug-item">
+        <span>当前层级:</span>
+        <span class="debug-value">{{ currentLevel }}</span>
+      </div>
+      <div class="debug-item">
+        <span>当前学科:</span>
+        <span class="debug-value">{{ disciplinesStore.currentDiscipline?.name || '无' }}</span>
+      </div>
+      <div class="debug-item">
+        <span>当前专业类:</span>
+        <span class="debug-value">{{ disciplinesStore.currentMajorGroup?.name || '无' }}</span>
+      </div>
+      <div class="debug-item">
+        <span>已加载专业类数:</span>
+        <span class="debug-value">
+          {{ disciplinesStore.currentDiscipline ? (disciplinesStore.majorGroupsCache[disciplinesStore.currentDiscipline.id]?.length || 0) : 0 }}
+        </span>
+      </div>
+    </div>
+
     <!-- 面包屑导航 -->
     <BreadcrumbNavigation
       v-if="currentLevel !== 'root'"
@@ -133,11 +155,27 @@ onMounted(async () => {
 })
 
 const currentLevel = computed(() => {
-  if (disciplinesStore.currentSpecialization) return 'specialization'
-  if (disciplinesStore.currentMajor) return 'majorDetail'
-  if (disciplinesStore.currentMajorGroup) return 'majorGroup'
-  if (disciplinesStore.currentDiscipline) return 'majorGroup'
-  return 'root'
+  let level = 'root'
+
+  if (disciplinesStore.currentSpecialization) {
+    level = 'specialization'
+  } else if (disciplinesStore.currentMajor) {
+    level = 'majorDetail'
+  } else if (disciplinesStore.currentMajorGroup) {
+    level = 'majorGroup'
+  } else if (disciplinesStore.currentDiscipline) {
+    level = 'majorGroup'
+  }
+
+  console.log('[DisciplineExplorer] currentLevel 计算结果:', {
+    level,
+    hasDiscipline: !!disciplinesStore.currentDiscipline,
+    hasMajorGroup: !!disciplinesStore.currentMajorGroup,
+    hasMajor: !!disciplinesStore.currentMajor,
+    hasSpecialization: !!disciplinesStore.currentSpecialization
+  })
+
+  return level
 })
 
 // 应用过滤和排序
@@ -190,12 +228,21 @@ function handleBreadcrumbNavigation(event) {
 
 // 选择学科处理
 async function selectDisciplineHandler(discipline) {
+  console.log('[DisciplineExplorer] 选择学科点击事件:', discipline.name)
   try {
+    console.log('[DisciplineExplorer] 调用 selectDiscipline')
     disciplinesStore.selectDiscipline(discipline)
+
+    console.log('[DisciplineExplorer] 加载专业类...')
     // 预加载专业类
     await disciplinesStore.loadMajorGroups(discipline.id)
+
+    console.log('[DisciplineExplorer] 专业类加载完成，当前状态:', {
+      currentDiscipline: disciplinesStore.currentDiscipline?.name,
+      majorGroups: disciplinesStore.majorGroupsCache[discipline.id]?.length || 0
+    })
   } catch (err) {
-    console.error('Failed to select discipline:', err)
+    console.error('[DisciplineExplorer] 选择学科出错:', err)
   }
 }
 
@@ -278,6 +325,35 @@ function getDisciplineColor(index) {
   display: flex;
   flex-direction: column;
   gap: 32px;
+}
+
+.debug-panel {
+  background: #fff9e6;
+  border: 1px solid #ffd591;
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin-bottom: 16px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+  font-size: 12px;
+}
+
+.debug-item {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+
+  span:first-child {
+    color: #666;
+    font-weight: 500;
+  }
+
+  .debug-value {
+    color: #ff9800;
+    font-weight: 600;
+    font-family: monospace;
+  }
 }
 
 .section-header {
