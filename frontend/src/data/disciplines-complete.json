@@ -1,744 +1,5 @@
 [
   {
-    "id": "01",
-    "code": "01",
-    "name": "哲学",
-    "icon": "🤔",
-    "description": "研究人生观、世界观、方法论的学科",
-    "color": "#9B59B6",
-    "majorGroups": [
-      {
-        "id": "0101",
-        "code": "0101",
-        "name": "哲学类",
-        "description": "哲学类专业类",
-        "questionCount": 304,
-        "majors": [
-          {
-            "id": "010101",
-            "code": "010101",
-            "name": "哲学",
-            "description": "研究哲学基本问题",
-            "icon": "📚",
-            "questionCount": 93,
-            "difficulty": "beginner",
-            "popularity": 77,
-            "specializations": [
-              {
-                "id": "哲学-0",
-                "name": "伦理学",
-                "description": "伦理学方向",
-                "coreCourses": [
-                  "伦理学基础",
-                  "伦理学研究"
-                ],
-                "relatedSkills": [
-                  "研究",
-                  "分析",
-                  "应用"
-                ],
-                "questionCount": 98
-              },
-              {
-                "id": "哲学-1",
-                "name": "逻辑学",
-                "description": "逻辑学方向",
-                "coreCourses": [
-                  "逻辑学基础",
-                  "逻辑学研究"
-                ],
-                "relatedSkills": [
-                  "研究",
-                  "分析",
-                  "应用"
-                ],
-                "questionCount": 40
-              },
-              {
-                "id": "哲学-2",
-                "name": "宗教学",
-                "description": "宗教学方向",
-                "coreCourses": [
-                  "宗教学基础",
-                  "宗教学研究"
-                ],
-                "relatedSkills": [
-                  "研究",
-                  "分析",
-                  "应用"
-                ],
-                "questionCount": 54
-              }
-            ]
-          },
-          {
-            "id": "010102",
-            "code": "010102",
-            "name": "逻辑学",
-            "description": "研究思维规律",
-            "icon": "📚",
-            "questionCount": 132,
-            "difficulty": "advanced",
-            "popularity": 85,
-            "specializations": []
-          },
-          {
-            "id": "010103",
-            "code": "010103",
-            "name": "宗教学",
-            "description": "研究宗教现象",
-            "icon": "📚",
-            "questionCount": 102,
-            "difficulty": "hard",
-            "popularity": 87,
-            "specializations": []
-          }
-        ]
-      }
-    ]
-  },
-  {
-    "id": "02",
-    "code": "02",
-    "name": "经济学",
-    "icon": "💰",
-    "description": "研究经济现象和经济规律的学科",
-    "color": "#FF6B6B",
-    "majorGroups": [
-      {
-        "id": "0201",
-        "code": "0201",
-        "name": "经济学类",
-        "description": "经济学类专业类",
-        "questionCount": 268,
-        "majors": [
-          {
-            "id": "020101",
-            "code": "020101",
-            "name": "经济学",
-            "description": "研究经济现象",
-            "icon": "📚",
-            "questionCount": 92,
-            "difficulty": "beginner",
-            "popularity": 54,
-            "specializations": [
-              {
-                "id": "经济学-0",
-                "name": "宏观经济学",
-                "description": "宏观经济学方向",
-                "coreCourses": [
-                  "宏观经济学基础",
-                  "宏观经济学研究"
-                ],
-                "relatedSkills": [
-                  "研究",
-                  "分析",
-                  "应用"
-                ],
-                "questionCount": 78
-              },
-              {
-                "id": "经济学-1",
-                "name": "微观经济学",
-                "description": "微观经济学方向",
-                "coreCourses": [
-                  "微观经济学基础",
-                  "微观经济学研究"
-                ],
-                "relatedSkills": [
-                  "研究",
-                  "分析",
-                  "应用"
-                ],
-                "questionCount": 98
-              }
-            ]
-          },
-          {
-            "id": "020102",
-            "code": "020102",
-            "name": "经济统计学",
-            "description": "经济数据分析",
-            "icon": "📚",
-            "questionCount": 119,
-            "difficulty": "hard",
-            "popularity": 69,
-            "specializations": []
-          }
-        ]
-      },
-      {
-        "id": "0203",
-        "code": "0203",
-        "name": "金融学类",
-        "description": "金融学类专业类",
-        "questionCount": 305,
-        "majors": [
-          {
-            "id": "020301",
-            "code": "020301",
-            "name": "金融学",
-            "description": "研究金融规律",
-            "icon": "📚",
-            "questionCount": 121,
-            "difficulty": "advanced",
-            "popularity": 78,
-            "specializations": [
-              {
-                "id": "金融学-0",
-                "name": "国际金融",
-                "description": "国际金融方向",
-                "coreCourses": [
-                  "国际金融基础",
-                  "国际金融研究"
-                ],
-                "relatedSkills": [
-                  "研究",
-                  "分析",
-                  "应用"
-                ],
-                "questionCount": 71
-              },
-              {
-                "id": "金融学-1",
-                "name": "公司金融",
-                "description": "公司金融方向",
-                "coreCourses": [
-                  "公司金融基础",
-                  "公司金融研究"
-                ],
-                "relatedSkills": [
-                  "研究",
-                  "分析",
-                  "应用"
-                ],
-                "questionCount": 52
-              },
-              {
-                "id": "金融学-2",
-                "name": "量化金融",
-                "description": "量化金融方向",
-                "coreCourses": [
-                  "量化金融基础",
-                  "量化金融研究"
-                ],
-                "relatedSkills": [
-                  "研究",
-                  "分析",
-                  "应用"
-                ],
-                "questionCount": 37
-              }
-            ]
-          },
-          {
-            "id": "020302",
-            "code": "020302",
-            "name": "金融工程",
-            "description": "金融产品设计",
-            "icon": "📚",
-            "questionCount": 119,
-            "difficulty": "hard",
-            "popularity": 74,
-            "specializations": []
-          },
-          {
-            "id": "020303",
-            "code": "020303",
-            "name": "保险学",
-            "description": "保险理论与实务",
-            "icon": "📚",
-            "questionCount": 165,
-            "difficulty": "beginner",
-            "popularity": 49,
-            "specializations": []
-          }
-        ]
-      }
-    ]
-  },
-  {
-    "id": "03",
-    "code": "03",
-    "name": "法学",
-    "icon": "⚖️",
-    "description": "研究法律现象和法律规律的学科",
-    "color": "#3498DB",
-    "majorGroups": [
-      {
-        "id": "0301",
-        "code": "0301",
-        "name": "法学类",
-        "description": "法学类专业类",
-        "questionCount": 317,
-        "majors": [
-          {
-            "id": "030101",
-            "code": "030101",
-            "name": "法学",
-            "description": "研究法律现象",
-            "icon": "📚",
-            "questionCount": 168,
-            "difficulty": "advanced",
-            "popularity": 71,
-            "specializations": [
-              {
-                "id": "法学-0",
-                "name": "民商法",
-                "description": "民商法方向",
-                "coreCourses": [
-                  "民商法基础",
-                  "民商法研究"
-                ],
-                "relatedSkills": [
-                  "研究",
-                  "分析",
-                  "应用"
-                ],
-                "questionCount": 90
-              },
-              {
-                "id": "法学-1",
-                "name": "刑法",
-                "description": "刑法方向",
-                "coreCourses": [
-                  "刑法基础",
-                  "刑法研究"
-                ],
-                "relatedSkills": [
-                  "研究",
-                  "分析",
-                  "应用"
-                ],
-                "questionCount": 45
-              },
-              {
-                "id": "法学-2",
-                "name": "经济法",
-                "description": "经济法方向",
-                "coreCourses": [
-                  "经济法基础",
-                  "经济法研究"
-                ],
-                "relatedSkills": [
-                  "研究",
-                  "分析",
-                  "应用"
-                ],
-                "questionCount": 44
-              }
-            ]
-          }
-        ]
-      }
-    ]
-  },
-  {
-    "id": "04",
-    "code": "04",
-    "name": "教育学",
-    "icon": "📚",
-    "description": "研究教育现象和教育规律的学科",
-    "color": "#2ECC71",
-    "majorGroups": [
-      {
-        "id": "0401",
-        "code": "0401",
-        "name": "教育学类",
-        "description": "教育学类专业类",
-        "questionCount": 332,
-        "majors": [
-          {
-            "id": "040101",
-            "code": "040101",
-            "name": "教育学",
-            "description": "研究教育规律",
-            "icon": "📚",
-            "questionCount": 96,
-            "difficulty": "hard",
-            "popularity": 42,
-            "specializations": []
-          },
-          {
-            "id": "040102",
-            "code": "040102",
-            "name": "科学教育",
-            "description": "科学教学方法",
-            "icon": "📚",
-            "questionCount": 132,
-            "difficulty": "beginner",
-            "popularity": 84,
-            "specializations": []
-          }
-        ]
-      }
-    ]
-  },
-  {
-    "id": "05",
-    "code": "05",
-    "name": "文学",
-    "icon": "✍️",
-    "description": "研究文学现象和文学创作的学科",
-    "color": "#F39C12",
-    "majorGroups": [
-      {
-        "id": "0501",
-        "code": "0501",
-        "name": "中国语言文学类",
-        "description": "中国语言文学类专业类",
-        "questionCount": 277,
-        "majors": [
-          {
-            "id": "050101",
-            "code": "050101",
-            "name": "汉语言文学",
-            "description": "中文语言文学",
-            "icon": "📚",
-            "questionCount": 98,
-            "difficulty": "intermediate",
-            "popularity": 50,
-            "specializations": []
-          },
-          {
-            "id": "050102",
-            "code": "050102",
-            "name": "汉语言",
-            "description": "汉语语法研究",
-            "icon": "📚",
-            "questionCount": 95,
-            "difficulty": "advanced",
-            "popularity": 78,
-            "specializations": []
-          }
-        ]
-      },
-      {
-        "id": "0502",
-        "code": "0502",
-        "name": "外国语言文学类",
-        "description": "外国语言文学类专业类",
-        "questionCount": 345,
-        "majors": [
-          {
-            "id": "050201",
-            "code": "050201",
-            "name": "英语",
-            "description": "英语语言文学",
-            "icon": "📚",
-            "questionCount": 137,
-            "difficulty": "beginner",
-            "popularity": 67,
-            "specializations": []
-          },
-          {
-            "id": "050202",
-            "code": "050202",
-            "name": "日语",
-            "description": "日语语言文学",
-            "icon": "📚",
-            "questionCount": 85,
-            "difficulty": "advanced",
-            "popularity": 88,
-            "specializations": []
-          }
-        ]
-      }
-    ]
-  },
-  {
-    "id": "06",
-    "code": "06",
-    "name": "历史学",
-    "icon": "📖",
-    "description": "研究历史现象和历史规律的学科",
-    "color": "#E74C3C",
-    "majorGroups": [
-      {
-        "id": "0601",
-        "code": "0601",
-        "name": "历史学类",
-        "description": "历史学类专业类",
-        "questionCount": 294,
-        "majors": [
-          {
-            "id": "060101",
-            "code": "060101",
-            "name": "历史学",
-            "description": "历史理论与研究",
-            "icon": "📚",
-            "questionCount": 82,
-            "difficulty": "hard",
-            "popularity": 46,
-            "specializations": []
-          },
-          {
-            "id": "060102",
-            "code": "060102",
-            "name": "世界史",
-            "description": "世界历史研究",
-            "icon": "📚",
-            "questionCount": 158,
-            "difficulty": "beginner",
-            "popularity": 77,
-            "specializations": []
-          }
-        ]
-      }
-    ]
-  },
-  {
-    "id": "07",
-    "code": "07",
-    "name": "理学",
-    "icon": "🔬",
-    "description": "研究自然现象和自然规律的学科",
-    "color": "#1ABC9C",
-    "majorGroups": [
-      {
-        "id": "0701",
-        "code": "0701",
-        "name": "数学类",
-        "description": "数学类专业类",
-        "questionCount": 335,
-        "majors": [
-          {
-            "id": "070101",
-            "code": "070101",
-            "name": "数学与应用数学",
-            "description": "数学理论与应用",
-            "icon": "📚",
-            "questionCount": 82,
-            "difficulty": "hard",
-            "popularity": 44,
-            "specializations": []
-          },
-          {
-            "id": "070102",
-            "code": "070102",
-            "name": "信息与计算科学",
-            "description": "计算数学",
-            "icon": "📚",
-            "questionCount": 159,
-            "difficulty": "advanced",
-            "popularity": 53,
-            "specializations": []
-          }
-        ]
-      },
-      {
-        "id": "0702",
-        "code": "0702",
-        "name": "物理学类",
-        "description": "物理学类专业类",
-        "questionCount": 316,
-        "majors": [
-          {
-            "id": "070201",
-            "code": "070201",
-            "name": "物理学",
-            "description": "物理理论研究",
-            "icon": "📚",
-            "questionCount": 177,
-            "difficulty": "advanced",
-            "popularity": 67,
-            "specializations": []
-          }
-        ]
-      }
-    ]
-  },
-  {
-    "id": "08",
-    "code": "08",
-    "name": "工学",
-    "icon": "🏗️",
-    "description": "研究工程应用和技术创新的学科",
-    "color": "#34495E",
-    "majorGroups": [
-      {
-        "id": "0809",
-        "code": "0809",
-        "name": "计算机类",
-        "description": "计算机类专业类",
-        "questionCount": 253,
-        "majors": [
-          {
-            "id": "080901",
-            "code": "080901",
-            "name": "计算机科学与技术",
-            "description": "计算机理论与应用",
-            "icon": "📚",
-            "questionCount": 124,
-            "difficulty": "hard",
-            "popularity": 50,
-            "specializations": [
-              {
-                "id": "计算机科学与技术-0",
-                "name": "人工智能",
-                "description": "人工智能方向",
-                "coreCourses": [
-                  "人工智能基础",
-                  "人工智能研究"
-                ],
-                "relatedSkills": [
-                  "研究",
-                  "分析",
-                  "应用"
-                ],
-                "questionCount": 20
-              },
-              {
-                "id": "计算机科学与技术-1",
-                "name": "网络安全",
-                "description": "网络安全方向",
-                "coreCourses": [
-                  "网络安全基础",
-                  "网络安全研究"
-                ],
-                "relatedSkills": [
-                  "研究",
-                  "分析",
-                  "应用"
-                ],
-                "questionCount": 35
-              },
-              {
-                "id": "计算机科学与技术-2",
-                "name": "计算机图形学",
-                "description": "计算机图形学方向",
-                "coreCourses": [
-                  "计算机图形学基础",
-                  "计算机图形学研究"
-                ],
-                "relatedSkills": [
-                  "研究",
-                  "分析",
-                  "应用"
-                ],
-                "questionCount": 49
-              }
-            ]
-          },
-          {
-            "id": "080902",
-            "code": "080902",
-            "name": "软件工程",
-            "description": "软件开发与管理",
-            "icon": "📚",
-            "questionCount": 179,
-            "difficulty": "hard",
-            "popularity": 86,
-            "specializations": [
-              {
-                "id": "软件工程-0",
-                "name": "软件开发",
-                "description": "软件开发方向",
-                "coreCourses": [
-                  "软件开发基础",
-                  "软件开发研究"
-                ],
-                "relatedSkills": [
-                  "研究",
-                  "分析",
-                  "应用"
-                ],
-                "questionCount": 74
-              },
-              {
-                "id": "软件工程-1",
-                "name": "云计算",
-                "description": "云计算方向",
-                "coreCourses": [
-                  "云计算基础",
-                  "云计算研究"
-                ],
-                "relatedSkills": [
-                  "研究",
-                  "分析",
-                  "应用"
-                ],
-                "questionCount": 48
-              }
-            ]
-          },
-          {
-            "id": "080903",
-            "code": "080903",
-            "name": "网络工程",
-            "description": "网络设计与管理",
-            "icon": "📚",
-            "questionCount": 82,
-            "difficulty": "intermediate",
-            "popularity": 76,
-            "specializations": []
-          },
-          {
-            "id": "080904",
-            "code": "080904",
-            "name": "信息安全",
-            "description": "信息系统安全",
-            "icon": "📚",
-            "questionCount": 94,
-            "difficulty": "hard",
-            "popularity": 55,
-            "specializations": []
-          }
-        ]
-      },
-      {
-        "id": "0802",
-        "code": "0802",
-        "name": "机械类",
-        "description": "机械类专业类",
-        "questionCount": 331,
-        "majors": [
-          {
-            "id": "080201",
-            "code": "080201",
-            "name": "机械工程",
-            "description": "机械设计与制造",
-            "icon": "📚",
-            "questionCount": 100,
-            "difficulty": "beginner",
-            "popularity": 92,
-            "specializations": []
-          }
-        ]
-      }
-    ]
-  },
-  {
-    "id": "09",
-    "code": "09",
-    "name": "农学",
-    "icon": "🌾",
-    "description": "研究农业生产和农业科学的学科",
-    "color": "#27AE60",
-    "majorGroups": [
-      {
-        "id": "0901",
-        "code": "0901",
-        "name": "植物生产类",
-        "description": "植物生产类专业类",
-        "questionCount": 284,
-        "majors": [
-          {
-            "id": "090101",
-            "code": "090101",
-            "name": "农学",
-            "description": "作物栽培与育种",
-            "icon": "📚",
-            "questionCount": 103,
-            "difficulty": "intermediate",
-            "popularity": 86,
-            "specializations": []
-          }
-        ]
-      }
-    ]
-  },
-  {
     "id": "10",
     "code": "10",
     "name": "医学",
@@ -747,53 +8,167 @@
     "color": "#C0392B",
     "majorGroups": [
       {
+        "id": "1001",
+        "code": "1001",
+        "name": "基础医学类",
+        "description": "基础医学类",
+        "questionCount": 270,
+        "majors": [
+          {
+            "id": "100101",
+            "code": "100101",
+            "name": "基础医学",
+            "description": "基础医学",
+            "icon": "📚",
+            "questionCount": 105,
+            "difficulty": "hard",
+            "popularity": 57,
+            "specializations": []
+          }
+        ]
+      },
+      {
         "id": "1002",
         "code": "1002",
         "name": "临床医学类",
-        "description": "临床医学类专业类",
-        "questionCount": 332,
+        "description": "临床医学类",
+        "questionCount": 289,
         "majors": [
           {
             "id": "100201",
             "code": "100201",
             "name": "临床医学",
-            "description": "临床诊断与治疗",
+            "description": "临床诊断和治疗",
             "icon": "📚",
-            "questionCount": 168,
-            "difficulty": "beginner",
-            "popularity": 73,
+            "questionCount": 81,
+            "difficulty": "advanced",
+            "popularity": 41,
             "specializations": [
               {
-                "id": "临床医学-0",
+                "id": "内科学",
                 "name": "内科学",
                 "description": "内科学方向",
                 "coreCourses": [
                   "内科学基础",
-                  "内科学研究"
+                  "内科学研究",
+                  "内科学实践"
                 ],
                 "relatedSkills": [
-                  "研究",
-                  "分析",
-                  "应用"
+                  "专业知识",
+                  "实践能力",
+                  "创新思维"
                 ],
-                "questionCount": 76
+                "questionCount": 23
               },
               {
-                "id": "临床医学-1",
+                "id": "外科学",
                 "name": "外科学",
                 "description": "外科学方向",
                 "coreCourses": [
                   "外科学基础",
-                  "外科学研究"
+                  "外科学研究",
+                  "外科学实践"
                 ],
                 "relatedSkills": [
-                  "研究",
-                  "分析",
-                  "应用"
+                  "专业知识",
+                  "实践能力",
+                  "创新思维"
                 ],
-                "questionCount": 90
+                "questionCount": 70
+              },
+              {
+                "id": "妇产科学",
+                "name": "妇产科学",
+                "description": "妇产科学方向",
+                "coreCourses": [
+                  "妇产科学基础",
+                  "妇产科学研究",
+                  "妇产科学实践"
+                ],
+                "relatedSkills": [
+                  "专业知识",
+                  "实践能力",
+                  "创新思维"
+                ],
+                "questionCount": 70
+              },
+              {
+                "id": "儿科学",
+                "name": "儿科学",
+                "description": "儿科学方向",
+                "coreCourses": [
+                  "儿科学基础",
+                  "儿科学研究",
+                  "儿科学实践"
+                ],
+                "relatedSkills": [
+                  "专业知识",
+                  "实践能力",
+                  "创新思维"
+                ],
+                "questionCount": 40
               }
             ]
+          }
+        ]
+      },
+      {
+        "id": "1003",
+        "code": "1003",
+        "name": "口腔医学类",
+        "description": "口腔医学类",
+        "questionCount": 313,
+        "majors": [
+          {
+            "id": "100301",
+            "code": "100301",
+            "name": "口腔医学",
+            "description": "口腔医学",
+            "icon": "📚",
+            "questionCount": 135,
+            "difficulty": "beginner",
+            "popularity": 78,
+            "specializations": []
+          }
+        ]
+      },
+      {
+        "id": "1004",
+        "code": "1004",
+        "name": "公共卫生与预防医学类",
+        "description": "公共卫生与预防医学类",
+        "questionCount": 343,
+        "majors": [
+          {
+            "id": "100401",
+            "code": "100401",
+            "name": "预防医学",
+            "description": "预防医学",
+            "icon": "📚",
+            "questionCount": 111,
+            "difficulty": "advanced",
+            "popularity": 57,
+            "specializations": []
+          }
+        ]
+      },
+      {
+        "id": "1005",
+        "code": "1005",
+        "name": "中医学类",
+        "description": "中医学类",
+        "questionCount": 307,
+        "majors": [
+          {
+            "id": "100501",
+            "code": "100501",
+            "name": "中医学",
+            "description": "中医学",
+            "icon": "📚",
+            "questionCount": 92,
+            "difficulty": "intermediate",
+            "popularity": 64,
+            "specializations": []
           }
         ]
       },
@@ -801,18 +176,100 @@
         "id": "1007",
         "code": "1007",
         "name": "药学类",
-        "description": "药学类专业类",
-        "questionCount": 264,
+        "description": "药学类",
+        "questionCount": 346,
         "majors": [
           {
             "id": "100701",
             "code": "100701",
             "name": "药学",
-            "description": "药物化学与应用",
+            "description": "药物化学和药理学",
             "icon": "📚",
-            "questionCount": 93,
+            "questionCount": 156,
+            "difficulty": "hard",
+            "popularity": 52,
+            "specializations": []
+          },
+          {
+            "id": "100702",
+            "code": "100702",
+            "name": "临床药学",
+            "description": "临床药学",
+            "icon": "📚",
+            "questionCount": 81,
+            "difficulty": "advanced",
+            "popularity": 68,
+            "specializations": []
+          }
+        ]
+      },
+      {
+        "id": "1008",
+        "code": "1008",
+        "name": "中药学类",
+        "description": "中药学类",
+        "questionCount": 281,
+        "majors": [
+          {
+            "id": "100801",
+            "code": "100801",
+            "name": "中药学",
+            "description": "中药学",
+            "icon": "📚",
+            "questionCount": 162,
+            "difficulty": "intermediate",
+            "popularity": 83,
+            "specializations": []
+          }
+        ]
+      },
+      {
+        "id": "1010",
+        "code": "1010",
+        "name": "医学技术类",
+        "description": "医学技术类",
+        "questionCount": 338,
+        "majors": [
+          {
+            "id": "101001",
+            "code": "101001",
+            "name": "医学检验技术",
+            "description": "医学检验技术",
+            "icon": "📚",
+            "questionCount": 90,
+            "difficulty": "hard",
+            "popularity": 61,
+            "specializations": []
+          },
+          {
+            "id": "101003",
+            "code": "101003",
+            "name": "医学影像技术",
+            "description": "医学影像技术",
+            "icon": "📚",
+            "questionCount": 142,
+            "difficulty": "intermediate",
+            "popularity": 73,
+            "specializations": []
+          }
+        ]
+      },
+      {
+        "id": "1011",
+        "code": "1011",
+        "name": "护理学类",
+        "description": "护理学类",
+        "questionCount": 263,
+        "majors": [
+          {
+            "id": "101101",
+            "code": "101101",
+            "name": "护理学",
+            "description": "护理学",
+            "icon": "📚",
+            "questionCount": 84,
             "difficulty": "beginner",
-            "popularity": 92,
+            "popularity": 83,
             "specializations": []
           }
         ]
@@ -831,18 +288,18 @@
         "id": "1101",
         "code": "1101",
         "name": "军事学理论类",
-        "description": "军事学理论类专业类",
-        "questionCount": 292,
+        "description": "军事学理论类",
+        "questionCount": 318,
         "majors": [
           {
             "id": "110101",
             "code": "110101",
             "name": "军事学",
-            "description": "军事理论与战略",
+            "description": "军事战略和战术理论",
             "icon": "📚",
-            "questionCount": 88,
+            "questionCount": 122,
             "difficulty": "intermediate",
-            "popularity": 68,
+            "popularity": 59,
             "specializations": []
           }
         ]
@@ -858,51 +315,111 @@
     "color": "#16A085",
     "majorGroups": [
       {
+        "id": "1201",
+        "code": "1201",
+        "name": "管理科学与工程类",
+        "description": "管理科学与工程类",
+        "questionCount": 334,
+        "majors": [
+          {
+            "id": "120101",
+            "code": "120101",
+            "name": "管理科学",
+            "description": "管理科学",
+            "icon": "📚",
+            "questionCount": 128,
+            "difficulty": "intermediate",
+            "popularity": 47,
+            "specializations": []
+          },
+          {
+            "id": "120102",
+            "code": "120102",
+            "name": "信息管理与信息系统",
+            "description": "信息管理与信息系统",
+            "icon": "📚",
+            "questionCount": 153,
+            "difficulty": "hard",
+            "popularity": 40,
+            "specializations": []
+          },
+          {
+            "id": "120103",
+            "code": "120103",
+            "name": "工程管理",
+            "description": "工程管理",
+            "icon": "📚",
+            "questionCount": 114,
+            "difficulty": "advanced",
+            "popularity": 71,
+            "specializations": []
+          }
+        ]
+      },
+      {
         "id": "1202",
         "code": "1202",
         "name": "工商管理类",
-        "description": "工商管理类专业类",
-        "questionCount": 308,
+        "description": "工商管理类",
+        "questionCount": 332,
         "majors": [
           {
             "id": "120201",
             "code": "120201",
             "name": "工商管理",
-            "description": "企业经营管理",
+            "description": "企业战略和运营管理",
             "icon": "📚",
-            "questionCount": 151,
-            "difficulty": "beginner",
-            "popularity": 70,
+            "questionCount": 176,
+            "difficulty": "intermediate",
+            "popularity": 55,
             "specializations": [
               {
-                "id": "工商管理-0",
+                "id": "战略管理",
                 "name": "战略管理",
                 "description": "战略管理方向",
                 "coreCourses": [
                   "战略管理基础",
-                  "战略管理研究"
+                  "战略管理研究",
+                  "战略管理实践"
                 ],
                 "relatedSkills": [
-                  "研究",
-                  "分析",
-                  "应用"
+                  "专业知识",
+                  "实践能力",
+                  "创新思维"
                 ],
-                "questionCount": 90
+                "questionCount": 86
               },
               {
-                "id": "工商管理-1",
+                "id": "市场营销",
                 "name": "市场营销",
                 "description": "市场营销方向",
                 "coreCourses": [
                   "市场营销基础",
-                  "市场营销研究"
+                  "市场营销研究",
+                  "市场营销实践"
                 ],
                 "relatedSkills": [
-                  "研究",
-                  "分析",
-                  "应用"
+                  "专业知识",
+                  "实践能力",
+                  "创新思维"
                 ],
-                "questionCount": 74
+                "questionCount": 40
+              },
+              {
+                "id": "生产运营管理",
+                "name": "生产运营管理",
+                "description": "生产运营管理方向",
+                "coreCourses": [
+                  "生产运营管理基础",
+                  "生产运营管理研究",
+                  "生产运营管理实践"
+                ],
+                "relatedSkills": [
+                  "专业知识",
+                  "实践能力",
+                  "创新思维"
+                ],
+                "questionCount": 47
               }
             ]
           },
@@ -910,22 +427,64 @@
             "id": "120202",
             "code": "120202",
             "name": "市场营销",
-            "description": "营销战略与管理",
+            "description": "营销战略和客户管理",
             "icon": "📚",
-            "questionCount": 174,
-            "difficulty": "intermediate",
-            "popularity": 61,
+            "questionCount": 171,
+            "difficulty": "advanced",
+            "popularity": 89,
             "specializations": []
           },
           {
             "id": "120203",
             "code": "120203",
             "name": "会计学",
-            "description": "财务会计与管理",
+            "description": "财务会计和管理会计",
             "icon": "📚",
-            "questionCount": 147,
-            "difficulty": "hard",
-            "popularity": 83,
+            "questionCount": 146,
+            "difficulty": "advanced",
+            "popularity": 81,
+            "specializations": []
+          },
+          {
+            "id": "120204",
+            "code": "120204",
+            "name": "财务管理",
+            "description": "财务管理",
+            "icon": "📚",
+            "questionCount": 124,
+            "difficulty": "intermediate",
+            "popularity": 60,
+            "specializations": []
+          },
+          {
+            "id": "120205",
+            "code": "120205",
+            "name": "人力资源管理",
+            "description": "人力资源管理",
+            "icon": "📚",
+            "questionCount": 157,
+            "difficulty": "advanced",
+            "popularity": 69,
+            "specializations": []
+          }
+        ]
+      },
+      {
+        "id": "1203",
+        "code": "1203",
+        "name": "农业经济管理类",
+        "description": "农业经济管理类",
+        "questionCount": 287,
+        "majors": [
+          {
+            "id": "120301",
+            "code": "120301",
+            "name": "农林经济管理",
+            "description": "农林经济管理",
+            "icon": "📚",
+            "questionCount": 94,
+            "difficulty": "intermediate",
+            "popularity": 49,
             "specializations": []
           }
         ]
@@ -934,18 +493,162 @@
         "id": "1204",
         "code": "1204",
         "name": "公共管理类",
-        "description": "公共管理类专业类",
-        "questionCount": 285,
+        "description": "公共管理类",
+        "questionCount": 257,
         "majors": [
+          {
+            "id": "120401",
+            "code": "120401",
+            "name": "公共事业管理",
+            "description": "公共事业管理",
+            "icon": "📚",
+            "questionCount": 141,
+            "difficulty": "beginner",
+            "popularity": 73,
+            "specializations": []
+          },
           {
             "id": "120402",
             "code": "120402",
             "name": "行政管理",
-            "description": "政府行政管理",
+            "description": "政府行政和组织管理",
             "icon": "📚",
-            "questionCount": 135,
+            "questionCount": 177,
+            "difficulty": "hard",
+            "popularity": 55,
+            "specializations": []
+          },
+          {
+            "id": "120403",
+            "code": "120403",
+            "name": "劳动与社会保障",
+            "description": "劳动与社会保障",
+            "icon": "📚",
+            "questionCount": 110,
             "difficulty": "advanced",
-            "popularity": 84,
+            "popularity": 67,
+            "specializations": []
+          }
+        ]
+      },
+      {
+        "id": "1205",
+        "code": "1205",
+        "name": "图书情报与档案管理类",
+        "description": "图书情报与档案管理类",
+        "questionCount": 336,
+        "majors": [
+          {
+            "id": "120501",
+            "code": "120501",
+            "name": "图书馆学",
+            "description": "图书馆学",
+            "icon": "📚",
+            "questionCount": 108,
+            "difficulty": "hard",
+            "popularity": 69,
+            "specializations": []
+          },
+          {
+            "id": "120502",
+            "code": "120502",
+            "name": "档案学",
+            "description": "档案学",
+            "icon": "📚",
+            "questionCount": 148,
+            "difficulty": "beginner",
+            "popularity": 91,
+            "specializations": []
+          }
+        ]
+      },
+      {
+        "id": "1206",
+        "code": "1206",
+        "name": "物流管理与工程类",
+        "description": "物流管理与工程类",
+        "questionCount": 333,
+        "majors": [
+          {
+            "id": "120601",
+            "code": "120601",
+            "name": "物流管理",
+            "description": "物流管理",
+            "icon": "📚",
+            "questionCount": 177,
+            "difficulty": "hard",
+            "popularity": 66,
+            "specializations": []
+          }
+        ]
+      },
+      {
+        "id": "1207",
+        "code": "1207",
+        "name": "工业工程类",
+        "description": "工业工程类",
+        "questionCount": 270,
+        "majors": [
+          {
+            "id": "120701",
+            "code": "120701",
+            "name": "工业工程",
+            "description": "工业工程",
+            "icon": "📚",
+            "questionCount": 139,
+            "difficulty": "beginner",
+            "popularity": 57,
+            "specializations": []
+          }
+        ]
+      },
+      {
+        "id": "1208",
+        "code": "1208",
+        "name": "电子商务类",
+        "description": "电子商务类",
+        "questionCount": 265,
+        "majors": [
+          {
+            "id": "120801",
+            "code": "120801",
+            "name": "电子商务",
+            "description": "电子商务",
+            "icon": "📚",
+            "questionCount": 165,
+            "difficulty": "intermediate",
+            "popularity": 74,
+            "specializations": []
+          }
+        ]
+      },
+      {
+        "id": "1209",
+        "code": "1209",
+        "name": "旅游管理类",
+        "description": "旅游管理类",
+        "questionCount": 279,
+        "majors": [
+          {
+            "id": "120901",
+            "code": "120901",
+            "name": "旅游管理",
+            "description": "旅游管理",
+            "icon": "📚",
+            "questionCount": 161,
+            "difficulty": "intermediate",
+            "popularity": 74,
+            "specializations": []
+          },
+          {
+            "id": "120902",
+            "code": "120902",
+            "name": "酒店管理",
+            "description": "酒店管理",
+            "icon": "📚",
+            "questionCount": 81,
+            "difficulty": "hard",
+            "popularity": 69,
             "specializations": []
           }
         ]
@@ -961,32 +664,169 @@
     "color": "#D35400",
     "majorGroups": [
       {
+        "id": "1301",
+        "code": "1301",
+        "name": "艺术学理论类",
+        "description": "艺术学理论类",
+        "questionCount": 291,
+        "majors": [
+          {
+            "id": "130101",
+            "code": "130101",
+            "name": "艺术史论",
+            "description": "艺术史论",
+            "icon": "📚",
+            "questionCount": 142,
+            "difficulty": "intermediate",
+            "popularity": 83,
+            "specializations": []
+          }
+        ]
+      },
+      {
+        "id": "1302",
+        "code": "1302",
+        "name": "音乐与舞蹈学类",
+        "description": "音乐与舞蹈学类",
+        "questionCount": 281,
+        "majors": [
+          {
+            "id": "130201",
+            "code": "130201",
+            "name": "音乐表演",
+            "description": "音乐表演",
+            "icon": "📚",
+            "questionCount": 117,
+            "difficulty": "intermediate",
+            "popularity": 79,
+            "specializations": []
+          },
+          {
+            "id": "130202",
+            "code": "130202",
+            "name": "音乐学",
+            "description": "音乐学",
+            "icon": "📚",
+            "questionCount": 95,
+            "difficulty": "beginner",
+            "popularity": 81,
+            "specializations": []
+          },
+          {
+            "id": "130204",
+            "code": "130204",
+            "name": "舞蹈表演",
+            "description": "舞蹈表演",
+            "icon": "📚",
+            "questionCount": 109,
+            "difficulty": "hard",
+            "popularity": 74,
+            "specializations": []
+          },
+          {
+            "id": "130205",
+            "code": "130205",
+            "name": "舞蹈学",
+            "description": "舞蹈学",
+            "icon": "📚",
+            "questionCount": 84,
+            "difficulty": "intermediate",
+            "popularity": 67,
+            "specializations": []
+          }
+        ]
+      },
+      {
+        "id": "1303",
+        "code": "1303",
+        "name": "戏剧与影视学类",
+        "description": "戏剧与影视学类",
+        "questionCount": 304,
+        "majors": [
+          {
+            "id": "130301",
+            "code": "130301",
+            "name": "表演",
+            "description": "表演",
+            "icon": "📚",
+            "questionCount": 123,
+            "difficulty": "intermediate",
+            "popularity": 81,
+            "specializations": []
+          },
+          {
+            "id": "130304",
+            "code": "130304",
+            "name": "戏剧影视文学",
+            "description": "戏剧影视文学",
+            "icon": "📚",
+            "questionCount": 114,
+            "difficulty": "hard",
+            "popularity": 55,
+            "specializations": []
+          },
+          {
+            "id": "130305",
+            "code": "130305",
+            "name": "广播电视编导",
+            "description": "广播电视编导",
+            "icon": "📚",
+            "questionCount": 168,
+            "difficulty": "hard",
+            "popularity": 41,
+            "specializations": []
+          },
+          {
+            "id": "130306",
+            "code": "130306",
+            "name": "戏剧影视导演",
+            "description": "戏剧影视导演",
+            "icon": "📚",
+            "questionCount": 115,
+            "difficulty": "intermediate",
+            "popularity": 59,
+            "specializations": []
+          }
+        ]
+      },
+      {
         "id": "1304",
         "code": "1304",
         "name": "美术学类",
-        "description": "美术学类专业类",
-        "questionCount": 258,
+        "description": "美术学类",
+        "questionCount": 269,
         "majors": [
           {
             "id": "130401",
             "code": "130401",
             "name": "美术学",
-            "description": "美术理论与创作",
+            "description": "美术理论和美术史",
             "icon": "📚",
-            "questionCount": 173,
+            "questionCount": 94,
             "difficulty": "intermediate",
-            "popularity": 66,
+            "popularity": 85,
             "specializations": []
           },
           {
             "id": "130402",
             "code": "130402",
             "name": "绘画",
-            "description": "绘画创作与理论",
+            "description": "绘画理论和创作实践",
             "icon": "📚",
-            "questionCount": 99,
+            "questionCount": 177,
+            "difficulty": "hard",
+            "popularity": 55,
+            "specializations": []
+          },
+          {
+            "id": "130403",
+            "code": "130403",
+            "name": "雕塑",
+            "description": "雕塑",
+            "icon": "📚",
+            "questionCount": 149,
             "difficulty": "advanced",
-            "popularity": 40,
+            "popularity": 89,
             "specializations": []
           }
         ]
@@ -995,29 +835,2356 @@
         "id": "1305",
         "code": "1305",
         "name": "设计学类",
-        "description": "设计学类专业类",
-        "questionCount": 263,
+        "description": "设计学类",
+        "questionCount": 334,
         "majors": [
+          {
+            "id": "130501",
+            "code": "130501",
+            "name": "艺术设计学",
+            "description": "艺术设计学",
+            "icon": "📚",
+            "questionCount": 99,
+            "difficulty": "intermediate",
+            "popularity": 85,
+            "specializations": []
+          },
           {
             "id": "130502",
             "code": "130502",
             "name": "视觉传达设计",
-            "description": "平面设计",
+            "description": "平面设计和视觉艺术",
             "icon": "📚",
-            "questionCount": 137,
-            "difficulty": "intermediate",
-            "popularity": 82,
-            "specializations": []
+            "questionCount": 176,
+            "difficulty": "beginner",
+            "popularity": 85,
+            "specializations": [
+              {
+                "id": "平面设计",
+                "name": "平面设计",
+                "description": "平面设计方向",
+                "coreCourses": [
+                  "平面设计基础",
+                  "平面设计研究",
+                  "平面设计实践"
+                ],
+                "relatedSkills": [
+                  "专业知识",
+                  "实践能力",
+                  "创新思维"
+                ],
+                "questionCount": 69
+              },
+              {
+                "id": "品牌设计",
+                "name": "品牌设计",
+                "description": "品牌设计方向",
+                "coreCourses": [
+                  "品牌设计基础",
+                  "品牌设计研究",
+                  "品牌设计实践"
+                ],
+                "relatedSkills": [
+                  "专业知识",
+                  "实践能力",
+                  "创新思维"
+                ],
+                "questionCount": 68
+              },
+              {
+                "id": "交互设计",
+                "name": "交互设计",
+                "description": "交互设计方向",
+                "coreCourses": [
+                  "交互设计基础",
+                  "交互设计研究",
+                  "交互设计实践"
+                ],
+                "relatedSkills": [
+                  "专业知识",
+                  "实践能力",
+                  "创新思维"
+                ],
+                "questionCount": 35
+              },
+              {
+                "id": "ui设计",
+                "name": "UI设计",
+                "description": "UI设计方向",
+                "coreCourses": [
+                  "UI设计基础",
+                  "UI设计研究",
+                  "UI设计实践"
+                ],
+                "relatedSkills": [
+                  "专业知识",
+                  "实践能力",
+                  "创新思维"
+                ],
+                "questionCount": 20
+              }
+            ]
           },
           {
             "id": "130503",
             "code": "130503",
             "name": "环境设计",
-            "description": "室内外设计",
+            "description": "室内外环境设计",
+            "icon": "📚",
+            "questionCount": 127,
+            "difficulty": "hard",
+            "popularity": 75,
+            "specializations": []
+          },
+          {
+            "id": "130504",
+            "code": "130504",
+            "name": "产品设计",
+            "description": "产品设计",
+            "icon": "📚",
+            "questionCount": 136,
+            "difficulty": "advanced",
+            "popularity": 65,
+            "specializations": []
+          },
+          {
+            "id": "130505",
+            "code": "130505",
+            "name": "服装与服饰设计",
+            "description": "服装与服饰设计",
+            "icon": "📚",
+            "questionCount": 162,
+            "difficulty": "advanced",
+            "popularity": 79,
+            "specializations": []
+          },
+          {
+            "id": "130508",
+            "code": "130508",
+            "name": "数字媒体艺术",
+            "description": "数字媒体艺术",
+            "icon": "📚",
+            "questionCount": 117,
+            "difficulty": "hard",
+            "popularity": 68,
+            "specializations": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "01",
+    "code": "01",
+    "name": "哲学",
+    "icon": "🤔",
+    "description": "研究人生观、世界观、方法论的学科",
+    "color": "#9B59B6",
+    "majorGroups": [
+      {
+        "id": "0101",
+        "code": "0101",
+        "name": "哲学类",
+        "description": "哲学类",
+        "questionCount": 313,
+        "majors": [
+          {
+            "id": "010101",
+            "code": "010101",
+            "name": "哲学",
+            "description": "研究哲学基本问题的学科",
+            "icon": "📚",
+            "questionCount": 150,
+            "difficulty": "beginner",
+            "popularity": 69,
+            "specializations": [
+              {
+                "id": "伦理学",
+                "name": "伦理学",
+                "description": "伦理学方向",
+                "coreCourses": [
+                  "伦理学基础",
+                  "伦理学研究",
+                  "伦理学实践"
+                ],
+                "relatedSkills": [
+                  "专业知识",
+                  "实践能力",
+                  "创新思维"
+                ],
+                "questionCount": 42
+              },
+              {
+                "id": "逻辑学",
+                "name": "逻辑学",
+                "description": "逻辑学方向",
+                "coreCourses": [
+                  "逻辑学基础",
+                  "逻辑学研究",
+                  "逻辑学实践"
+                ],
+                "relatedSkills": [
+                  "专业知识",
+                  "实践能力",
+                  "创新思维"
+                ],
+                "questionCount": 78
+              },
+              {
+                "id": "宗教学",
+                "name": "宗教学",
+                "description": "宗教学方向",
+                "coreCourses": [
+                  "宗教学基础",
+                  "宗教学研究",
+                  "宗教学实践"
+                ],
+                "relatedSkills": [
+                  "专业知识",
+                  "实践能力",
+                  "创新思维"
+                ],
+                "questionCount": 66
+              },
+              {
+                "id": "马克思主义哲学",
+                "name": "马克思主义哲学",
+                "description": "马克思主义哲学方向",
+                "coreCourses": [
+                  "马克思主义哲学基础",
+                  "马克思主义哲学研究",
+                  "马克思主义哲学实践"
+                ],
+                "relatedSkills": [
+                  "专业知识",
+                  "实践能力",
+                  "创新思维"
+                ],
+                "questionCount": 41
+              },
+              {
+                "id": "中国哲学",
+                "name": "中国哲学",
+                "description": "中国哲学方向",
+                "coreCourses": [
+                  "中国哲学基础",
+                  "中国哲学研究",
+                  "中国哲学实践"
+                ],
+                "relatedSkills": [
+                  "专业知识",
+                  "实践能力",
+                  "创新思维"
+                ],
+                "questionCount": 82
+              },
+              {
+                "id": "西方哲学",
+                "name": "西方哲学",
+                "description": "西方哲学方向",
+                "coreCourses": [
+                  "西方哲学基础",
+                  "西方哲学研究",
+                  "西方哲学实践"
+                ],
+                "relatedSkills": [
+                  "专业知识",
+                  "实践能力",
+                  "创新思维"
+                ],
+                "questionCount": 46
+              }
+            ]
+          },
+          {
+            "id": "010102",
+            "code": "010102",
+            "name": "逻辑学",
+            "description": "研究思维规律和推理规则",
+            "icon": "📚",
+            "questionCount": 131,
+            "difficulty": "hard",
+            "popularity": 46,
+            "specializations": []
+          },
+          {
+            "id": "010103",
+            "code": "010103",
+            "name": "宗教学",
+            "description": "研究宗教现象和宗教理论",
+            "icon": "📚",
+            "questionCount": 85,
+            "difficulty": "intermediate",
+            "popularity": 81,
+            "specializations": []
+          },
+          {
+            "id": "010104",
+            "code": "010104",
+            "name": "国民经济学",
+            "description": "研究国民经济学",
+            "icon": "📚",
+            "questionCount": 150,
+            "difficulty": "hard",
+            "popularity": 91,
+            "specializations": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "02",
+    "code": "02",
+    "name": "经济学",
+    "icon": "💰",
+    "description": "研究经济现象和经济规律的学科",
+    "color": "#FF6B6B",
+    "majorGroups": [
+      {
+        "id": "0201",
+        "code": "0201",
+        "name": "经济学类",
+        "description": "经济学类",
+        "questionCount": 263,
+        "majors": [
+          {
+            "id": "020101",
+            "code": "020101",
+            "name": "经济学",
+            "description": "研究经济现象和经济规律",
+            "icon": "📚",
+            "questionCount": 90,
+            "difficulty": "intermediate",
+            "popularity": 83,
+            "specializations": []
+          },
+          {
+            "id": "020102",
+            "code": "020102",
+            "name": "经济统计学",
+            "description": "经济数据分析与统计方法",
+            "icon": "📚",
+            "questionCount": 139,
+            "difficulty": "advanced",
+            "popularity": 57,
+            "specializations": []
+          },
+          {
+            "id": "020103",
+            "code": "020103",
+            "name": "国民经济管理",
+            "description": "国民经济管理",
+            "icon": "📚",
+            "questionCount": 128,
+            "difficulty": "intermediate",
+            "popularity": 50,
+            "specializations": []
+          },
+          {
+            "id": "020104",
+            "code": "020104",
+            "name": "资源与环境经济学",
+            "description": "资源与环境经济学",
+            "icon": "📚",
+            "questionCount": 171,
+            "difficulty": "beginner",
+            "popularity": 56,
+            "specializations": []
+          },
+          {
+            "id": "020105",
+            "code": "020105",
+            "name": "商务经济学",
+            "description": "商务经济学",
+            "icon": "📚",
+            "questionCount": 117,
+            "difficulty": "beginner",
+            "popularity": 65,
+            "specializations": []
+          },
+          {
+            "id": "020106",
+            "code": "020106",
+            "name": "能源经济",
+            "description": "能源经济",
+            "icon": "📚",
+            "questionCount": 80,
+            "difficulty": "beginner",
+            "popularity": 46,
+            "specializations": []
+          }
+        ]
+      },
+      {
+        "id": "0202",
+        "code": "0202",
+        "name": "财政学类",
+        "description": "财政学类",
+        "questionCount": 321,
+        "majors": [
+          {
+            "id": "020201",
+            "code": "020201",
+            "name": "财政学",
+            "description": "财政学",
+            "icon": "📚",
+            "questionCount": 94,
+            "difficulty": "beginner",
+            "popularity": 92,
+            "specializations": []
+          },
+          {
+            "id": "020202",
+            "code": "020202",
+            "name": "税收学",
+            "description": "税收学",
+            "icon": "📚",
+            "questionCount": 142,
+            "difficulty": "intermediate",
+            "popularity": 65,
+            "specializations": []
+          }
+        ]
+      },
+      {
+        "id": "0203",
+        "code": "0203",
+        "name": "金融学类",
+        "description": "金融学类",
+        "questionCount": 295,
+        "majors": [
+          {
+            "id": "020301",
+            "code": "020301",
+            "name": "金融学",
+            "description": "研究金融现象和金融规律",
+            "icon": "📚",
+            "questionCount": 157,
+            "difficulty": "intermediate",
+            "popularity": 83,
+            "specializations": [
+              {
+                "id": "国际金融",
+                "name": "国际金融",
+                "description": "国际金融方向",
+                "coreCourses": [
+                  "国际金融基础",
+                  "国际金融研究",
+                  "国际金融实践"
+                ],
+                "relatedSkills": [
+                  "专业知识",
+                  "实践能力",
+                  "创新思维"
+                ],
+                "questionCount": 25
+              },
+              {
+                "id": "公司金融",
+                "name": "公司金融",
+                "description": "公司金融方向",
+                "coreCourses": [
+                  "公司金融基础",
+                  "公司金融研究",
+                  "公司金融实践"
+                ],
+                "relatedSkills": [
+                  "专业知识",
+                  "实践能力",
+                  "创新思维"
+                ],
+                "questionCount": 41
+              },
+              {
+                "id": "量化金融",
+                "name": "量化金融",
+                "description": "量化金融方向",
+                "coreCourses": [
+                  "量化金融基础",
+                  "量化金融研究",
+                  "量化金融实践"
+                ],
+                "relatedSkills": [
+                  "专业知识",
+                  "实践能力",
+                  "创新思维"
+                ],
+                "questionCount": 63
+              },
+              {
+                "id": "金融科技",
+                "name": "金融科技",
+                "description": "金融科技方向",
+                "coreCourses": [
+                  "金融科技基础",
+                  "金融科技研究",
+                  "金融科技实践"
+                ],
+                "relatedSkills": [
+                  "专业知识",
+                  "实践能力",
+                  "创新思维"
+                ],
+                "questionCount": 37
+              }
+            ]
+          },
+          {
+            "id": "020302",
+            "code": "020302",
+            "name": "金融工程",
+            "description": "金融产品设计与定价",
+            "icon": "📚",
+            "questionCount": 129,
+            "difficulty": "beginner",
+            "popularity": 52,
+            "specializations": []
+          },
+          {
+            "id": "020303",
+            "code": "020303",
+            "name": "保险学",
+            "description": "保险理论与实务",
+            "icon": "📚",
+            "questionCount": 138,
+            "difficulty": "hard",
+            "popularity": 84,
+            "specializations": []
+          },
+          {
+            "id": "020304",
+            "code": "020304",
+            "name": "投资学",
+            "description": "投资学",
+            "icon": "📚",
+            "questionCount": 131,
+            "difficulty": "intermediate",
+            "popularity": 52,
+            "specializations": []
+          },
+          {
+            "id": "020305",
+            "code": "020305",
+            "name": "金融数学",
+            "description": "金融数学",
+            "icon": "📚",
+            "questionCount": 125,
+            "difficulty": "intermediate",
+            "popularity": 54,
+            "specializations": []
+          },
+          {
+            "id": "020306",
+            "code": "020306",
+            "name": "信用管理",
+            "description": "信用管理",
+            "icon": "📚",
+            "questionCount": 83,
+            "difficulty": "intermediate",
+            "popularity": 75,
+            "specializations": []
+          },
+          {
+            "id": "020307",
+            "code": "020307",
+            "name": "经济与金融",
+            "description": "经济与金融",
+            "icon": "📚",
+            "questionCount": 102,
+            "difficulty": "hard",
+            "popularity": 57,
+            "specializations": []
+          }
+        ]
+      },
+      {
+        "id": "0204",
+        "code": "0204",
+        "name": "经济与贸易类",
+        "description": "经济与贸易类",
+        "questionCount": 296,
+        "majors": [
+          {
+            "id": "020401",
+            "code": "020401",
+            "name": "国际经济与贸易",
+            "description": "国际经济与贸易",
+            "icon": "📚",
+            "questionCount": 148,
+            "difficulty": "beginner",
+            "popularity": 60,
+            "specializations": []
+          },
+          {
+            "id": "020402",
+            "code": "020402",
+            "name": "贸易经济",
+            "description": "贸易经济",
+            "icon": "📚",
+            "questionCount": 132,
+            "difficulty": "intermediate",
+            "popularity": 88,
+            "specializations": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "03",
+    "code": "03",
+    "name": "法学",
+    "icon": "⚖️",
+    "description": "研究法律现象和法律规律的学科",
+    "color": "#3498DB",
+    "majorGroups": [
+      {
+        "id": "0301",
+        "code": "0301",
+        "name": "法学类",
+        "description": "法学类",
+        "questionCount": 274,
+        "majors": [
+          {
+            "id": "030101",
+            "code": "030101",
+            "name": "法学",
+            "description": "研究法律现象和法律规律",
+            "icon": "📚",
+            "questionCount": 109,
+            "difficulty": "hard",
+            "popularity": 92,
+            "specializations": [
+              {
+                "id": "民商法",
+                "name": "民商法",
+                "description": "民商法方向",
+                "coreCourses": [
+                  "民商法基础",
+                  "民商法研究",
+                  "民商法实践"
+                ],
+                "relatedSkills": [
+                  "专业知识",
+                  "实践能力",
+                  "创新思维"
+                ],
+                "questionCount": 43
+              },
+              {
+                "id": "刑法",
+                "name": "刑法",
+                "description": "刑法方向",
+                "coreCourses": [
+                  "刑法基础",
+                  "刑法研究",
+                  "刑法实践"
+                ],
+                "relatedSkills": [
+                  "专业知识",
+                  "实践能力",
+                  "创新思维"
+                ],
+                "questionCount": 48
+              },
+              {
+                "id": "经济法",
+                "name": "经济法",
+                "description": "经济法方向",
+                "coreCourses": [
+                  "经济法基础",
+                  "经济法研究",
+                  "经济法实践"
+                ],
+                "relatedSkills": [
+                  "专业知识",
+                  "实践能力",
+                  "创新思维"
+                ],
+                "questionCount": 63
+              },
+              {
+                "id": "国际法",
+                "name": "国际法",
+                "description": "国际法方向",
+                "coreCourses": [
+                  "国际法基础",
+                  "国际法研究",
+                  "国际法实践"
+                ],
+                "relatedSkills": [
+                  "专业知识",
+                  "实践能力",
+                  "创新思维"
+                ],
+                "questionCount": 85
+              },
+              {
+                "id": "知识产权法",
+                "name": "知识产权法",
+                "description": "知识产权法方向",
+                "coreCourses": [
+                  "知识产权法基础",
+                  "知识产权法研究",
+                  "知识产权法实践"
+                ],
+                "relatedSkills": [
+                  "专业知识",
+                  "实践能力",
+                  "创新思维"
+                ],
+                "questionCount": 64
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "0302",
+        "code": "0302",
+        "name": "政治学类",
+        "description": "政治学类",
+        "questionCount": 286,
+        "majors": [
+          {
+            "id": "030201",
+            "code": "030201",
+            "name": "政治学与行政学",
+            "description": "政治学与行政学",
+            "icon": "📚",
+            "questionCount": 81,
+            "difficulty": "intermediate",
+            "popularity": 42,
+            "specializations": []
+          },
+          {
+            "id": "030202",
+            "code": "030202",
+            "name": "国际政治",
+            "description": "国际政治",
+            "icon": "📚",
+            "questionCount": 91,
+            "difficulty": "beginner",
+            "popularity": 71,
+            "specializations": []
+          },
+          {
+            "id": "030203",
+            "code": "030203",
+            "name": "外交学",
+            "description": "外交学",
+            "icon": "📚",
+            "questionCount": 109,
+            "difficulty": "beginner",
+            "popularity": 70,
+            "specializations": []
+          }
+        ]
+      },
+      {
+        "id": "0303",
+        "code": "0303",
+        "name": "社会学类",
+        "description": "社会学类",
+        "questionCount": 270,
+        "majors": [
+          {
+            "id": "030301",
+            "code": "030301",
+            "name": "社会学",
+            "description": "社会学",
+            "icon": "📚",
+            "questionCount": 146,
+            "difficulty": "hard",
+            "popularity": 40,
+            "specializations": []
+          },
+          {
+            "id": "030302",
+            "code": "030302",
+            "name": "社会工作",
+            "description": "社会工作",
+            "icon": "📚",
+            "questionCount": 159,
+            "difficulty": "hard",
+            "popularity": 72,
+            "specializations": []
+          }
+        ]
+      },
+      {
+        "id": "0304",
+        "code": "0304",
+        "name": "民族学类",
+        "description": "民族学类",
+        "questionCount": 282,
+        "majors": [
+          {
+            "id": "030401",
+            "code": "030401",
+            "name": "民族学",
+            "description": "民族学",
+            "icon": "📚",
+            "questionCount": 103,
+            "difficulty": "beginner",
+            "popularity": 42,
+            "specializations": []
+          }
+        ]
+      },
+      {
+        "id": "0305",
+        "code": "0305",
+        "name": "马克思主义理论类",
+        "description": "马克思主义理论类",
+        "questionCount": 337,
+        "majors": [
+          {
+            "id": "030501",
+            "code": "030501",
+            "name": "科学社会主义",
+            "description": "科学社会主义",
+            "icon": "📚",
+            "questionCount": 97,
+            "difficulty": "intermediate",
+            "popularity": 76,
+            "specializations": []
+          },
+          {
+            "id": "030503",
+            "code": "030503",
+            "name": "中国共产党历史",
+            "description": "中国共产党历史",
+            "icon": "📚",
+            "questionCount": 87,
+            "difficulty": "intermediate",
+            "popularity": 55,
+            "specializations": []
+          },
+          {
+            "id": "030504",
+            "code": "030504",
+            "name": "思想政治教育",
+            "description": "思想政治教育",
+            "icon": "📚",
+            "questionCount": 131,
+            "difficulty": "beginner",
+            "popularity": 71,
+            "specializations": []
+          }
+        ]
+      },
+      {
+        "id": "0306",
+        "code": "0306",
+        "name": "公安学类",
+        "description": "公安学类",
+        "questionCount": 265,
+        "majors": [
+          {
+            "id": "030601",
+            "code": "030601",
+            "name": "治安学",
+            "description": "治安学",
+            "icon": "📚",
+            "questionCount": 101,
+            "difficulty": "hard",
+            "popularity": 52,
+            "specializations": []
+          },
+          {
+            "id": "030602",
+            "code": "030602",
+            "name": "侦查学",
+            "description": "侦查学",
+            "icon": "📚",
+            "questionCount": 91,
+            "difficulty": "hard",
+            "popularity": 65,
+            "specializations": []
+          },
+          {
+            "id": "030603",
+            "code": "030603",
+            "name": "边防管理",
+            "description": "边防管理",
+            "icon": "📚",
+            "questionCount": 103,
+            "difficulty": "advanced",
+            "popularity": 66,
+            "specializations": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "04",
+    "code": "04",
+    "name": "教育学",
+    "icon": "📚",
+    "description": "研究教育现象和教育规律的学科",
+    "color": "#2ECC71",
+    "majorGroups": [
+      {
+        "id": "0401",
+        "code": "0401",
+        "name": "教育学类",
+        "description": "教育学类",
+        "questionCount": 267,
+        "majors": [
+          {
+            "id": "040101",
+            "code": "040101",
+            "name": "教育学",
+            "description": "研究教育现象和教育规律",
+            "icon": "📚",
+            "questionCount": 177,
+            "difficulty": "hard",
+            "popularity": 83,
+            "specializations": []
+          },
+          {
+            "id": "040102",
+            "code": "040102",
+            "name": "科学教育",
+            "description": "科学领域的教育方法",
+            "icon": "📚",
+            "questionCount": 106,
+            "difficulty": "beginner",
+            "popularity": 67,
+            "specializations": []
+          },
+          {
+            "id": "040104",
+            "code": "040104",
+            "name": "学前教育",
+            "description": "学前教育",
+            "icon": "📚",
+            "questionCount": 150,
+            "difficulty": "beginner",
+            "popularity": 61,
+            "specializations": []
+          },
+          {
+            "id": "040105",
+            "code": "040105",
+            "name": "特殊教育",
+            "description": "特殊教育",
+            "icon": "📚",
+            "questionCount": 163,
+            "difficulty": "beginner",
+            "popularity": 59,
+            "specializations": []
+          }
+        ]
+      },
+      {
+        "id": "0402",
+        "code": "0402",
+        "name": "体育学类",
+        "description": "体育学类",
+        "questionCount": 319,
+        "majors": [
+          {
+            "id": "040201",
+            "code": "040201",
+            "name": "体育教育",
+            "description": "体育教育",
+            "icon": "📚",
+            "questionCount": 176,
+            "difficulty": "beginner",
+            "popularity": 62,
+            "specializations": []
+          },
+          {
+            "id": "040202",
+            "code": "040202",
+            "name": "运动训练",
+            "description": "运动训练",
+            "icon": "📚",
+            "questionCount": 126,
+            "difficulty": "hard",
+            "popularity": 89,
+            "specializations": []
+          },
+          {
+            "id": "040203",
+            "code": "040203",
+            "name": "社会体育指导与管理",
+            "description": "社会体育指导与管理",
+            "icon": "📚",
+            "questionCount": 150,
+            "difficulty": "advanced",
+            "popularity": 78,
+            "specializations": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "05",
+    "code": "05",
+    "name": "文学",
+    "icon": "✍️",
+    "description": "研究文学现象和文学创作的学科",
+    "color": "#F39C12",
+    "majorGroups": [
+      {
+        "id": "0501",
+        "code": "0501",
+        "name": "中国语言文学类",
+        "description": "中国语言文学类",
+        "questionCount": 317,
+        "majors": [
+          {
+            "id": "050101",
+            "code": "050101",
+            "name": "汉语言文学",
+            "description": "中国语言文学经典与创作",
+            "icon": "📚",
+            "questionCount": 125,
+            "difficulty": "intermediate",
+            "popularity": 77,
+            "specializations": []
+          },
+          {
+            "id": "050102",
+            "code": "050102",
+            "name": "汉语言",
+            "description": "汉语语法和语言学研究",
+            "icon": "📚",
+            "questionCount": 99,
+            "difficulty": "advanced",
+            "popularity": 43,
+            "specializations": []
+          },
+          {
+            "id": "050103",
+            "code": "050103",
+            "name": "汉语国际教育",
+            "description": "汉语国际教育",
+            "icon": "📚",
+            "questionCount": 87,
+            "difficulty": "intermediate",
+            "popularity": 62,
+            "specializations": []
+          }
+        ]
+      },
+      {
+        "id": "0502",
+        "code": "0502",
+        "name": "外国语言文学类",
+        "description": "外国语言文学类",
+        "questionCount": 348,
+        "majors": [
+          {
+            "id": "050201",
+            "code": "050201",
+            "name": "英语",
+            "description": "英语语言文学和跨文化交际",
+            "icon": "📚",
+            "questionCount": 97,
+            "difficulty": "intermediate",
+            "popularity": 64,
+            "specializations": []
+          },
+          {
+            "id": "050202",
+            "code": "050202",
+            "name": "俄语",
+            "description": "俄语语言文学",
+            "icon": "📚",
+            "questionCount": 125,
+            "difficulty": "beginner",
+            "popularity": 94,
+            "specializations": []
+          },
+          {
+            "id": "050203",
+            "code": "050203",
+            "name": "德语",
+            "description": "德语语言文学",
+            "icon": "📚",
+            "questionCount": 113,
+            "difficulty": "beginner",
+            "popularity": 80,
+            "specializations": []
+          },
+          {
+            "id": "050204",
+            "code": "050204",
+            "name": "法语",
+            "description": "法语语言文学",
+            "icon": "📚",
+            "questionCount": 126,
+            "difficulty": "beginner",
+            "popularity": 83,
+            "specializations": []
+          },
+          {
+            "id": "050205",
+            "code": "050205",
+            "name": "西班牙语",
+            "description": "西班牙语语言文学",
+            "icon": "📚",
+            "questionCount": 160,
+            "difficulty": "advanced",
+            "popularity": 45,
+            "specializations": []
+          },
+          {
+            "id": "050207",
+            "code": "050207",
+            "name": "日语",
+            "description": "日语语言文学和文化交流",
+            "icon": "📚",
+            "questionCount": 176,
+            "difficulty": "hard",
+            "popularity": 66,
+            "specializations": []
+          }
+        ]
+      },
+      {
+        "id": "0503",
+        "code": "0503",
+        "name": "新闻传播学类",
+        "description": "新闻传播学类",
+        "questionCount": 306,
+        "majors": [
+          {
+            "id": "050301",
+            "code": "050301",
+            "name": "新闻学",
+            "description": "新闻学",
             "icon": "📚",
             "questionCount": 141,
             "difficulty": "beginner",
-            "popularity": 71,
+            "popularity": 67,
+            "specializations": []
+          },
+          {
+            "id": "050302",
+            "code": "050302",
+            "name": "广播电视学",
+            "description": "广播电视学",
+            "icon": "📚",
+            "questionCount": 103,
+            "difficulty": "beginner",
+            "popularity": 42,
+            "specializations": []
+          },
+          {
+            "id": "050303",
+            "code": "050303",
+            "name": "广告学",
+            "description": "广告学",
+            "icon": "📚",
+            "questionCount": 169,
+            "difficulty": "hard",
+            "popularity": 45,
+            "specializations": []
+          },
+          {
+            "id": "050304",
+            "code": "050304",
+            "name": "传播学",
+            "description": "传播学",
+            "icon": "📚",
+            "questionCount": 115,
+            "difficulty": "intermediate",
+            "popularity": 74,
+            "specializations": []
+          },
+          {
+            "id": "050305",
+            "code": "050305",
+            "name": "编辑出版学",
+            "description": "编辑出版学",
+            "icon": "📚",
+            "questionCount": 157,
+            "difficulty": "intermediate",
+            "popularity": 58,
+            "specializations": []
+          },
+          {
+            "id": "050306",
+            "code": "050306",
+            "name": "网络与新媒体",
+            "description": "网络与新媒体",
+            "icon": "📚",
+            "questionCount": 156,
+            "difficulty": "beginner",
+            "popularity": 73,
+            "specializations": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "06",
+    "code": "06",
+    "name": "历史学",
+    "icon": "📖",
+    "description": "研究历史现象和历史规律的学科",
+    "color": "#E74C3C",
+    "majorGroups": [
+      {
+        "id": "0601",
+        "code": "0601",
+        "name": "历史学类",
+        "description": "历史学类",
+        "questionCount": 270,
+        "majors": [
+          {
+            "id": "060101",
+            "code": "060101",
+            "name": "历史学",
+            "description": "中国和世界历史研究",
+            "icon": "📚",
+            "questionCount": 111,
+            "difficulty": "beginner",
+            "popularity": 83,
+            "specializations": []
+          },
+          {
+            "id": "060102",
+            "code": "060102",
+            "name": "世界史",
+            "description": "世界古代和现代历史研究",
+            "icon": "📚",
+            "questionCount": 165,
+            "difficulty": "intermediate",
+            "popularity": 40,
+            "specializations": []
+          },
+          {
+            "id": "060103",
+            "code": "060103",
+            "name": "考古学",
+            "description": "考古学",
+            "icon": "📚",
+            "questionCount": 88,
+            "difficulty": "advanced",
+            "popularity": 65,
+            "specializations": []
+          },
+          {
+            "id": "060104",
+            "code": "060104",
+            "name": "文物与博物馆学",
+            "description": "文物与博物馆学",
+            "icon": "📚",
+            "questionCount": 127,
+            "difficulty": "intermediate",
+            "popularity": 74,
+            "specializations": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "07",
+    "code": "07",
+    "name": "理学",
+    "icon": "🔬",
+    "description": "研究自然现象和自然规律的学科",
+    "color": "#1ABC9C",
+    "majorGroups": [
+      {
+        "id": "0701",
+        "code": "0701",
+        "name": "数学类",
+        "description": "数学类",
+        "questionCount": 265,
+        "majors": [
+          {
+            "id": "070101",
+            "code": "070101",
+            "name": "数学与应用数学",
+            "description": "数学理论与应用研究",
+            "icon": "📚",
+            "questionCount": 90,
+            "difficulty": "hard",
+            "popularity": 55,
+            "specializations": []
+          },
+          {
+            "id": "070102",
+            "code": "070102",
+            "name": "信息与计算科学",
+            "description": "计算数学和信息科学",
+            "icon": "📚",
+            "questionCount": 138,
+            "difficulty": "advanced",
+            "popularity": 58,
+            "specializations": []
+          }
+        ]
+      },
+      {
+        "id": "0702",
+        "code": "0702",
+        "name": "物理学类",
+        "description": "物理学类",
+        "questionCount": 281,
+        "majors": [
+          {
+            "id": "070201",
+            "code": "070201",
+            "name": "物理学",
+            "description": "物理理论和实验研究",
+            "icon": "📚",
+            "questionCount": 118,
+            "difficulty": "advanced",
+            "popularity": 53,
+            "specializations": []
+          },
+          {
+            "id": "070202",
+            "code": "070202",
+            "name": "应用物理学",
+            "description": "应用物理学",
+            "icon": "📚",
+            "questionCount": 102,
+            "difficulty": "intermediate",
+            "popularity": 53,
+            "specializations": []
+          }
+        ]
+      },
+      {
+        "id": "0703",
+        "code": "0703",
+        "name": "化学类",
+        "description": "化学类",
+        "questionCount": 303,
+        "majors": [
+          {
+            "id": "070301",
+            "code": "070301",
+            "name": "化学",
+            "description": "化学",
+            "icon": "📚",
+            "questionCount": 107,
+            "difficulty": "advanced",
+            "popularity": 60,
+            "specializations": []
+          },
+          {
+            "id": "070302",
+            "code": "070302",
+            "name": "应用化学",
+            "description": "应用化学",
+            "icon": "📚",
+            "questionCount": 94,
+            "difficulty": "hard",
+            "popularity": 67,
+            "specializations": []
+          }
+        ]
+      },
+      {
+        "id": "0704",
+        "code": "0704",
+        "name": "天文学类",
+        "description": "天文学类",
+        "questionCount": 335,
+        "majors": [
+          {
+            "id": "070401",
+            "code": "070401",
+            "name": "天文学",
+            "description": "天文学",
+            "icon": "📚",
+            "questionCount": 157,
+            "difficulty": "advanced",
+            "popularity": 46,
+            "specializations": []
+          }
+        ]
+      },
+      {
+        "id": "0705",
+        "code": "0705",
+        "name": "地理科学类",
+        "description": "地理科学类",
+        "questionCount": 316,
+        "majors": [
+          {
+            "id": "070501",
+            "code": "070501",
+            "name": "地理科学",
+            "description": "地理科学",
+            "icon": "📚",
+            "questionCount": 114,
+            "difficulty": "beginner",
+            "popularity": 59,
+            "specializations": []
+          },
+          {
+            "id": "070502",
+            "code": "070502",
+            "name": "自然地理与资源环境",
+            "description": "自然地理与资源环境",
+            "icon": "📚",
+            "questionCount": 170,
+            "difficulty": "beginner",
+            "popularity": 83,
+            "specializations": []
+          },
+          {
+            "id": "070503",
+            "code": "070503",
+            "name": "人文地理与城乡规划",
+            "description": "人文地理与城乡规划",
+            "icon": "📚",
+            "questionCount": 132,
+            "difficulty": "hard",
+            "popularity": 67,
+            "specializations": []
+          }
+        ]
+      },
+      {
+        "id": "0706",
+        "code": "0706",
+        "name": "大气科学类",
+        "description": "大气科学类",
+        "questionCount": 277,
+        "majors": [
+          {
+            "id": "070601",
+            "code": "070601",
+            "name": "大气科学",
+            "description": "大气科学",
+            "icon": "📚",
+            "questionCount": 115,
+            "difficulty": "beginner",
+            "popularity": 59,
+            "specializations": []
+          },
+          {
+            "id": "070602",
+            "code": "070602",
+            "name": "应用气象学",
+            "description": "应用气象学",
+            "icon": "📚",
+            "questionCount": 170,
+            "difficulty": "hard",
+            "popularity": 56,
+            "specializations": []
+          }
+        ]
+      },
+      {
+        "id": "0707",
+        "code": "0707",
+        "name": "海洋科学类",
+        "description": "海洋科学类",
+        "questionCount": 303,
+        "majors": [
+          {
+            "id": "070701",
+            "code": "070701",
+            "name": "海洋科学",
+            "description": "海洋科学",
+            "icon": "📚",
+            "questionCount": 152,
+            "difficulty": "advanced",
+            "popularity": 68,
+            "specializations": []
+          },
+          {
+            "id": "070702",
+            "code": "070702",
+            "name": "海洋技术",
+            "description": "海洋技术",
+            "icon": "📚",
+            "questionCount": 80,
+            "difficulty": "hard",
+            "popularity": 46,
+            "specializations": []
+          }
+        ]
+      },
+      {
+        "id": "0708",
+        "code": "0708",
+        "name": "地球物理学类",
+        "description": "地球物理学类",
+        "questionCount": 254,
+        "majors": [
+          {
+            "id": "070801",
+            "code": "070801",
+            "name": "地球物理学",
+            "description": "地球物理学",
+            "icon": "📚",
+            "questionCount": 122,
+            "difficulty": "hard",
+            "popularity": 92,
+            "specializations": []
+          }
+        ]
+      },
+      {
+        "id": "0709",
+        "code": "0709",
+        "name": "地质学类",
+        "description": "地质学类",
+        "questionCount": 335,
+        "majors": [
+          {
+            "id": "070901",
+            "code": "070901",
+            "name": "地质学",
+            "description": "地质学",
+            "icon": "📚",
+            "questionCount": 159,
+            "difficulty": "beginner",
+            "popularity": 90,
+            "specializations": []
+          },
+          {
+            "id": "070902",
+            "code": "070902",
+            "name": "地球化学",
+            "description": "地球化学",
+            "icon": "📚",
+            "questionCount": 95,
+            "difficulty": "intermediate",
+            "popularity": 66,
+            "specializations": []
+          }
+        ]
+      },
+      {
+        "id": "0710",
+        "code": "0710",
+        "name": "生物科学类",
+        "description": "生物科学类",
+        "questionCount": 306,
+        "majors": [
+          {
+            "id": "071001",
+            "code": "071001",
+            "name": "生物科学",
+            "description": "生物科学",
+            "icon": "📚",
+            "questionCount": 159,
+            "difficulty": "intermediate",
+            "popularity": 68,
+            "specializations": []
+          },
+          {
+            "id": "071002",
+            "code": "071002",
+            "name": "生物技术",
+            "description": "生物技术",
+            "icon": "📚",
+            "questionCount": 128,
+            "difficulty": "beginner",
+            "popularity": 68,
+            "specializations": []
+          }
+        ]
+      },
+      {
+        "id": "0711",
+        "code": "0711",
+        "name": "心理学类",
+        "description": "心理学类",
+        "questionCount": 269,
+        "majors": [
+          {
+            "id": "071101",
+            "code": "071101",
+            "name": "心理学",
+            "description": "心理学",
+            "icon": "📚",
+            "questionCount": 149,
+            "difficulty": "intermediate",
+            "popularity": 92,
+            "specializations": []
+          },
+          {
+            "id": "071102",
+            "code": "071102",
+            "name": "应用心理学",
+            "description": "应用心理学",
+            "icon": "📚",
+            "questionCount": 81,
+            "difficulty": "hard",
+            "popularity": 77,
+            "specializations": []
+          }
+        ]
+      },
+      {
+        "id": "0712",
+        "code": "0712",
+        "name": "统计学类",
+        "description": "统计学类",
+        "questionCount": 264,
+        "majors": [
+          {
+            "id": "071201",
+            "code": "071201",
+            "name": "统计学",
+            "description": "统计学",
+            "icon": "📚",
+            "questionCount": 166,
+            "difficulty": "beginner",
+            "popularity": 75,
+            "specializations": []
+          },
+          {
+            "id": "071202",
+            "code": "071202",
+            "name": "应用统计学",
+            "description": "应用统计学",
+            "icon": "📚",
+            "questionCount": 132,
+            "difficulty": "beginner",
+            "popularity": 80,
+            "specializations": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "08",
+    "code": "08",
+    "name": "工学",
+    "icon": "🏗️",
+    "description": "研究工程应用和技术创新的学科",
+    "color": "#34495E",
+    "majorGroups": [
+      {
+        "id": "0801",
+        "code": "0801",
+        "name": "力学类",
+        "description": "力学类",
+        "questionCount": 325,
+        "majors": [
+          {
+            "id": "080101",
+            "code": "080101",
+            "name": "理论与应用力学",
+            "description": "理论与应用力学",
+            "icon": "📚",
+            "questionCount": 99,
+            "difficulty": "hard",
+            "popularity": 82,
+            "specializations": []
+          }
+        ]
+      },
+      {
+        "id": "0802",
+        "code": "0802",
+        "name": "机械类",
+        "description": "机械类",
+        "questionCount": 329,
+        "majors": [
+          {
+            "id": "080201",
+            "code": "080201",
+            "name": "机械工程",
+            "description": "机械设计和制造",
+            "icon": "📚",
+            "questionCount": 159,
+            "difficulty": "advanced",
+            "popularity": 43,
+            "specializations": []
+          },
+          {
+            "id": "080202",
+            "code": "080202",
+            "name": "机械设计制造及其自动化",
+            "description": "机械设计制造及其自动化",
+            "icon": "📚",
+            "questionCount": 125,
+            "difficulty": "hard",
+            "popularity": 88,
+            "specializations": []
+          },
+          {
+            "id": "080204",
+            "code": "080204",
+            "name": "车辆工程",
+            "description": "车辆工程",
+            "icon": "📚",
+            "questionCount": 163,
+            "difficulty": "advanced",
+            "popularity": 48,
+            "specializations": []
+          }
+        ]
+      },
+      {
+        "id": "0804",
+        "code": "0804",
+        "name": "材料类",
+        "description": "材料类",
+        "questionCount": 312,
+        "majors": [
+          {
+            "id": "080401",
+            "code": "080401",
+            "name": "材料科学与工程",
+            "description": "材料科学与工程",
+            "icon": "📚",
+            "questionCount": 81,
+            "difficulty": "intermediate",
+            "popularity": 87,
+            "specializations": []
+          },
+          {
+            "id": "080402",
+            "code": "080402",
+            "name": "材料物理",
+            "description": "材料物理",
+            "icon": "📚",
+            "questionCount": 135,
+            "difficulty": "advanced",
+            "popularity": 82,
+            "specializations": []
+          },
+          {
+            "id": "080403",
+            "code": "080403",
+            "name": "材料化学",
+            "description": "材料化学",
+            "icon": "📚",
+            "questionCount": 112,
+            "difficulty": "intermediate",
+            "popularity": 52,
+            "specializations": []
+          }
+        ]
+      },
+      {
+        "id": "0806",
+        "code": "0806",
+        "name": "电气类",
+        "description": "电气类",
+        "questionCount": 341,
+        "majors": [
+          {
+            "id": "080601",
+            "code": "080601",
+            "name": "电气工程及其自动化",
+            "description": "电气工程及其自动化",
+            "icon": "📚",
+            "questionCount": 160,
+            "difficulty": "advanced",
+            "popularity": 69,
+            "specializations": []
+          }
+        ]
+      },
+      {
+        "id": "0807",
+        "code": "0807",
+        "name": "电子信息类",
+        "description": "电子信息类",
+        "questionCount": 294,
+        "majors": [
+          {
+            "id": "080701",
+            "code": "080701",
+            "name": "电子信息工程",
+            "description": "电子信息工程",
+            "icon": "📚",
+            "questionCount": 115,
+            "difficulty": "advanced",
+            "popularity": 40,
+            "specializations": []
+          },
+          {
+            "id": "080702",
+            "code": "080702",
+            "name": "电子科学与技术",
+            "description": "电子科学与技术",
+            "icon": "📚",
+            "questionCount": 154,
+            "difficulty": "beginner",
+            "popularity": 51,
+            "specializations": []
+          },
+          {
+            "id": "080703",
+            "code": "080703",
+            "name": "通信工程",
+            "description": "通信工程",
+            "icon": "📚",
+            "questionCount": 165,
+            "difficulty": "hard",
+            "popularity": 83,
+            "specializations": []
+          },
+          {
+            "id": "080705",
+            "code": "080705",
+            "name": "光电信息科学与工程",
+            "description": "光电信息科学与工程",
+            "icon": "📚",
+            "questionCount": 114,
+            "difficulty": "advanced",
+            "popularity": 56,
+            "specializations": []
+          },
+          {
+            "id": "080717",
+            "code": "080717",
+            "name": "人工智能",
+            "description": "人工智能",
+            "icon": "📚",
+            "questionCount": 163,
+            "difficulty": "intermediate",
+            "popularity": 89,
+            "specializations": []
+          }
+        ]
+      },
+      {
+        "id": "0808",
+        "code": "0808",
+        "name": "自动化类",
+        "description": "自动化类",
+        "questionCount": 267,
+        "majors": [
+          {
+            "id": "080801",
+            "code": "080801",
+            "name": "自动化",
+            "description": "自动化",
+            "icon": "📚",
+            "questionCount": 134,
+            "difficulty": "beginner",
+            "popularity": 84,
+            "specializations": []
+          }
+        ]
+      },
+      {
+        "id": "0809",
+        "code": "0809",
+        "name": "计算机类",
+        "description": "计算机类",
+        "questionCount": 325,
+        "majors": [
+          {
+            "id": "080901",
+            "code": "080901",
+            "name": "计算机科学与技术",
+            "description": "计算机理论与应用",
+            "icon": "📚",
+            "questionCount": 173,
+            "difficulty": "beginner",
+            "popularity": 66,
+            "specializations": [
+              {
+                "id": "计算机系统结构",
+                "name": "计算机系统结构",
+                "description": "计算机系统结构方向",
+                "coreCourses": [
+                  "计算机系统结构基础",
+                  "计算机系统结构研究",
+                  "计算机系统结构实践"
+                ],
+                "relatedSkills": [
+                  "专业知识",
+                  "实践能力",
+                  "创新思维"
+                ],
+                "questionCount": 64
+              },
+              {
+                "id": "计算机软件与理论",
+                "name": "计算机软件与理论",
+                "description": "计算机软件与理论方向",
+                "coreCourses": [
+                  "计算机软件与理论基础",
+                  "计算机软件与理论研究",
+                  "计算机软件与理论实践"
+                ],
+                "relatedSkills": [
+                  "专业知识",
+                  "实践能力",
+                  "创新思维"
+                ],
+                "questionCount": 90
+              },
+              {
+                "id": "人工智能",
+                "name": "人工智能",
+                "description": "人工智能方向",
+                "coreCourses": [
+                  "人工智能基础",
+                  "人工智能研究",
+                  "人工智能实践"
+                ],
+                "relatedSkills": [
+                  "专业知识",
+                  "实践能力",
+                  "创新思维"
+                ],
+                "questionCount": 91
+              },
+              {
+                "id": "网络安全",
+                "name": "网络安全",
+                "description": "网络安全方向",
+                "coreCourses": [
+                  "网络安全基础",
+                  "网络安全研究",
+                  "网络安全实践"
+                ],
+                "relatedSkills": [
+                  "专业知识",
+                  "实践能力",
+                  "创新思维"
+                ],
+                "questionCount": 30
+              },
+              {
+                "id": "计算机图形学",
+                "name": "计算机图形学",
+                "description": "计算机图形学方向",
+                "coreCourses": [
+                  "计算机图形学基础",
+                  "计算机图形学研究",
+                  "计算机图形学实践"
+                ],
+                "relatedSkills": [
+                  "专业知识",
+                  "实践能力",
+                  "创新思维"
+                ],
+                "questionCount": 74
+              }
+            ]
+          },
+          {
+            "id": "080902",
+            "code": "080902",
+            "name": "软件工程",
+            "description": "软件开发和项目管理",
+            "icon": "📚",
+            "questionCount": 150,
+            "difficulty": "intermediate",
+            "popularity": 76,
+            "specializations": [
+              {
+                "id": "软件开发",
+                "name": "软件开发",
+                "description": "软件开发方向",
+                "coreCourses": [
+                  "软件开发基础",
+                  "软件开发研究",
+                  "软件开发实践"
+                ],
+                "relatedSkills": [
+                  "专业知识",
+                  "实践能力",
+                  "创新思维"
+                ],
+                "questionCount": 65
+              },
+              {
+                "id": "软件测试",
+                "name": "软件测试",
+                "description": "软件测试方向",
+                "coreCourses": [
+                  "软件测试基础",
+                  "软件测试研究",
+                  "软件测试实践"
+                ],
+                "relatedSkills": [
+                  "专业知识",
+                  "实践能力",
+                  "创新思维"
+                ],
+                "questionCount": 63
+              },
+              {
+                "id": "嵌入式系统",
+                "name": "嵌入式系统",
+                "description": "嵌入式系统方向",
+                "coreCourses": [
+                  "嵌入式系统基础",
+                  "嵌入式系统研究",
+                  "嵌入式系统实践"
+                ],
+                "relatedSkills": [
+                  "专业知识",
+                  "实践能力",
+                  "创新思维"
+                ],
+                "questionCount": 72
+              },
+              {
+                "id": "项目管理",
+                "name": "项目管理",
+                "description": "项目管理方向",
+                "coreCourses": [
+                  "项目管理基础",
+                  "项目管理研究",
+                  "项目管理实践"
+                ],
+                "relatedSkills": [
+                  "专业知识",
+                  "实践能力",
+                  "创新思维"
+                ],
+                "questionCount": 38
+              },
+              {
+                "id": "云计算",
+                "name": "云计算",
+                "description": "云计算方向",
+                "coreCourses": [
+                  "云计算基础",
+                  "云计算研究",
+                  "云计算实践"
+                ],
+                "relatedSkills": [
+                  "专业知识",
+                  "实践能力",
+                  "创新思维"
+                ],
+                "questionCount": 71
+              }
+            ]
+          },
+          {
+            "id": "080903",
+            "code": "080903",
+            "name": "网络工程",
+            "description": "网络设计和管理",
+            "icon": "📚",
+            "questionCount": 105,
+            "difficulty": "advanced",
+            "popularity": 47,
+            "specializations": []
+          },
+          {
+            "id": "080904",
+            "code": "080904",
+            "name": "信息安全",
+            "description": "信息系统安全",
+            "icon": "📚",
+            "questionCount": 164,
+            "difficulty": "advanced",
+            "popularity": 67,
+            "specializations": []
+          },
+          {
+            "id": "080905",
+            "code": "080905",
+            "name": "物联网工程",
+            "description": "物联网工程",
+            "icon": "📚",
+            "questionCount": 177,
+            "difficulty": "intermediate",
+            "popularity": 65,
+            "specializations": []
+          },
+          {
+            "id": "080906",
+            "code": "080906",
+            "name": "数字媒体技术",
+            "description": "数字媒体技术",
+            "icon": "📚",
+            "questionCount": 116,
+            "difficulty": "intermediate",
+            "popularity": 70,
+            "specializations": []
+          },
+          {
+            "id": "080907",
+            "code": "080907",
+            "name": "数据科学与大数据技术",
+            "description": "数据科学与大数据技术",
+            "icon": "📚",
+            "questionCount": 96,
+            "difficulty": "intermediate",
+            "popularity": 92,
+            "specializations": []
+          },
+          {
+            "id": "080910",
+            "code": "080910",
+            "name": "区块链工程",
+            "description": "区块链工程",
+            "icon": "📚",
+            "questionCount": 103,
+            "difficulty": "hard",
+            "popularity": 83,
+            "specializations": []
+          }
+        ]
+      },
+      {
+        "id": "0810",
+        "code": "0810",
+        "name": "土木类",
+        "description": "土木类",
+        "questionCount": 299,
+        "majors": [
+          {
+            "id": "081001",
+            "code": "081001",
+            "name": "土木工程",
+            "description": "土木工程",
+            "icon": "📚",
+            "questionCount": 132,
+            "difficulty": "hard",
+            "popularity": 92,
+            "specializations": []
+          },
+          {
+            "id": "081003",
+            "code": "081003",
+            "name": "水利水电工程",
+            "description": "水利水电工程",
+            "icon": "📚",
+            "questionCount": 82,
+            "difficulty": "beginner",
+            "popularity": 83,
+            "specializations": []
+          }
+        ]
+      },
+      {
+        "id": "0813",
+        "code": "0813",
+        "name": "化工与制药类",
+        "description": "化工与制药类",
+        "questionCount": 274,
+        "majors": [
+          {
+            "id": "081301",
+            "code": "081301",
+            "name": "化学工程与工艺",
+            "description": "化学工程与工艺",
+            "icon": "📚",
+            "questionCount": 145,
+            "difficulty": "advanced",
+            "popularity": 92,
+            "specializations": []
+          },
+          {
+            "id": "081302",
+            "code": "081302",
+            "name": "制药工程",
+            "description": "制药工程",
+            "icon": "📚",
+            "questionCount": 159,
+            "difficulty": "advanced",
+            "popularity": 85,
+            "specializations": []
+          }
+        ]
+      },
+      {
+        "id": "0825",
+        "code": "0825",
+        "name": "航空航天类",
+        "description": "航空航天类",
+        "questionCount": 311,
+        "majors": [
+          {
+            "id": "082501",
+            "code": "082501",
+            "name": "航空航天工程",
+            "description": "航空航天工程",
+            "icon": "📚",
+            "questionCount": 167,
+            "difficulty": "advanced",
+            "popularity": 84,
+            "specializations": []
+          },
+          {
+            "id": "082502",
+            "code": "082502",
+            "name": "飞行器设计与工程",
+            "description": "飞行器设计与工程",
+            "icon": "📚",
+            "questionCount": 97,
+            "difficulty": "hard",
+            "popularity": 69,
+            "specializations": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "09",
+    "code": "09",
+    "name": "农学",
+    "icon": "🌾",
+    "description": "研究农业生产和农业科学的学科",
+    "color": "#27AE60",
+    "majorGroups": [
+      {
+        "id": "0901",
+        "code": "0901",
+        "name": "植物生产类",
+        "description": "植物生产类",
+        "questionCount": 313,
+        "majors": [
+          {
+            "id": "090101",
+            "code": "090101",
+            "name": "农学",
+            "description": "作物栽培和育种",
+            "icon": "📚",
+            "questionCount": 159,
+            "difficulty": "intermediate",
+            "popularity": 48,
+            "specializations": []
+          },
+          {
+            "id": "090102",
+            "code": "090102",
+            "name": "园艺",
+            "description": "园艺",
+            "icon": "📚",
+            "questionCount": 179,
+            "difficulty": "intermediate",
+            "popularity": 81,
+            "specializations": []
+          }
+        ]
+      },
+      {
+        "id": "0902",
+        "code": "0902",
+        "name": "自然保护与环境生态类",
+        "description": "自然保护与环境生态类",
+        "questionCount": 294,
+        "majors": [
+          {
+            "id": "090201",
+            "code": "090201",
+            "name": "农业资源与环境",
+            "description": "农业资源与环境",
+            "icon": "📚",
+            "questionCount": 101,
+            "difficulty": "advanced",
+            "popularity": 51,
+            "specializations": []
+          }
+        ]
+      },
+      {
+        "id": "0903",
+        "code": "0903",
+        "name": "动物生产类",
+        "description": "动物生产类",
+        "questionCount": 281,
+        "majors": [
+          {
+            "id": "090301",
+            "code": "090301",
+            "name": "动物科学",
+            "description": "动物科学",
+            "icon": "📚",
+            "questionCount": 163,
+            "difficulty": "advanced",
+            "popularity": 72,
+            "specializations": []
+          }
+        ]
+      },
+      {
+        "id": "0904",
+        "code": "0904",
+        "name": "动物医学类",
+        "description": "动物医学类",
+        "questionCount": 348,
+        "majors": [
+          {
+            "id": "090401",
+            "code": "090401",
+            "name": "动物医学",
+            "description": "动物医学",
+            "icon": "📚",
+            "questionCount": 116,
+            "difficulty": "hard",
+            "popularity": 83,
+            "specializations": []
+          }
+        ]
+      },
+      {
+        "id": "0905",
+        "code": "0905",
+        "name": "林学类",
+        "description": "林学类",
+        "questionCount": 313,
+        "majors": [
+          {
+            "id": "090501",
+            "code": "090501",
+            "name": "林学",
+            "description": "林学",
+            "icon": "📚",
+            "questionCount": 146,
+            "difficulty": "hard",
+            "popularity": 70,
+            "specializations": []
+          }
+        ]
+      },
+      {
+        "id": "0906",
+        "code": "0906",
+        "name": "水产类",
+        "description": "水产类",
+        "questionCount": 304,
+        "majors": [
+          {
+            "id": "090601",
+            "code": "090601",
+            "name": "水产养殖学",
+            "description": "水产养殖学",
+            "icon": "📚",
+            "questionCount": 179,
+            "difficulty": "intermediate",
+            "popularity": 93,
+            "specializations": []
+          }
+        ]
+      },
+      {
+        "id": "0907",
+        "code": "0907",
+        "name": "草学类",
+        "description": "草学类",
+        "questionCount": 275,
+        "majors": [
+          {
+            "id": "090701",
+            "code": "090701",
+            "name": "草业科学",
+            "description": "草业科学",
+            "icon": "📚",
+            "questionCount": 126,
+            "difficulty": "advanced",
+            "popularity": 53,
             "specializations": []
           }
         ]
