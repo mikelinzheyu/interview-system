@@ -1,406 +1,184 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI面试功能测试</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-            background: #f5f7fa;
-        }
-        .test-section {
-            background: white;
-            margin: 20px 0;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
-        .test-title {
-            color: #333;
-            border-bottom: 2px solid #409eff;
-            padding-bottom: 10px;
-            margin-bottom: 20px;
-        }
-        .test-controls {
-            margin: 15px 0;
-        }
-        .test-controls button {
-            background: #409eff;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 4px;
-            cursor: pointer;
-            margin: 5px;
-        }
-        .test-controls button:hover {
-            background: #337ecc;
-        }
-        .test-controls button:disabled {
-            background: #c0c4cc;
-            cursor: not-allowed;
-        }
-        #videoElement {
-            width: 100%;
-            max-width: 400px;
-            height: 300px;
-            background: #000;
-            border-radius: 8px;
-        }
-        .result-area {
-            background: #f8f9fa;
-            padding: 15px;
-            border-radius: 4px;
-            margin: 10px 0;
-            min-height: 100px;
-            border-left: 4px solid #409eff;
-        }
-        .status {
-            color: #67c23a;
-            font-weight: bold;
-        }
-        .error {
-            color: #f56c6c;
-            font-weight: bold;
-        }
-        .api-test {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-        }
-        @media (max-width: 768px) {
-            .api-test {
-                grid-template-columns: 1fr;
-            }
-        }
-    </style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>功能自检 - 摄像头/语音识别/API 健康检查</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, 'Helvetica Neue', Arial, 'Noto Sans', 'Noto Sans CJK SC', 'PingFang SC', 'Microsoft YaHei', sans-serif; margin: 0; padding: 24px; background: #f7f8fa; color: #1f2937; }
+    h1 { margin: 0 0 16px; }
+    .test-section { background: #fff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 16px; margin: 16px 0; }
+    .test-title { margin: 0 0 12px; }
+    .test-controls { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 8px; }
+    button { padding: 8px 12px; border: 1px solid #e5e7eb; background: #f3f4f6; border-radius: 8px; cursor: pointer; }
+    button:hover { background: #e5e7eb; }
+    .result-area { white-space: pre-wrap; background: #f9fafb; border: 1px dashed #e5e7eb; padding: 10px; border-radius: 8px; color: #111827; }
+    video { width: 100%; max-width: 520px; border-radius: 8px; border: 1px solid #e5e7eb; }
+    .status { color: #047857 }
+    .error { color: #b91c1c }
+  </style>
 </head>
 <body>
-    <h1>🎯 AI面试系统功能测试</h1>
+  <h1>🧪 功能自检</h1>
 
-    <!-- 摄像头测试 -->
-    <div class="test-section">
-        <h2 class="test-title">📹 摄像头功能测试</h2>
-        <div class="test-controls">
-            <button onclick="startCamera()">启动摄像头</button>
-            <button onclick="stopCamera()">停止摄像头</button>
-            <button onclick="checkCameraSupport()">检查支持情况</button>
-        </div>
-        <video id="videoElement" autoplay muted playsinline></video>
-        <div id="cameraStatus" class="result-area">等待测试...</div>
+  <!-- 摄像头测试 -->
+  <div class="test-section">
+    <h2 class="test-title">📹 摄像头功能测试</h2>
+    <div class="test-controls">
+      <button onclick="startCamera()">启动摄像头</button>
+      <button onclick="stopCamera()">停止摄像头</button>
+      <button onclick="checkCameraSupport()">检查支持情况</button>
     </div>
+    <video id="videoElement" autoplay muted playsinline></video>
+    <div id="cameraStatus" class="result-area">等待测试...</div>
+  </div>
 
-    <!-- 语音识别测试 -->
-    <div class="test-section">
-        <h2 class="test-title">🎤 语音识别功能测试</h2>
-        <div class="test-controls">
-            <button onclick="startSpeechRecognition()">开始语音识别</button>
-            <button onclick="stopSpeechRecognition()">停止语音识别</button>
-            <button onclick="checkSpeechSupport()">检查支持情况</button>
-        </div>
-        <div id="speechResult" class="result-area">等待语音输入...</div>
-        <div id="speechStatus" class="result-area">状态: 未开始</div>
+  <!-- 语音识别测试 -->
+  <div class="test-section">
+    <h2 class="test-title">🎤 语音识别功能测试</h2>
+    <div class="test-controls">
+      <button onclick="startSpeechRecognition()">开始语音识别</button>
+      <button onclick="stopSpeechRecognition()">停止语音识别</button>
+      <button onclick="checkSpeechSupport()">检查支持情况</button>
     </div>
+    <div id="speechResult" class="result-area">等待语音输入...</div>
+    <div id="speechStatus" class="result-area">状态：未开启</div>
+  </div>
 
-    <!-- API接口测试 -->
-    <div class="test-section">
-        <h2 class="test-title">🔗 API接口功能测试</h2>
-        <div class="api-test">
-            <div>
-                <h3>生成问题API</h3>
-                <button onclick="testGenerateQuestion()">测试生成问题</button>
-                <div id="questionResult" class="result-area">等待测试...</div>
-            </div>
-            <div>
-                <h3>分析回答API</h3>
-                <button onclick="testAnalyzeAnswer()">测试分析回答</button>
-                <div id="analysisResult" class="result-area">等待测试...</div>
-            </div>
-        </div>
-        <div>
-            <h3>健康检查</h3>
-            <button onclick="testHealthCheck()">测试健康检查</button>
-            <div id="healthResult" class="result-area">等待测试...</div>
-        </div>
+  <!-- API 健康检查 -->
+  <div class="test-section">
+    <h2 class="test-title">🩺 API 健康检查</h2>
+    <div class="test-controls">
+      <button onclick="testHealthCheck()">测试健康检查</button>
     </div>
+    <div id="healthResult" class="result-area">等待测试...</div>
+  </div>
 
-    <!-- 综合测试 -->
-    <div class="test-section">
-        <h2 class="test-title">🚀 综合功能测试</h2>
-        <div class="test-controls">
-            <button onclick="runFullTest()">运行完整测试</button>
-            <button onclick="clearAllResults()">清空结果</button>
-        </div>
-        <div id="fullTestResult" class="result-area">点击运行完整测试...</div>
+  <!-- 汇总测试 -->
+  <div class="test-section">
+    <h2 class="test-title">📋 一键完整测试</h2>
+    <div class="test-controls">
+      <button onclick="runFullTest()">开始运行完整功能测试..</button>
     </div>
+    <div id="fullTestResult" class="result-area">等待测试...</div>
+  </div>
 
-    <script>
-        // 全局变量
-        let mediaStream = null;
-        let recognition = null;
-        let isListening = false;
+  <script>
+    const videoEl = document.getElementById('videoElement');
+    const setText = (id, text, cls='') => { const el = document.getElementById(id); el.textContent = text; el.className = `result-area ${cls}` }
 
-        // 摄像头功能测试
-        async function startCamera() {
-            try {
-                updateStatus('cameraStatus', '正在启动摄像头...', 'status');
+    // 摄像头
+    let mediaStream;
+    async function startCamera() {
+      try {
+        setText('cameraStatus', '正在启动摄像头..', 'status')
+        mediaStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false })
+        videoEl.srcObject = mediaStream
+        setText('cameraStatus', '✅ 摄像头启动成功', 'status')
+      } catch (e) {
+        setText('cameraStatus', `❌ 摄像头启动失败: ${e.message}`, 'error')
+      }
+    }
+    function stopCamera() {
+      if (mediaStream) {
+        mediaStream.getTracks().forEach(t => t.stop())
+        videoEl.srcObject = null
+      }
+      setText('cameraStatus', '⏹️ 摄像头已停止', 'status')
+    }
+    function checkCameraSupport() {
+      const support = {
+        mediaDevices: !!navigator.mediaDevices,
+        getUserMedia: !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia),
+        webRTC: 'RTCPeerConnection' in window
+      }
+      const text = [
+        '📋 浏览器支持情况:',
+        `- getUserMedia: ${support.getUserMedia ? '已支持' : '不支持'}`,
+        `- WebRTC: ${support.webRTC ? '已支持' : '不支持'}`
+      ].join('\n')
+      setText('cameraStatus', text, support.getUserMedia ? 'status' : 'error')
+    }
 
-                mediaStream = await navigator.mediaDevices.getUserMedia({
-                    video: { width: 1280, height: 720, facingMode: 'user' },
-                    audio: false
-                });
+    // 语音识别（Chrome/Edge 实验性）
+    let recognition, isListening = false
+    function startSpeechRecognition() {
+      const SR = window.SpeechRecognition || window.webkitSpeechRecognition
+      if (!SR) {
+        setText('speechStatus', '❌ 浏览器不支持语音识别', 'error')
+        return
+      }
+      recognition = new SR()
+      recognition.lang = 'zh-CN'
+      recognition.interimResults = true
+      recognition.continuous = true
 
-                const videoElement = document.getElementById('videoElement');
-                videoElement.srcObject = mediaStream;
-
-                updateStatus('cameraStatus', '✅ 摄像头启动成功！', 'status');
-            } catch (error) {
-                updateStatus('cameraStatus', `❌ 摄像头启动失败: ${error.message}`, 'error');
-            }
+      recognition.onresult = (event) => {
+        let finalTranscript = '', interimTranscript = ''
+        for (let i = event.resultIndex; i < event.results.length; ++i) {
+          const t = event.results[i][0].transcript
+          if (event.results[i].isFinal) finalTranscript += t; else interimTranscript += t
         }
+        const out = [
+          `📝 实时识别: ${interimTranscript}`,
+          finalTranscript ? `✅ 最终结果: ${finalTranscript}` : ''
+        ].filter(Boolean).join('\n')
+        setText('speechResult', out || '等待语音输入...')
+      }
+      recognition.onerror = (e) => { setText('speechStatus', `❌ 语音识别错误: ${e.error}`, 'error'); isListening = false }
+      recognition.onend = () => { setText('speechStatus', '⏹️ 语音识别已停止', 'status'); isListening = false }
+      recognition.start(); isListening = true
+      setText('speechStatus', '🎙️ 正在听写...', 'status')
+    }
+    function stopSpeechRecognition() { if (recognition && isListening) recognition.stop() }
+    function checkSpeechSupport() {
+      const supported = !!(window.SpeechRecognition || window.webkitSpeechRecognition)
+      const text = [
+        '📋 语音识别支持情况:',
+        `- Web Speech API: ${supported ? '已支持' : '不支持'}`,
+        '- 建议浏览器: Chrome, Edge'
+      ].join('\n')
+      setText('speechStatus', text, supported ? 'status' : 'error')
+    }
 
-        function stopCamera() {
-            if (mediaStream) {
-                mediaStream.getTracks().forEach(track => track.stop());
-                mediaStream = null;
-                document.getElementById('videoElement').srcObject = null;
-                updateStatus('cameraStatus', '⏹️ 摄像头已停止', 'status');
-            } else {
-                updateStatus('cameraStatus', '⚠️ 摄像头未启动', 'error');
-            }
-        }
+    // API 健康检查
+    async function testHealthCheck() {
+      try {
+        setText('healthResult', '🔎 检查服务健康状态..', 'status')
+        const r = await fetch('/api/health')
+        const data = await r.json()
+        const text = [
+          '✅ 服务健康检查通过',
+          `🏷️ 服务: ${data.data?.service || 'mock'}`,
+          `📊 状态: ${data.data?.status || 'UP'}`,
+          `📅 时间: ${new Date(data.timestamp || Date.now()).toLocaleString()}`
+        ].join('\n')
+        setText('healthResult', text, 'status')
+      } catch (e) {
+        setText('healthResult', `❌ 健康检查失败: ${e.message}`, 'error')
+      }
+    }
 
-        function checkCameraSupport() {
-            const support = {
-                getUserMedia: !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia),
-                webRTC: !!(window.RTCPeerConnection || window.webkitRTCPeerConnection)
-            };
+    // 汇总测试
+    async function runFullTest() {
+      setText('fullTestResult', '🚀 开始运行完整功能测试..', 'status')
+      const tests = [
+        { name: '浏览器支持检查', func: checkCameraSupport },
+        { name: '语音识别支持检查', func: checkSpeechSupport },
+        { name: 'API 健康检查', func: testHealthCheck }
+      ]
+      let results = ['🔍 测试结果汇总']
+      for (const t of tests) {
+        try { await t.func(); results.push(`✓ ${t.name}: 通过`) }
+        catch (e) { results.push(`✗ ${t.name}: 失败 - ${e.message}`) }
+      }
+      results.push('\n🎉 测试完成！可以开始使用 AI 面试功能')
+      setText('fullTestResult', results.join('\n'), 'status')
+    }
 
-            const supportText = `
-                📋 浏览器支持情况:
-                - getUserMedia: ${support.getUserMedia ? '✅ 支持' : '❌ 不支持'}
-                - WebRTC: ${support.webRTC ? '✅ 支持' : '❌ 不支持'}
-            `;
-            updateStatus('cameraStatus', supportText, support.getUserMedia ? 'status' : 'error');
-        }
-
-        // 语音识别功能测试
-        function startSpeechRecognition() {
-            if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
-                updateStatus('speechStatus', '❌ 浏览器不支持语音识别', 'error');
-                return;
-            }
-
-            try {
-                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-                recognition = new SpeechRecognition();
-
-                recognition.lang = 'zh-CN';
-                recognition.continuous = true;
-                recognition.interimResults = true;
-
-                recognition.onstart = () => {
-                    isListening = true;
-                    updateStatus('speechStatus', '🎤 正在监听语音...', 'status');
-                    updateStatus('speechResult', '等待语音输入...');
-                };
-
-                recognition.onresult = (event) => {
-                    let finalTranscript = '';
-                    let interimTranscript = '';
-
-                    for (let i = event.resultIndex; i < event.results.length; i++) {
-                        const transcript = event.results[i][0].transcript;
-                        if (event.results[i].isFinal) {
-                            finalTranscript += transcript;
-                        } else {
-                            interimTranscript += transcript;
-                        }
-                    }
-
-                    const result = `
-                        📝 实时识别: ${interimTranscript}
-                        ✅ 最终结果: ${finalTranscript}
-                        🎯 置信度: ${(event.results[event.results.length - 1][0].confidence * 100).toFixed(1)}%
-                    `;
-                    updateStatus('speechResult', result);
-                };
-
-                recognition.onerror = (event) => {
-                    updateStatus('speechStatus', `❌ 语音识别错误: ${event.error}`, 'error');
-                    isListening = false;
-                };
-
-                recognition.onend = () => {
-                    updateStatus('speechStatus', '⏹️ 语音识别已停止', 'status');
-                    isListening = false;
-                };
-
-                recognition.start();
-            } catch (error) {
-                updateStatus('speechStatus', `❌ 启动语音识别失败: ${error.message}`, 'error');
-            }
-        }
-
-        function stopSpeechRecognition() {
-            if (recognition && isListening) {
-                recognition.stop();
-            } else {
-                updateStatus('speechStatus', '⚠️ 语音识别未启动', 'error');
-            }
-        }
-
-        function checkSpeechSupport() {
-            const isSupported = ('webkitSpeechRecognition' in window) || ('SpeechRecognition' in window);
-            const supportText = `
-                📋 语音识别支持情况:
-                - Web Speech API: ${isSupported ? '✅ 支持' : '❌ 不支持'}
-                - 建议浏览器: Chrome, Edge
-            `;
-            updateStatus('speechStatus', supportText, isSupported ? 'status' : 'error');
-        }
-
-        // API接口测试
-        async function testGenerateQuestion() {
-            try {
-                updateStatus('questionResult', '⏳ 正在生成问题...', 'status');
-
-                const response = await fetch('/api/interview/generate-question', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        position: '前端工程师',
-                        level: '中级',
-                        skills: ['JavaScript', 'Vue.js']
-                    })
-                });
-
-                const data = await response.json();
-
-                if (data.success) {
-                    const result = `
-                        ✅ 问题生成成功！
-                        📝 问题: ${data.question}
-                        🏷️ 分类: ${data.category}
-                        ⭐ 难度: ${data.difficulty}
-                        🔑 关键词: ${data.keywords.join(', ')}
-                    `;
-                    updateStatus('questionResult', result, 'status');
-                } else {
-                    updateStatus('questionResult', `❌ 生成失败: ${data.error}`, 'error');
-                }
-            } catch (error) {
-                updateStatus('questionResult', `❌ 请求失败: ${error.message}`, 'error');
-            }
-        }
-
-        async function testAnalyzeAnswer() {
-            try {
-                updateStatus('analysisResult', '⏳ 正在分析回答...', 'status');
-
-                const response = await fetch('/api/interview/analyze', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        question: 'JavaScript闭包是什么？',
-                        answer: '闭包是函数能够访问其外部作用域中变量的特性，即使外部函数已经执行完毕。',
-                        interviewId: 123
-                    })
-                });
-
-                const data = await response.json();
-
-                if (data.success) {
-                    const result = `
-                        ✅ 分析完成！
-                        📊 总分: ${data.overallScore}/100
-                        💻 技术能力: ${data.technicalScore}/100
-                        🗣️ 表达能力: ${data.communicationScore}/100
-                        🧠 逻辑思维: ${data.logicalScore}/100
-                        📝 总结: ${data.summary}
-                        💡 建议: ${data.suggestions.slice(0, 2).join('; ')}
-                    `;
-                    updateStatus('analysisResult', result, 'status');
-                } else {
-                    updateStatus('analysisResult', `❌ 分析失败: ${data.error}`, 'error');
-                }
-            } catch (error) {
-                updateStatus('analysisResult', `❌ 请求失败: ${error.message}`, 'error');
-            }
-        }
-
-        async function testHealthCheck() {
-            try {
-                updateStatus('healthResult', '⏳ 检查服务健康状态...', 'status');
-
-                const response = await fetch('/api/health');
-                const data = await response.json();
-
-                const result = `
-                    ✅ 服务健康检查通过！
-                    🏷️ 服务: ${data.service}
-                    📊 状态: ${data.status}
-                    📅 时间: ${new Date(data.timestamp).toLocaleString()}
-                    🔖 版本: ${data.version}
-                `;
-                updateStatus('healthResult', result, 'status');
-            } catch (error) {
-                updateStatus('healthResult', `❌ 健康检查失败: ${error.message}`, 'error');
-            }
-        }
-
-        // 综合测试
-        async function runFullTest() {
-            updateStatus('fullTestResult', '🚀 开始运行完整功能测试...', 'status');
-
-            const tests = [
-                { name: '浏览器支持检查', func: checkCameraSupport },
-                { name: '语音识别支持检查', func: checkSpeechSupport },
-                { name: 'API健康检查', func: testHealthCheck },
-                { name: '问题生成测试', func: testGenerateQuestion },
-                { name: '回答分析测试', func: testAnalyzeAnswer }
-            ];
-
-            let results = ['🔍 测试结果汇总:'];
-
-            for (const test of tests) {
-                try {
-                    await test.func();
-                    results.push(`✅ ${test.name}: 通过`);
-                } catch (error) {
-                    results.push(`❌ ${test.name}: 失败 - ${error.message}`);
-                }
-                // 添加延迟避免过快请求
-                await new Promise(resolve => setTimeout(resolve, 500));
-            }
-
-            results.push('\n🎉 测试完成！可以开始使用AI面试功能。');
-            updateStatus('fullTestResult', results.join('\n'), 'status');
-        }
-
-        function clearAllResults() {
-            const resultElements = document.querySelectorAll('.result-area');
-            resultElements.forEach(el => {
-                el.textContent = '等待测试...';
-                el.className = 'result-area';
-            });
-        }
-
-        // 工具函数
-        function updateStatus(elementId, message, type = '') {
-            const element = document.getElementById(elementId);
-            element.textContent = message;
-            element.className = `result-area ${type}`;
-        }
-
-        // 页面加载完成后自动检查支持情况
-        document.addEventListener('DOMContentLoaded', () => {
-            updateStatus('fullTestResult', '📋 页面加载完成，可以开始测试各项功能。');
-        });
-    </script>
+    document.addEventListener('DOMContentLoaded', () => {
+      setText('fullTestResult', '📋 页面加载完成，可以开始测试各项功能')
+    })
+  </script>
 </body>
 </html>

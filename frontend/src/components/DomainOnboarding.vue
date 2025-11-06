@@ -188,7 +188,7 @@
                 <span>{{ domain.questionCount }} 题</span>
               </div>
             </div>
-            <el-icon class="item-arrow"><Arrow /></el-icon>
+            <el-icon class="item-arrow"><ArrowRight /></el-icon>
           </div>
         </div>
 
@@ -209,7 +209,7 @@
 
 <script setup>
 import { ref, computed } from 'vue'
-import { Arrow } from '@element-plus/icons-vue'
+import { ArrowRight } from '@element-plus/icons-vue'
 import { useDomainStore } from '@/stores/domain'
 import { storeToRefs } from 'pinia'
 

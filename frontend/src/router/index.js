@@ -183,6 +183,7 @@ const routes = [
     component: () => import('@/views/chat/ChatList.vue'),
     meta: { requiresAuth: true }
   },
+  // Temporary safe chat room while ChatRoom.vue is under repair
   {
     path: '/chat/room/:roomId',
     name: 'ChatRoom',

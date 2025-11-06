@@ -8,6 +8,23 @@
       <p class="section-subtitle">4层递进式学习: 学科 → 专业类 → 专业 → 细分方向</p>
     </div>
 
+    <!-- 面包屑导航 -->
+    <BreadcrumbNavigation
+      v-if="currentLevel !== 'root'"
+      :show-steps="true"
+      :show-quick-nav="false"
+      @navigate-to-level="handleBreadcrumbNavigation"
+    />
+
+    <!-- 搜索和过滤 -->
+    <DisciplineSearchFilter
+      :current-level="currentLevel"
+      @search="handleSearch"
+      @filter-change="handleFilterChange"
+      @select-result="handleSearchResultSelect"
+      @expand-results="handleExpandResults"
+    />
+
     <el-skeleton v-if="disciplinesStore.disciplinesLoading" animated :rows="6" />
 
     <!-- 第一层：学科门类 -->
@@ -85,16 +102,26 @@
 </template>
 
 <script setup>
-import { computed, onMounted } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useDisciplinesStore } from '@/stores/disciplines'
 import MajorGroupSelector from './MajorGroupSelector.vue'
 import MajorsGrid from './MajorsGrid.vue'
 import MajorDetailPanel from './MajorDetailPanel.vue'
 import SpecializationDetailPanel from './SpecializationDetailPanel.vue'
+import BreadcrumbNavigation from './BreadcrumbNavigation.vue'
+import DisciplineSearchFilter from './DisciplineSearchFilter.vue'
 
 const emit = defineEmits(['select-domain'])
 
 const disciplinesStore = useDisciplinesStore()
+
+// 搜索和过滤状态
+const searchQuery = ref('')
+const filterOptions = ref({
+  sortBy: 'default',
+  difficulty: [],
+  time: []
+})
 
 // 加载学科数据
 onMounted(async () => {
@@ -112,6 +139,54 @@ const currentLevel = computed(() => {
   if (disciplinesStore.currentDiscipline) return 'majorGroup'
   return 'root'
 })
+
+// 应用过滤和排序
+const filteredDisciplines = computed(() => {
+  let items = disciplinesStore.disciplines
+
+  // 根据排序方式排序
+  if (filterOptions.value.sortBy === 'popularity') {
+    items = [...items].sort((a, b) => (b.popularity || 0) - (a.popularity || 0))
+  } else if (filterOptions.value.sortBy === 'questionCount') {
+    items = [...items].sort((a, b) => (b.questionCount || 0) - (a.questionCount || 0))
+  } else if (filterOptions.value.sortBy === 'difficulty') {
+    const difficultyOrder = { beginner: 1, intermediate: 2, advanced: 3, hard: 4 }
+    items = [...items].sort((a, b) => {
+      const aOrder = difficultyOrder[a.difficulty] || 0
+      const bOrder = difficultyOrder[b.difficulty] || 0
+      return aOrder - bOrder
+    })
+  }
+
+  return items
+})
+
+// 处理搜索
+function handleSearch(event) {
+  searchQuery.value = event.query
+}
+
+// 处理过滤变更
+function handleFilterChange(options) {
+  filterOptions.value = options
+}
+
+// 处理搜索结果选择
+function handleSearchResultSelect(result) {
+  // 搜索已处理导航，此处可做额外处理
+  console.log('Selected search result:', result)
+}
+
+// 展开搜索结果
+function handleExpandResults(results) {
+  // 打开全量搜索结果模态框
+  console.log('Expand results:', results)
+}
+
+// 处理面包屑导航
+function handleBreadcrumbNavigation(event) {
+  console.log('Navigate to level:', event)
+}
 
 // 选择学科处理
 async function selectDisciplineHandler(discipline) {
@@ -360,6 +435,4 @@ function getDisciplineColor(index) {
   }
 }
 
-}
 </style>
-

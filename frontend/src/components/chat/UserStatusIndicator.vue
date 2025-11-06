@@ -109,7 +109,7 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { ElMessage } from 'element-plus'
-import { Check, ArrowDown, ArrowUp, RightArrow, Upload } from '@element-plus/icons-vue'
+import { Check, ArrowDown, ArrowUp, ArrowRight, Upload } from '@element-plus/icons-vue'
 import {
   getStatusManager,
   getCurrentUserStatus,

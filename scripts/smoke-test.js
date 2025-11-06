@@ -221,6 +221,19 @@ async function main() {
     }
   }
 
+  // 7) Facets (Java mode)
+  try {
+    if (process.env.MOCK_MODE !== 'true') {
+      const fr = await request(`${API_PREFIX}/questions/facets`)
+      assertApiOk(fr, 'facets')
+      add('Facets', 'pass')
+    } else {
+      add('Facets', 'skip', { reason: 'mock mode' })
+    }
+  } catch (e) {
+    add('Facets', 'warn', { error: String(e) })
+  }
+
   // Summary
   const counts = results.reduce((acc, r) => { acc[r.status] = (acc[r.status]||0)+1; return acc }, {})
   console.log('\n===== Smoke Test Summary =====')

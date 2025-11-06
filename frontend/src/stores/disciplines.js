@@ -310,6 +310,17 @@ export const useDisciplinesStore = defineStore('disciplines', () => {
   }
 
   /**
+   * 返回根目录（学科列表）
+   */
+  function goToRoot() {
+    currentDiscipline.value = null
+    currentMajorGroup.value = null
+    currentMajor.value = null
+    currentSpecialization.value = null
+    updateBreadcrumb()
+  }
+
+  /**
    * 跳转到指定面包屑级别
    */
   function navigateToBreadcrumb(index) {
@@ -569,6 +580,7 @@ export const useDisciplinesStore = defineStore('disciplines', () => {
     // 方法 - 导航
     updateBreadcrumb,
     goBack,
+    goToRoot,
     navigateToBreadcrumb,
 
     // 方法 - 搜索

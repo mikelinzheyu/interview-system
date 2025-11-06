@@ -239,6 +239,7 @@ function handleSave() {
   overflow: hidden;
   min-height: 600px;
   display: flex;
+  animation: fadeInDown 0.4s ease-out;
 }
 
 .hero-content {
@@ -300,6 +301,10 @@ function handleSave() {
   font-weight: 700;
   color: #0f172a;
   margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .hero-description {
@@ -307,6 +312,10 @@ function handleSave() {
   color: #475569;
   font-size: 16px;
   line-height: 1.7;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .hero-metrics {
@@ -486,6 +495,18 @@ function handleSave() {
   margin-top: 12px;
 }
 
+/* 动画关键帧 */
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 /* 响应式布局 */
 @media (max-width: 1280px) {
   .domain-hero-card {
@@ -500,6 +521,23 @@ function handleSave() {
     position: static;
     align-self: center;
     margin-bottom: 18px;
+  }
+}
+
+@media (max-width: 1024px) {
+  .domain-hero-card {
+    min-height: auto;
+    padding: 28px;
+  }
+
+  .hero-title {
+    font-size: 32px;
+  }
+
+  .hero-illustration {
+    width: 140px;
+    height: 140px;
+    font-size: 56px;
   }
 }
 
@@ -534,6 +572,52 @@ function handleSave() {
   .hero-cta,
   .hero-secondary-cta {
     width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .domain-hero-card {
+    padding: 16px;
+  }
+
+  .hero-header {
+    gap: 8px;
+  }
+
+  .hero-title {
+    font-size: 24px;
+  }
+
+  .hero-description {
+    font-size: 14px;
+  }
+
+  .hero-illustration {
+    width: 100px;
+    height: 100px;
+    font-size: 40px;
+  }
+
+  .hero-metrics {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .metric {
+    padding: 14px 16px;
+  }
+
+  .section-title {
+    font-size: 14px;
+  }
+
+  .difficulty-tags {
+    gap: 8px;
+  }
+
+  .course-item,
+  .path-item {
+    font-size: 12px;
   }
 }
 </style>

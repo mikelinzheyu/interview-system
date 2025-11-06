@@ -15,6 +15,18 @@ require('dotenv').config()
 
 const PORT = 3001
 
+// ============ 加载学科数据 ============
+let disciplinesData = []
+try {
+  const disciplinesPath = path.join(__dirname, '../frontend/src/data/disciplines-complete.json')
+  const disciplinesJson = fs.readFileSync(disciplinesPath, 'utf-8')
+  disciplinesData = JSON.parse(disciplinesJson)
+  console.log(`✓ 成功加载 ${disciplinesData.length} 个学科门类数据`)
+} catch (e) {
+  console.warn(`⚠️  加载学科数据失败: ${e.message}，将使用空数据`)
+  disciplinesData = []
+}
+
 const CURRENT_USER_ID = 1
 
 // ============ Dify API 配置 ============
@@ -2890,6 +2902,176 @@ const routes = {
       sendResponse(res, 200, facets)
     } catch (e) {
       sendResponse(res, 500, null, `facets 生成失败: ${e.message}`)
+    }
+  },
+
+  // ============ 新增：学科体系 API ============
+
+  // 1. GET /api/disciplines - 返回所有学科门类 + 专业类 + 专业
+  'GET:/api/disciplines': (req, res) => {
+    try {
+      if (!disciplinesData || disciplinesData.length === 0) {
+        sendResponse(res, 200, [], '暂未加载学科数据')
+        return
+      }
+      sendResponse(res, 200, disciplinesData)
+    } catch (e) {
+      sendResponse(res, 500, null, `学科数据加载失败: ${e.message}`)
+    }
+  },
+
+  // 2. GET /api/disciplines/:id/major-groups - 返回某学科的专业类列表
+  'GET:/api/disciplines/:id/major-groups': (req, res) => {
+    try {
+      const disciplineId = req.url.split('/')[3]
+      const discipline = disciplinesData.find(d => d.id === disciplineId)
+
+      if (!discipline) {
+        sendResponse(res, 404, null, `学科 ${disciplineId} 不存在`)
+        return
+      }
+
+      const majorGroups = (discipline.majorGroups || []).map(group => ({
+        id: group.id,
+        code: group.code,
+        name: group.name,
+        description: group.description,
+        questionCount: group.questionCount || 0,
+        majorCount: (group.majors || []).length,
+        majors: (group.majors || []).map(m => ({
+          id: m.id,
+          code: m.code,
+          name: m.name,
+          icon: m.icon,
+          questionCount: m.questionCount || 0
+        }))
+      }))
+
+      sendResponse(res, 200, majorGroups)
+    } catch (e) {
+      sendResponse(res, 500, null, `查询专业类失败: ${e.message}`)
+    }
+  },
+
+  // 3. GET /api/majors/:id/details - 返回专业详情 + 细分方向
+  'GET:/api/majors/:id/details': (req, res) => {
+    try {
+      const majorId = req.url.split('/')[3]
+
+      // 从所有学科中查找专业
+      let targetMajor = null
+      let parentGroup = null
+
+      for (const discipline of disciplinesData) {
+        for (const group of discipline.majorGroups || []) {
+          const major = (group.majors || []).find(m => m.id === majorId)
+          if (major) {
+            targetMajor = major
+            parentGroup = group
+            break
+          }
+        }
+        if (targetMajor) break
+      }
+
+      if (!targetMajor) {
+        sendResponse(res, 404, null, `专业 ${majorId} 不存在`)
+        return
+      }
+
+      const majorDetail = {
+        id: targetMajor.id,
+        code: targetMajor.code,
+        name: targetMajor.name,
+        description: targetMajor.description,
+        icon: targetMajor.icon,
+        questionCount: targetMajor.questionCount || 0,
+        difficulty: targetMajor.difficulty || 'intermediate',
+        popularity: targetMajor.popularity || 0,
+        majorGroupId: parentGroup.id,
+        majorGroupName: parentGroup.name,
+        specializations: (targetMajor.specializations || []).map(spec => ({
+          id: spec.id,
+          name: spec.name,
+          description: spec.description,
+          coreCourses: spec.coreCourses || [],
+          relatedSkills: spec.relatedSkills || [],
+          questionCount: spec.questionCount || 0
+        }))
+      }
+
+      sendResponse(res, 200, majorDetail)
+    } catch (e) {
+      sendResponse(res, 500, null, `查询专业详情失败: ${e.message}`)
+    }
+  },
+
+  // 4. GET /api/specializations/:id - 返回细分方向详情
+  'GET:/api/specializations/:id': (req, res) => {
+    try {
+      const specId = req.url.split('/')[3]
+
+      // 从所有学科中查找细分方向
+      let targetSpec = null
+      let parentMajor = null
+
+      for (const discipline of disciplinesData) {
+        for (const group of discipline.majorGroups || []) {
+          for (const major of group.majors || []) {
+            const spec = (major.specializations || []).find(s => s.id === specId)
+            if (spec) {
+              targetSpec = spec
+              parentMajor = major
+              break
+            }
+          }
+          if (targetSpec) break
+        }
+        if (targetSpec) break
+      }
+
+      if (!targetSpec) {
+        sendResponse(res, 404, null, `细分方向 ${specId} 不存在`)
+        return
+      }
+
+      const specDetail = {
+        id: targetSpec.id,
+        name: targetSpec.name,
+        description: targetSpec.description,
+        parentMajorId: parentMajor.id,
+        parentMajorName: parentMajor.name,
+        coreCourses: targetSpec.coreCourses || [],
+        relatedSkills: targetSpec.relatedSkills || [],
+        questionCount: targetSpec.questionCount || 0,
+        learningPath: [
+          {
+            stage: 1,
+            name: '基础阶段',
+            description: '掌握基础理论和核心概念',
+            estimatedDays: 30,
+            topics: (targetSpec.coreCourses || []).slice(0, 2)
+          },
+          {
+            stage: 2,
+            name: '进阶阶段',
+            description: '深入学习专业核心知识',
+            estimatedDays: 60,
+            topics: (targetSpec.coreCourses || []).slice(2)
+          },
+          {
+            stage: 3,
+            name: '实战阶段',
+            description: '项目实践和技能应用',
+            estimatedDays: 30,
+            topics: targetSpec.relatedSkills || []
+          }
+        ]
+      }
+
+      sendResponse(res, 200, specDetail)
+    } catch (e) {
+      sendResponse(res, 500, null, `查询细分方向失败: ${e.message}`)
     }
   },
 
@@ -8709,6 +8891,10 @@ server.listen(PORT, async () => {
   console.log(`   POST /api/questions/:id/submit - 提交题目作答 🆕`)
   console.log(`   GET  /api/questions/:id/practice-records - 获取题目练习记录 🆕`)
   console.log(`   GET  /api/questions/recommendations - 获取题目推荐 🆕`)
+  console.log(`   GET  /api/disciplines - 获取所有学科门类 🆕🎓`)
+  console.log(`   GET  /api/disciplines/:id/major-groups - 获取学科专业类 🆕🎓`)
+  console.log(`   GET  /api/majors/:id/details - 获取专业详情 + 细分方向 🆕🎓`)
+  console.log(`   GET  /api/specializations/:id - 获取细分方向详情 🆕🎓`)
   console.log(`   GET  /api/users/statistics - 获取用户统计数据`)
   console.log(`   POST /api/users/statistics/events - 记录统计事件`)
   console.log(`   GET  /api/users/leaderboard - 获取排行榜`)

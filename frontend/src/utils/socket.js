@@ -9,22 +9,16 @@ import { getWebSocketBaseUrl } from '@/utils/networkConfig'
 const DEFAULT_WS_URL = 'ws://localhost:3001'
 
 const normalizeSocketUrl = (value) => {
-  if (!value || typeof value !== 'string') {
-    return ''
-  }
+  if (!value || typeof value !== 'string') return ''
   return value.trim()
 }
 
 const resolveWebSocketUrl = (candidate) => {
   const direct = normalizeSocketUrl(candidate)
-  if (direct) {
-    return direct
-  }
+  if (direct) return direct
 
   const envResolved = normalizeSocketUrl(getWebSocketBaseUrl())
-  if (envResolved) {
-    return envResolved
-  }
+  if (envResolved) return envResolved
 
   console.warn('[Socket] 未解析到 WebSocket 地址，回退到默认 ws://localhost:3001')
   return DEFAULT_WS_URL
@@ -38,7 +32,7 @@ class SocketService {
     this.connecting = false
     this.reconnectAttempts = 0
     this.maxReconnectAttempts = 5
-    this.reconnectDelay = 3000 // 3秒
+    this.reconnectDelay = 3000 // 3s
     this.listeners = new Map() // 存储事件监听器
   }
 
@@ -57,12 +51,10 @@ class SocketService {
     this.socketUrl = targetUrl
     this.connecting = true
 
-    console.log('[Socket] 正在连接到 WebSocket 服务器...', targetUrl)
+    console.log('[Socket] 正在连接 WebSocket 服务...', targetUrl)
 
     this.socket = io(targetUrl, {
-      auth: {
-        token: token || '1' // 传递 JWT token
-      },
+      auth: { token: token || '1' }, // 传入 JWT token
       transports: ['websocket', 'polling'],
       reconnection: true,
       reconnectionAttempts: this.maxReconnectAttempts,
@@ -120,7 +112,7 @@ class SocketService {
 
     // 在线用户数更新
     this.socket.on('online-users-updated', (data) => {
-      console.log('[Socket] 在线用户数:', data.count)
+      console.log('[Socket] 在线用户数', data.count)
     })
 
     return this.socket
@@ -152,13 +144,11 @@ class SocketService {
     }
 
     // 存储监听器以便重连后恢复
-    if (!this.listeners.has(event)) {
-      this.listeners.set(event, [])
-    }
+    if (!this.listeners.has(event)) this.listeners.set(event, [])
     this.listeners.get(event).push(callback)
 
     this.socket.on(event, callback)
-    console.log(`[Socket] 已监听事件: ${event}`)
+    console.log(`[Socket] 已监听事件 ${event}`)
   }
 
   /**
@@ -171,21 +161,17 @@ class SocketService {
 
     if (callback) {
       this.socket.off(event, callback)
-
-      // 从存储中移除特定回调
       const callbacks = this.listeners.get(event)
       if (callbacks) {
         const index = callbacks.indexOf(callback)
-        if (index > -1) {
-          callbacks.splice(index, 1)
-        }
+        if (index > -1) callbacks.splice(index, 1)
       }
     } else {
       this.socket.off(event)
       this.listeners.delete(event)
     }
 
-    console.log(`[Socket] 已取消监听事件: ${event}`)
+    console.log(`[Socket] 已取消监听事件 ${event}`)
   }
 
   /**
@@ -200,7 +186,7 @@ class SocketService {
     }
 
     this.socket.emit(event, data)
-    console.log(`[Socket] 已发送事件: ${event}`, data)
+    console.log(`[Socket] 已发送事件 ${event}`, data)
   }
 
   /**
@@ -208,13 +194,9 @@ class SocketService {
    */
   reRegisterListeners() {
     if (!this.socket) return
-
     console.log('[Socket] 重新注册监听器...')
-
     for (const [event, callbacks] of this.listeners.entries()) {
-      callbacks.forEach(callback => {
-        this.socket.on(event, callback)
-      })
+      callbacks.forEach(callback => this.socket.on(event, callback))
     }
   }
 
@@ -222,7 +204,7 @@ class SocketService {
 
   /**
    * 加入聊天室
-   * @param {number} roomId - 聊天室 ID
+   * @param {number} roomId - 聊天室ID
    */
   joinRoom(roomId) {
     this.emit('join-room', { roomId })
@@ -230,7 +212,7 @@ class SocketService {
 
   /**
    * 离开聊天室
-   * @param {number} roomId - 聊天室 ID
+   * @param {number} roomId - 聊天室ID
    */
   leaveRoom(roomId) {
     this.emit('leave-room', { roomId })
@@ -238,9 +220,9 @@ class SocketService {
 
   /**
    * 发送消息
-   * @param {number} roomId - 聊天室 ID
+   * @param {number} roomId - 聊天室ID
    * @param {string} content - 消息内容
-   * @param {number} replyTo - 回复的消息 ID（可选）
+   * @param {number} replyTo - 回复的消息ID（可选）
    */
   sendMessage(roomId, content, replyTo = null) {
     this.emit('send-message', { roomId, content, replyTo })
@@ -248,7 +230,7 @@ class SocketService {
 
   /**
    * 发送输入状态
-   * @param {number} roomId - 聊天室 ID
+   * @param {number} roomId - 聊天室ID
    * @param {boolean} isTyping - 是否正在输入
    */
   sendTypingStatus(roomId, isTyping) {
@@ -360,3 +342,4 @@ class SocketService {
 // 导出单例
 export const socketService = new SocketService()
 export default socketService
+

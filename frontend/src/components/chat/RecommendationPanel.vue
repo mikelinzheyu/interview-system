@@ -3,7 +3,7 @@
     <!-- Panel Header -->
     <div class="panel-header">
       <h3>
-        <el-icon><Sparkles /></el-icon>
+        <el-icon><MagicStick /></el-icon>
         AI推荐 - Recommended for Review
       </h3>
       <el-button
@@ -97,7 +97,7 @@ import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import messageAIRecommendationService from '@/services/messageAIRecommendationService'
 import { useWrongAnswersStore } from '@/stores/wrongAnswers'
-import { Sparkles, DocumentCopy, DataAnalysis, WarningFilled, Refresh } from '@element-plus/icons-vue'
+import { MagicStick, DocumentCopy, DataAnalysis, WarningFilled, Refresh } from '@element-plus/icons-vue'
 
 const router = useRouter()
 const store = useWrongAnswersStore()

@@ -8,7 +8,9 @@ import {
   fetchQuestionCategories,
   fetchQuestionTags,
   fetchQuestionPracticeRecords,
-  fetchQuestionRecommendations
+  fetchQuestionRecommendations,
+  fetchQuestionFacets,
+  fetchCategories
 } from '@/api/questions'
 
 export const useQuestionBankStore = defineStore('questionBank', () => {
@@ -141,13 +143,21 @@ export const useQuestionBankStore = defineStore('questionBank', () => {
       pagination.total = data.total || 0
       pagination.totalPages = data.totalPages || Math.max(1, Math.ceil((data.total || 0) / pagination.size))
 
-      if (data.availableFilters) {
+      // Facets 聚合（难度与分类分布），忽略失败
+      try {
+        const facetParams = {}
+        if (filters.keyword) facetParams.q = filters.keyword
+        if (filters.categoryId) facetParams.category_id = filters.categoryId
+        if (filters.tags.length) facetParams.tags = filters.tags.join(',')
+        const facetsResp = await fetchQuestionFacets(facetParams)
+        const f = facetsResp.data || {}
         availableFilters.value = {
-          difficulties: data.availableFilters.difficulties || [],
-          types: data.availableFilters.types || [],
-          tags: data.availableFilters.tags || []
+          difficulties: f.difficulties || [],
+          categories: f.categories || [],
+          types: data.availableFilters?.types || [],
+          tags: data.availableFilters?.tags || []
         }
-      }
+      } catch (e) {}
 
       lastFetchedAt.value = Date.now()
     } catch (err) {
@@ -165,10 +175,23 @@ export const useQuestionBankStore = defineStore('questionBank', () => {
       if (domainId) {
         params.domain_id = domainId
       }
-      const response = await fetchQuestionCategories(params)
-      const data = response.data || {}
-      categoriesTree.value = data.tree || []
-      categoriesFlat.value = data.flat || []
+      // 优先新接口，失败回退旧接口
+      try {
+        const respNew = await fetchCategories(params)
+        const dataNew = respNew.data || {}
+        if (Array.isArray(dataNew)) {
+          categoriesFlat.value = dataNew
+          categoriesTree.value = dataNew
+        } else {
+          categoriesTree.value = dataNew.tree || []
+          categoriesFlat.value = dataNew.flat || []
+        }
+      } catch (e) {
+        const response = await fetchQuestionCategories(params)
+        const data = response.data || {}
+        categoriesTree.value = data.tree || []
+        categoriesFlat.value = data.flat || []
+      }
     } catch (err) {
       console.error('加载题库分类失败:', err)
       ElMessage.error('题库分类加载失败')

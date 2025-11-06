@@ -13,7 +13,8 @@ public interface QuestionService {
 
     PageResponse<Question> getQuestions(int page, int size, Long categoryId,
                                       String difficulty, String type,
-                                      String keyword, String tags);
+                                      String keyword, String tags,
+                                      String sort);
 
 
     Question getQuestionById(Long id);
@@ -27,4 +28,14 @@ public interface QuestionService {
     void incrementViewCount(Long id);
 
     void likeQuestion(Long id);
+
+    // Facets aggregation
+    com.interview.dto.QuestionFacetsResponse getFacets(Long categoryId, String keyword, String tags);
+
+    // Import questions (JSON items)
+    com.interview.dto.ApiResponse<?> importQuestions(java.util.List<java.util.Map<String, Object>> items);
+
+    // Publish/version operations
+    void publishQuestion(Long id);
+    void archiveQuestion(Long id);
 }

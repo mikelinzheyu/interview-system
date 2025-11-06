@@ -1,4 +1,4 @@
-package com.interview.interview-common.entity;
+package com.interview.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import java.time.LocalDateTime;

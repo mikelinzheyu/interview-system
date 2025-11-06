@@ -4,15 +4,41 @@ import { ElMessage, ElNotification } from 'element-plus'
 // import StatisticsService from '@/services/statisticsService'
 // import healthChecker from '@/utils/healthCheck'
 
+// Safe defaults to ensure UI never receives undefined values
+const DEFAULT_FORMATTED = {
+  interviewCount: { value: 0, formatted: '0次' },
+  practiceTime: { value: 0, formatted: '0分钟' },
+  averageScore: { value: 0, formatted: '0.0分' },
+  rank: { level: 'N/A', formatted: 'N/A' }
+}
+const DEFAULT_SUMMARY = {
+  interviewCount: 0,
+  totalPracticeTime: 0,
+  averageScore: 0
+}
+
 // Mock implementations to avoid parsing errors in corrupted files
 const StatisticsService = {
   async getUserStatistics() {
-    return { success: true, data: { summary: {}, formatted: {}, trends: {} } }
+    return {
+      success: true,
+      data: {
+        summary: { ...DEFAULT_SUMMARY },
+        formatted: { ...DEFAULT_FORMATTED },
+        trends: {}
+      }
+    }
   },
   async updateAfterInterview() { return { success: true } },
   async getLeaderboard() { return { success: true, data: [] } },
   async getUserTrends() { return { success: true, data: { trends: [] } } },
-  getFallbackData() { return { summary: {}, formatted: {}, trends: {} } },
+  getFallbackData() {
+    return {
+      summary: { ...DEFAULT_SUMMARY },
+      formatted: { ...DEFAULT_FORMATTED },
+      trends: {}
+    }
+  },
   formatTime(ms) { return Math.round(ms / 60000) + '分钟' }
 }
 

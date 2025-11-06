@@ -51,3 +51,17 @@ export function fetchQuestionPracticeRecords(id, params) {
 export function fetchQuestionRecommendations(params) {
   return api.get('/questions/recommendations', { params })
 }
+
+// Facets 聚合（难度与分类分布）
+export function fetchQuestionFacets(params) {
+  return api.get('/questions/facets', { params })
+}
+
+// 兼容新的分类接口（后端为 /categories）
+export function fetchCategories(params) {
+  return api.get('/categories', { params })
+}
+
+export function exportQuestions(params) {
+  return api({ url: '/questions/export', method: 'get', params, responseType: 'blob' })
+}
