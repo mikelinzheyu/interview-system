@@ -409,19 +409,34 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
   const userStore = useUserStore()
   const isAuthenticated = userStore.isAuthenticated
+  const isAdmin = userStore.isAdmin
 
+  // 如果在登录页且已认证，重定向到首页
   if (to.name === 'Landing' && isAuthenticated) {
     next('/home')
     return
   }
 
+  // 检查认证要求
   if (to.meta.requiresAuth && !isAuthenticated) {
     next('/login')
-  } else if (to.meta.requiresGuest && isAuthenticated) {
-    next('/home')
-  } else {
-    next()
+    return
   }
+
+  // 检查管理员权限
+  if (to.meta.requiresAdmin && !isAdmin) {
+    console.warn(`Access denied to ${to.path}: Admin privileges required`)
+    next('/home')
+    return
+  }
+
+  // 检查访客限制（登录/注册页面）
+  if (to.meta.requiresGuest && isAuthenticated) {
+    next('/home')
+    return
+  }
+
+  next()
 })
 
 export default router
