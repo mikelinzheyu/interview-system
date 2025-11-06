@@ -32,49 +32,90 @@ const routes = [
     component: () => import('@/views/Home.vue'),
     meta: { requiresAuth: true }
   },
+  // ========== 题库与学习模块 ==========
+  // 主入口：学习中心
   {
     path: '/questions',
     name: 'QuestionBankRoot',
-    redirect: '/questions/hub',
+    redirect: '/learning-hub',
     meta: { requiresAuth: true }
   },
+
+  // 学习中心（首页仪表板）
   {
-    path: '/questions/hub',
+    path: '/learning-hub',
     name: 'LearningHub',
     component: () => import('@/views/questions/LearningHubDashboard.vue'),
-    meta: { requiresAuth: true }
+    meta: {
+      requiresAuth: true,
+      title: '学习中心',
+      description: '题库、推荐题目、学习进度'
+    }
   },
+
+  // 题库页面（具体学科/专业的题目列表）
   {
-    path: '/questions/:domainSlug',
+    path: '/learning-hub/:domainSlug',
     name: 'QuestionBankPage',
     component: () => import('@/views/questions/QuestionBankPage.vue'),
-    meta: { requiresAuth: true },
+    meta: {
+      requiresAuth: true,
+      title: '题库',
+      description: '查看特定学科的题目'
+    },
     props: true
   },
+
+  // 学习路径列表
   {
     path: '/learning-paths',
     name: 'LearningPathList',
     component: () => import('@/views/learning/LearningPathList.vue'),
-    meta: { requiresAuth: true }
+    meta: {
+      requiresAuth: true,
+      title: '学习路径',
+      description: '查看推荐的学习路径'
+    }
   },
+
+  // 学习路径详情
   {
     path: '/learning-paths/:pathSlug',
     name: 'LearningPathDetail',
     component: () => import('@/views/learning/LearningPathDetail.vue'),
-    meta: { requiresAuth: true },
+    meta: {
+      requiresAuth: true,
+      title: '学习路径详情',
+      description: '查看学习路径的详细信息'
+    },
     props: true
   },
+
+  // ========== 题目管理（管理员） ==========
+  // 创建新题目
   {
     path: '/admin/questions/new',
     name: 'QuestionCreate',
     component: () => import('@/views/admin/QuestionEditor.vue'),
-    meta: { requiresAuth: true, requiresAdmin: true }
+    meta: {
+      requiresAuth: true,
+      requiresAdmin: true,
+      title: '创建题目',
+      description: '创建新的考试题目'
+    }
   },
+
+  // 编辑题目
   {
     path: '/admin/questions/:id/edit',
     name: 'QuestionEdit',
     component: () => import('@/views/admin/QuestionEditor.vue'),
-    meta: { requiresAuth: true, requiresAdmin: true },
+    meta: {
+      requiresAuth: true,
+      requiresAdmin: true,
+      title: '编辑题目',
+      description: '编辑已有的考试题目'
+    },
     props: true
   },
 
