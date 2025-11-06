@@ -220,12 +220,21 @@ const features = ref([
   },
   {
     key: 'questions',
-    title: '题库练习',
-    description: '海量面试题目，分类练习提升专业能力',
-    buttonText: '开始练习',
+    title: '学习中心',
+    description: '题库首页 - 推荐题目、学习进度、我的收藏',
+    buttonText: '进入学习中心',
     icon: markRaw(Document),
     color: '#67c23a',
-    route: '/questions'
+    route: '/learning-hub'
+  },
+  {
+    key: 'learning-paths',
+    title: '学习路径',
+    description: '系统化的学习路径规划，从基础到精通',
+    buttonText: '浏览路径',
+    icon: markRaw(MagicStick),
+    color: '#f56c6c',
+    route: '/learning-paths'
   },
   {
     key: 'community',
@@ -247,8 +256,30 @@ const features = ref([
   }
 ])
 
-// 过滤功能列表 - 排除AI生成题目
-const filteredFeatures = computed(() => features.value.filter(f => f.key !== 'ai-generate'))
+// 添加管理员功能卡片
+const adminFeatures = ref([
+  {
+    key: 'admin-questions',
+    title: '题目管理',
+    description: '创建、编辑、管理考试题目（仅管理员可见）',
+    buttonText: '进入管理',
+    icon: markRaw(Edit),
+    color: '#ff6b6b',
+    route: '/admin/questions/new'
+  }
+])
+
+// 过滤功能列表 - 排除AI生成题目，并根据权限添加管理员功能
+const filteredFeatures = computed(() => {
+  let filtered = features.value.filter(f => f.key !== 'ai-generate')
+
+  // 如果是管理员，添加管理员功能
+  if (userStore.isAdmin) {
+    filtered = [...filtered, ...adminFeatures.value]
+  }
+
+  return filtered
+})
 
 // 最近活动
 const activities = ref([

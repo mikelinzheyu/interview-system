@@ -13,6 +13,29 @@
           @navigate="handleNavigate"
         />
         <div class="header-actions">
+          <!-- 题库导航菜单 -->
+          <el-dropdown @command="handleNavigationCommand">
+            <el-button text>
+              更多功能
+              <el-icon class="el-icon--right"><ArrowDown /></el-icon>
+            </el-button>
+            <template #dropdown>
+              <el-dropdown-menu>
+                <el-dropdown-item command="learning-paths">
+                  📚 学习路径
+                </el-dropdown-item>
+                <el-dropdown-item command="learning-hub">
+                  🏠 返回首页
+                </el-dropdown-item>
+                <el-dropdown-item v-if="userStore.isAdmin" divided command="admin-create">
+                  ➕ 创建新题目
+                </el-dropdown-item>
+                <el-dropdown-item v-if="userStore.isAdmin" command="admin-manage">
+                  📝 题目管理
+                </el-dropdown-item>
+              </el-dropdown-menu>
+            </template>
+          </el-dropdown>
           <el-button text :icon="CircleCheck" @click="showMyProgress = true">
             <span>学习进度</span>
           </el-button>
@@ -85,7 +108,7 @@ import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
 import { ElMessage } from 'element-plus'
-import { CircleCheck, Star } from '@element-plus/icons-vue'
+import { CircleCheck, Star, ArrowDown } from '@element-plus/icons-vue'
 import CommandPalette from '@/views/questions/components/CommandPalette.vue'
 import RecommendedForYouSection from '@/views/questions/components/RecommendedForYouSection.vue'
 import DisciplineExplorerSection from '@/views/questions/components/DisciplineExplorerSection.vue'
@@ -94,10 +117,12 @@ import MyProgressPanel from '@/views/questions/components/MyProgressPanel.vue'
 import MyFavoritesPanel from '@/views/questions/components/MyFavoritesPanel.vue'
 import { useDomainStore } from '@/stores/domain'
 import { useQuestionBankStore } from '@/stores/questions'
+import { useUserStore } from '@/stores/user'
 
 const router = useRouter()
 const domainStore = useDomainStore()
 const questionStore = useQuestionBankStore()
+const userStore = useUserStore()
 
 const {
   analyticsLoading,
@@ -533,6 +558,26 @@ function handleNavigate(payload) {
       default:
         break
     }
+  }
+}
+
+// 处理导航菜单命令
+function handleNavigationCommand(command) {
+  switch (command) {
+    case 'learning-paths':
+      router.push({ name: 'LearningPathList' })
+      break
+    case 'learning-hub':
+      router.push({ name: 'LearningHub' })
+      break
+    case 'admin-create':
+      router.push({ name: 'QuestionCreate' })
+      break
+    case 'admin-manage':
+      router.push({ name: 'QuestionCreate' })
+      break
+    default:
+      ElMessage.info('功能开发中...')
   }
 }
 </script>

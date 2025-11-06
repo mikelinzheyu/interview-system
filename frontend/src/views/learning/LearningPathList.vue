@@ -6,6 +6,25 @@
         <p class="subtitle">系统化学习,快速成长为领域专家</p>
       </div>
       <div class="header-actions">
+        <el-dropdown @command="handleNavigationCommand">
+          <el-button>
+            📚 更多功能
+            <el-icon class="el-icon--right"><ArrowDown /></el-icon>
+          </el-button>
+          <template #dropdown>
+            <el-dropdown-menu>
+              <el-dropdown-item command="learning-hub">
+                🏠 返回学习中心
+              </el-dropdown-item>
+              <el-dropdown-item command="home">
+                🏠 返回首页
+              </el-dropdown-item>
+              <el-dropdown-item v-if="userStore.isAdmin" divided command="admin-create">
+                ➕ 创建新题目
+              </el-dropdown-item>
+            </el-dropdown-menu>
+          </template>
+        </el-dropdown>
         <el-select v-model="selectedDomain" placeholder="筛选领域" clearable @change="handleDomainFilter">
           <el-option label="全部领域" :value="null" />
           <el-option
@@ -113,13 +132,15 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { Document, Clock, QuestionFilled, User, Medal } from '@element-plus/icons-vue'
+import { Document, Clock, QuestionFilled, User, Medal, ArrowDown } from '@element-plus/icons-vue'
 import { useLearningPathStore } from '@/stores/learningPath'
 import { useDomainStore } from '@/stores/domain'
+import { useUserStore } from '@/stores/user'
 
 const router = useRouter()
 const pathStore = useLearningPathStore()
 const domainStore = useDomainStore()
+const userStore = useUserStore()
 
 const selectedDomain = ref(null)
 const selectedLevel = ref(null)
@@ -188,6 +209,23 @@ function goToPathDetail(path) {
     name: 'LearningPathDetail',
     params: { pathSlug: path.slug }
   })
+}
+
+// 处理导航菜单命令
+function handleNavigationCommand(command) {
+  switch (command) {
+    case 'learning-hub':
+      router.push({ name: 'LearningHub' })
+      break
+    case 'home':
+      router.push({ name: 'Home' })
+      break
+    case 'admin-create':
+      router.push({ name: 'QuestionCreate' })
+      break
+    default:
+      break
+  }
 }
 </script>
 
