@@ -1,395 +1,307 @@
-# 🚀 快速启动指南 - Ngrok 到 Nginx 迁移
+# 🚀 生产部署快速开始
 
-**目标**: 在 2-3 小时内完成从 ngrok 到生产级 Nginx 的迁移
+## 📦 已完成的配置文件
 
----
+我已经为你创建了完整的Docker生产部署和GitHub CI/CD自动化。以下是关键文件：
 
-## 📂 新增/修改的文件清单
+### ✅ 已创建的文件
 
-```
-interview-system/
-│
-├─ .github/workflows/
-│  └─ deploy-storage-service.yml          ✨ 新增：GitHub Actions 自动部署
-│
-├─ scripts/
-│  ├─ deploy-storage-to-cloud.sh          ✨ 新增：Linux/Mac 部署脚本
-│  └─ deploy-storage-to-cloud.bat         ✨ 新增：Windows 部署脚本
-│
-├─ storage-service/
-│  ├─ .env.example                        ✨ 新增：本地开发配置示例
-│  └─ .env.prod                           ✏️  已存在：生产环境配置
-│
-├─ NGROK_TO_NGINX_MIGRATION_GUIDE.md      ✨ 新增：完整迁移概述
-├─ GITHUB_SECRETS_SETUP.md                ✨ 新增：GitHub Secrets 配置指南
-├─ IMPLEMENTATION_STEPS.md                ✨ 新增：逐步实施指南
-└─ QUICK_START.md                         ✨ 新增：快速启动（本文件）
-```
+1. **`.github/workflows/build-deploy.yml`**
+   - GitHub Actions自动化工作流
+   - 自动构建→推送到阿里云→部署到服务器
+   - 每次push到main分支自动触发
+
+2. **`.env.prod`** (已更新)
+   - 生产环境完整配置
+   - 包含域名、Dify配置、数据库密码等
+
+3. **`DEPLOYMENT_GUIDE.md`** (详细指南)
+   - 完整的部署步骤说明
+   - 包括服务器准备、配置、验证
+
+4. **`GITHUB_SECRETS_SETUP.md`** (快速参考)
+   - GitHub Secrets配置说明
+   - SSH密钥生成方式
 
 ---
 
-## ⏱️ 时间分配（总计 2-3 小时）
+## ⚡ 5分钟快速部署步骤
 
-| 步骤 | 时间 | 描述 |
-|------|------|------|
-| 1️⃣  本地测试 | 30 分钟 | 在本地验证存储服务工作正常 |
-| 2️⃣  GitHub 准备 | 20 分钟 | 创建仓库并推送代码 |
-| 3️⃣  GitHub Secrets | 20 分钟 | 配置自动部署所需的密钥 |
-| 4️⃣  云服务器准备 | 1 小时 | 购买和配置服务器、域名 |
-| 5️⃣  自动部署 | 15 分钟 | 推送代码自动部署 |
-| 6️⃣  验证 | 15 分钟 | 测试云端服务 |
-| 7️⃣  更新 Dify | 15 分钟 | 修改工作流配置 |
-
----
-
-## 🎯 三步快速开始
-
-### 步骤 1️⃣：本地测试（30 分钟）
+### 步骤1: 生成SSH密钥（5分钟）
 
 ```bash
-# 1. 进入存储服务目录
-cd D:\code7\interview-system\storage-service
+# 在你的本地电脑上运行
+ssh-keygen -t rsa -b 4096 -f ~/.ssh/interview_deploy -N ""
 
-# 2. 创建本地 .env 文件
-cp .env.example .env
+# 查看私钥（复制全部到GitHub Secret）
+cat ~/.ssh/interview_deploy
 
-# 3. 启动本地 Docker
-docker-compose up -d
-
-# 4. 等待 15 秒，检查状态
-docker-compose ps
-
-# 5. 测试 API（在新的 Terminal/PowerShell 中）
-curl -X POST http://localhost:8081/api/sessions \
-  -H "Authorization: Bearer ak_dev_test_key_12345678901234567890" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "sessionId": "test-001",
-    "jobTitle": "Python开发",
-    "questions": [{"id": "q1", "question": "test question", "answer": "test answer"}]
-  }'
-
-# 6. 看到 200 响应后，停止容器
-docker-compose down
+# 添加公钥到服务器
+ssh-copy-id -i ~/.ssh/interview_deploy.pub root@47.76.110.106
 ```
 
-✅ **检查点**: API 返回 200 OK
+### 步骤2: 添加GitHub Secrets（5分钟）
 
----
+打开 https://github.com/mikelinzheyu/interview-system/settings/secrets/actions
 
-### 步骤 2️⃣：GitHub 准备（20 分钟）
+添加以下7个Secrets：
+
+| Secret名称 | 值 |
+|-----------|-----|
+| `ALIYUN_REGISTRY_USERNAME` | 你的阿里云用户名 |
+| `ALIYUN_REGISTRY_PASSWORD` | 你的阿里云密码 |
+| `DEPLOY_HOST` | 47.76.110.106 |
+| `DEPLOY_USER` | root |
+| `DEPLOY_PORT` | 22 |
+| `DEPLOY_PATH` | /opt/interview-system |
+| `DEPLOY_PRIVATE_KEY` | 上面生成的私钥内容 |
+
+### 步骤3: 在服务器上准备环境（10分钟）
 
 ```bash
-# 1. 创建 GitHub 仓库
-# 访问 https://github.com/new
-# 仓库名: interview-system
-# 可见性: Private
-# 创建后会得到 https://github.com/YOUR_USERNAME/interview-system.git
+# 连接到服务器
+ssh root@47.76.110.106
 
-# 2. 本地配置 Git
-cd D:\code7\interview-system
+# 安装Docker和Docker Compose
+curl -fsSL https://get.docker.com | sh
+sudo curl -L "https://github.com/docker/compose/releases/download/v2.20.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+sudo chmod +x /usr/local/bin/docker-compose
 
-git init
-git remote add origin https://github.com/YOUR_USERNAME/interview-system.git
-git branch -M main
+# 创建部署目录
+mkdir -p /opt/interview-system
+cd /opt/interview-system
 
-# 3. 检查 .gitignore（确保包含敏感文件）
-cat .gitignore | grep -E "\.env|\.env\.prod|dump.rdb"
+# 克隆项目
+git clone https://github.com/mikelinzheyu/interview-system.git .
 
-# 如果没有，添加：
-cat >> .gitignore << 'EOF'
-.env
-.env.prod
-.env.local
-dump.rdb
-EOF
+# 创建数据目录
+mkdir -p data/{db,redis,uploads,backups}
+mkdir -p logs/{backend,frontend,db,redis,nginx}
 
-# 4. 推送代码
+# 编辑.env.prod，修改关键配置
+vi .env.prod
+```
+
+### 步骤4: 获取SSL证书（5分钟）
+
+```bash
+# 在服务器上运行
+apt-get install certbot python3-certbot-nginx -y
+certbot certonly --standalone -d viewself.cn
+
+# 证书位置: /etc/letsencrypt/live/viewself.cn/
+```
+
+### 步骤5: 手动测试部署（10分钟）
+
+```bash
+cd /opt/interview-system
+
+# 登录阿里云
+docker login -u your-username -p your-password \
+  crpi-ez54q3vldx3th6xj.cn-hongkong.personal.cr.aliyuncs.com
+
+# 启动所有服务
+docker-compose -f docker-compose.prod.yml up -d
+
+# 检查状态
+docker-compose -f docker-compose.prod.yml ps
+
+# 查看日志
+docker-compose -f docker-compose.prod.yml logs -f
+```
+
+### 步骤6: 触发自动部署（自动）
+
+```bash
+# 在本地推送代码到main分支
 git add .
-git commit -m "Initial commit: Storage service with cloud deployment"
-git push -u origin main
-
-# 5. 验证：访问 https://github.com/YOUR_USERNAME/interview-system
-# 应该能看到代码已上传
-```
-
-✅ **检查点**: 代码在 GitHub 上可见
-
----
-
-### 步骤 3️⃣：GitHub Secrets（20 分钟）
-
-**准备数据**（在本地运行）：
-
-```bash
-# 获取或生成需要的信息
-
-# 1. 云服务器 IP（从云服务商获取）
-# 例如: 203.0.113.42
-
-# 2. SSH 用户名（通常是）
-# 例如: root
-
-# 3. SSH 私钥（从本地获取）
-# Linux/Mac:
-cat ~/.ssh/id_rsa
-
-# Windows:
-Get-Content $env:USERPROFILE\.ssh\id_rsa
-
-# 4. 生成 Storage API Key (32字符)
-openssl rand -base64 32
-# 输出: ABCDefghijklmnopqrstuvwxyz123456=
-
-# 5. 生成 Redis 密码 (16字符)
-openssl rand -base64 16
-# 输出: RedisPassword1234=
-
-# 6. 你的域名
-# 例如: storage.interview-system.com
-```
-
-**在 GitHub 中添加 Secrets**：
-
-1. 进入 GitHub 仓库 → **Settings** → **Secrets and variables** → **Actions**
-
-2. 点击 **New repository secret**，逐个添加：
-
-| Secret 名称 | 值 | 示例 |
-|-----------|-----|------|
-| `CLOUD_SERVER_IP` | 云服务器 IP | `203.0.113.42` |
-| `CLOUD_SERVER_USER` | SSH 用户 | `root` |
-| `CLOUD_SERVER_KEY` | SSH 私钥（完整） | `-----BEGIN RSA...-----END RSA...` |
-| `STORAGE_API_KEY` | 32 字符密钥 | `ak_prod_ABCDef...` |
-| `REDIS_PASSWORD` | 16 字符密码 | `RedisPassword...` |
-| `DOMAIN_NAME` | 你的域名 | `storage.interview-system.com` |
-
-✅ **检查点**: GitHub 上能看到 6 个加密的 Secrets
-
----
-
-### 步骤 4️⃣：云服务器和域名（1 小时）
-
-**云服务器**：
-```bash
-# 从以下选择一个（按推荐度）：
-# 1. 阿里云 ECS (¥10/月, 2核2GB)
-# 2. 腾讯云 CVM (¥15/月, 2核2GB)
-# 3. DigitalOcean (¥40/月, 2GB)
-
-# 获取公网 IP 和 SSH 访问凭证
-# 复制到 GitHub Secrets 中
-```
-
-**域名**：
-```bash
-# 从 GoDaddy、Namecheap、阿里云等购买域名
-# 在 DNS 管理中添加 A 记录：
-
-# 主机记录: storage
-# 记录值: 你的云服务器 IP (203.0.113.42)
-# 完整域名: storage.interview-system.com
-
-# 等待 DNS 生效（5-30 分钟）
-nslookup storage.interview-system.com
-# 应该返回你的 IP
-```
-
-✅ **检查点**: `nslookup` 能解析你的域名到正确的 IP
-
----
-
-### 步骤 5️⃣：自动部署（15 分钟）
-
-```bash
-# 1. 做一个小改动触发部署
-cd D:\code7\interview-system
-echo "# Deployment test" >> storage-service/README.md
-
-# 2. 推送（这会自动触发 GitHub Actions）
-git add storage-service/README.md
-git commit -m "Trigger cloud deployment"
+git commit -m "feat: 完成生产部署配置"
 git push origin main
 
-# 3. 监控部署
-# 进入 GitHub → Actions → 看到 "Deploy Storage Service to Cloud" 正在运行
-
-# 4. 等待完成（通常 5-10 分钟）
-# 日志应该显示：
-# ✓ Build with Maven
-# ✓ Build Docker image
-# ✓ Deploy to cloud server
-# ✓ Health check passed
+# 自动触发GitHub Actions工作流
+# 监控地址: https://github.com/mikelinzheyu/interview-system/actions
 ```
-
-✅ **检查点**: GitHub Actions 工作流成功完成
 
 ---
 
-### 步骤 6️⃣：验证云端（15 分钟）
+## 📊 部署完成后访问
+
+部署成功后，你可以访问：
+
+| 应用 | URL |
+|-----|-----|
+| 应用主页 | https://viewself.cn |
+| API | https://viewself.cn/api |
+| Grafana监控 | https://viewself.cn:3000 |
+| Prometheus | https://viewself.cn:9090 |
+
+---
+
+## 🔑 关键配置项检查清单
+
+在开始部署前，确保你有以下信息：
+
+### 服务器信息
+- ✅ IP: 47.76.110.106
+- ✅ 用户: root
+- ✅ SSH端口: 22
+- ✅ 已安装Docker & Docker Compose
+
+### 阿里云配置
+- ✅ 镜像仓库: crpi-ez54q3vldx3th6xj.cn-hongkong.personal.cr.aliyuncs.com
+- ✅ 命名空间: ai_interview
+- ✅ 用户名和密码获取
+
+### GitHub配置
+- ✅ 仓库地址: https://github.com/mikelinzheyu/interview-system
+- ✅ SSH密钥已生成
+- ✅ GitHub Secrets已配置
+
+### 应用配置
+- ✅ 域名: viewself.cn
+- ✅ SSL证书已获取
+- ✅ .env.prod已更新关键配置
+- ✅ Dify API密钥已获取
+
+---
+
+## 🎯 自动化部署工作流
+
+```
+┌─────────────────────┐
+│  Push to main分支   │
+└──────────┬──────────┘
+           │
+           ▼
+┌─────────────────────┐
+│ GitHub Actions      │
+│ 自动构建镜像        │
+│ (Build Job)         │
+└──────────┬──────────┘
+           │
+           ▼
+┌─────────────────────┐
+│ 推送到阿里云        │
+│ 容器仓库            │
+└──────────┬──────────┘
+           │
+           ▼
+┌─────────────────────┐
+│ SSH登录生产服务器   │
+│ (Deploy Job)        │
+└──────────┬──────────┘
+           │
+           ▼
+┌─────────────────────┐
+│ 拉取新镜像          │
+│ 重启容器            │
+│ 验证健康检查        │
+└──────────┬──────────┘
+           │
+           ▼
+┌─────────────────────┐
+│ ✅ 部署完成         │
+│ 应用已上线          │
+└─────────────────────┘
+```
+
+---
+
+## 📝 可能需要修改的文件
+
+在.env.prod中修改以下关键配置：
 
 ```bash
-# 1. SSH 连接到云服务器
-ssh root@YOUR_CLOUD_SERVER_IP
+# 1. 数据库密码（必须修改）
+DB_PASSWORD=your-strong-password
 
-# 2. 检查 Docker 容器
-docker-compose -f /home/interview-system/storage-service/docker-compose-prod.yml ps
+# 2. Redis密码（必须修改）
+REDIS_PASSWORD=your-strong-password
 
-# 应该看到：
-# interview-redis        Up 5 minutes
-# interview-storage-service   Up 5 minutes
+# 3. JWT密钥（必须修改，最少32个字符）
+JWT_SECRET=your-strong-random-string-32-chars
 
-# 3. 测试 HTTPS API（在本地运行）
-curl -H "Authorization: Bearer ak_prod_YOUR_KEY" \
-  https://storage.interview-system.com/api/sessions
+# 4. Dify API配置（必须配置）
+DIFY_API_KEY=your-actual-key
+DIFY_WORKFLOW_1_ID=your-workflow-id-1
+DIFY_WORKFLOW_2_ID=your-workflow-id-2
+DIFY_WORKFLOW_3_ID=your-workflow-id-3
 
-# 应该返回 200 OK
-
-# 4. 查看日志（在云服务器上）
-docker-compose logs -f interview-storage-service
+# 5. Grafana密码（可选但建议修改）
+GRAFANA_PASSWORD=your-strong-password
 ```
-
-✅ **检查点**: HTTPS 能访问 API，容器正常运行
 
 ---
 
-### 步骤 7️⃣：更新 Dify 工作流（15 分钟）
+## ❓ 常见问题快速解答
 
-**对每个工作流（1, 2, 3）**：
+### Q: 如何查看部署日志？
+```bash
+# GitHub Actions日志
+https://github.com/mikelinzheyu/interview-system/actions
 
-1. 打开 Dify 工作流编辑器
-2. 找到代码节点中的 ngrok URL
-3. 替换为你的新域名：
-
-```python
-# 旧
-api_url = "https://xxxx-xxxx.ngrok-free.dev/api/sessions"
-
-# 新
-api_url = "https://storage.interview-system.com/api/sessions"
+# 服务器日志
+ssh root@47.76.110.106
+cd /opt/interview-system
+docker-compose -f docker-compose.prod.yml logs -f backend
 ```
 
-4. 找到 API Key，替换为新的：
+### Q: 部署失败怎么办？
+1. 检查GitHub Actions日志找出错误
+2. 验证SSH密钥和Secrets配置是否正确
+3. 检查服务器是否正确安装了Docker
+4. 查看.env.prod配置是否有错误
 
-```python
-# 旧
-api_key = "ak_live_a1b2c3d4e5f6..."
-
-# 新
-api_key = "ak_prod_YOUR_NEW_KEY"
+### Q: 如何手动更新应用？
+```bash
+ssh root@47.76.110.106
+cd /opt/interview-system
+git pull origin main
+docker-compose -f docker-compose.prod.yml pull
+docker-compose -f docker-compose.prod.yml down
+docker-compose -f docker-compose.prod.yml up -d
 ```
 
-5. 保存并发布工作流
-
-6. 在 Dify 中测试工作流（生成问题 → 保存 → 加载）
-
-✅ **检查点**: Dify 工作流能成功保存和加载数据
-
----
-
-## 📋 完整清单
-
-```
-✅ 本地测试完成
-✅ 代码推送到 GitHub
-✅ GitHub Secrets 配置完成
-✅ 云服务器购买并配置
-✅ 域名购买并配置 DNS
-✅ GitHub Actions 自动部署成功
-✅ 云端 Docker 容器运行正常
-✅ HTTPS API 可访问
-✅ Dify 工作流已更新
-✅ 工作流测试通过
+### Q: 如何查看容器状态？
+```bash
+ssh root@47.76.110.106
+cd /opt/interview-system
+docker-compose -f docker-compose.prod.yml ps
 ```
 
 ---
 
 ## 📚 详细文档
 
-如果需要更多细节，参考：
-
-- **完整迁移方案**: [NGROK_TO_NGINX_MIGRATION_GUIDE.md](./NGROK_TO_NGINX_MIGRATION_GUIDE.md)
-- **逐步实施指南**: [IMPLEMENTATION_STEPS.md](./IMPLEMENTATION_STEPS.md)
-- **GitHub Secrets 配置**: [GITHUB_SECRETS_SETUP.md](./GITHUB_SECRETS_SETUP.md)
+- **完整部署步骤**: 见 `DEPLOYMENT_GUIDE.md`
+- **Secrets配置详解**: 见 `GITHUB_SECRETS_SETUP.md`
+- **工作流配置**: 见 `.github/workflows/build-deploy.yml`
 
 ---
 
-## 🆘 常见问题
+## ✨ 部署完成后建议
 
-### Q: 部署失败了怎么办？
-A:
-1. 检查 GitHub Actions 日志
-2. 查看错误信息（通常是 SSH 密钥或 Secrets 配置有误）
-3. 参考 `IMPLEMENTATION_STEPS.md` 中的故障排查部分
-
-### Q: DNS 没有生效怎么办？
-A:
-```bash
-# 1. 等待 5-30 分钟
-# 2. 使用 nslookup 检查
-nslookup storage.interview-system.com
-# 3. 如果还是不行，检查域名 DNS 设置
-```
-
-### Q: 我想本地开发测试怎么办？
-A:
-```bash
-# 使用 .env.example 作为 .env
-cp storage-service/.env.example storage-service/.env
-docker-compose -f storage-service/docker-compose.yml up
-# 本地开发地址: http://localhost:8081
-```
-
-### Q: 如何回滚到上一个版本？
-A:
-```bash
-git log --oneline
-git revert <commit-hash>
-git push origin main
-# GitHub Actions 会自动重新部署
-```
+1. **设置监控告警** - 在Grafana中配置告警规则
+2. **定期备份** - 每周备份MySQL数据库
+3. **查看日志** - 定期查看应用日志发现问题
+4. **更新依赖** - 定期更新Docker镜像
+5. **性能优化** - 根据Prometheus指标优化配置
 
 ---
 
-## 🎉 下一步
+## 🎉 下一步行动
 
-完成以上步骤后，你就有了：
-
-✅ **生产级的存储服务**
-- Spring Boot + Redis
-- Docker 容器化
-- Nginx 反向代理
-- HTTPS 加密
-
-✅ **自动化 CI/CD 流程**
-- GitHub Actions 自动构建
-- 自动推送到云服务器
-- 自动健康检查
-
-✅ **稳定的域名服务**
-- 替代了不稳定的 ngrok
-- 99.9% 可用性
-- SSL/TLS 加密
-
-✅ **完整的微服务架构**
-- 前端独立开发部署
-- 后端独立运行
-- 存储服务独立扩展
+1. ✅ 生成SSH密钥（使用上面的命令）
+2. ✅ 添加GitHub Secrets（7个配置）
+3. ✅ 准备生产服务器（安装Docker）
+4. ✅ 修改.env.prod中的关键配置
+5. ✅ 手动测试部署流程
+6. ✅ 推送main分支触发自动部署
+7. ✅ 验证https://viewself.cn是否可访问
 
 ---
 
-## 📞 需要帮助？
+**准备好了吗？让我们开始部署吧！** 🚀
 
-如果遇到问题：
-
-1. 查看相关文档（上面列出的）
-2. 检查 GitHub Actions 日志
-3. 查看云服务器日志
-4. 参考故障排查部分
-
----
-
-**🚀 祝部署成功！**
-
-有任何问题，随时查看详细文档。
-
+如有任何问题，请查看详细文档或联系我！

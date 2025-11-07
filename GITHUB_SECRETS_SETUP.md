@@ -1,267 +1,287 @@
-# GitHub Secrets 和环境变量配置指南
+# GitHub Actions Secrets 配置快速参考
 
-## 📌 什么是 GitHub Secrets？
+## 📋 需要配置的Secrets列表
 
-GitHub Secrets 是一个安全的存储机制，用于存储敏感信息（密码、API密钥等），这些信息：
-- ✅ 在 Actions 工作流中可以访问
-- ✅ 不会显示在日志中
-- ✅ 不会被提交到仓库
-- ❌ 不能在 PR 中被访问（除非明确允许）
+在 GitHub 仓库的 **Settings → Secrets and variables → Actions** 中添加以下Secrets：
 
----
+### 🔐 阿里云容器仓库认证（必需）
 
-## 🔑 必需的 GitHub Secrets
+```
+名称: ALIYUN_REGISTRY_USERNAME
+值: your-aliyun-username@example.com
+说明: 阿里云容器仓库登录用户名（邮箱或用户名）
 
-### 1. 云服务器 SSH 配置
+名称: ALIYUN_REGISTRY_PASSWORD
+值: your-aliyun-password-or-token
+说明: 阿里云容器仓库登录密码或访问令牌
+```
 
-#### `CLOUD_SERVER_IP`
-- **说明**: 云服务器的公网 IP 地址
-- **示例**: `203.0.113.42`
-- **获取方式**:
-  - 阿里云: 服务器详情 → 公网IP
-  - 腾讯云: 云服务器 → 公网IP
-  - AWS: EC2 → 公有IPv4 地址
+**获取方式:**
+1. 访问 https://cr.console.aliyun.com
+2. 左侧菜单 → **访问凭证**
+3. 复制或创建访问密钥
 
-#### `CLOUD_SERVER_USER`
-- **说明**: SSH 登录用户名
-- **示例**: `root` 或 `ubuntu` (取决于系统)
-- **获取方式**: 云服务商提供，通常是 `root` 或 `ec2-user`
+### 🔑 生产服务器SSH连接信息（必需）
 
-#### `CLOUD_SERVER_KEY`
-- **说明**: SSH 私钥（用于无密码登录）
-- **格式**: 完整的 RSA 私钥（包括 `-----BEGIN RSA PRIVATE KEY-----`）
-- **获取方式**:
-  ```bash
-  # Linux/Mac - 复制私钥内容
-  cat ~/.ssh/id_rsa
+```
+名称: DEPLOY_HOST
+值: 47.76.110.106
+说明: 生产服务器公网IP地址
 
-  # Windows - 如果使用 PuTTY
-  # 使用 PuTTYgen 生成的私钥
-  ```
+名称: DEPLOY_USER
+值: root
+说明: SSH登录用户名（通常是root）
 
-### 2. 存储服务配置
+名称: DEPLOY_PORT
+值: 22
+说明: SSH连接端口（默认22）
 
-#### `STORAGE_API_KEY`
-- **说明**: 存储服务的 API 密钥
-- **长度**: 最少 32 字符（强密码）
-- **生成方式**:
-  ```bash
-  # 使用 openssl
-  openssl rand -base64 32
+名称: DEPLOY_PATH
+值: /opt/interview-system
+说明: 在服务器上的部署目录
 
-  # 输出示例: abcdefghijklmnopqrstuvwxyz123456789
-  ```
-- **用途**: Dify 工作流调用存储服务时使用
-  ```
-  Authorization: Bearer ak_prod_your_key_here
-  ```
-
-#### `REDIS_PASSWORD`
-- **说明**: Redis 数据库的访问密码
-- **长度**: 最少 16 字符（强密码）
-- **生成方式**:
-  ```bash
-  # 使用 openssl
-  openssl rand -base64 16
-
-  # 输出示例: redis_password_123456
-  ```
-
-### 3. 域名信息
-
-#### `DOMAIN_NAME`
-- **说明**: 存储服务的域名
-- **格式**: `storage.interview-system.com` 或 `storage.yourdomain.com`
-- **获取方式**:
-  - 从域名注册商购买
-  - 在 DNS 管理中添加 A 记录指向云服务器 IP
+名称: DEPLOY_PRIVATE_KEY
+值: -----BEGIN RSA PRIVATE KEY-----
+     ... (你的私钥内容) ...
+     -----END RSA PRIVATE KEY-----
+说明: SSH私钥（见下方生成方式）
+```
 
 ---
 
-## 🚀 配置步骤
+## 🔑 生成SSH密钥对
 
-### 第 1 步：生成密码和密钥
+### 步骤1: 在本地生成密钥
 
 ```bash
-# 在本地运行这些命令
+# 在你的本地电脑上运行
+ssh-keygen -t rsa -b 4096 -f ~/.ssh/interview_deploy -N ""
 
-# 1. 生成 Storage API Key（32字符）
-openssl rand -base64 32
-
-# 2. 生成 Redis 密码（16字符）
-openssl rand -base64 16
-
-# 3. 生成或获取 SSH 私钥
-cat ~/.ssh/id_rsa
+# 这会生成两个文件：
+# ~/.ssh/interview_deploy (私钥)
+# ~/.ssh/interview_deploy.pub (公钥)
 ```
 
-### 第 2 步：登录 GitHub
-
-1. 进入你的仓库
-2. 点击 **Settings** → **Secrets and variables** → **Actions**
-
-### 第 3 步：添加 Secrets
-
-点击 **New repository secret**，逐个添加以下内容：
-
-#### Secret 1: CLOUD_SERVER_IP
-| 字段 | 值 |
-|------|-----|
-| Name | `CLOUD_SERVER_IP` |
-| Secret | `203.0.113.42` (替换为你的IP) |
-
-#### Secret 2: CLOUD_SERVER_USER
-| 字段 | 值 |
-|------|-----|
-| Name | `CLOUD_SERVER_USER` |
-| Secret | `root` |
-
-#### Secret 3: CLOUD_SERVER_KEY
-| 字段 | 值 |
-|------|-----|
-| Name | `CLOUD_SERVER_KEY` |
-| Secret | (粘贴完整的私钥，包括 -----BEGIN------- 和 -------END-------) |
-
-#### Secret 4: STORAGE_API_KEY
-| 字段 | 值 |
-|------|-----|
-| Name | `STORAGE_API_KEY` |
-| Secret | `ak_prod_生成的32字符密钥` |
-
-#### Secret 5: REDIS_PASSWORD
-| 字段 | 值 |
-|------|-----|
-| Name | `REDIS_PASSWORD` |
-| Secret | `生成的16字符密码` |
-
-#### Secret 6: DOMAIN_NAME
-| 字段 | 值 |
-|------|-----|
-| Name | `DOMAIN_NAME` |
-| Secret | `storage.interview-system.com` |
-
-### 第 4 步：验证 Secrets
+### 步骤2: 获取私钥内容
 
 ```bash
-# 在 GitHub 中验证（Actions 工作流会显示加密的值）
-echo "✓ 所有 Secrets 已添加"
+# 显示私钥内容（复制整个输出到DEPLOY_PRIVATE_KEY）
+cat ~/.ssh/interview_deploy
 ```
 
----
+**输出示例:**
+```
+-----BEGIN RSA PRIVATE KEY-----
+MIIEpAIBAAKCAQEA1234567890...
+...
+-----END RSA PRIVATE KEY-----
+```
 
-## ⚠️ 安全最佳实践
+### 步骤3: 将公钥添加到服务器
 
-### ✅ 应该做
-- ✓ 使用强密码（最少 16-32 字符）
-- ✓ 定期轮换密钥
-- ✓ 为不同的环境使用不同的密钥
-- ✓ 只授予必要的权限
-
-### ❌ 不应该做
-- ✗ 不要将 Secret 提交到代码库
-- ✗ 不要在日志中打印 Secret
-- ✗ 不要在其他地方公开 Secret
-- ✗ 不要为多个服务使用相同的密钥
-
----
-
-## 🔄 更新 Secrets
-
-如果需要修改 Secret（如更换密码）：
-
-1. 在 GitHub Settings 中找到对应的 Secret
-2. 点击 **Update**
-3. 输入新值
-4. 保存更改
-
-**注意**：更新后，新的工作流运行将使用新的值。旧的运行不会受到影响。
-
----
-
-## 🐛 排查 Secrets 相关问题
-
-### 问题 1: "Authorization failed" 或 "Access denied"
-
-**可能原因**:
-- SSH 密钥不正确
-- `CLOUD_SERVER_USER` 和 `CLOUD_SERVER_IP` 的组合不正确
-- 云服务器的防火墙未开放 22 端口
-
-**解决方案**:
 ```bash
-# 在本地测试 SSH 连接
-ssh -i /path/to/private/key root@203.0.113.42
+# 方式1: 使用ssh-copy-id（推荐）
+ssh-copy-id -i ~/.ssh/interview_deploy.pub root@47.76.110.106
 
-# 如果失败，检查密钥权限
-chmod 600 /path/to/private/key
+# 方式2: 手动添加
+cat ~/.ssh/interview_deploy.pub | ssh root@47.76.110.106 "cat >> ~/.ssh/authorized_keys"
+
+# 方式3: 直接编辑服务器
+# 登录服务器后，编辑 ~/.ssh/authorized_keys，添加公钥内容
 ```
 
-### 问题 2: "Secret not found"
+### 步骤4: 验证SSH连接
 
-**可能原因**:
-- Secret 的名字拼写错误
-- Secret 未添加到仓库
+```bash
+# 测试SSH连接是否正常
+ssh -i ~/.ssh/interview_deploy -p 22 root@47.76.110.106 "echo 'SSH connection successful'"
 
-**解决方案**:
-- 检查 GitHub Settings 中的 Secrets 列表
-- 确保名字完全匹配（大小写敏感）
-
-### 问题 3: Docker 构建失败
-
-**可能原因**:
-- `STORAGE_API_KEY` 包含特殊字符，需要转义
-- `REDIS_PASSWORD` 中有空格
-
-**解决方案**:
-- 使用 `openssl rand -base64` 生成密钥（安全且无特殊字符）
-- 避免在密码中使用引号、反斜杠等特殊字符
-
----
-
-## 📋 Secrets 配置清单
-
-完成后检查：
-
-```
-GitHub Secrets 配置:
-  ☐ CLOUD_SERVER_IP - 云服务器公网IP
-  ☐ CLOUD_SERVER_USER - SSH用户名（通常root）
-  ☐ CLOUD_SERVER_KEY - SSH私钥（完整内容）
-  ☐ STORAGE_API_KEY - 存储服务API密钥（32字符以上）
-  ☐ REDIS_PASSWORD - Redis密码（16字符以上）
-  ☐ DOMAIN_NAME - 域名（如storage.interview-system.com）
-
-本地测试:
-  ☐ SSH 连接可用: ssh -i key root@IP
-  ☐ Docker Compose 本地运行成功
-  ☐ API Key 和 Redis 密码不包含特殊字符
-
-GitHub Actions:
-  ☐ 工作流文件 (.github/workflows/deploy-storage-service.yml) 存在
-  ☐ Actions 标签页显示可运行的工作流
-  ☐ 可以手动触发工作流 (workflow_dispatch)
+# 应该输出: SSH connection successful
 ```
 
 ---
 
-## 📚 参考资源
+## ✅ Secrets配置检查清单
 
-- [GitHub Secrets 官方文档](https://docs.github.com/en/actions/security-guides/encrypted-secrets)
-- [GitHub Actions 文档](https://docs.github.com/en/actions)
-- [Docker 官方文档](https://docs.docker.com/)
-- [Nginx 反向代理文档](https://nginx.org/en/docs/)
+在GitHub仓库中验证所有Secrets都已正确添加：
 
----
-
-## 🎯 下一步
-
-1. ✅ 配置好所有 6 个 GitHub Secrets
-2. ✅ 验证 SSH 连接可用
-3. ✅ 推送代码到 GitHub: `git push origin main`
-4. ✅ 检查 GitHub Actions 是否自动触发
-5. ✅ 监控部署日志
-6. ✅ 在 Dify 中更新工作流 API 地址
+```
+☐ ALIYUN_REGISTRY_USERNAME     ← 阿里云用户名
+☐ ALIYUN_REGISTRY_PASSWORD     ← 阿里云密码
+☐ DEPLOY_HOST                   ← 服务器IP (47.76.110.106)
+☐ DEPLOY_USER                   ← SSH用户名 (root)
+☐ DEPLOY_PORT                   ← SSH端口 (22)
+☐ DEPLOY_PATH                   ← 部署目录 (/opt/interview-system)
+☐ DEPLOY_PRIVATE_KEY           ← SSH私钥
+```
 
 ---
 
-**完成这些步骤后，你就拥有了完整的 CI/CD 自动化部署流程！** 🚀
+## 🚀 部署流程验证
+
+### 第一次手动测试
+
+```bash
+# 1. 登录GitHub Actions查看工作流
+# https://github.com/mikelinzheyu/interview-system/actions
+
+# 2. 在本地提交代码触发自动部署
+git add .
+git commit -m "chore: 配置生产部署"
+git push origin main
+
+# 3. 观看GitHub Actions构建过程
+# - 构建前端镜像 (5-10分钟)
+# - 构建后端镜像 (5-10分钟)
+# - 推送到阿里云 (2-5分钟)
+# - 部署到生产服务器 (3-5分钟)
+
+# 4. 验证部署
+curl -I https://viewself.cn/
+curl -I https://viewself.cn/api/health
+```
+
+### 监控部署日志
+
+```bash
+# 在GitHub Actions中查看详细日志
+# 1. 打开 https://github.com/mikelinzheyu/interview-system/actions
+# 2. 点击最新的工作流运行
+# 3. 查看各个步骤的详细日志
+
+# 或在服务器上查看
+ssh root@47.76.110.106
+cd /opt/interview-system
+docker-compose -f docker-compose.prod.yml logs -f
+```
+
+---
+
+## 📝 环境变量配置
+
+### 服务器上的.env.prod配置
+
+**关键配置项（必须修改）:**
+
+```bash
+# 数据库密码 - 使用强密码
+DB_PASSWORD=YourStrongDBPassword123!@#
+
+# Redis密码 - 使用强密码
+REDIS_PASSWORD=YourStrongRedisPassword123!@#
+
+# JWT密钥 - 最少32个字符的随机字符串
+JWT_SECRET=generate-a-strong-random-string-minimum-32-chars
+
+# Dify AI配置 - 从https://dify.ai获取
+DIFY_API_KEY=your-actual-dify-api-key-here
+DIFY_WORKFLOW_1_ID=workflow-id-1
+DIFY_WORKFLOW_2_ID=workflow-id-2
+DIFY_WORKFLOW_3_ID=workflow-id-3
+
+# Grafana管理员密码
+GRAFANA_PASSWORD=YourStrongGrafanaPassword123!@#
+
+# 域名配置
+DOMAIN=viewself.cn
+API_BASE_URL=https://viewself.cn/api
+```
+
+---
+
+## 🔄 持续集成/持续部署流程
+
+### 自动化工作流触发时机
+
+```
+GitHub Actions 工作流：build-deploy.yml
+
+触发事件:
+✓ 每次push到main分支自动触发
+✓ 可以手动触发（Actions标签页）
+
+工作流步骤:
+1. 检出代码 (checkout)
+2. 设置Docker Buildx
+3. 登录阿里云容器仓库
+4. 构建前端镜像 + 推送
+5. 构建后端镜像 + 推送
+6. 构建存储服务镜像 + 推送
+7. 连接到生产服务器
+8. 拉取新镜像
+9. 重启容器
+10. 验证部署
+```
+
+---
+
+## 🆘 常见问题
+
+### Q: 如何重新生成SSH密钥？
+
+```bash
+# 删除旧密钥
+rm ~/.ssh/interview_deploy*
+
+# 重新生成
+ssh-keygen -t rsa -b 4096 -f ~/.ssh/interview_deploy -N ""
+
+# 添加到服务器
+ssh-copy-id -i ~/.ssh/interview_deploy.pub root@47.76.110.106
+
+# 更新GitHub Secret (DEPLOY_PRIVATE_KEY)
+```
+
+### Q: 如何测试GitHub Actions工作流？
+
+```bash
+# 方法1: 在GitHub Web界面手动运行
+# 1. 打开Actions标签页
+# 2. 选择工作流
+# 3. 点击"Run workflow"按钮
+
+# 方法2: 通过提交代码触发
+git commit --allow-empty -m "test: trigger workflow"
+git push origin main
+```
+
+### Q: 部署失败怎么办？
+
+```bash
+# 1. 查看GitHub Actions日志
+# https://github.com/mikelinzheyu/interview-system/actions
+
+# 2. 查看生产服务器日志
+ssh root@47.76.110.106
+cd /opt/interview-system
+docker-compose -f docker-compose.prod.yml logs -f
+
+# 3. 手动部署测试
+docker-compose -f docker-compose.prod.yml down
+docker-compose -f docker-compose.prod.yml pull
+docker-compose -f docker-compose.prod.yml up -d
+```
+
+### Q: 如何修改镜像仓库地址？
+
+如果你的阿里云镜像仓库地址不同，更新以下文件：
+
+```bash
+# 1. 编辑docker-compose.prod.yml
+# 将所有镜像地址改为你的仓库地址
+
+# 2. 编辑.github/workflows/build-deploy.yml
+# 更新REGISTRY和REGISTRY_NAMESPACE变量
+```
+
+---
+
+## 📞 需要帮助？
+
+1. **检查GitHub Actions日志**: https://github.com/mikelinzheyu/interview-system/actions
+2. **查看部署指南**: 见 DEPLOYMENT_GUIDE.md
+3. **检查服务器状态**: `ssh root@47.76.110.106`
+
+---
+
+**完成配置后，每次push到main分支都会自动部署！** 🚀

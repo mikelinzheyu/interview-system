@@ -1,403 +1,264 @@
-# 生产部署检查清单
+# 🎯 部署检查清单 - 实时跟踪
 
-## ✅ 文件准备完成
+## 你现在的进度
 
-### 核心Docker配置
-- ✅ docker-compose.prod.yml - 完整生产编排文件
-- ✅ backend/Dockerfile.prod - Node.js后端多阶段构建
-- ✅ frontend/Dockerfile.prod - Vue 3前端多阶段构建
-- ✅ storage-service/Dockerfile.prod - Java存储服务多阶段构建
+**已完成:**
+- ✅ 添加GitHub Secrets (7个配置)
 
-### Nginx配置
-- ✅ nginx/prod.conf - 生产级反向代理和负载均衡
-- ✅ frontend/conf/server.conf - 前端Nginx配置
-- ✅ nginx/ssl/ - SSL证书目录(需创建证书)
-
-### 环境和配置
-- ✅ .env.prod - 生产环境变量文件
-- ✅ monitoring/prometheus.yml - Prometheus监控配置
-
-### 部署脚本
-- ✅ deploy-prod.sh - Linux/macOS自动部署脚本
-- ✅ deploy-prod.bat - Windows自动部署脚本
-- ✅ health-check.sh - 系统健康检查脚本
-
-### 文档
-- ✅ PRODUCTION_DEPLOYMENT.md - 完整部署指南(40KB)
-- ✅ DEPLOYMENT_SUMMARY.md - 部署总结和概览
-- ✅ QUICK_DEPLOYMENT_REFERENCE.md - 快速参考卡片
-- ✅ DEPLOYMENT_CHECKLIST.md - 本清单
+**下一步需要做:**
 
 ---
 
-## 📋 部署前准备 (按优先级)
+## 📋 部署步骤检查清单
 
-### 🔴 关键 - 必须完成
+### 🔧 Step 1: 准备生产服务器 (15-20分钟)
 
-- [ ] **检查系统要求**
-  - [ ] Docker版本 ≥ 20.10
-    ```bash
-    docker --version
-    ```
-  - [ ] docker-compose版本 ≥ 2.0
-    ```bash
-    docker-compose --version
-    ```
-  - [ ] 磁盘空间 ≥ 50GB
-    ```bash
-    df -h
-    ```
-  - [ ] 可用内存 ≥ 8GB
-    ```bash
-    free -h  # Linux
-    wmic OS get TotalVisibleMemorySize  # Windows
-    ```
-
-- [ ] **配置环境变量**
-  - [ ] 复制 `.env.docker` 到 `.env.prod`
-    ```bash
-    cp .env.docker .env.prod
-    ```
-  - [ ] 编辑 `.env.prod` 修改以下项:
-    - [ ] `DB_PASSWORD` - PostgreSQL密码 (强密码)
-    - [ ] `REDIS_PASSWORD` - Redis密码 (强密码)
-    - [ ] `JWT_SECRET` - JWT签名密钥 (≥32字符)
-    - [ ] `DIFY_API_KEY` - Dify API密钥
-    - [ ] `DIFY_API_BASE_URL` - Dify API地址
-    - [ ] 其他根据实际情况修改的项
-
-- [ ] **生成SSL证书**
-  - [ ] 创建证书目录
-    ```bash
-    mkdir -p nginx/ssl
-    ```
-  - [ ] 选择证书方案:
-    - [ ] 自签证书(开发/测试)
-      ```bash
-      openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
-        -keyout nginx/ssl/key.pem -out nginx/ssl/cert.pem
-      ```
-    - [ ] Let's Encrypt证书(生产推荐)
-      - [ ] 安装certbot
-      - [ ] 运行certbot获取证书
-      - [ ] 复制证书到nginx/ssl/
-    - [ ] 商业证书
-      - [ ] 获取PEM格式证书和私钥
-      - [ ] 放置到nginx/ssl/
-
-- [ ] **创建数据目录结构**
+- [ ] **连接到服务器**
   ```bash
-  mkdir -p data/db/{init,backups}
-  mkdir -p data/redis
-  mkdir -p data/backend/uploads
-  mkdir -p data/storage
-  mkdir -p data/frontend/cache
-  mkdir -p data/proxy/cache
-  mkdir -p logs/{db,redis,backend,storage,frontend,proxy}
+  ssh -i ~/.ssh/interview_deploy root@47.76.110.106
   ```
 
-### 🟠 重要 - 强烈建议
-
-- [ ] **验证防火墙配置**
-  - [ ] 允许入站端口80 (HTTP)
-  - [ ] 允许入站端口443 (HTTPS)
-  - [ ] 限制其他端口访问
-
-- [ ] **准备备份方案**
-  - [ ] 创建备份脚本
-  - [ ] 配置备份计划
-  - [ ] 测试恢复流程
-
-- [ ] **配置日志收集**
-  - [ ] 创建logs目录
-  - [ ] 配置日志轮转
-  - [ ] 可选：启用监控profile
-
-- [ ] **DNS和域名配置**
-  - [ ] 获取域名(如有)
-  - [ ] 配置DNS A记录指向服务器
-  - [ ] 验证DNS解析
-
-### 🟡 建议 - 生产最佳实践
-
-- [ ] **启用监控服务**
+- [ ] **安装Docker**
   ```bash
-  docker-compose -f docker-compose.prod.yml --profile monitoring up -d
+  curl -fsSL https://get.docker.com -o get-docker.sh
+  sudo sh get-docker.sh
+  docker --version  # 验证
   ```
 
-- [ ] **配置日志堆栈**
+- [ ] **安装Docker Compose**
   ```bash
-  docker-compose -f docker-compose.prod.yml --profile logging up -d
+  sudo curl -L "https://github.com/docker/compose/releases/download/v2.20.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+  sudo chmod +x /usr/local/bin/docker-compose
+  docker-compose --version  # 验证
   ```
 
-- [ ] **设置系统告警**
-  - [ ] CPU使用率告警 (>80%)
-  - [ ] 内存使用率告警 (>90%)
-  - [ ] 磁盘使用率告警 (>85%)
-  - [ ] 服务宕机告警
+- [ ] **创建部署目录**
+  ```bash
+  mkdir -p /opt/interview-system
+  cd /opt/interview-system
+  mkdir -p data/{db,redis,uploads,backups}
+  mkdir -p logs/{backend,frontend,db,redis,nginx}
+  ```
 
-- [ ] **准备文档**
-  - [ ] 保存管理员凭证
-  - [ ] 记录API密钥
-  - [ ] 文档系统架构
-  - [ ] 准备运维手册
+- [ ] **克隆项目代码**
+  ```bash
+  git clone https://github.com/mikelinzheyu/interview-system.git .
+  ls -la  # 验证
+  ```
 
----
+### 🔐 Step 2: 获取SSL证书 (5-10分钟)
 
-## 🚀 部署执行
+- [ ] **安装Certbot**
+  ```bash
+  apt-get install -y certbot python3-certbot-nginx
+  certbot --version  # 验证
+  ```
 
-### 阶段1: 验证和准备 (5分钟)
+- [ ] **获取Let's Encrypt证书**
+  ```bash
+  certbot certonly --standalone -d viewself.cn --agree-tos --register-unsafely-without-email
+  ls /etc/letsencrypt/live/viewself.cn/  # 验证
+  ```
 
-```bash
-# 1. 进入项目目录
-cd /path/to/interview-system
+### ⚙️ Step 3: 配置.env.prod (10分钟)
 
-# 2. 验证配置
-echo "检查.env.prod存在..."
-test -f .env.prod && echo "✓ .env.prod存在" || echo "✗ 错误: .env.prod不存在"
+- [ ] **编辑配置文件**
+  ```bash
+  cd /opt/interview-system
+  vi .env.prod
+  ```
 
-# 3. 验证Dockerfile
-for f in backend/Dockerfile.prod frontend/Dockerfile.prod storage-service/Dockerfile.prod; do
-  test -f "$f" && echo "✓ $f存在" || echo "✗ 错误: $f不存在"
-done
+- [ ] **修改必要的配置**
+  - [ ] `DB_PASSWORD` - 强密码
+  - [ ] `REDIS_PASSWORD` - 强密码
+  - [ ] `JWT_SECRET` - 强密钥（最少32字符）
+  - [ ] `DIFY_API_KEY` - 实际的Dify API密钥
+  - [ ] `DIFY_WORKFLOW_1_ID` - 工作流1 ID
+  - [ ] `DIFY_WORKFLOW_2_ID` - 工作流2 ID
+  - [ ] `DIFY_WORKFLOW_3_ID` - 工作流3 ID
+  - [ ] `GRAFANA_PASSWORD` - Grafana密码
 
-# 4. 验证目录结构
-mkdir -p logs/{db,redis,backend,storage,frontend,proxy}
-mkdir -p data/{db/init,db/backups,redis,backend/uploads,storage,frontend/cache,proxy/cache}
-mkdir -p nginx/ssl
-echo "✓ 目录结构创建完成"
-```
+- [ ] **验证配置**
+  ```bash
+  cat .env.prod | grep -E "DB_PASSWORD|DIFY_API_KEY"
+  # 不应该看到 "your-*" 占位符
+  ```
 
-### 阶段2: 构建镜像 (10-30分钟)
+### 🐳 Step 4: 手动测试部署 (20-30分钟)
 
-```bash
-# 显示构建进度
-docker-compose -f docker-compose.prod.yml build --no-cache
+- [ ] **登录阿里云容器仓库**
+  ```bash
+  docker login -u your-aliyun-username -p your-aliyun-password \
+    crpi-ez54q3vldx3th6xj.cn-hongkong.personal.cr.aliyuncs.com
+  ```
 
-# 验证镜像
-docker images | grep interview-system
-
-# 应该看到:
-# interview-system/backend          latest
-# interview-system/frontend         latest
-# interview-system/storage-service  latest
-```
-
-### 阶段3: 启动服务 (3-5分钟)
-
-```bash
-# 启动所有核心服务
-docker-compose -f docker-compose.prod.yml up -d
-
-# 查看启动进度
-docker-compose -f docker-compose.prod.yml logs -f
-
-# 等待所有服务就绪 (约30-60秒)
-sleep 30
-docker-compose -f docker-compose.prod.yml ps
-```
-
-### 阶段4: 验证部署 (5分钟)
-
-```bash
-# 运行健康检查脚本
-./health-check.sh
-
-# 手动验证关键服务
-echo "检查前端..." && curl -k https://localhost/health
-echo "检查后端API..." && curl -k https://localhost/api/health  
-echo "检查数据库..." && docker exec interview-db psql -U admin -d interview_system -c "SELECT 1"
-echo "检查Redis..." && docker exec interview-redis redis-cli ping
-
-# 所有应该都返回成功
-```
-
----
-
-## 🔍 部署后检查
-
-### 立即验证 (1小时内)
-
-- [ ] **访问应用**
-  - [ ] 打开 https://localhost 检查前端
-  - [ ] 访问 https://localhost/api/health 检查后端
-  - [ ] 查看浏览器控制台，确认无错误
+- [ ] **启动所有服务**
+  ```bash
+  docker-compose -f docker-compose.prod.yml up -d
+  sleep 30  # 等待容器启动
+  ```
 
 - [ ] **检查容器状态**
   ```bash
   docker-compose -f docker-compose.prod.yml ps
-  # 所有容器状态应为 Up
+  # 所有容器应该显示 "Up (healthy)"
   ```
 
-- [ ] **验证数据库**
+- [ ] **检查应用是否可访问**
   ```bash
-  docker exec interview-db psql -U admin -d interview_system -c "SELECT COUNT(*) FROM pg_tables WHERE schemaname='public'"
+  curl -I https://viewself.cn
+  curl -I https://viewself.cn/api/health
+  # 应该返回 200
   ```
 
-- [ ] **检查日志**
+- [ ] **查看日志确保无错误**
   ```bash
-  docker-compose -f docker-compose.prod.yml logs --tail=100
-  # 不应有ERROR或CRITICAL信息
+  docker-compose -f docker-compose.prod.yml logs --tail=50
+  # 检查是否有ERROR信息
   ```
 
-### 功能测试 (部署后第一天)
+### 🚀 Step 5: 触发GitHub Actions自动部署 (5分钟)
 
-- [ ] **API测试**
-  - [ ] 测试健康检查端点
-  - [ ] 测试主要API功能
-  - [ ] 检查错误处理
-
-- [ ] **数据库测试**
-  - [ ] 创建测试数据
-  - [ ] 验证持久化
-  - [ ] 测试查询性能
-
-- [ ] **前端测试**
-  - [ ] 导航各页面
-  - [ ] 测试API集成
-  - [ ] 检查资源加载
-
-### 性能测试 (部署后第一周)
-
-- [ ] **负载测试**
+- [ ] **在本地推送代码**
   ```bash
-  # 使用Apache Bench或wrk
-  ab -n 1000 -c 10 https://localhost/
+  git add .
+  git commit -m "feat: 完成生产部署配置"
+  git push origin main
   ```
 
-- [ ] **资源监控**
+- [ ] **监控GitHub Actions**
+  访问: https://github.com/mikelinzheyu/interview-system/actions
+
+  - [ ] 工作流开始运行
+  - [ ] 前端镜像构建完成 (~10分钟)
+  - [ ] 后端镜像构建完成 (~10分钟)
+  - [ ] 推送到阿里云完成 (~5分钟)
+  - [ ] 部署到服务器完成 (~5分钟)
+
+### ✅ Step 6: 验证最终部署 (5分钟)
+
+- [ ] **应用主页可访问**
+  访问: https://viewself.cn
   ```bash
-  # 监控CPU和内存
-  docker stats
+  curl -I https://viewself.cn
+  # HTTP/2 200 或 HTTP/1.1 200
   ```
 
-- [ ] **日志分析**
+- [ ] **API健康检查通过**
   ```bash
-  # 检查日志中的性能指标
-  docker-compose -f docker-compose.prod.yml logs backend | grep response_time
+  curl https://viewself.cn/api/health
+  ```
+
+- [ ] **Grafana监控可访问**
+  访问: https://viewself.cn:3000
+  用户名: admin
+  密码: 见.env.prod
+
+- [ ] **Prometheus可访问**
+  访问: https://viewself.cn:9090
+
+- [ ] **所有容器保持运行**
+  ```bash
+  docker-compose -f docker-compose.prod.yml ps
+  # 无容器重启，都显示 "Up"
   ```
 
 ---
 
-## 📊 部署后监控指标
+## 🎯 进度总结
 
-### 关键性能指标 (KPI)
-
-| 指标 | 目标 | 告警值 |
-|------|------|--------|
-| API响应时间 | <500ms | >1s |
-| 数据库查询时间 | <100ms | >500ms |
-| Redis延迟 | <10ms | >50ms |
-| 前端加载时间 | <3s | >5s |
-| CPU使用率 | <60% | >80% |
-| 内存使用率 | <70% | >90% |
-| 磁盘使用率 | <60% | >85% |
-| 可用性 | 99.9% | <99% |
+| 步骤 | 项目 | 状态 | 耗时 |
+|------|------|------|------|
+| 1 | 准备服务器 | ⏳ 待做 | 15-20min |
+| 2 | 获取SSL证书 | ⏳ 待做 | 5-10min |
+| 3 | 配置.env.prod | ⏳ 待做 | 10min |
+| 4 | 手动测试 | ⏳ 待做 | 20-30min |
+| 5 | 触发自动部署 | ⏳ 待做 | 30-40min |
+| 6 | 验证部署 | ⏳ 待做 | 5min |
+| **总耗时** | | | **约2小时** |
 
 ---
 
-## 🔐 安全检查清单
+## 💡 关键提示
 
-部署后必须验证:
+### ⚠️ 重要注意事项
 
-- [ ] **HTTPS/SSL**
-  - [ ] 访问HTTP自动重定向到HTTPS
-  - [ ] SSL证书有效期>30天
-  - [ ] 没有SSL警告
+1. **不要跳过.env.prod配置**
+   - 必须修改所有 `your-*` 占位符
+   - 使用强密码和密钥
+   - Dify API密钥是必需的
 
-- [ ] **身份验证**
-  - [ ] 默认凭证已更改
-  - [ ] API密钥配置正确
-  - [ ] JWT令牌功能正常
+2. **第一次部署需要时间**
+   - 镜像构建: 20-30分钟
+   - GitHub Actions运行: 30-40分钟
+   - 总共: 1-2小时
+   - 请耐心等待，不要中途中断
 
-- [ ] **访问控制**
-  - [ ] 数据库不可从外部访问
-  - [ ] Redis不可从外部访问
-  - [ ] 只有必要的端口开放
+3. **监控日志很重要**
+   - GitHub Actions: 查看构建日志
+   - 服务器: 查看容器日志
+   - 问题出现时检查日志找根因
 
-- [ ] **数据保护**
-  - [ ] 数据加密传输
-  - [ ] 敏感数据未暴露在日志中
-  - [ ] 备份数据已加密
+4. **防火墙配置**
+   - 确保80和443端口开放
+   - 如果无法访问，检查安全组规则
 
----
+### ✨ 快速命令参考
 
-## 📝 部署记录
-
-部署完成后填写:
-
-```
-部署日期: __________
-部署人员: __________
-部署环境: ☐ 开发 ☐ 测试 ☐ 生产
-服务器IP: __________
-域名: __________
-数据库版本: __________
-Redis版本: __________
-Node.js版本: __________
-Java版本: __________
-总部署时间: __________分钟
-问题和解决: ____________________________
-签名: __________
-```
-
----
-
-## 🆘 故障快速修复
-
-### 问题: 容器无法启动
 ```bash
-docker-compose -f docker-compose.prod.yml logs backend
-# 查看具体错误信息
-```
+# 连接到服务器
+ssh -i ~/.ssh/interview_deploy root@47.76.110.106
 
-### 问题: 无法连接API
-```bash
-# 1. 检查容器状态
+# 启动所有服务
+docker-compose -f docker-compose.prod.yml up -d
+
+# 查看容器状态
 docker-compose -f docker-compose.prod.yml ps
 
-# 2. 检查网络
-docker network inspect interview-network
+# 查看实时日志
+docker-compose -f docker-compose.prod.yml logs -f
 
-# 3. 检查日志
-docker exec interview-backend cat logs/*.log
-```
+# 停止所有服务
+docker-compose -f docker-compose.prod.yml down
 
-### 问题: 数据库连接失败
-```bash
-# 1. 检查数据库容器
-docker-compose -f docker-compose.prod.yml logs db
+# 查看特定服务日志
+docker-compose -f docker-compose.prod.yml logs -f backend
+docker-compose -f docker-compose.prod.yml logs -f frontend
 
-# 2. 验证连接
-docker exec interview-db psql -U admin -d interview_system -c "\dt"
-
-# 3. 重启数据库
-docker-compose -f docker-compose.prod.yml restart db
+# 手动更新应用
+git pull origin main
+docker-compose -f docker-compose.prod.yml pull
+docker-compose -f docker-compose.prod.yml restart
 ```
 
 ---
 
-## ✅ 最终确认
+## 📞 实时问题排查
 
-所有项目完成后，在下方签名:
+如果遇到问题，请提供：
 
-- [ ] 所有前置检查已完成
-- [ ] 所有部署步骤已执行
-- [ ] 所有验证测试已通过
-- [ ] 所有安全检查已完成
-- [ ] 监控告警已配置
-- [ ] 文档已更新
-- [ ] 团队已培训
-- [ ] 备份已验证
-
-**部署状态**: ✅ 生产就绪
-
-**负责人**: ________________  
-**确认时间**: ________________  
-**计划维护窗口**: ________________  
+1. **问题描述** - 什么步骤出了问题？
+2. **错误信息** - 完整的错误输出
+3. **日志输出** - GitHub Actions或容器日志
+4. **你的环境** - 服务器配置、OS版本等
 
 ---
 
-**文档版本**: 1.0.0  
-**最后更新**: 2024-10-27  
-**有效期**: 至2025-10-27
+## 🎉 预期结果
+
+部署成功后你将拥有：
+
+✅ **完整的在线应用** - https://viewself.cn
+✅ **实时监控系统** - Grafana仪表板
+✅ **性能指标收集** - Prometheus
+✅ **集中日志管理** - Loki
+✅ **自动化部署** - push即部署
+✅ **高可用架构** - 容器自动重启
+✅ **SSL/HTTPS** - 安全加密
+✅ **监控告警** - 发现问题
+
+---
+
+**现在就开始部署吧！按照检查清单一步步进行。** 🚀
+
+**我会在这里等你的进度报告！** 👋

@@ -81,7 +81,19 @@
       "Bash(taskkill:*)",
       "Bash(nul)",
       "Bash(wmic process where name=\"node.exe\" delete /nointeractive 2)",
-      "Bash(test:*)"
+      "Bash(test:*)",
+      "Bash(\"C:\\Program Files\\nodejs\\node.exe\" \"D:\\code7\\interview-system\\frontend\\node_modules\\vite\\bin\\vite.js\" --host 0.0.0.0 --port 5174)",
+      "Bash(tree:*)",
+      "Bash(find:*)",
+      "Bash(\"C:\\Program Files\\nodejs\\node.exe\" \"D:\\code7\\interview-system\\cleanup3.js\")",
+      "Bash(del cleanup.js cleanup2.js cleanup3.js cleanup.ps1 2)",
+      "Bash(\"C:\\Program Files\\nodejs\\node.exe\" -e \"const fs = require(''fs''); [''cleanup.js'', ''cleanup2.js'', ''cleanup3.js'', ''cleanup.ps1''].forEach(f => { try { fs.unlinkSync(''D:\\\\code7\\\\interview-system\\\\'' + f); console.log(''Deleted: '' + f); } catch(e) { } });\")",
+      "Bash(\"C:\\Program Files\\nodejs\\node.exe\" \"D:\\code7\\interview-system\\cleanup-temp.js\")",
+      "Bash(\"C:\\Program Files\\nodejs\\node.exe\" -e \"const fs = require(''fs''); try { fs.unlinkSync(''D:/code7/interview-system/cleanup-temp.js''); console.log(''Deleted cleanup-temp.js''); } catch(e) { }\")",
+      "Bash(\"C:\\Program Files\\nodejs\\node.exe\" -e:*)",
+      "Bash(\"C:\\Program Files\\nodejs\\node.exe\" -e \"const fs = require(''fs''); try { fs.unlinkSync(''cleanup-tests.js''); console.log(''✓ 清理脚本已删除''); } catch(e) { console.log(''✗ 无法删除脚本''); }\")",
+      "Bash(\"C:\\Program Files\\nodejs\\node.exe\" -e \"\nconst fs = require(''fs'');\nconst scripts = [''cleanup-tests.js'', ''delete-logs.js''];\nscripts.forEach(file => {\n  try {\n    if (fs.existsSync(file)) {\n      fs.unlinkSync(file);\n      console.log(''✓ 已删除: '' + file);\n    }\n  } catch (e) {\n    console.log(''✗ 无法删除: '' + file);\n  }\n});\n\")",
+      "Bash(\"C:\\Program Files\\nodejs\\node.exe\" -e \"\nconst fs = require(''fs'');\nconst path = require(''path'');\n\nif (fs.existsSync(''logs'')) {\n  const files = fs.readdirSync(''logs'');\n  console.log(''logs/ 目录中的文件：'');\n  files.forEach(f => console.log(''  - '' + f));\n  \n  // 删除所有文件\n  console.log('''');\n  files.forEach(f => {\n    try {\n      fs.unlinkSync(path.join(''logs'', f));\n      console.log(''已删除: '' + f);\n    } catch (e) {\n      console.log(''无法删除: '' + f);\n    }\n  });\n  \n  // 检查目录是否为空\n  const remaining = fs.readdirSync(''logs'');\n  if (remaining.length === 0) {\n    console.log(''✓ logs/ 目录已清空'');\n  }\n}\n\")"
     ],
     "deny": [],
     "ask": []
