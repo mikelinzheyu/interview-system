@@ -79,12 +79,7 @@ services:
   # Node.js 后端API服务
   # ============================================
   backend:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile.prod
-      args:
-        NODE_ENV: production
-    image: interview-system/backend:latest
+    image: crpi-ez54q3vldx3th6xj.cn-hongkong.personal.cr.aliyuncs.com/ai_interview/ai_interview_backend:latest
     container_name: interview-backend
     restart: always
     environment:
@@ -142,10 +137,7 @@ services:
   # Java 存储服务
   # ============================================
   storage-service:
-    build:
-      context: ./storage-service
-      dockerfile: Dockerfile.prod
-    image: interview-system/storage-service:latest
+    image: crpi-ez54q3vldx3th6xj.cn-hongkong.personal.cr.aliyuncs.com/ai_interview/ai_interview_storage:latest
     container_name: interview-storage
     restart: always
     environment:
@@ -188,13 +180,7 @@ services:
   # Vue 前端服务
   # ============================================
   frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile.prod
-      args:
-        VITE_API_BASE_URL: ${VITE_API_BASE_URL:-http://localhost:8080/api}
-        VITE_STORAGE_API_BASE_URL: ${VITE_STORAGE_API_BASE_URL:-http://localhost:8081/api}
-    image: interview-system/frontend:latest
+    image: crpi-ez54q3vldx3th6xj.cn-hongkong.personal.cr.aliyuncs.com/ai_interview/ai_interview_frontend:latest
     container_name: interview-frontend
     restart: always
     expose:
