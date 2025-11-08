@@ -107,13 +107,14 @@ services:
   frontend:
     image: crpi-ez54q3vldx3th6xj.cn-hongkong.personal.cr.aliyuncs.com/ai_interview/ai_interview_frontend:latest
     container_name: interview-frontend
-    restart: always
+    restart: on-failure
+    environment:
+      - VITE_API_BASE_URL=http://localhost:3001/api
+      - VITE_STORAGE_API_BASE_URL=http://localhost:8081/api
     expose:
       - "80"
     networks:
       - interview-network
-    depends_on:
-      - backend
 
   # ============================================
   # Nginx 反向代理和路由
