@@ -79,29 +79,6 @@ services:
         condition: service_healthy
 
   # ============================================
-  # Java 存储服务 - 使用预构建镜像
-  # ============================================
-  storage-service:
-    image: crpi-ez54q3vldx3th6xj.cn-hongkong.personal.cr.aliyuncs.com/ai_interview/ai_interview_storage:latest
-    container_name: interview-storage
-    restart: always
-    environment:
-      SERVER_PORT: 8081
-      SPRING_PROFILES_ACTIVE: prod
-      TZ: ${TZ:-Asia/Shanghai}
-      SPRING_REDIS_HOST: interview-redis
-      SPRING_REDIS_PORT: 6379
-      SPRING_REDIS_PASSWORD: ${REDIS_PASSWORD:-RedisPassword123!}
-      SPRING_REDIS_DATABASE: 0
-    expose:
-      - "8081"
-    networks:
-      - interview-network
-    depends_on:
-      redis:
-        condition: service_healthy
-
-  # ============================================
   # Vue 前端服务 - 使用预构建镜像
   # ============================================
   frontend:
@@ -110,7 +87,6 @@ services:
     restart: on-failure
     environment:
       - VITE_API_BASE_URL=http://localhost:3001/api
-      - VITE_STORAGE_API_BASE_URL=http://localhost:8081/api
     expose:
       - "80"
     networks:
@@ -135,7 +111,6 @@ services:
     depends_on:
       - frontend
       - backend
-      - storage-service
 
 networks:
   interview-network:
