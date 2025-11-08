@@ -34,8 +34,8 @@ COPY --from=build-stage /app/dist /usr/share/nginx/html
 # 复制public资源文件
 COPY public /usr/share/nginx/html/
 
-# 复制nginx配置文件
-COPY nginx.conf /etc/nginx/nginx.conf
+# 复制nginx配置文件到conf.d目录（标准做法）
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 # 创建日志目录
 RUN mkdir -p /var/log/nginx && \
