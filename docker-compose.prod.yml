@@ -20,7 +20,6 @@ services:
       TZ: ${TZ:-Asia/Shanghai}
     volumes:
       - db_data:/var/lib/postgresql/data
-      - ./data/db/init:/docker-entrypoint-initdb.d
       - ./logs/db:/var/log/postgresql
     networks:
       - interview-network
@@ -29,11 +28,6 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
 
   # ============================================
   # Redis 缓存服务 (已优化)
@@ -44,39 +38,21 @@ services:
     restart: always
     environment:
       TZ: ${TZ:-Asia/Shanghai}
-    command: >
-      redis-server
-      --maxmemory 512mb
-      --maxmemory-policy allkeys-lru
-      --save 900 1
-      --save 300 10
-      --save 60 10000
-      --appendonly yes
-      --appendfsync everysec
-      --requirepass ${REDIS_PASSWORD:-RedisPassword123!}
-      --tcp-backlog 511
-      --timeout 0
-      --tcp-keepalive 300
+    command: redis-server --maxmemory 512mb --maxmemory-policy allkeys-lru
+    ports:
+      - "6379:6379"
     volumes:
       - redis_data:/data
-      - ./logs/redis:/var/log/redis
-    ports:
-      - "${REDIS_PORT:-6379}:6379"
     networks:
       - interview-network
     healthcheck:
-      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD:-RedisPassword123!}", "ping"]
+      test: ["CMD", "redis-cli", "ping"]
       interval: 10s
       timeout: 5s
       retries: 5
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
 
   # ============================================
-  # Node.js 后端API服务
+  # Node.js 后端API服务 - 使用预构建镜像
   # ============================================
   backend:
     image: crpi-ez54q3vldx3th6xj.cn-hongkong.personal.cr.aliyuncs.com/ai_interview/ai_interview_backend:latest
@@ -86,55 +62,24 @@ services:
       NODE_ENV: production
       PORT: 3001
       TZ: ${TZ:-Asia/Shanghai}
-      # API配置
       DIFY_API_KEY: ${DIFY_API_KEY}
       DIFY_API_BASE_URL: ${DIFY_API_BASE_URL}
       DIFY_WORKFLOW_URL: ${DIFY_WORKFLOW_URL}
-      # Redis配置
       REDIS_HOST: interview-redis
       REDIS_PORT: 6379
       REDIS_PASSWORD: ${REDIS_PASSWORD:-RedisPassword123!}
       REDIS_DB: 0
-      # 数据库配置 (如果需要)
-      DB_HOST: interview-db
-      DB_PORT: 5432
-      DB_NAME: ${DB_NAME:-interview_system}
-      DB_USER: ${DB_USER:-admin}
-      DB_PASSWORD: ${DB_PASSWORD:-SecurePassword123!}
-      # 安全配置
-      JWT_SECRET: ${JWT_SECRET:-interview-system-jwt-secret-key-change-in-production-environment}
-      JWT_EXPIRATION: ${JWT_EXPIRATION:-86400000}
-      # 应用配置
-      LOG_LEVEL: ${LOG_LEVEL:-INFO}
-      MAX_UPLOAD_SIZE: ${MAX_UPLOAD_SIZE:-10MB}
-      RATE_LIMIT_WINDOW: ${RATE_LIMIT_WINDOW:-15}
-      RATE_LIMIT_MAX: ${RATE_LIMIT_MAX:-100}
+      JWT_SECRET: ${JWT_SECRET:-interview-system-jwt-secret-key}
     expose:
       - "3001"
-    volumes:
-      - ./logs/backend:/app/logs
-      - ./data/backend/uploads:/app/uploads
     networks:
       - interview-network
     depends_on:
       redis:
         condition: service_healthy
-      db:
-        condition: service_healthy
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3001/api/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-      start_period: 40s
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
 
   # ============================================
-  # Java 存储服务
+  # Java 存储服务 - 使用预构建镜像
   # ============================================
   storage-service:
     image: crpi-ez54q3vldx3th6xj.cn-hongkong.personal.cr.aliyuncs.com/ai_interview/ai_interview_storage:latest
@@ -144,40 +89,20 @@ services:
       SERVER_PORT: 8081
       SPRING_PROFILES_ACTIVE: prod
       TZ: ${TZ:-Asia/Shanghai}
-      # Redis配置
       SPRING_REDIS_HOST: interview-redis
       SPRING_REDIS_PORT: 6379
       SPRING_REDIS_PASSWORD: ${REDIS_PASSWORD:-RedisPassword123!}
       SPRING_REDIS_DATABASE: 0
-      SPRING_REDIS_TIMEOUT: 60000
-      # 存储配置
-      SESSION_STORAGE_API_KEY: ${SESSION_STORAGE_API_KEY:-ak_live_a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0}
-      # JVM配置
-      JAVA_OPTS: "-Xms256m -Xmx512m -XX:+UseG1GC -XX:MaxGCPauseMillis=200"
     expose:
       - "8081"
-    volumes:
-      - ./logs/storage:/app/logs
-      - ./data/storage:/app/data
     networks:
       - interview-network
     depends_on:
       redis:
         condition: service_healthy
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8081/api/sessions"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-      start_period: 40s
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
 
   # ============================================
-  # Vue 前端服务
+  # Vue 前端服务 - 使用预构建镜像
   # ============================================
   frontend:
     image: crpi-ez54q3vldx3th6xj.cn-hongkong.personal.cr.aliyuncs.com/ai_interview/ai_interview_frontend:latest
@@ -185,194 +110,37 @@ services:
     restart: always
     expose:
       - "80"
-      - "443"
-    volumes:
-      - ./logs/frontend:/var/log/nginx
-      - ./data/frontend/cache:/var/cache/nginx
     networks:
       - interview-network
     depends_on:
-      backend:
-        condition: service_healthy
-      storage-service:
-        condition: service_healthy
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-      start_period: 20s
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
+      - backend
 
   # ============================================
-  # Nginx 反向代理和负载均衡器
+  # Nginx 反向代理和路由
   # ============================================
   nginx-proxy:
-    image: nginx:alpine
-    container_name: interview-proxy
+    image: nginx:1.27-alpine
+    container_name: interview-nginx
     restart: always
     ports:
       - "80:80"
       - "443:443"
     volumes:
-      - ./nginx/prod.conf:/etc/nginx/nginx.conf:ro
-      - ./nginx/conf.d:/etc/nginx/conf.d:ro
-      - ./nginx/ssl:/etc/nginx/ssl:ro
-      - ./logs/proxy:/var/log/nginx
-      - ./data/proxy/cache:/var/cache/nginx
-    environment:
-      TZ: ${TZ:-Asia/Shanghai}
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+      - nginx_cache:/var/cache/nginx
     networks:
       - interview-network
     depends_on:
-      frontend:
-        condition: service_healthy
-      backend:
-        condition: service_healthy
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "20m"
-        max-file: "5"
+      - frontend
+      - backend
+      - storage-service
 
-  # ============================================
-  # Prometheus 监控 (可选)
-  # ============================================
-  prometheus:
-    image: prom/prometheus:latest
-    container_name: interview-prometheus
-    restart: always
-    volumes:
-      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
-      - prometheus_data:/prometheus
-      - ./logs/prometheus:/var/log/prometheus
-    command:
-      - '--config.file=/etc/prometheus/prometheus.yml'
-      - '--storage.tsdb.path=/prometheus'
-      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
-      - '--web.console.templates=/usr/share/prometheus/consoles'
-      - '--web.enable-lifecycle'
-    expose:
-      - "9090"
-    networks:
-      - interview-network
-    profiles:
-      - monitoring
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
-
-  # ============================================
-  # Grafana 可视化仪表板 (可选)
-  # ============================================
-  grafana:
-    image: grafana/grafana:latest
-    container_name: interview-grafana
-    restart: always
-    environment:
-      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD:-admin}
-      GF_USERS_ALLOW_SIGN_UP: 'false'
-      TZ: ${TZ:-Asia/Shanghai}
-    volumes:
-      - grafana_data:/var/lib/grafana
-      - ./monitoring/grafana:/etc/grafana/provisioning
-      - ./logs/grafana:/var/log/grafana
-    expose:
-      - "3000"
-    networks:
-      - interview-network
-    depends_on:
-      - prometheus
-    profiles:
-      - monitoring
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
-
-  # ============================================
-  # ELK Stack - Elasticsearch (可选)
-  # ============================================
-  elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:8.5.0
-    container_name: interview-elasticsearch
-    restart: always
-    environment:
-      discovery.type: single-node
-      xpack.security.enabled: 'false'
-      ES_JAVA_OPTS: "-Xms256m -Xmx512m"
-      TZ: ${TZ:-Asia/Shanghai}
-    volumes:
-      - elasticsearch_data:/usr/share/elasticsearch/data
-      - ./logs/elasticsearch:/var/log/elasticsearch
-    expose:
-      - "9200"
-    networks:
-      - interview-network
-    profiles:
-      - logging
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
-
-  # ============================================
-  # Kibana 日志查询 (可选)
-  # ============================================
-  kibana:
-    image: docker.elastic.co/kibana/kibana:8.5.0
-    container_name: interview-kibana
-    restart: always
-    environment:
-      ELASTICSEARCH_HOSTS: http://elasticsearch:9200
-      TZ: ${TZ:-Asia/Shanghai}
-    expose:
-      - "5601"
-    networks:
-      - interview-network
-    depends_on:
-      - elasticsearch
-    profiles:
-      - logging
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
-
-# ============================================
-# 数据卷定义
-# ============================================
-volumes:
-  db_data:
-    driver: local
-  redis_data:
-    driver: local
-  prometheus_data:
-    driver: local
-  grafana_data:
-    driver: local
-  elasticsearch_data:
-    driver: local
-
-# ============================================
-# 网络配置
-# ============================================
 networks:
   interview-network:
     driver: bridge
-    driver_opts:
-      com.docker.network.bridge.name: br_interview
+
+volumes:
+  db_data:
+  redis_data:
+  nginx_cache:
