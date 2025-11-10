@@ -109,7 +109,22 @@ jobs:
           set -e
 
           echo "========== 开始部署 =========="
+
+          # 确保部署目录存在
+          mkdir -p ${{ secrets.DEPLOY_PATH }}
           cd ${{ secrets.DEPLOY_PATH }}
+
+          # ===== 从 GitHub 同步最新配置文件（关键步骤）=====
+          echo "正在从 GitHub 同步配置文件..."
+          if [ ! -d .git ]; then
+            echo "首次部署，克隆仓库..."
+            git clone https://github.com/mikelinzheyu/interview-system.git .
+          else
+            echo "后续部署，拉取最新更新..."
+            git fetch origin
+            git reset --hard origin/main
+          fi
+          echo "✅ 配置文件同步完成"
 
           # 登录阿里云
           docker login -u ${{ secrets.ALIYUN_REGISTRY_USERNAME }} -p ${{ secrets.ALIYUN_REGISTRY_PASSWORD }} ${{ env.REGISTRY }}
