@@ -1,6 +1,7 @@
 # 强制保持 Unix 行结符的文件
 nginx.conf text eol=lf
 *.sh text eol=lf
+*.ps1 text eol=lf
 .env* text eol=lf
 docker-compose*.yml text eol=lf
 
