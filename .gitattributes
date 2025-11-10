@@ -1,0 +1,16 @@
+# 强制保持 Unix 行结符的文件
+nginx.conf text eol=lf
+*.sh text eol=lf
+.env* text eol=lf
+docker-compose*.yml text eol=lf
+
+# 强制保持 Windows 行结符的文件（如果有）
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# 二进制文件
+*.zip binary
+*.jar binary
+*.png binary
+*.jpg binary
+*.jpeg binary

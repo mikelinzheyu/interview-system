@@ -103,6 +103,7 @@ services:
       - "80:80"
       - "443:443"
     volumes:
+      # 使用相对路径，确保与 docker-compose.prod.yml 同目录
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
       - /etc/letsencrypt:/etc/letsencrypt:ro
       - /var/www/certbot:/var/www/certbot:ro
@@ -112,6 +113,12 @@ services:
     depends_on:
       - frontend
       - backend
+    # 添加健康检查，确保 nginx 正常启动
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
 networks:
   interview-network:
