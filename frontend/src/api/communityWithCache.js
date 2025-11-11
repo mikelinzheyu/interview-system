@@ -944,6 +944,252 @@ class CommunityAPI {
   }
 
   /**
+   * @ 提及：搜索可提及的用户
+   */
+  searchMentionableUsers(keyword) {
+    const key = `mentions:search:${keyword}`
+    return this.getCached(
+      key,
+      () =>
+        this.retryRequest(() =>
+          api({
+            url: '/community/mentions/search',
+            method: 'get',
+            params: { q: keyword }
+          })
+        ),
+      1 * 60 * 1000  // 1分钟缓存
+    )
+  }
+
+  /**
+   * 获取被提及的用户列表
+   */
+  getMentionedUsers() {
+    return this.getCached(
+      'mentions:mentioned-users',
+      () =>
+        this.retryRequest(() =>
+          api({
+            url: '/community/mentions/users',
+            method: 'get'
+          })
+        ),
+      10 * 60 * 1000  // 10分钟缓存
+    )
+  }
+
+  /**
+   * 获取提及历史
+   */
+  getMentionHistory() {
+    return this.getCached(
+      'mentions:history',
+      () =>
+        this.retryRequest(() =>
+          api({
+            url: '/community/mentions/history',
+            method: 'get'
+          })
+        ),
+      10 * 60 * 1000  // 10分钟缓存
+    )
+  }
+
+  /**
+   * 私信：获取会话列表
+   */
+  getConversations() {
+    return this.getCached(
+      'messages:conversations',
+      () =>
+        this.retryRequest(() =>
+          api({
+            url: '/community/messages/conversations',
+            method: 'get'
+          })
+        ),
+      3 * 60 * 1000  // 3分钟缓存
+    )
+  }
+
+  /**
+   * 搜索会话
+   */
+  searchConversations(keyword) {
+    const key = `messages:search:${keyword}`
+    return this.getCached(
+      key,
+      () =>
+        this.retryRequest(() =>
+          api({
+            url: '/community/messages/conversations/search',
+            method: 'get',
+            params: { q: keyword }
+          })
+        ),
+      1 * 60 * 1000  // 1分钟缓存
+    )
+  }
+
+  /**
+   * 获取单个会话及其消息
+   */
+  getConversation(conversationId) {
+    const key = `messages:conversation:${conversationId}`
+    return this.getCached(
+      key,
+      () =>
+        this.retryRequest(() =>
+          api({
+            url: `/community/messages/conversations/${conversationId}`,
+            method: 'get'
+          })
+        ),
+      3 * 60 * 1000  // 3分钟缓存
+    )
+  }
+
+  /**
+   * 获取会话消息（分页）
+   */
+  getConversationMessages(conversationId, params) {
+    const key = `messages:${conversationId}:${JSON.stringify(params)}`
+    return this.getCached(
+      key,
+      () =>
+        this.retryRequest(() =>
+          api({
+            url: `/community/messages/conversations/${conversationId}/messages`,
+            method: 'get',
+            params
+          })
+        ),
+      3 * 60 * 1000  // 3分钟缓存
+    )
+  }
+
+  /**
+   * 发送私信
+   */
+  sendPrivateMessage(recipientId, data) {
+    return this.retryRequest(() =>
+      api({
+        url: `/community/messages/send/${recipientId}`,
+        method: 'post',
+        data
+      })
+    ).then(res => {
+      // 清除会话缓存
+      this.invalidateCache('messages:conversations')
+      this.invalidateCache(`messages:conversation:`)
+      return res
+    })
+  }
+
+  /**
+   * 标记会话为已读
+   */
+  markConversationAsRead(conversationId) {
+    return api({
+      url: `/community/messages/conversations/${conversationId}/read`,
+      method: 'post'
+    }).then(res => {
+      // 清除缓存
+      this.invalidateCache('messages:conversations')
+      return res
+    })
+  }
+
+  /**
+   * 删除会话
+   */
+  deleteConversation(conversationId) {
+    return api({
+      url: `/community/messages/conversations/${conversationId}`,
+      method: 'delete'
+    }).then(res => {
+      // 清除缓存
+      this.invalidateCache('messages:conversations')
+      this.invalidateCache(`messages:conversation:${conversationId}`)
+      return res
+    })
+  }
+
+  /**
+   * 开始新会话
+   */
+  startConversation(userId) {
+    return this.retryRequest(() =>
+      api({
+        url: `/community/messages/conversations/start/${userId}`,
+        method: 'post'
+      })
+    ).then(res => {
+      // 清除缓存
+      this.invalidateCache('messages:conversations')
+      return res
+    })
+  }
+
+  /**
+   * 推荐：获取推荐用户
+   */
+  getRecommendedUsers(params) {
+    const key = `recommendations:users:${JSON.stringify(params)}`
+    return this.getCached(
+      key,
+      () =>
+        this.retryRequest(() =>
+          api({
+            url: '/community/recommendations/users',
+            method: 'get',
+            params
+          })
+        ),
+      30 * 60 * 1000  // 30分钟缓存（推荐变化不频繁）
+    )
+  }
+
+  /**
+   * 获取热门创作者
+   */
+  getTrendingCreators(params) {
+    const key = `recommendations:trending:${JSON.stringify(params)}`
+    return this.getCached(
+      key,
+      () =>
+        this.retryRequest(() =>
+          api({
+            url: '/community/recommendations/creators',
+            method: 'get',
+            params
+          })
+        ),
+      30 * 60 * 1000  // 30分钟缓存
+    )
+  }
+
+  /**
+   * 获取相似用户
+   */
+  getSimilarUsers(params) {
+    const key = `recommendations:similar:${JSON.stringify(params)}`
+    return this.getCached(
+      key,
+      () =>
+        this.retryRequest(() =>
+          api({
+            url: '/community/recommendations/similar',
+            method: 'get',
+            params
+          })
+        ),
+      30 * 60 * 1000  // 30分钟缓存
+    )
+  }
+
+  /**
    * 获取缓存统计信息
    */
   getCacheStats() {
