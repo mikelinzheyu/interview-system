@@ -3,6 +3,7 @@
  * 提供缓存、重试、去重等高级功能
  */
 import api from './index'
+import { generateMockPosts } from './communityMock'
 
 const cache = new Map()
 const CACHE_TIME = {
@@ -102,14 +103,24 @@ class CommunityAPI {
     const key = `forums:posts:${slug}:${JSON.stringify(params)}`
     return this.getCached(
       key,
-      () =>
-        this.retryRequest(() =>
-          api({
-            url: `/community/forums/${slug}/posts`,
-            method: 'get',
-            params
-          })
-        ),
+      async () => {
+        try {
+          return await this.retryRequest(() =>
+            api({
+              url: `/community/forums/${slug}/posts`,
+              method: 'get',
+              params
+            })
+          )
+        } catch (error) {
+          // 后端 API 失败时，使用模拟数据
+          console.warn(
+            `Forum posts API (${slug}) not available, using mock data`,
+            error.message
+          )
+          return generateMockPosts({ ...params, forumSlug: slug })
+        }
+      },
       CACHE_TIME.POSTS
     )
   }
@@ -121,14 +132,21 @@ class CommunityAPI {
     const key = `posts:list:${JSON.stringify(params)}`
     return this.getCached(
       key,
-      () =>
-        this.retryRequest(() =>
-          api({
-            url: '/community/posts',
-            method: 'get',
-            params
-          })
-        ),
+      async () => {
+        try {
+          return await this.retryRequest(() =>
+            api({
+              url: '/community/posts',
+              method: 'get',
+              params
+            })
+          )
+        } catch (error) {
+          // 后端 API 失败时，使用模拟数据
+          console.warn('Community posts API not available, using mock data', error.message)
+          return generateMockPosts(params)
+        }
+      },
       CACHE_TIME.POSTS
     )
   }
