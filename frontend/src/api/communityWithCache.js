@@ -359,6 +359,89 @@ class CommunityAPI {
   }
 
   /**
+   * 获取评论列表
+   */
+  getComments(postId, params) {
+    const key = `comments:post:${postId}:${JSON.stringify(params)}`
+    return this.getCached(
+      key,
+      () =>
+        this.retryRequest(() =>
+          api({
+            url: `/community/posts/${postId}/comments`,
+            method: 'get',
+            params
+          })
+        ),
+      CACHE_TIME.POSTS
+    )
+  }
+
+  /**
+   * 创建评论
+   */
+  createComment(postId, data) {
+    return this.retryRequest(() =>
+      api({
+        url: `/community/posts/${postId}/comments`,
+        method: 'post',
+        data
+      })
+    ).then(res => {
+      // 清除该帖子的评论缓存
+      this.invalidateCache(`comments:post:${postId}`)
+      // 清除帖子详情缓存（评论数会改变）
+      this.invalidateCache(`posts:detail:${postId}`)
+      return res
+    })
+  }
+
+  /**
+   * 更新评论
+   */
+  updateComment(commentId, data) {
+    return this.retryRequest(() =>
+      api({
+        url: `/community/comments/${commentId}`,
+        method: 'put',
+        data
+      })
+    ).then(res => {
+      // 清除关相关缓存
+      this.invalidateCache('comments:')
+      return res
+    })
+  }
+
+  /**
+   * 删除评论
+   */
+  deleteComment(commentId) {
+    return this.retryRequest(() =>
+      api({
+        url: `/community/comments/${commentId}`,
+        method: 'delete'
+      })
+    ).then(res => {
+      // 清除相关缓存
+      this.invalidateCache('comments:')
+      return res
+    })
+  }
+
+  /**
+   * 点赞评论
+   */
+  likeComment(commentId) {
+    return this.retryRequest(() =>
+      api({
+        url: `/community/comments/${commentId}/like`,
+        method: 'post'
+      })
+    )
+  }
+
+  /**
    * 清除所有缓存
    */
   clearCache() {
