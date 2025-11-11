@@ -450,6 +450,282 @@ class CommunityAPI {
   }
 
   /**
+   * 获取用户资料
+   */
+  getUserProfile(userId) {
+    const key = `users:profile:${userId}`
+    return this.getCached(
+      key,
+      () =>
+        this.retryRequest(() =>
+          api({
+            url: `/community/users/${userId}`,
+            method: 'get'
+          })
+        ),
+      CACHE_TIME.POSTS
+    )
+  }
+
+  /**
+   * 更新用户资料
+   */
+  updateUserProfile(userId, data) {
+    return this.retryRequest(() =>
+      api({
+        url: `/community/users/${userId}`,
+        method: 'put',
+        data
+      })
+    ).then(res => {
+      // 清除用户资料缓存
+      this.invalidateCache(`users:profile:${userId}`)
+      return res
+    })
+  }
+
+  /**
+   * 上传头像
+   */
+  uploadAvatar(formData) {
+    return api({
+      url: '/community/users/avatar',
+      method: 'post',
+      data: formData,
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    })
+  }
+
+  /**
+   * 获取用户发布的帖子
+   */
+  getUserPosts(userId, params) {
+    const key = `users:posts:${userId}:${JSON.stringify(params)}`
+    return this.getCached(
+      key,
+      () =>
+        this.retryRequest(() =>
+          api({
+            url: `/community/users/${userId}/posts`,
+            method: 'get',
+            params
+          })
+        ),
+      CACHE_TIME.POSTS
+    )
+  }
+
+  /**
+   * 获取用户的评论
+   */
+  getUserComments(userId, params) {
+    const key = `users:comments:${userId}:${JSON.stringify(params)}`
+    return this.getCached(
+      key,
+      () =>
+        this.retryRequest(() =>
+          api({
+            url: `/community/users/${userId}/comments`,
+            method: 'get',
+            params
+          })
+        ),
+      CACHE_TIME.POSTS
+    )
+  }
+
+  /**
+   * 获取用户的收藏
+   */
+  getUserCollections(userId) {
+    const key = `users:collections:${userId}`
+    return this.getCached(
+      key,
+      () =>
+        this.retryRequest(() =>
+          api({
+            url: `/community/users/${userId}/collections`,
+            method: 'get'
+          })
+        ),
+      CACHE_TIME.POSTS
+    )
+  }
+
+  /**
+   * 检查关注状态
+   */
+  checkFollowStatus(userId) {
+    const key = `users:follow:status:${userId}`
+    return this.getCached(
+      key,
+      () =>
+        this.retryRequest(() =>
+          api({
+            url: `/community/users/${userId}/follow-status`,
+            method: 'get'
+          })
+        ),
+      CACHE_TIME.POSTS
+    )
+  }
+
+  /**
+   * 关注/取消关注用户
+   */
+  toggleFollow(userId) {
+    return this.retryRequest(() =>
+      api({
+        url: `/community/users/${userId}/follow`,
+        method: 'post'
+      })
+    ).then(res => {
+      // 清除关注状态缓存
+      this.invalidateCache(`users:follow:status:${userId}`)
+      this.invalidateCache(`users:followers:`)
+      this.invalidateCache(`users:following:`)
+      return res
+    })
+  }
+
+  /**
+   * 获取粉丝列表
+   */
+  getFollowers(userId, params) {
+    const key = `users:followers:${userId}:${JSON.stringify(params)}`
+    return this.getCached(
+      key,
+      () =>
+        this.retryRequest(() =>
+          api({
+            url: `/community/users/${userId}/followers`,
+            method: 'get',
+            params
+          })
+        ),
+      CACHE_TIME.POSTS
+    )
+  }
+
+  /**
+   * 获取关注列表
+   */
+  getFollowing(userId, params) {
+    const key = `users:following:${userId}:${JSON.stringify(params)}`
+    return this.getCached(
+      key,
+      () =>
+        this.retryRequest(() =>
+          api({
+            url: `/community/users/${userId}/following`,
+            method: 'get',
+            params
+          })
+        ),
+      CACHE_TIME.POSTS
+    )
+  }
+
+  /**
+   * 屏蔽用户
+   */
+  blockUser(userId) {
+    return this.retryRequest(() =>
+      api({
+        url: `/community/users/${userId}/block`,
+        method: 'post'
+      })
+    )
+  }
+
+  /**
+   * 取消屏蔽用户
+   */
+  unblockUser(userId) {
+    return this.retryRequest(() =>
+      api({
+        url: `/community/users/${userId}/unblock`,
+        method: 'post'
+      })
+    )
+  }
+
+  /**
+   * 获取用户声誉信息
+   */
+  getUserReputation(userId) {
+    const key = `users:reputation:${userId}`
+    return this.getCached(
+      key,
+      () =>
+        this.retryRequest(() =>
+          api({
+            url: `/community/users/${userId}/reputation`,
+            method: 'get'
+          })
+        ),
+      CACHE_TIME.POSTS
+    )
+  }
+
+  /**
+   * 获取用户徽章
+   */
+  getUserBadges(userId) {
+    const key = `users:badges:${userId}`
+    return this.getCached(
+      key,
+      () =>
+        this.retryRequest(() =>
+          api({
+            url: `/community/users/${userId}/badges`,
+            method: 'get'
+          })
+        ),
+      CACHE_TIME.POSTS
+    )
+  }
+
+  /**
+   * 获取用户成就
+   */
+  getUserAchievements(userId) {
+    const key = `users:achievements:${userId}`
+    return this.getCached(
+      key,
+      () =>
+        this.retryRequest(() =>
+          api({
+            url: `/community/users/${userId}/achievements`,
+            method: 'get'
+          })
+        ),
+      CACHE_TIME.POSTS
+    )
+  }
+
+  /**
+   * 获取声誉排行榜
+   */
+  getReputationLeaderboard(params) {
+    const key = `leaderboard:reputation:${JSON.stringify(params)}`
+    return this.getCached(
+      key,
+      () =>
+        this.retryRequest(() =>
+          api({
+            url: '/community/leaderboard/reputation',
+            method: 'get',
+            params
+          })
+        ),
+      CACHE_TIME.POSTS
+    )
+  }
+
+  /**
    * 获取缓存统计信息
    */
   getCacheStats() {
