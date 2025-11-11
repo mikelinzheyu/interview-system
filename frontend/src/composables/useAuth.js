@@ -1,12 +1,15 @@
 /**
  * useAuth - 认证和权限管理组合式函数
  */
-import { computed, ref, inject } from 'vue'
+import { computed, ref, inject, isRef } from 'vue'
 
 export function useAuth() {
   // 从全局状态或 Pinia 获取当前用户
   // 这里我们假设通过 inject 获取（或改用 Pinia）
-  const currentUser = ref(inject('currentUser') || {
+  const injectedUser = inject('currentUser', null)
+  const currentUser = isRef(injectedUser)
+    ? injectedUser
+    : ref(injectedUser || {
     id: null,
     role: 'guest',
     isAdmin: false

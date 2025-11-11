@@ -110,7 +110,8 @@ import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { View, ChatDotRound, Star, StarFilled } from '@element-plus/icons-vue'
-import { getPostDetail, likePost, createComment, likeComment as likeCommentApi } from '@/api/community'
+import communityAPI from '@/api/communityWithCache'
+import { likePost, createComment, likeComment as likeCommentApi } from '@/api/community'
 
 const route = useRoute()
 
@@ -153,11 +154,11 @@ const fetchPostDetail = async () => {
   loading.value = true
   try {
     const postId = route.params.id
-    const res = await getPostDetail(postId)
+    const res = await communityAPI.getPostDetail(postId)
     post.value = res.data
   } catch (error) {
     ElMessage.error('获取帖子详情失败')
-    console.error(error)
+    console.error('AxiosError', error)
   } finally {
     loading.value = false
   }

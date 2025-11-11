@@ -7300,6 +7300,21 @@ const routes = {
     sendResponse(res, 200, hotTags, '获取热门标签成功')
   },
 
+  // 今日社区统计
+  'GET:/api/community/stats/today': (req, res) => {
+    // 生成一些稳定的模拟统计数据，便于前端展示
+    const now = new Date()
+    // 简单依据时间波动，避免完全固定
+    const base = now.getHours() * 3 + now.getMinutes() % 5
+    const stats = {
+      postsCount: 25 + (base % 10),
+      onlineUsers: 42 + (base % 15),
+      activeUsers: 30 + (base % 12),
+      newUsers: 5 + (base % 4)
+    }
+    sendResponse(res, 200, stats, '获取今日统计成功')
+  },
+
   // ==================== 聊天室 API ====================
 
   // 获取聊天室列表

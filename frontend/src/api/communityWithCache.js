@@ -3,7 +3,7 @@
  * 提供缓存、重试、去重等高级功能
  */
 import api from './index'
-import { generateMockPosts, generateMockForums, generateMockHotTags } from './communityMock'
+import { generateMockPosts, generateMockForums, generateMockHotTags, getPostDetailMock } from './communityMock'
 
 const cache = new Map()
 const CACHE_TIME = {
@@ -223,13 +223,34 @@ class CommunityAPI {
     const key = `posts:detail:${id}`
     return this.getCached(
       key,
-      () =>
-        this.retryRequest(() =>
-          api({
-            url: `/community/posts/${id}`,
-            method: 'get'
-          })
-        ),
+      async () => {
+        // 如果启用了 Mock 数据，直接返回
+        if (this.config.useMockData) {
+          console.log(`[PostDetail: ${id}] Using mock data`)
+          const mockData = getPostDetailMock(id)
+          if (mockData) {
+            return { data: mockData }
+          }
+          // 如果 mock 数据中找不到，继续尝试 API
+        }
+
+        try {
+          return await this.retryRequest(() =>
+            api({
+              url: `/community/posts/${id}`,
+              method: 'get'
+            })
+          )
+        } catch (error) {
+          // 后端 API 失败时，降级使用模拟数据
+          console.warn(`Post detail API (${id}) not available, using mock data`, error.message)
+          const mockData = getPostDetailMock(id)
+          if (mockData) {
+            return { data: mockData }
+          }
+          throw error
+        }
+      },
       CACHE_TIME.POST_DETAIL
     )
   }

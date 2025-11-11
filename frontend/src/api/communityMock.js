@@ -558,4 +558,47 @@ export function generateMockHotTags() {
   }
 }
 
+/**
+ * 获取帖子详情（包含完整内容和评论）
+ */
+export function getPostDetailMock(postId) {
+  const post = mockPosts.find(p => String(p.id) === String(postId))
+
+  if (!post) {
+    // 如果找不到，返回默认值或错误
+    return null
+  }
+
+  // 为帖子详情生成额外的数据
+  return {
+    ...post,
+    // 添加评论数据
+    comments: [
+      {
+        id: 'comment-1',
+        author: users[1],
+        content: '这是一个很有价值的讨论，感谢分享！',
+        likes: 3,
+        createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
+        floorNumber: 1
+      },
+      {
+        id: 'comment-2',
+        author: users[2],
+        content: '完全同意，这个方案确实很实用。我们团队也正在使用类似的方案。',
+        likes: 5,
+        createdAt: new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString(),
+        floorNumber: 2
+      }
+    ],
+    // 添加详情页面需要的字段
+    userAvatar: post.author?.avatar,
+    username: post.author?.name,
+    likeCount: post.likes || 0,
+    viewCount: post.viewCount || 0,
+    commentCount: post.commentCount || 0,
+    isPinned: post.pinned || false
+  }
+}
+
 export default mockPosts
