@@ -726,6 +726,97 @@ class CommunityAPI {
   }
 
   /**
+   * 搜索内容（帖子、用户、标签）
+   */
+  search(keyword, params) {
+    const key = `search:${keyword}:${JSON.stringify(params)}`
+    return this.getCached(
+      key,
+      () =>
+        this.retryRequest(() =>
+          api({
+            url: '/community/search',
+            method: 'get',
+            params: {
+              q: keyword,
+              ...params
+            }
+          })
+        ),
+      CACHE_TIME.POSTS
+    )
+  }
+
+  /**
+   * 获取搜索建议
+   */
+  getSearchSuggestions(keyword) {
+    const key = `search:suggestions:${keyword}`
+    return this.getCached(
+      key,
+      () =>
+        this.retryRequest(() =>
+          api({
+            url: '/community/search/suggestions',
+            method: 'get',
+            params: { q: keyword }
+          })
+        ),
+      1 * 60 * 1000  // 1分钟缓存
+    )
+  }
+
+  /**
+   * 获取热门搜索
+   */
+  getTrendingSearches() {
+    return this.getCached(
+      'search:trending',
+      () =>
+        this.retryRequest(() =>
+          api({
+            url: '/community/search/trending',
+            method: 'get'
+          })
+        ),
+      10 * 60 * 1000  // 10分钟缓存
+    )
+  }
+
+  /**
+   * 获取搜索历史（从后端同步）
+   */
+  getSearchHistory() {
+    return this.retryRequest(() =>
+      api({
+        url: '/community/user/search-history',
+        method: 'get'
+      })
+    )
+  }
+
+  /**
+   * 记录搜索历史
+   */
+  recordSearchHistory(keyword) {
+    return api({
+      url: '/community/user/search-history',
+      method: 'post',
+      data: { keyword }
+    })
+  }
+
+  /**
+   * 清空搜索历史
+   */
+  clearSearchHistory() {
+    return api({
+      url: '/community/user/search-history',
+      method: 'delete'
+    })
+  }
+
+  /**
    * 获取缓存统计信息
    */
   getCacheStats() {
