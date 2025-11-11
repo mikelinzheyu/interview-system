@@ -3,7 +3,7 @@
  * 提供缓存、重试、去重等高级功能
  */
 import api from './index'
-import { generateMockPosts } from './communityMock'
+import { generateMockPosts, generateMockForums, generateMockHotTags } from './communityMock'
 
 const cache = new Map()
 const CACHE_TIME = {
@@ -91,7 +91,15 @@ class CommunityAPI {
   getForums() {
     return this.getCached(
       'forums:list',
-      () => this.retryRequest(() => api({ url: '/community/forums', method: 'get' })),
+      async () => {
+        try {
+          return await this.retryRequest(() => api({ url: '/community/forums', method: 'get' }))
+        } catch (error) {
+          // 后端 API 失败时，使用模拟数据
+          console.warn('Forums API not available, using mock data', error.message)
+          return generateMockForums()
+        }
+      },
       CACHE_TIME.FORUMS
     )
   }
@@ -268,7 +276,15 @@ class CommunityAPI {
   getHotTags() {
     return this.getCached(
       'tags:hot',
-      () => this.retryRequest(() => api({ url: '/community/tags/hot', method: 'get' })),
+      async () => {
+        try {
+          return await this.retryRequest(() => api({ url: '/community/tags/hot', method: 'get' }))
+        } catch (error) {
+          // 后端 API 失败时，使用模拟数据
+          console.warn('Hot tags API not available, using mock data', error.message)
+          return generateMockHotTags()
+        }
+      },
       CACHE_TIME.TAGS
     )
   }
