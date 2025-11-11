@@ -101,9 +101,10 @@
             <el-link @click="$router.push('/community/posts?sortBy=latest')">
               最新帖子
             </el-link>
-            <el-link @click="$router.push('/community/my-posts')">
+            <!-- TODO: 实现"我的帖子"功能和对应路由 -->
+            <!-- <el-link @click="$router.push('/community/my-posts')">
               我的帖子
-            </el-link>
+            </el-link> -->
           </div>
         </el-card>
       </el-col>

@@ -261,7 +261,24 @@ class CommunityAPI {
   getTodayStats() {
     return this.getCached(
       'stats:today',
-      () => this.retryRequest(() => api({ url: '/community/stats/today', method: 'get' })),
+      async () => {
+        try {
+          return await this.retryRequest(() =>
+            api({ url: '/community/stats/today', method: 'get' })
+          )
+        } catch (error) {
+          // API 不可用时返回默认数据，不抛出错误
+          console.warn('Stats API not available, using default values')
+          return {
+            data: {
+              postsCount: 0,
+              onlineUsers: 0,
+              activeUsers: 0,
+              newUsers: 0
+            }
+          }
+        }
+      },
       CACHE_TIME.STATS
     )
   }
