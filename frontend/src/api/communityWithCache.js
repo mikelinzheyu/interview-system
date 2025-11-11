@@ -14,10 +14,49 @@ const CACHE_TIME = {
   STATS: 1 * 60 * 1000         // 统计：1分钟
 }
 
+/**
+ * 配置开关：是否使用 Mock 数据
+ * 默认在所有环境都使用 Mock 数据，确保数据总是可见
+ * 可通过环境变量或手动调用来禁用 Mock 模式
+ *
+ * 使用方式：
+ * import communityAPI from '@/api/communityWithCache'
+ * communityAPI.setUseMockData(true)  // 启用 mock 模式
+ * communityAPI.setUseMockData(false) // 禁用 mock 模式，使用真实 API
+ *
+ * 环境变量配置（可选）：
+ * 在 .env 或 .env.production 中设置：
+ * VITE_USE_MOCK_DATA=true   // 使用 mock（默认）
+ * VITE_USE_MOCK_DATA=false  // 使用真实 API
+ */
+const config = {
+  // 默认值：所有环境都使用 mock 数据
+  // 这样可以确保无论是开发、测试还是生产环境，
+  // 前端都能直接显示完整的论坛数据，无需等待后端 API
+  useMockData: import.meta.env.VITE_USE_MOCK_DATA !== 'false'
+}
+
 class CommunityAPI {
   constructor() {
     this.cache = cache
     this.pending = new Map()
+    this.config = config
+  }
+
+  /**
+   * 设置是否使用 Mock 数据
+   * @param {boolean} useMock - true 使用 mock，false 使用真实 API
+   */
+  setUseMockData(useMock) {
+    this.config.useMockData = useMock
+    console.log(`[CommunityAPI] Mock Data Mode: ${useMock ? '✅ 启用' : '❌ 禁用'}`)
+  }
+
+  /**
+   * 获取当前 Mock 数据模式状态
+   */
+  isUsingMockData() {
+    return this.config.useMockData
   }
 
   /**
@@ -92,10 +131,16 @@ class CommunityAPI {
     return this.getCached(
       'forums:list',
       async () => {
+        // 如果启用了 Mock 数据，直接返回
+        if (this.config.useMockData) {
+          console.log('[Forums] Using mock data')
+          return generateMockForums()
+        }
+
         try {
           return await this.retryRequest(() => api({ url: '/community/forums', method: 'get' }))
         } catch (error) {
-          // 后端 API 失败时，使用模拟数据
+          // 后端 API 失败时，降级使用模拟数据
           console.warn('Forums API not available, using mock data', error.message)
           return generateMockForums()
         }
@@ -112,6 +157,12 @@ class CommunityAPI {
     return this.getCached(
       key,
       async () => {
+        // 如果启用了 Mock 数据，直接返回
+        if (this.config.useMockData) {
+          console.log(`[ForumPosts: ${slug}] Using mock data`)
+          return generateMockPosts({ ...params, forumSlug: slug })
+        }
+
         try {
           return await this.retryRequest(() =>
             api({
@@ -121,7 +172,7 @@ class CommunityAPI {
             })
           )
         } catch (error) {
-          // 后端 API 失败时，使用模拟数据
+          // 后端 API 失败时，降级使用模拟数据
           console.warn(
             `Forum posts API (${slug}) not available, using mock data`,
             error.message
@@ -141,6 +192,12 @@ class CommunityAPI {
     return this.getCached(
       key,
       async () => {
+        // 如果启用了 Mock 数据，直接返回
+        if (this.config.useMockData) {
+          console.log('[Posts] Using mock data')
+          return generateMockPosts(params)
+        }
+
         try {
           return await this.retryRequest(() =>
             api({
@@ -150,7 +207,7 @@ class CommunityAPI {
             })
           )
         } catch (error) {
-          // 后端 API 失败时，使用模拟数据
+          // 后端 API 失败时，降级使用模拟数据
           console.warn('Community posts API not available, using mock data', error.message)
           return generateMockPosts(params)
         }
@@ -277,10 +334,16 @@ class CommunityAPI {
     return this.getCached(
       'tags:hot',
       async () => {
+        // 如果启用了 Mock 数据，直接返回
+        if (this.config.useMockData) {
+          console.log('[HotTags] Using mock data')
+          return generateMockHotTags()
+        }
+
         try {
           return await this.retryRequest(() => api({ url: '/community/tags/hot', method: 'get' }))
         } catch (error) {
-          // 后端 API 失败时，使用模拟数据
+          // 后端 API 失败时，降级使用模拟数据
           console.warn('Hot tags API not available, using mock data', error.message)
           return generateMockHotTags()
         }
