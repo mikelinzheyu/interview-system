@@ -71,7 +71,7 @@
         >
           删除
         </el-button>
-        <el-dropdown @command="handleCommand">
+        <el-dropdown @command="handleCommand" @click.stop>
           <el-button link type="info" size="small">
             更多
             <el-icon><ArrowDown /></el-icon>
