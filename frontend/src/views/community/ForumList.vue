@@ -24,12 +24,12 @@
           </el-statistic>
         </el-col>
         <el-col :span="6">
-          <el-statistic title="今日新帖" :value="todayPosts">
+          <el-statistic title="今日新帖" :value="todayStats.postsCount">
             <template #suffix>篇</template>
           </el-statistic>
         </el-col>
         <el-col :span="6">
-          <el-statistic title="在线用户" :value="onlineUsers">
+          <el-statistic title="在线用户" :value="todayStats.onlineUsers">
             <template #suffix>人</template>
           </el-statistic>
         </el-col>
@@ -112,51 +112,37 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { ArrowRight } from '@element-plus/icons-vue'
-import { getForums, getHotTags } from '@/api/community'
+import communityAPI from '@/api/communityWithCache'
+import { useForumList } from '@/composables/useForumList'
+import { useForumStats } from '@/composables/useForumStats'
 
 const router = useRouter()
 
-// 状态
-const loading = ref(false)
-const tagsLoading = ref(false)
-const forums = ref([])
+// 使用论坛列表 composable
+const {
+  forums,
+  loading,
+  totalPosts,
+  activeForums,
+  refreshForums
+} = useForumList()
+
+// 使用论坛统计 composable
+const { todayStats } = useForumStats()
+
+// 热门标签状态
 const hotTags = ref([])
-
-// 统计数据
-const totalPosts = computed(() => {
-  return forums.value.reduce((sum, forum) => sum + forum.postCount, 0)
-})
-
-const activeForums = computed(() => {
-  return forums.value.filter(f => f.active).length
-})
-
-const todayPosts = ref(12) // 模拟数据
-const onlineUsers = ref(45) // 模拟数据
-
-// 获取板块列表
-const fetchForums = async () => {
-  loading.value = true
-  try {
-    const res = await getForums()
-    forums.value = res.data || []
-  } catch (error) {
-    ElMessage.error('获取板块列表失败')
-    console.error(error)
-  } finally {
-    loading.value = false
-  }
-}
+const tagsLoading = ref(false)
 
 // 获取热门标签
 const fetchHotTags = async () => {
   tagsLoading.value = true
   try {
-    const res = await getHotTags()
+    const res = await communityAPI.getHotTags()
     hotTags.value = (res.data || []).slice(0, 10)
   } catch (error) {
     console.error('获取热门标签失败', error)
@@ -175,10 +161,15 @@ const searchByTag = (tag) => {
   router.push(`/community/posts?tag=${encodeURIComponent(tag)}`)
 }
 
-onMounted(() => {
-  fetchForums()
-  fetchHotTags()
-})
+// 手动刷新
+const handleRefresh = async () => {
+  await refreshForums()
+  await fetchHotTags()
+  ElMessage.success('刷新成功')
+}
+
+// 初始化时获取热门标签
+fetchHotTags()
 </script>
 
 <style scoped lang="scss">

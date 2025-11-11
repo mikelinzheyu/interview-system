@@ -13,6 +13,7 @@
         clearable
         style="width: 300px"
         @keyup.enter="handleSearch"
+        @input="handleSearchInput"
       >
         <template #prefix>
           <el-icon><Search /></el-icon>
@@ -25,22 +26,38 @@
         <el-option label="最多点赞" value="popular" />
       </el-select>
 
+      <el-button
+        type="primary"
+        :icon="Refresh"
+        :loading="loading"
+        @click="handleRefresh"
+        circle
+      />
+
       <el-button type="primary" @click="$router.push('/community/create-post')">
         发布新帖
       </el-button>
+
+      <!-- 显示统计信息 -->
+      <div class="stats-info" v-if="!isEmpty">
+        共 {{ total }} 篇 | 显示 {{ startIndex }}-{{ endIndex }}
+      </div>
     </div>
 
+    <!-- 列表内容 -->
     <div v-loading="loading" class="posts-container">
       <post-card
         v-for="post in posts"
         :key="post.id"
         :post="post"
+        :loading="isActionLoading(`post:${post.id}`)"
         @like="handleLike"
         @tag-click="handleTagClick"
       />
 
-      <el-empty v-if="!loading && posts.length === 0" description="暂无帖子" />
+      <el-empty v-if="isEmpty" description="暂无帖子" />
 
+      <!-- 分页器 -->
       <el-pagination
         v-if="total > pageSize"
         v-model:current-page="currentPage"
@@ -48,112 +65,79 @@
         :total="total"
         :page-sizes="[10, 20, 50]"
         layout="total, sizes, prev, pager, next, jumper"
-        @size-change="fetchPosts"
-        @current-change="fetchPosts"
+        @size-change="handlePageSizeChange"
+        @current-change="handlePageChange"
       />
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue'
+import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import { Search } from '@element-plus/icons-vue'
-import { getPosts, getForumPosts, likePost } from '@/api/community'
+import { Search, Refresh } from '@element-plus/icons-vue'
+import communityAPI from '@/api/communityWithCache'
+import { usePostList } from '@/composables/usePostList'
+import { usePostActions } from '@/composables/usePostActions'
 import PostCard from './components/PostCard.vue'
 
 const route = useRoute()
 const router = useRouter()
 
-// 状态
-const loading = ref(false)
-const posts = ref([])
-const currentPage = ref(1)
-const pageSize = ref(20)
-const total = ref(0)
-const sortBy = ref('latest')
-const searchKeyword = ref('')
+// 使用帖子列表 composable
+const {
+  posts,
+  loading,
+  currentPage,
+  pageSize,
+  total,
+  sortBy,
+  searchKeyword,
+  selectedForumSlug,
+  selectedTag,
+  isEmpty,
+  hasMore,
+  startIndex,
+  endIndex,
+  handleSearch,
+  handleSortChange,
+  handlePageChange,
+  handlePageSizeChange,
+  clearSearch,
+  refreshPosts
+} = usePostList({
+  defaultPageSize: 20,
+  onError: (error) => {
+    ElMessage.error('获取帖子失败: ' + (error.message || '请检查网络连接'))
+  }
+})
+
+// 使用帖子操作 composable
+const { toggleLikePost, isLoading: isActionLoading } = usePostActions()
 
 // 页面标题
 const pageTitle = computed(() => {
-  if (route.params.slug) {
-    return `${route.params.slug} 板块`
+  if (selectedForumSlug.value) {
+    const forumName = route.params.slug || selectedForumSlug.value
+    return `${forumName} 板块`
   }
-  if (route.query.tag) {
-    return `标签: ${route.query.tag}`
+  if (selectedTag.value) {
+    return `标签: ${selectedTag.value}`
   }
   return '所有帖子'
 })
 
 const backTitle = computed(() => {
-  return route.params.slug ? '返回板块列表' : '返回'
+  return selectedForumSlug.value ? '返回板块列表' : '返回'
 })
 
-// 获取帖子列表
-const fetchPosts = async () => {
-  loading.value = true
-  try {
-    const params = {
-      page: currentPage.value,
-      size: pageSize.value,
-      sortBy: sortBy.value
-    }
-
-    // 如果有标签参数
-    if (route.query.tag) {
-      params.tag = route.query.tag
-    }
-
-    // 如果有关键词
-    if (searchKeyword.value) {
-      params.keyword = searchKeyword.value
-    }
-
-    let res
-    if (route.params.slug) {
-      // 获取指定板块的帖子
-      res = await getForumPosts(route.params.slug, params)
-    } else {
-      // 获取所有帖子
-      res = await getPosts(params)
-    }
-
-    posts.value = res.data.items || []
-    total.value = res.data.total || 0
-  } catch (error) {
-    ElMessage.error('获取帖子列表失败')
-    console.error(error)
-  } finally {
-    loading.value = false
-  }
-}
-
-// 处理排序变化
-const handleSortChange = () => {
-  currentPage.value = 1
-  fetchPosts()
-}
-
-// 处理搜索
-const handleSearch = () => {
-  currentPage.value = 1
-  fetchPosts()
-}
-
 // 处理点赞
-const handleLike = async (postId) => {
+const handleLike = async (post) => {
   try {
-    const res = await likePost(postId)
-    const post = posts.value.find(p => p.id === postId)
-    if (post) {
-      post.liked = res.data.liked
-      post.likeCount = res.data.likeCount
-    }
-    ElMessage.success(res.data.liked ? '点赞成功' : '已取消点赞')
+    await toggleLikePost(post)
   } catch (error) {
-    ElMessage.error('操作失败')
-    console.error(error)
+    ElMessage.error('点赞失败，请重试')
   }
 }
 
@@ -162,22 +146,17 @@ const handleTagClick = (tag) => {
   router.push(`/community/posts?tag=${encodeURIComponent(tag)}`)
 }
 
-// 监听路由变化
-watch(
-  () => route.query,
-  () => {
-    currentPage.value = 1
-    fetchPosts()
-  }
-)
+// 处理刷新
+const handleRefresh = async () => {
+  await refreshPosts()
+  ElMessage.success('刷新成功')
+}
 
-onMounted(() => {
-  // 从路由参数初始化
-  if (route.query.sortBy) {
-    sortBy.value = route.query.sortBy
-  }
-  fetchPosts()
-})
+// 处理搜索输入（防抖）
+const handleSearchInput = () => {
+  // 实际搜索由 handleSearch 方法处理（在按回车或点击搜索时）
+}
+
 </script>
 
 <style scoped lang="scss">
@@ -201,6 +180,14 @@ onMounted(() => {
   background: white;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  flex-wrap: wrap;
+
+  .stats-info {
+    margin-left: auto;
+    font-size: 14px;
+    color: #909399;
+    font-weight: 500;
+  }
 }
 
 .posts-container {
