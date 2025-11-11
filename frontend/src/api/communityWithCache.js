@@ -817,6 +817,133 @@ class CommunityAPI {
   }
 
   /**
+   * 获取通知列表
+   */
+  getNotifications(params) {
+    const key = `notifications:${JSON.stringify(params)}`
+    return this.getCached(
+      key,
+      () =>
+        this.retryRequest(() =>
+          api({
+            url: '/community/notifications',
+            method: 'get',
+            params
+          })
+        ),
+      CACHE_TIME.POSTS
+    )
+  }
+
+  /**
+   * 获取未读通知计数
+   */
+  getUnreadNotificationCount() {
+    return this.getCached(
+      'notifications:unread:count',
+      () =>
+        this.retryRequest(() =>
+          api({
+            url: '/community/notifications/unread/count',
+            method: 'get'
+          })
+        ),
+      1 * 60 * 1000  // 1分钟缓存
+    )
+  }
+
+  /**
+   * 标记通知为已读
+   */
+  markNotificationAsRead(notificationId) {
+    return api({
+      url: `/community/notifications/${notificationId}/read`,
+      method: 'post'
+    }).then(res => {
+      // 清除未读计数缓存
+      this.invalidateCache('notifications:unread:count')
+      return res
+    })
+  }
+
+  /**
+   * 标记全部通知为已读
+   */
+  markAllNotificationsAsRead() {
+    return api({
+      url: '/community/notifications/read-all',
+      method: 'post'
+    }).then(res => {
+      // 清除缓存
+      this.invalidateCache('notifications:')
+      this.invalidateCache('notifications:unread:count')
+      return res
+    })
+  }
+
+  /**
+   * 删除通知
+   */
+  deleteNotification(notificationId) {
+    return api({
+      url: `/community/notifications/${notificationId}`,
+      method: 'delete'
+    }).then(res => {
+      // 清除缓存
+      this.invalidateCache('notifications:')
+      this.invalidateCache('notifications:unread:count')
+      return res
+    })
+  }
+
+  /**
+   * 清空所有通知
+   */
+  clearAllNotifications() {
+    return api({
+      url: '/community/notifications',
+      method: 'delete'
+    }).then(res => {
+      // 清除缓存
+      this.invalidateCache('notifications:')
+      this.invalidateCache('notifications:unread:count')
+      return res
+    })
+  }
+
+  /**
+   * 获取通知偏好设置
+   */
+  getNotificationPreferences() {
+    return this.getCached(
+      'notifications:preferences',
+      () =>
+        this.retryRequest(() =>
+          api({
+            url: '/community/notifications/preferences',
+            method: 'get'
+          })
+        ),
+      30 * 60 * 1000  // 30分钟缓存
+    )
+  }
+
+  /**
+   * 更新通知偏好设置
+   */
+  updateNotificationPreferences(preferences) {
+    return api({
+      url: '/community/notifications/preferences',
+      method: 'put',
+      data: preferences
+    }).then(res => {
+      // 清除缓存
+      this.invalidateCache('notifications:preferences')
+      return res
+    })
+  }
+
+  /**
    * 获取缓存统计信息
    */
   getCacheStats() {
