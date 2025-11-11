@@ -1,0 +1,377 @@
+用户注册系统 - API测试示例
+================================================================================
+
+## 测试1: 通过API创建用户
+
+使用curl命令:
+```
+curl -X POST http://localhost:8080/api/v1/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{
+    "username": "johndoe123",
+    "email": "johndoe@example.com",
+    "password": "SecurePass123",
+    "realName": "John Doe",
+    "phone": "13800138000"
+  }'
+```
+
+预期响应 (成功):
+```json
+{
+  "code": 200,
+  "data": {
+    "user": {
+      "id": 1,
+      "username": "johndoe123",
+      "email": "johndoe@example.com",
+      "realName": "John Doe",
+      "phone": "13800138000",
+      "avatar": null,
+      "bio": null,
+      "status": "active",
+      "totalAnswered": 0,
+      "correctAnswered": 0,
+      "accuracyRate": 0.0,
+      "studyTime": 0,
+      "interviewCount": 0,
+      "createdAt": "2025-11-08T10:30:45.123Z",
+      "updatedAt": "2025-11-08T10:30:45.123Z"
+    },
+    "token": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJqb2huZG9lMTIzIiwidXNlcklkIjoxLCJpYXQiOjE3OTk0OTM4NDUsImV4cCI6MTc5OTU4MDI0NX0.abc..."
+  },
+  "message": "success"
+}
+```
+
+错误响应示例1 - 用户名已存在:
+```json
+{
+  "code": 409,
+  "data": null,
+  "message": "用户名已存在"
+}
+```
+
+错误响应示例2 - 邮箱已被注册:
+```json
+{
+  "code": 409,
+  "data": null,
+  "message": "邮箱已被注册"
+}
+```
+
+错误响应示例3 - 验证失败:
+```json
+{
+  "code": 400,
+  "data": null,
+  "message": "邮箱格式不正确"
+}
+```
+
+================================================================================
+## 测试2: 用户登录
+
+使用curl命令:
+```
+curl -X POST http://localhost:8080/api/v1/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "johndoe@example.com",
+    "password": "SecurePass123",
+    "remember": true
+  }'
+```
+
+也可以使用用户名:
+```
+curl -X POST http://localhost:8080/api/v1/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "johndoe123",
+    "password": "SecurePass123",
+    "remember": true
+  }'
+```
+
+预期响应:
+```json
+{
+  "code": 200,
+  "data": {
+    "user": {
+      "id": 1,
+      "username": "johndoe123",
+      "email": "johndoe@example.com",
+      "status": "active",
+      ...
+    },
+    "token": "eyJhbGciOiJIUzUxMiJ9...",
+    "expires_at": "2025-11-09T10:30:45Z"
+  },
+  "message": "success"
+}
+```
+
+错误响应:
+```json
+{
+  "code": 401,
+  "data": null,
+  "message": "用户不存在"
+}
+```
+
+或
+
+```json
+{
+  "code": 401,
+  "data": null,
+  "message": "密码错误"
+}
+```
+
+================================================================================
+## 测试3: 获取用户资料
+
+使用curl命令 (需要Bearer Token):
+```
+curl -X GET http://localhost:8080/api/v1/user/profile \
+  -H "Authorization: Bearer eyJhbGciOiJIUzUxMiJ9..."
+```
+
+预期响应:
+```json
+{
+  "code": 200,
+  "data": {
+    "id": 1,
+    "username": "johndoe123",
+    "email": "johndoe@example.com",
+    "realName": "John Doe",
+    "phone": "13800138000",
+    "avatar": null,
+    "bio": null,
+    "status": "active",
+    "totalAnswered": 5,
+    "correctAnswered": 4,
+    "accuracyRate": 0.8,
+    "studyTime": 120,
+    "interviewCount": 2,
+    "createdAt": "2025-11-08T10:30:45Z",
+    "updatedAt": "2025-11-08T15:45:30Z"
+  },
+  "message": "success"
+}
+```
+
+================================================================================
+## 测试4: 更新用户资料
+
+使用curl命令:
+```
+curl -X PUT http://localhost:8080/api/v1/user/profile \
+  -H "Authorization: Bearer eyJhbGciOiJIUzUxMiJ9..." \
+  -H "Content-Type: application/json" \
+  -d '{
+    "realName": "John Smith",
+    "bio": "Software Engineer",
+    "phone": "13900139000",
+    "avatar": "https://example.com/avatar.jpg"
+  }'
+```
+
+预期响应:
+```json
+{
+  "code": 200,
+  "data": {
+    "id": 1,
+    "username": "johndoe123",
+    "email": "johndoe@example.com",
+    "realName": "John Smith",
+    "bio": "Software Engineer",
+    "phone": "13900139000",
+    "avatar": "https://example.com/avatar.jpg",
+    "status": "active",
+    "updatedAt": "2025-11-08T16:00:00Z"
+  },
+  "message": "success"
+}
+```
+
+================================================================================
+## 测试5: 修改密码
+
+使用curl命令:
+```
+curl -X PUT http://localhost:8080/api/v1/user/password \
+  -H "Authorization: Bearer eyJhbGciOiJIUzUxMiJ9..." \
+  -H "Content-Type: application/json" \
+  -d '{
+    "old_password": "SecurePass123",
+    "new_password": "NewSecurePass456",
+    "confirm_password": "NewSecurePass456"
+  }'
+```
+
+预期响应:
+```json
+{
+  "code": 200,
+  "data": null,
+  "message": "success"
+}
+```
+
+错误响应:
+```json
+{
+  "code": 400,
+  "data": null,
+  "message": "旧密码错误"
+}
+```
+
+================================================================================
+## 测试6: 用户登出
+
+使用curl命令:
+```
+curl -X POST http://localhost:8080/api/v1/auth/logout \
+  -H "Authorization: Bearer eyJhbGciOiJIUzUxMiJ9..."
+```
+
+预期响应:
+```json
+{
+  "code": 200,
+  "data": null,
+  "message": "success"
+}
+```
+
+================================================================================
+## 使用Postman测试
+
+1. 导入以下集合配置到Postman
+
+[环境配置]
+变量:
+  base_url: http://localhost:8080/api/v1
+  token: (从登录/注册响应中复制)
+
+[注册请求]
+Method: POST
+URL: {{base_url}}/auth/register
+Headers:
+  Content-Type: application/json
+Body (raw):
+{
+  "username": "testuser",
+  "email": "test@example.com",
+  "password": "TestPass123",
+  "realName": "Test User",
+  "phone": "13800138000"
+}
+
+[登录请求]
+Method: POST
+URL: {{base_url}}/auth/login
+Headers:
+  Content-Type: application/json
+Body (raw):
+{
+  "email": "test@example.com",
+  "password": "TestPass123",
+  "remember": true
+}
+
+[获取资料请求]
+Method: GET
+URL: {{base_url}}/user/profile
+Headers:
+  Authorization: Bearer {{token}}
+
+================================================================================
+## 使用JavaScript/fetch测试
+
+注册:
+```javascript
+const response = await fetch('http://localhost:8080/api/v1/auth/register', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    username: 'testuser',
+    email: 'test@example.com',
+    password: 'TestPass123',
+    realName: 'Test User',
+    phone: '13800138000'
+  })
+})
+const data = await response.json()
+console.log('Token:', data.data.token)
+console.log('User:', data.data.user)
+```
+
+登录:
+```javascript
+const response = await fetch('http://localhost:8080/api/v1/auth/login', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    email: 'test@example.com',
+    password: 'TestPass123'
+  })
+})
+const data = await response.json()
+localStorage.setItem('token', data.data.token)
+```
+
+获取资料:
+```javascript
+const token = localStorage.getItem('token')
+const response = await fetch('http://localhost:8080/api/v1/user/profile', {
+  headers: { 'Authorization': `Bearer ${token}` }
+})
+const data = await response.json()
+console.log('User:', data.data)
+```
+
+================================================================================
+## 常见测试场景
+
+场景1: 重复用户名注册
+请求1: username="user123"
+请求2: username="user123"
+预期: 第二个请求返回409 "用户名已存在"
+
+场景2: 无效邮箱格式
+请求: email="not-an-email"
+预期: 400 "邮箱格式不正确"
+
+场景3: 密码过短
+请求: password="123"
+预期: 400 "密码长度必须在6-32个字符之间"
+
+场景4: 用户名包含特殊字符
+请求: username="user@#$"
+预期: 400 "用户名只能包含字母、数字和下划线"
+
+场景5: 登录不存在的用户
+请求: email="nonexist@example.com"
+预期: 401 "用户不存在"
+
+场景6: 错误的密码
+请求: 正确的邮箱 + 错误的密码
+预期: 401 "密码错误"
+
+场景7: 没有Authorization header
+请求: GET /user/profile (无Authorization)
+预期: 401 Unauthorized
+
+================================================================================
+

@@ -1,0 +1,125 @@
+[
+  {
+    "id": 950309,
+    "domainId": 1,
+    "type": "short_answer",
+    "title": "Bootstrap 与 Jackknife",
+    "question": "对比两者在估计方差与置信区间上的应用与差异。",
+    "difficulty": "medium",
+    "tags": ["bootstrap", "jackknife", "resampling"],
+    "answer": "Bootstrap 通过有放回重采样估计分布，适用广泛；Jackknife 逐一剔除样本，计算效率高但近似偏差不同。Bootstrap 更适合复杂统计量与置信区间估计。",
+    "explanation": "重采样方法在小样本下提供非参数估计手段。",
+    "metadata": { "specialization": "测量与误差理论", "specialization_slug": "measurement-and-error-theory" },
+    "createdAt": "2025-11-09T10:50:00Z"
+  },
+  {
+    "id": 950310,
+    "domainId": 1,
+    "type": "multiple_choice",
+    "title": "贝叶斯 vs 频率学派，哪些描述合理？",
+    "question": "选择所有正确项",
+    "difficulty": "hard",
+    "choices": [
+      { "key": "A", "text": "贝叶斯利用先验与似然得到后验分布" },
+      { "key": "B", "text": "频率学置信区间基于重复抽样覆盖率" },
+      { "key": "C", "text": "二者在大样本下总是等价" },
+      { "key": "D", "text": "贝叶斯置信区间=后验置信区间（可信区间）" }
+    ],
+    "correctOptions": ["A", "B", "D"],
+    "tags": ["bayes", "frequentist", "interval"],
+    "explanation": "在特定条件下收敛，但并非总等价；术语有差异。",
+    "metadata": { "specialization": "测量与误差理论", "specialization_slug": "measurement-and-error-theory" },
+    "createdAt": "2025-11-09T10:51:00Z"
+  },
+  {
+    "id": 950311,
+    "domainId": 1,
+    "type": "short_answer",
+    "title": "卡方检验与拟合优度",
+    "question": "说明卡方拟合优度检验的前提、统计量构造与结论解读。",
+    "difficulty": "medium",
+    "tags": ["chi-square", "goodness-of-fit"],
+    "answer": "基于分类频数与期望频数构建统计量，样本量与期望频数需满足条件（一般≥5）；小 p 值拒绝原假设；需注意多重比较与分组选择影响。",
+    "explanation": "满足前提条件是检验有效性的关键。",
+    "metadata": { "specialization": "测量与误差理论", "specialization_slug": "measurement-and-error-theory" },
+    "createdAt": "2025-11-09T10:52:00Z"
+  },
+  {
+    "id": 950312,
+    "domainId": 1,
+    "type": "multiple_choice",
+    "title": "序列相关与有效样本量",
+    "question": "选择所有正确项",
+    "difficulty": "hard",
+    "choices": [
+      { "key": "A", "text": "自相关会导致方差估计偏小" },
+      { "key": "B", "text": "可通过降采样或建模白化" },
+      { "key": "C", "text": "有效样本量等于名义样本量" },
+      { "key": "D", "text": "块自助法可缓解相关性对重采样的影响" }
+    ],
+    "correctOptions": ["A", "B", "D"],
+    "tags": ["autocorrelation", "ess", "block-bootstrap"],
+    "explanation": "相关性降低独立信息量，需调整估计方法。",
+    "metadata": { "specialization": "测量与误差理论", "specialization_slug": "measurement-and-error-theory" },
+    "createdAt": "2025-11-09T10:53:00Z"
+  },
+  {
+    "id": 950313,
+    "domainId": 1,
+    "type": "short_answer",
+    "title": "Allan 方差与噪声表征",
+    "question": "说明 Allan 方差在陀螺/加计噪声分解（白噪/随机游走/偏置不稳定）中的作用。",
+    "difficulty": "hard",
+    "tags": ["allan-variance", "imu", "noise"],
+    "answer": "通过不同平均时间下的方差斜率识别噪声类型，提取角随机游走与偏置不稳定等指标，用于传感器建模与滤波参数设定。",
+    "explanation": "频域-时域联合分析有助于精确建模。",
+    "metadata": { "specialization": "测量与误差理论", "specialization_slug": "measurement-and-error-theory" },
+    "createdAt": "2025-11-09T10:54:00Z"
+  },
+  {
+    "id": 950314,
+    "domainId": 1,
+    "type": "multiple_choice",
+    "title": "量化噪声与抖动（Dither）",
+    "question": "选择所有正确项",
+    "difficulty": "medium",
+    "choices": [
+      { "key": "A", "text": "抖动可线性化量化误差并改善有效分辨率" },
+      { "key": "B", "text": "量化噪声总是白噪声" },
+      { "key": "C", "text": "过度抖动会引入额外噪声与带宽占用" },
+      { "key": "D", "text": "噪声整形可将误差移至高频" }
+    ],
+    "correctOptions": ["A", "C", "D"],
+    "tags": ["quantization", "dither", "noise-shaping"],
+    "explanation": "量化噪声与信号相关时并非白噪，需处理相关性。",
+    "metadata": { "specialization": "测量与误差理论", "specialization_slug": "measurement-and-error-theory" },
+    "createdAt": "2025-11-09T10:55:00Z"
+  },
+  {
+    "id": 950315,
+    "domainId": 1,
+    "type": "short_answer",
+    "title": "Grubbs 与 Dixon 异常值检测",
+    "question": "说明适用条件、显著性水平选择与对结果的影响。",
+    "difficulty": "medium",
+    "tags": ["outlier", "grubbs", "dixon"],
+    "answer": "Grubbs 假设正态且单异常值；Dixon 适合小样本；显著性越高越不易剔除；剔除需谨慎并记录原因，防止选择性报告。",
+    "explanation": "异常值处理需与领域知识与测量流程结合。",
+    "metadata": { "specialization": "测量与误差理论", "specialization_slug": "measurement-and-error-theory" },
+    "createdAt": "2025-11-09T10:56:00Z"
+  },
+  {
+    "id": 950316,
+    "domainId": 1,
+    "type": "short_answer",
+    "title": "卡尔曼滤波测量更新权重",
+    "question": "解释卡尔曼增益与量测噪声协方差 R 的关系，以及如何根据传感器质量设定权重。",
+    "difficulty": "easy",
+    "tags": ["kalman", "gain", "measurement-noise"],
+    "answer": "增益随 R 增大而减小，量测越不确定则权重越低；可依据传感器噪声谱与标定数据设置 R，并在运行时进行自适应调整。",
+    "explanation": "合理的 R/Q 设定是滤波性能的核心。",
+    "metadata": { "specialization": "测量与误差理论", "specialization_slug": "measurement-and-error-theory" },
+    "createdAt": "2025-11-09T10:57:00Z"
+  }
+]
+

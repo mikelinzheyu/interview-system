@@ -1,0 +1,34 @@
+[
+  {
+    "id": 981101,
+    "domainId": 1,
+    "type": "short_answer",
+    "title": "事务隔离级别与并发现象",
+    "question": "解释读未提交/读已提交/可重复读/串行化各自能防止的并发现象，并举例说明。",
+    "difficulty": "medium",
+    "tags": ["database", "isolation", "transaction"],
+    "answer": "RU 无防护；RC 防脏读；RR 防脏读/不可重复读；Serializable 进一步防幻读（不同实现手段）。",
+    "explanation": "具体行为受引擎实现影响，如 MVCC/Next-Key Lock 等。",
+    "metadata": { "specialization": "数据库与信息检索" },
+    "createdAt": "2024-11-01T11:30:00Z"
+  },
+  {
+    "id": 981102,
+    "domainId": 1,
+    "type": "multiple_choice",
+    "title": "索引选择与查询优化",
+    "question": "选择所有正确项",
+    "difficulty": "medium",
+    "choices": [
+      {"key": "A", "text": "高选择性列优先建索引"},
+      {"key": "B", "text": "联合索引顺序会影响利用率"},
+      {"key": "C", "text": "索引越多越好"},
+      {"key": "D", "text": "覆盖索引可减少回表"}
+    ],
+    "correctOptions": ["A", "B", "D"],
+    "tags": ["index", "optimizer"],
+    "explanation": "索引需平衡写入开销与查询收益，关注执行计划与统计信息。",
+    "metadata": { "specialization": "数据库与信息检索" },
+    "createdAt": "2024-11-01T11:35:00Z"
+  }
+]

@@ -46,7 +46,7 @@
           :class="{ liked: isLiked }"
           @click.stop="handleLike"
         >
-          <el-icon :class="{ 'is-liked': isLiked }"><Like /></el-icon>
+          <el-icon :class="{ 'is-liked': isLiked }"><StarFilled /></el-icon>
           {{ post.likes || 0 }}
         </span>
       </div>
@@ -131,7 +131,7 @@ import { ElMessage } from 'element-plus'
 import {
   View,
   ChatDotRound,
-  Like,
+  StarFilled,
   Warning,
   Share,
   Collection,

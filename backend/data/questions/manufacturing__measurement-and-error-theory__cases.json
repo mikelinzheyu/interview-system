@@ -1,0 +1,81 @@
+[
+  {
+    "id": 950317,
+    "domainId": 1,
+    "type": "short_answer",
+    "title": "计算：合成不确定度（RSS）",
+    "question": "测量 y=f(x1,x2)，标准不确定度 u(x1)=0.8，灵敏度系数 c1=1.2；u(x2)=0.6，c2=0.5，忽略相关性。求合成不确定度 u(y)。",
+    "difficulty": "easy",
+    "tags": ["calculation", "uncertainty", "gum"],
+    "answer": "u(y)=sqrt((c1·u1)^2+(c2·u2)^2)=sqrt((1.2×0.8)^2+(0.5×0.6)^2)=sqrt(0.9216+0.09)≈1.01。",
+    "explanation": "一阶近似 RSS 合成，相关性为 0 时不含协方差项。",
+    "metadata": { "specialization": "测量与误差理论", "specialization_slug": "measurement-and-error-theory" },
+    "createdAt": "2025-11-09T11:50:00Z"
+  },
+  {
+    "id": 950318,
+    "domainId": 1,
+    "type": "short_answer",
+    "title": "计算：小样本均值的置信区间",
+    "question": "n=9，样本均值 10.2，样本标准差 0.9，置信度 95%。给出总体均值的双侧置信区间（使用 t 分布，t_{0.975,8}≈2.306）。",
+    "difficulty": "easy",
+    "tags": ["calculation", "confidence-interval", "t-test"],
+    "answer": "CI=\u03bc\u2208[10.2±t·s/√n]=[10.2±2.306×0.9/3]=[10.2±0.692]≈[9.508,10.892]。",
+    "explanation": "小样本未知方差用 t 分布。",
+    "metadata": { "specialization": "测量与误差理论", "specialization_slug": "measurement-and-error-theory" },
+    "createdAt": "2025-11-09T11:51:00Z"
+  },
+  {
+    "id": 950319,
+    "domainId": 1,
+    "type": "short_answer",
+    "title": "计算：Grubbs 异常值检验",
+    "question": "样本量 n=10，样本均值 50.0，标准差 2.0，最大值 55.5。计算 G=|x_max-\u03bc|/s 并据临界值 2.29（α=0.05）判断是否异常。",
+    "difficulty": "medium",
+    "tags": ["calculation", "outlier", "grubbs"],
+    "answer": "G=|55.5-50|/2=2.75>2.29，判定为异常值，可剔除（需记录原因并谨慎）。",
+    "explanation": "在满足正态与单异常假设前提下适用。",
+    "metadata": { "specialization": "测量与误差理论", "specialization_slug": "measurement-and-error-theory" },
+    "createdAt": "2025-11-09T11:52:00Z"
+  },
+  {
+    "id": 950320,
+    "domainId": 1,
+    "type": "short_answer",
+    "title": "计算：加权平均与不确定度",
+    "question": "两独立测量 z1=10.0±1.0 与 z2=9.5±0.5（均为标准不确定度）。求最优加权平均与合成不确定度。",
+    "difficulty": "medium",
+    "tags": ["calculation", "weighted-mean", "variance"],
+    "answer": "权重 w_i=1/u_i^2，w1=1, w2=4，\u0177=(w1z1+w2z2)/(w1+w2)=(1×10+4×9.5)/5=9.6；u(\u0177)=1/√(w1+w2)=1/√5≈0.447。",
+    "explanation": "独立测量的最佳线性无偏估计（BLUE）。",
+    "metadata": { "specialization": "测量与误差理论", "specialization_slug": "measurement-and-error-theory" },
+    "createdAt": "2025-11-09T11:53:00Z"
+  },
+  {
+    "id": 950321,
+    "domainId": 1,
+    "type": "short_answer",
+    "title": "案例：MSA GRR 判定",
+    "question": "给出一组 GRR 结果：总变差 TV=10.0，GRR=2.4，%GRR=24%。结合通常判据（<10%优、10-30%可接受、>30%不可接受）给出判定与改进建议。",
+    "difficulty": "easy",
+    "tags": ["case", "msa", "grr"],
+    "answer": "%GRR=24% 属于可接受但需改进：优化工装/流程、培训操作者、增加重复次数、改进量具或分辨率。",
+    "explanation": "在过程能力评估前先验证测量系统能力。",
+    "metadata": { "specialization": "测量与误差理论", "specialization_slug": "measurement-and-error-theory" },
+    "createdAt": "2025-11-09T11:54:00Z"
+  },
+  {
+    "id": 950322,
+    "domainId": 1,
+    "type": "short_answer",
+    "title": "计算：Allan 方差斜率判读",
+    "question": "给出 Allan 方差在不同平均时间下的斜率：-0.5（短时）、0（中时）、+0.5（长时）。对应主要噪声类型分别是什么？",
+    "difficulty": "medium",
+    "tags": ["calculation", "allan-variance", "imu"],
+    "answer": "-0.5：白噪声（角/速度随机游走），0：偏置不稳定（1/f），+0.5：随机游走/漂移。",
+    "explanation": "斜率与噪声型谱对应关系用于分解与建模。",
+    "metadata": { "specialization": "测量与误差理论", "specialization_slug": "measurement-and-error-theory" },
+    "createdAt": "2025-11-09T11:55:00Z"
+  }
+]
+

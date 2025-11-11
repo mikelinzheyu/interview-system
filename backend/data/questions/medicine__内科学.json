@@ -1,0 +1,34 @@
+[
+  {
+    "id": 984101,
+    "domainId": 3,
+    "type": "short_answer",
+    "title": "心力衰竭的分型与初步治疗",
+    "question": "简述心衰的临床分型（HFrEF/HFpEF）与一线治疗策略。",
+    "difficulty": "medium",
+    "tags": ["cardiology", "heart-failure"],
+    "answer": "HFrEF 射血分数降低，HFpEF 射血分数保留；治疗含 ACEI/ARB/ARNI、β 阻滞剂、利尿剂等个体化组合。",
+    "explanation": "治疗方案需结合血压、肾功能、容量状态等评估并动态调整。",
+    "metadata": { "specialization": "内科学" },
+    "createdAt": "2024-11-01T12:00:00Z"
+  },
+  {
+    "id": 984102,
+    "domainId": 3,
+    "type": "multiple_choice",
+    "title": "社区获得性肺炎严重程度评估",
+    "question": "选择所有正确项（参考 CURB-65）",
+    "difficulty": "easy",
+    "choices": [
+      {"key": "A", "text": "意识障碍"},
+      {"key": "B", "text": "尿素氮升高"},
+      {"key": "C", "text": "呼吸频率降低"},
+      {"key": "D", "text": "低血压"}
+    ],
+    "correctOptions": ["A", "B", "D"],
+    "tags": ["pneumonia"],
+    "explanation": "CURB-65 指标含意识、尿素氮、呼吸频率≥30、低血压、年龄≥65。",
+    "metadata": { "specialization": "内科学" },
+    "createdAt": "2024-11-01T12:05:00Z"
+  }
+]

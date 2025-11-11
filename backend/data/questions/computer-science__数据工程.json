@@ -1,0 +1,34 @@
+[
+  {
+    "id": 920101,
+    "domainId": 1,
+    "type": "short_answer",
+    "title": "数据管道的典型分层设计",
+    "question": "请简述数仓/数据湖中的ODS/DWD/DWS/ADS 各层含义与作用，并给出一条从 ODS 到 ADS 的加工示例。",
+    "difficulty": "medium",
+    "tags": ["data-engineering", "data-pipeline", "warehouse"],
+    "answer": "ODS 原始层、DWD 明细层、DWS 汇总层、ADS 应用层；示例：用户行为日志 ODS → 清洗解析 DWD → 指标聚合 DWS → 看板查询 ADS。",
+    "explanation": "分层有利于职责清晰、血缘追踪与复用，结合调度编排与元数据管理实现可靠的数据工程。",
+    "metadata": { "specialization": "数据工程" },
+    "createdAt": "2024-11-01T10:00:00Z"
+  },
+  {
+    "id": 920102,
+    "domainId": 1,
+    "type": "multiple_choice",
+    "title": "降低数据倾斜的做法包含哪几项？",
+    "question": "选择所有正确项",
+    "difficulty": "medium",
+    "choices": [
+      { "key": "A", "text": "随机前缀打散热点 Key" },
+      { "key": "B", "text": "两阶段聚合减小 Shuffle" },
+      { "key": "C", "text": "人为扩大热点 Key 频次" },
+      { "key": "D", "text": "热点 Key 独立处理" }
+    ],
+    "correctOptions": ["A", "B", "D"],
+    "tags": ["spark", "skew"],
+    "explanation": "随机前缀与两阶段聚合可有效缓解倾斜，热点 Key 独立处理亦常见。",
+    "metadata": { "specialization": "数据工程" },
+    "createdAt": "2024-11-01T10:10:00Z"
+  }
+]

@@ -1,0 +1,81 @@
+[
+  {
+    "id": 930217,
+    "domainId": 1,
+    "type": "short_answer",
+    "title": "计算：RAIM 最小观测数量",
+    "question": "GNSS 完整性 RAIM 进行故障检测与排除（FDE）时，至少需要多少颗卫星观测？并说明原因。",
+    "difficulty": "easy",
+    "tags": ["calculation", "raim", "gnss"],
+    "answer": "检测一般需要 ≥5 颗，排除（定位+隔离）需要 ≥6 颗，以提供冗余观测进行一致性检验与可疑卫星的识别。",
+    "explanation": "多于最小定位需求（4 颗）的冗余用于完整性监测。",
+    "metadata": { "specialization": "飞行器航电与测试", "specialization_slug": "avionics-and-testing" },
+    "createdAt": "2025-11-09T11:30:00Z"
+  },
+  {
+    "id": 930218,
+    "domainId": 1,
+    "type": "short_answer",
+    "title": "计算：AFDX VL 速率与 BAG",
+    "question": "某 VL 配置 BAG=8ms，最大帧长 Lmax=1518B（含以太开销）。估算该 VL 的最大发电速率（fps 与 Mbps 近似），忽略帧间隙。",
+    "difficulty": "medium",
+    "tags": ["calculation", "afdx", "vl"],
+    "answer": "最大发电速率≈1/0.008=125 fps；吞吐≈125×1518×8≈1.52 Mbps（未计入实际以太开销与整形抖动）。",
+    "explanation": "BAG 设定最小间隔，决定 VL 的峰值发送频率上限。",
+    "metadata": { "specialization": "飞行器航电与测试", "specialization_slug": "avionics-and-testing" },
+    "createdAt": "2025-11-09T11:31:00Z"
+  },
+  {
+    "id": 930219,
+    "domainId": 1,
+    "type": "short_answer",
+    "title": "案例：DO-160 EMI 失败整改",
+    "question": "设备在 DO-160 EMI 辐射发射测试中超标。请提出整改思路（布线/屏蔽/滤波/接地/时钟）与复测策略。",
+    "difficulty": "medium",
+    "tags": ["case", "do160", "emi"],
+    "answer": "优化回流路径与地参考、屏蔽与缝隙密封、滤波（共模/差模）、关键走线/时钟频点与边沿速率控制、分区接地与单点/多点合理选择；复测先做预一致性扫描定位峰值，再按整改项逐一验证并留裕量。",
+    "explanation": "EMI 整改强调电流回路与辐射耦合路径的系统性治理。",
+    "metadata": { "specialization": "飞行器航电与测试", "specialization_slug": "avionics-and-testing" },
+    "createdAt": "2025-11-09T11:32:00Z"
+  },
+  {
+    "id": 930220,
+    "domainId": 1,
+    "type": "short_answer",
+    "title": "计算：小角度安装误差补偿",
+    "question": "IMU 安装存在偏航 0.5° 误差。给出对应的近似旋转矩阵（绕 Z 轴）与是否可用小角度线性化处理。",
+    "difficulty": "easy",
+    "tags": ["calculation", "imu", "alignment"],
+    "answer": "θ≈0.5°≈0.00873rad；Rz≈[[cosθ,-sinθ,0],[sinθ,cosθ,0],[0,0,1]]≈[[0.99996,-0.00873,0],[0.00873,0.99996,0],[0,0,1]]；小角度可线性化（sinθ≈θ, cosθ≈1）。",
+    "explanation": "线性化在小角度下近似良好，用于快速补偿与滤波线性化。",
+    "metadata": { "specialization": "飞行器航电与测试", "specialization_slug": "avionics-and-testing" },
+    "createdAt": "2025-11-09T11:33:00Z"
+  },
+  {
+    "id": 930221,
+    "domainId": 1,
+    "type": "short_answer",
+    "title": "计算：皮托-静压空速改正",
+    "question": "IAS 指示 120kt，已知仪表/位置误差合计 +3kt，需要给出修正空速（CAS）。",
+    "difficulty": "easy",
+    "tags": ["calculation", "airspeed", "pitot-static"],
+    "answer": "CAS≈IAS-误差≈120-3=117kt（正负号方向以误差定义为“指示偏高”故减）。",
+    "explanation": "简化情形下将位置+仪表误差作为修正量；实际还需温度/密度等。",
+    "metadata": { "specialization": "飞行器航电与测试", "specialization_slug": "avionics-and-testing" },
+    "createdAt": "2025-11-09T11:34:00Z"
+  },
+  {
+    "id": 930222,
+    "domainId": 1,
+    "type": "short_answer",
+    "title": "案例：三余度传感器的 FDIR 设计",
+    "question": "姿态传感三余度（A/B/C）融合。请给出故障检测（残差）、隔离（投票/一致性）与恢复（降级/重构）策略。",
+    "difficulty": "hard",
+    "tags": ["case", "fdir", "redundancy"],
+    "answer": "检测：互相残差与门限逻辑；隔离：2/3 投票或一致性检验识别离群通道；恢复：屏蔽故障通道并进入降级模式（双余度/单余度），必要时重构估计；记录与上报健康状态。",
+    "explanation": "FDIR 以检测-隔离-重构闭环确保关键功能持续。",
+    "metadata": { "specialization": "飞行器航电与测试", "specialization_slug": "avionics-and-testing" },
+    "createdAt": "2025-11-09T11:35:00Z"
+  }
+]
+

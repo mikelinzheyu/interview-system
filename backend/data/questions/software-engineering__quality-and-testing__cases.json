@@ -1,0 +1,81 @@
+[
+  {
+    "id": 980217,
+    "domainId": 1,
+    "type": "short_answer",
+    "title": "案例：单体拆分后的测试策略设计",
+    "question": "某单体系统正拆分为微服务（用户、订单、库存）。请给出测试金字塔配比、契约测试接入、少量稳定E2E的范围与准入门槛，以及测试数据管理方案（脱敏/子集/合成）的整体策略。",
+    "difficulty": "medium",
+    "tags": ["case", "strategy", "contract-testing", "pyramid"],
+    "answer": "单元/组件为主（~70-80%）、契约+集成适中（~15-25%）、关键路径E2E少量（<5%）；Consumer-Driven Contract 进入各服务流水线并作为准入门槛；E2E仅覆盖下单-扣减-回滚等关键跨域流程；TDM以脱敏+子集+场景合成组合，版本化数据快照与回滚；质量门禁以变化风险和SLO驱动动态调整。",
+    "explanation": "用契约测试承接跨服务演进，E2E只验证关键路径，数据策略确保可重复与合规。",
+    "metadata": { "specialization": "质量与测试", "specialization_slug": "quality-and-testing" },
+    "createdAt": "2025-11-09T11:00:00Z"
+  },
+  {
+    "id": 980218,
+    "domainId": 1,
+    "type": "short_answer",
+    "title": "计算：并行编排下的流水线用时",
+    "question": "现有用例规模：单元 1200 个，平均 0.8s；集成 250 个，平均 4s；E2E 40 个，平均 120s。单元并行度 10、集成并行度 5、E2E 并行度 4，忽略环境启动与排队，请估算顺序阶段编排时的总用时（单位：分钟）。",
+    "difficulty": "easy",
+    "tags": ["calculation", "ci", "parallel"],
+    "answer": "单元总时长 1200×0.8=960s，按 10 并行约 96s；集成 250×4=1000s，按 5 并行约 200s；E2E 40×120=4800s，按 4 并行约 1200s；顺序执行总计≈96+200+1200=1496s≈24.9 分钟。",
+    "explanation": "阶段串行时总用时为各阶段并行后的和；优化方向是提升最慢阶段并行与稳定性。",
+    "metadata": { "specialization": "质量与测试", "specialization_slug": "quality-and-testing" },
+    "createdAt": "2025-11-09T11:01:00Z"
+  },
+  {
+    "id": 980219,
+    "domainId": 1,
+    "type": "short_answer",
+    "title": "案例：时间相关导致的 Flaky UI 测试",
+    "question": "凌晨定时任务后 UI E2E 偶发失败，表现为超时与边界日期断言不稳定。请提出可复现手段与根因定位清单，并给出工程化治理方案。",
+    "difficulty": "medium",
+    "tags": ["case", "flaky", "clock-mocking"],
+    "answer": "复现：固定测试时钟/时区、冻结网络/接口数据、设置相同种子；定位：查依赖真实时间/异步轮询/缓存失效/时区转换；治理：注入可控时钟与时区、用数据工厂稳定边界数据、减少隐式等待、增加可观测埋点（trace/log/metric），对定时任务相关用例隔离窗口执行。",
+    "explanation": "时间与异步是 Flaky 高发区，需通过可控时钟与稳定数据根除不确定性。",
+    "metadata": { "specialization": "质量与测试", "specialization_slug": "quality-and-testing" },
+    "createdAt": "2025-11-09T11:02:00Z"
+  },
+  {
+    "id": 980220,
+    "domainId": 1,
+    "type": "short_answer",
+    "title": "计算：SLO 驱动的发布门禁",
+    "question": "门禁阈值：p95 延迟 ≤ 450ms、错误率 ≤ 0.5%。当前实验组观测：p95=420ms、错误率=0.3%、与基线对比 p95 上浮 10%、错误率上浮 0.1pp。是否放行？若拒绝，请给出常见护栏。",
+    "difficulty": "easy",
+    "tags": ["calculation", "slo", "canary"],
+    "answer": "满足阈值（420ms≤450ms，0.3%≤0.5%），可放行。护栏建议：设置 Guardrail 指标（资源、错误分布、尾延迟）、灰度比例与最大影响、回滚/熔断策略与自动停止条件。",
+    "explanation": "既要满足阈值也要关注相对退化幅度并设置护栏。",
+    "metadata": { "specialization": "质量与测试", "specialization_slug": "quality-and-testing" },
+    "createdAt": "2025-11-09T11:03:00Z"
+  },
+  {
+    "id": 980221,
+    "domainId": 1,
+    "type": "short_answer",
+    "title": "计算：变异测试投放优先级",
+    "question": "模块与变更率：A(10k LoC, 15%)、B(3k, 5%)、C(2k, 2%)。变异生成密度 10/100LoC，执行速率 600 变异/小时/核，8 核并行，夜间配额 1.5 小时。请估算总产能与分配优先级，并给出取舍理由。",
+    "difficulty": "medium",
+    "tags": ["calculation", "mutation-testing", "prioritization"],
+    "answer": "产能≈600×8×1.5=7200 变异/晚。规模：A≈1000、B≈300、C≈200，共1500≤产能。优先覆盖 A（高变更高风险）全部，再覆盖 B/C 关键路径；如产能紧张，按变更率×影响度加权投放，保留等价变异过滤。",
+    "explanation": "按风险与变更韵律优先投放，避免一刀切。",
+    "metadata": { "specialization": "质量与测试", "specialization_slug": "quality-and-testing" },
+    "createdAt": "2025-11-09T11:04:00Z"
+  },
+  {
+    "id": 980222,
+    "domainId": 1,
+    "type": "short_answer",
+    "title": "案例：向后兼容的契约变更与下线计划",
+    "question": "Provider 拟将响应字段 foo 重命名为 bar。请给出兼容发布策略（双写/双读）、契约管理、灰度与迁移窗口、以及破坏性变更的下线节奏。",
+    "difficulty": "medium",
+    "tags": ["case", "versioning", "contract-testing"],
+    "answer": "Provider 先双写 foo/bar 并声明弃用，Consumer 双读并优先 bar；在 Broker 标注兼容版本范围并发布弃用公告；灰度验证后冻结时间窗口，统计仍用 foo 的消费者并驱动迁移；窗口结束后移除 foo 并提升主版本。",
+    "explanation": "用双写/双读与契约治理平滑过渡，确保可观测与可回滚。",
+    "metadata": { "specialization": "质量与测试", "specialization_slug": "quality-and-testing" },
+    "createdAt": "2025-11-09T11:05:00Z"
+  }
+]
+

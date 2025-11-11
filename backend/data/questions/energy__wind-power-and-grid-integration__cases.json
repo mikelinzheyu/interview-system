@@ -1,0 +1,81 @@
+[
+  {
+    "id": 940217,
+    "domainId": 1,
+    "type": "short_answer",
+    "title": "计算：并网点无功需求",
+    "question": "风电场并网点有功 50MW，要求功率因数 |PF|≥0.95（超前/滞后）。在 PF=0.95 滞后时的最小无功需求 Q 为多少（Mvar）？",
+    "difficulty": "easy",
+    "tags": ["calculation", "reactive", "pf"],
+    "answer": "Q=P×tan(arccos(PF))≈50×tan(arccos(0.95))≈50×0.329≈16.45Mvar（滞后）。",
+    "explanation": "功率三角关系：cosφ=PF，Q=P·tanφ。",
+    "metadata": { "specialization": "风电与并网", "specialization_slug": "wind-power-and-grid-integration" },
+    "createdAt": "2025-11-09T11:40:00Z"
+  },
+  {
+    "id": 940218,
+    "domainId": 1,
+    "type": "short_answer",
+    "title": "计算：尾流对 AEP 的影响（近似）",
+    "question": "下游机组平均风速较上游降低 8%，假设功率 ~ 风速^3 近似，估算该机组年发电量（AEP）的相对变化百分比。",
+    "difficulty": "easy",
+    "tags": ["calculation", "wake", "aep"],
+    "answer": "(0.92)^3≈0.778，约降低 22.2%。",
+    "explanation": "立方律近似仅适用于一定风速区间，实际需功率曲线修正。",
+    "metadata": { "specialization": "风电与并网", "specialization_slug": "wind-power-and-grid-integration" },
+    "createdAt": "2025-11-09T11:41:00Z"
+  },
+  {
+    "id": 940219,
+    "domainId": 1,
+    "type": "short_answer",
+    "title": "案例：LVRT 现场验证计划",
+    "question": "给出低电压穿越（LVRT）现场验证的测试步骤、测量指标与合格判据，并说明保护定值协调要点。",
+    "difficulty": "medium",
+    "tags": ["case", "lvrt", "test"],
+    "answer": "步骤：并网前检查->故障模拟->记录电压/电流/频率与无功支撑->恢复评估；指标：穿越曲线符合性、无功响应、直流母线与电流限幅、并网保持；判据：满足 Grid Code 要求；保护定值需与控制策略协调，避免误动。",
+    "explanation": "穿越测试需统一量测基准与触发条件，确保可重复性。",
+    "metadata": { "specialization": "风电与并网", "specialization_slug": "wind-power-and-grid-integration" },
+    "createdAt": "2025-11-09T11:42:00Z"
+  },
+  {
+    "id": 940220,
+    "domainId": 1,
+    "type": "short_answer",
+    "title": "计算：下垂控制功率分配",
+    "question": "两台并联逆变器额定相同，下垂系数相等，母线负载 8MW。各自分配的有功功率近似是多少？如其中一台下垂系数加大一倍会怎样？",
+    "difficulty": "medium",
+    "tags": ["calculation", "droop", "sharing"],
+    "answer": "下垂系数相等则近似均分，各 4MW；某台下垂系数更大则该台对频率偏差更敏感、分配更少，另一台分配更多。",
+    "explanation": "下垂控制按系数比例分担偏差。",
+    "metadata": { "specialization": "风电与并网", "specialization_slug": "wind-power-and-grid-integration" },
+    "createdAt": "2025-11-09T11:43:00Z"
+  },
+  {
+    "id": 940221,
+    "domainId": 1,
+    "type": "short_answer",
+    "title": "案例：并网点谐波与闪变测量方案",
+    "question": "制定 PCC 谐波/闪变测量方案：仪表等级、采样率/窗口、评价指标与合格判据，解释为何 SCADA 不适合合规评估。",
+    "difficulty": "medium",
+    "tags": ["case", "harmonics", "flicker"],
+    "answer": "使用符合标准的功率质量分析仪，设定满足谐波与闪变标准的采样与窗函数；指标：THD/单次谐波、短期/长期闪变；判据按 IEC/地方规范；SCADA 面向运维监视，采样/滤波/同步不满足合规测量精度。",
+    "explanation": "合规评估需要标准化仪表与方法。",
+    "metadata": { "specialization": "风电与并网", "specialization_slug": "wind-power-and-grid-integration" },
+    "createdAt": "2025-11-09T11:44:00Z"
+  },
+  {
+    "id": 940222,
+    "domainId": 1,
+    "type": "short_answer",
+    "title": "计算：STATCOM 容量粗估",
+    "question": "若并网点要求在 50MW 下提供 ±0.33P 的无功调节范围，估算 STATCOM 的无功容量范围（Mvar）。",
+    "difficulty": "easy",
+    "tags": ["calculation", "statcom", "reactive"],
+    "answer": "±0.33×50MW≈±16.5Mvar（忽略电压变化与功率因数曲线细节）。",
+    "explanation": "容量与并网点电压、电流限幅有关，需进一步校核。",
+    "metadata": { "specialization": "风电与并网", "specialization_slug": "wind-power-and-grid-integration" },
+    "createdAt": "2025-11-09T11:45:00Z"
+  }
+]
+

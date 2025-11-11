@@ -1,0 +1,125 @@
+[
+  {
+    "id": 950201,
+    "domainId": 1,
+    "type": "short_answer",
+    "title": "人机协作（HRC）模式与安全原则",
+    "question": "概述协作机器人在人机协作中的典型模式（SPS/SSM/PFL/HG）及核心安全原则。",
+    "difficulty": "medium",
+    "tags": ["hrc", "cobot", "safety"],
+    "answer": "常见模式包括：速度与分离监控（SSM）、功率与力限制（PFL）、手导引（HG）与安全停止/限制速度（SLS/SLSM）。遵循 ISO 10218/TS 15066 要求，进行风险评估、限定力/压强阈值、确保安全停机回路与防护距离。",
+    "explanation": "HRC 的本质是风险可控的人与机器人共享空间作业，需以标准与评估闭环为前提。",
+    "metadata": { "specialization": "人机协作与系统集成", "specialization_slug": "human-machine-collaboration-and-system-integration" },
+    "createdAt": "2025-11-09T09:20:00Z"
+  },
+  {
+    "id": 950202,
+    "domainId": 1,
+    "type": "multiple_choice",
+    "title": "HRC 标准与实践，哪些说法正确？",
+    "question": "选择所有正确项",
+    "difficulty": "medium",
+    "choices": [
+      { "key": "A", "text": "ISO 10218/TS 15066 对协作模式与力限有明确规定" },
+      { "key": "B", "text": "协作机器人天生安全，可免除风险评估" },
+      { "key": "C", "text": "SSM 依赖对空间与人的可靠感知（如 3D 视觉/激光扫描）" },
+      { "key": "D", "text": "PFL 模式下也需验证夹持/尖锐边缘等二次风险" }
+    ],
+    "correctOptions": ["A", "C", "D"],
+    "tags": ["standards", "iso", "risk"],
+    "explanation": "协作并不等于无风险，风险评估与验证不可省略。",
+    "metadata": { "specialization": "人机协作与系统集成", "specialization_slug": "human-machine-collaboration-and-system-integration" },
+    "createdAt": "2025-11-09T09:21:00Z"
+  },
+  {
+    "id": 950203,
+    "domainId": 1,
+    "type": "short_answer",
+    "title": "产线系统集成典型架构",
+    "question": "说明 PLC/Cell Controller、OPC UA/MQTT 网关、MES/SCADA 的集成关系与数据流设计要点。",
+    "difficulty": "medium",
+    "tags": ["opc-ua", "mqtt", "mes", "scada"],
+    "answer": "现场设备通过现场总线接入 PLC/Cell 控制器，网关做协议转换与边缘聚合，经消息总线/OPC UA 暴露至 MES/SCADA；设计要点：语义建模（命名空间/信息模型）、缓冲与断点续传、时序一致性、事件/度量分流与幂等消费。",
+    "explanation": "高可靠与可维护性依赖清晰的接口契约与容错策略。",
+    "metadata": { "specialization": "人机协作与系统集成", "specialization_slug": "human-machine-collaboration-and-system-integration" },
+    "createdAt": "2025-11-09T09:22:00Z"
+  },
+  {
+    "id": 950204,
+    "domainId": 1,
+    "type": "multiple_choice",
+    "title": "虚拟调试与数字孪生",
+    "question": "选择所有正确项",
+    "difficulty": "easy",
+    "choices": [
+      { "key": "A", "text": "虚拟调试可显著缩短现场停机时间" },
+      { "key": "B", "text": "数字孪生可完全替代现场安全验证" },
+      { "key": "C", "text": "SIL/HIL/集成流水线可逐步提升验证覆盖" },
+      { "key": "D", "text": "孪生模型精度与传感/执行延迟不影响控制验证" }
+    ],
+    "correctOptions": ["A", "C"],
+    "tags": ["digital-twin", "commissioning"],
+    "explanation": "数字孪生是强工具但非安全认证的替代；模型与延迟对控制策略验证至关重要。",
+    "metadata": { "specialization": "人机协作与系统集成", "specialization_slug": "human-machine-collaboration-and-system-integration" },
+    "createdAt": "2025-11-09T09:23:00Z"
+  },
+  {
+    "id": 950205,
+    "domainId": 1,
+    "type": "short_answer",
+    "title": "人机接力与工装更换",
+    "question": "阐述人机接力任务的安全与效率设计（手导引、示教、快速夹具/工装更换）。",
+    "difficulty": "easy",
+    "tags": ["handover", "tooling", "teach"],
+    "answer": "通过手导引/示教降低编程门槛；快速夹具实现少换型时间；在接力点设置安全速度/力限，采用姿态/手势确认与视觉感知，保证人机交接的可预期与可回退。",
+    "explanation": "接力设计需兼顾人体工学与安全冗余。",
+    "metadata": { "specialization": "人机协作与系统集成", "specialization_slug": "human-machine-collaboration-and-system-integration" },
+    "createdAt": "2025-11-09T09:24:00Z"
+  },
+  {
+    "id": 950206,
+    "domainId": 1,
+    "type": "multiple_choice",
+    "title": "视觉标定与测量要点",
+    "question": "选择所有正确项",
+    "difficulty": "medium",
+    "choices": [
+      { "key": "A", "text": "手眼标定需估计内参与外参" },
+      { "key": "B", "text": "单点标定足以保证绝对定位精度" },
+      { "key": "C", "text": "工业相机畸变可忽略" },
+      { "key": "D", "text": "重复测量与鲁棒估计有助于抑制随机误差" }
+    ],
+    "correctOptions": ["A", "D"],
+    "tags": ["vision", "calibration", "metrology"],
+    "explanation": "需系统性标定并关注工况变化引入的偏差。",
+    "metadata": { "specialization": "人机协作与系统集成", "specialization_slug": "human-machine-collaboration-and-system-integration" },
+    "createdAt": "2025-11-09T09:25:00Z"
+  },
+  {
+    "id": 950207,
+    "domainId": 1,
+    "type": "short_answer",
+    "title": "集成总线与消息设计",
+    "question": "如何在产线数据总线中处理消息排序、重复与幂等，确保事件一致性与可追溯？",
+    "difficulty": "medium",
+    "tags": ["bus", "messaging", "idempotency"],
+    "answer": "按设备/工位/工单进行分区保证局部顺序；以业务键与时间戳去重，端到端幂等更新；事件溯源与重放机制辅助恢复；采用死信与补偿流程处理异常。",
+    "explanation": "通过“有效一次”策略控制重复与乱序的影响。",
+    "metadata": { "specialization": "人机协作与系统集成", "specialization_slug": "human-machine-collaboration-and-system-integration" },
+    "createdAt": "2025-11-09T09:26:00Z"
+  },
+  {
+    "id": 950208,
+    "domainId": 1,
+    "type": "short_answer",
+    "title": "安全 PLC 与功能安全",
+    "question": "说明安全 PLC 与常规 PLC 的差异、典型安全回路与 SIL/PL 目标设定。",
+    "difficulty": "hard",
+    "tags": ["safety-plc", "functional-safety"],
+    "answer": "安全 PLC 硬件/软件具有冗余与自诊断，支持安全指令与双通道输入输出；依据 ISO 13849/IEC 62061 设定 PL/SIL 目标，设计双回路安全停机、急停、门锁互锁等，并验证诊断覆盖率与平均危险失效间隔。",
+    "explanation": "功能安全设计需以风险评估为起点，兼顾可维护与可测试性。",
+    "metadata": { "specialization": "人机协作与系统集成", "specialization_slug": "human-machine-collaboration-and-system-integration" },
+    "createdAt": "2025-11-09T09:27:00Z"
+  }
+]
+

@@ -1,0 +1,81 @@
+[
+  {
+    "id": 950217,
+    "domainId": 1,
+    "type": "short_answer",
+    "title": "计算：人机协作节拍与产能",
+    "question": "一工位人机协作节拍：机器人作业 18s，人工作业 14s，二者可重叠 8s，换型平均损失 2s/件。请估算单工位理论节拍与小时产能。",
+    "difficulty": "medium",
+    "tags": ["calculation", "cycle-time", "hrc"],
+    "answer": "重叠后节拍≈max(18,14)-8=10s，考虑换型损失 2s/件，节拍≈12s/件；小时产能≈3600/12≈300 件/小时。",
+    "explanation": "重叠并行减少有效节拍，需叠加换型等损耗。",
+    "metadata": { "specialization": "人机协作与系统集成", "specialization_slug": "human-machine-collaboration-and-system-integration" },
+    "createdAt": "2025-11-09T11:20:00Z"
+  },
+  {
+    "id": 950218,
+    "domainId": 1,
+    "type": "short_answer",
+    "title": "计算：安全防护距离（ISO/TS 15066）",
+    "question": "已知接近速度 K=1600 mm/s，总停机时间 T=0.25 s，附加常数 C=120 mm。求最小防护距离 S。",
+    "difficulty": "easy",
+    "tags": ["calculation", "safety", "ts15066"],
+    "answer": "S=K×T+C=1600×0.25+120=520 mm。",
+    "explanation": "典型线性近似公式，需结合工况与测得 T。",
+    "metadata": { "specialization": "人机协作与系统集成", "specialization_slug": "human-machine-collaboration-and-system-integration" },
+    "createdAt": "2025-11-09T11:21:00Z"
+  },
+  {
+    "id": 950219,
+    "domainId": 1,
+    "type": "short_answer",
+    "title": "案例：TSN 时隙调度与确定性",
+    "question": "多轴同步控制采用 TSN。请给出 1ms 周期内的时隙规划思路（控制、测量、剩余带宽），并说明如何验证端到端抖动指标。",
+    "difficulty": "hard",
+    "tags": ["case", "tsn", "schedule"],
+    "answer": "1ms 周期划分高优先级控制窗口（如 300µs）、测量回传（200µs）、管理/剩余带宽（其余）；使用 802.1AS 时间同步，Qbv 时隙调度与 Qbu 抢占；验证端到端抖动通过时间戳对齐与统计分析，必要时示波器/探针侧量测对拍。",
+    "explanation": "控制与测量窗口需优先保障并最小化干扰。",
+    "metadata": { "specialization": "人机协作与系统集成", "specialization_slug": "human-machine-collaboration-and-system-integration" },
+    "createdAt": "2025-11-09T11:22:00Z"
+  },
+  {
+    "id": 950220,
+    "domainId": 1,
+    "type": "short_answer",
+    "title": "计算：视觉测量分辨率与误差",
+    "question": "相机视场 400mm×300mm，分辨率 1600×1200px。估算像素分辨率（mm/px）与单像素量化误差对测量的影响。",
+    "difficulty": "easy",
+    "tags": ["calculation", "vision", "metrology"],
+    "answer": "水平≈400/1600=0.25mm/px，垂直≈300/1200=0.25mm/px。单像素量化误差约 ±0.25mm（未亚像素与畸变补偿时）。",
+    "explanation": "分辨率受标定、畸变、姿态影响，工程上可用亚像素与标定降低误差。",
+    "metadata": { "specialization": "人机协作与系统集成", "specialization_slug": "human-machine-collaboration-and-system-integration" },
+    "createdAt": "2025-11-09T11:23:00Z"
+  },
+  {
+    "id": 950221,
+    "domainId": 1,
+    "type": "short_answer",
+    "title": "案例：OPC UA 信息模型设计",
+    "question": "为产线工位（设备/工装/配方/批次）设计 OPC UA 信息模型。给出 NodeId/Namespace 规划、对象/变量/方法以及事件模型。",
+    "difficulty": "medium",
+    "tags": ["case", "opc-ua", "information-model"],
+    "answer": "以命名空间区分企业/行业/供应商；设备对象含状态/告警/参数，方法含启动/停止/换型；配方与批次为对象并与工位关联；事件模型用于产出、缺陷与切换事件；NodeId 稳定、层次清晰并可浏览。",
+    "explanation": "语义建模保证跨系统互操作与可维护。",
+    "metadata": { "specialization": "人机协作与系统集成", "specialization_slug": "human-machine-collaboration-and-system-integration" },
+    "createdAt": "2025-11-09T11:24:00Z"
+  },
+  {
+    "id": 950222,
+    "domainId": 1,
+    "type": "short_answer",
+    "title": "案例：HIL 流水线的场景覆盖",
+    "question": "给出机器人单元的 HIL 场景集：启动/急停/门锁、通信丢包与抖动、传感器异常、工装更换、手导引与接力交互，并说明验收准则。",
+    "difficulty": "medium",
+    "tags": ["case", "hil", "coverage"],
+    "answer": "按安全>功能>性能分层；安全：急停/门锁联动、失效安全与 SIL/PL 达标；通信：丢包/延迟/乱序下的容错；传感：漂移/失真/缺失；工装更换：互锁与防呆；人机接力：力限与速度限。准则：通过率、恢复时间与日志可追溯。",
+    "explanation": "以安全优先并覆盖关键失效模式，设定量化标准。",
+    "metadata": { "specialization": "人机协作与系统集成", "specialization_slug": "human-machine-collaboration-and-system-integration" },
+    "createdAt": "2025-11-09T11:25:00Z"
+  }
+]
+

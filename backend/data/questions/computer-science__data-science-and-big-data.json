@@ -1,0 +1,124 @@
+[
+  {
+    "id": 910001,
+    "domainId": 1,
+    "type": "short_answer",
+    "title": "什么是特征工程？",
+    "question": "简述特征工程在数据科学中的作用，并给出两个常见方法。",
+    "difficulty": "easy",
+    "tags": ["data-science", "feature-engineering", "big-data"],
+    "answer": "通过特征构造/选择提升模型表达与泛化，例如标准化、分箱、交互特征",
+    "explanation": "特征工程改善数据表示，缓解偏移与尺度问题；常见方法包括One-Hot、标准化、分箱、特征组合等。",
+    "metadata": { "specialization": "data-science-and-big-data" },
+    "createdAt": "2024-10-01T10:00:00Z"
+  },
+  {
+    "id": 910002,
+    "domainId": 1,
+    "type": "multiple_choice",
+    "title": "Spark RDD 的特性包含以下哪些？",
+    "question": "选择所有正确项",
+    "difficulty": "medium",
+    "choices": [
+      { "key": "A", "text": "不可变性" },
+      { "key": "B", "text": "血缘(lineage)跟踪" },
+      { "key": "C", "text": "强制单线程执行" },
+      { "key": "D", "text": "容错恢复" }
+    ],
+    "correctOptions": ["A", "B", "D"],
+    "tags": ["spark", "rdd", "big-data"],
+    "explanation": "RDD 是不可变的分布式集合，具备血缘记录与基于血缘的容错恢复；并非单线程。",
+    "metadata": { "specialization": "data-science-and-big-data" },
+    "createdAt": "2024-10-01T10:05:00Z"
+  },
+  {
+    "id": 910003,
+    "domainId": 1,
+    "type": "short_answer",
+    "title": "MapReduce 中 Combiner 的作用",
+    "question": "解释 Combiner 的目的及注意事项。",
+    "difficulty": "medium",
+    "tags": ["mapreduce", "hadoop", "big-data"],
+    "answer": "本地预聚合，减少shuffle数据量；需满足交换结合律，避免改变结果",
+    "explanation": "Combiner 在 Map 端对中间结果局部聚合，减少网络传输；仅适用于可安全聚合的操作。",
+    "metadata": { "specialization": "data-science-and-big-data" },
+    "createdAt": "2024-10-01T10:10:00Z"
+  },
+  {
+    "id": 910004,
+    "domainId": 1,
+    "type": "multiple_choice",
+    "title": "特征选择的常见方法",
+    "question": "选择所有正确项",
+    "difficulty": "easy",
+    "choices": [
+      { "key": "A", "text": "基于方差阈值" },
+      { "key": "B", "text": "基于模型的选择（L1/L2）" },
+      { "key": "C", "text": "留一法交叉验证" },
+      { "key": "D", "text": "基于互信息/相关系数" }
+    ],
+    "correctOptions": ["A", "B", "D"],
+    "tags": ["feature-selection", "ml", "data-science"],
+    "explanation": "方差阈值、互信息/相关、模型正则化等均可用于特征选择；留一法是验证策略。",
+    "metadata": { "specialization": "data-science-and-big-data" },
+    "createdAt": "2024-10-01T10:20:00Z"
+  },
+  {
+    "id": 910005,
+    "domainId": 1,
+    "type": "short_answer",
+    "title": "数据倾斜的常见处理策略",
+    "question": "在分布式大数据处理时，如何缓解数据倾斜？",
+    "difficulty": "hard",
+    "tags": ["data-skew", "spark", "big-data"],
+    "answer": "随机前缀打散、两阶段聚合、热点Key特殊处理、采样调参",
+    "explanation": "数据倾斜会导致任务瓶颈；常用策略包括对热点Key做随机前缀、局部聚合、定向拆分等。",
+    "metadata": { "specialization": "data-science-and-big-data" },
+    "createdAt": "2024-10-01T10:30:00Z"
+  },
+  {
+    "id": 910006,
+    "domainId": 1,
+    "type": "short_answer",
+    "title": "AUC 与 ROC 的关系",
+    "question": "说明 ROC 曲线与 AUC 指标的含义及适用场景。",
+    "difficulty": "medium",
+    "tags": ["ml", "auc", "roc", "classification"],
+    "answer": "ROC 表示TPR/FPR权衡，AUC为其面积，衡量排序能力；适用于不均衡分类",
+    "explanation": "AUC 不依赖于阈值，适合不平衡数据评估；但不反映概率校准。",
+    "metadata": { "specialization": "data-science-and-big-data" },
+    "createdAt": "2024-10-01T10:40:00Z"
+  },
+  {
+    "id": 910007,
+    "domainId": 1,
+    "type": "multiple_choice",
+    "title": "数据湖与数据仓库的差异",
+    "question": "选择所有正确项",
+    "difficulty": "medium",
+    "choices": [
+      { "key": "A", "text": "数据湖通常存原始数据，仓库存结构化数据" },
+      { "key": "B", "text": "数据湖更适合探索性/AI工作负载" },
+      { "key": "C", "text": "数据仓库不支持SQL" },
+      { "key": "D", "text": "数据湖常基于对象存储" }
+    ],
+    "correctOptions": ["A", "B", "D"],
+    "tags": ["data-lake", "data-warehouse", "big-data"],
+    "explanation": "仓库注重结构化与治理；湖偏原始与灵活；对象存储常为数据湖底座。",
+    "metadata": { "specialization": "data-science-and-big-data" },
+    "createdAt": "2024-10-01T10:50:00Z"
+  },
+  {
+    "id": 910008,
+    "domainId": 1,
+    "type": "short_answer",
+    "title": "Kafka 分区与顺序性",
+    "question": "说明 Kafka 分区对吞吐与有序性的影响。",
+    "difficulty": "medium",
+    "tags": ["kafka", "streaming", "big-data"],
+    "answer": "多分区提升吞吐；单分区内保持顺序，跨分区无全局顺序",
+    "explanation": "通过分区并行提高吞吐，但仅保证分区内的消息顺序；需按Key路由保证局部顺序。",
+    "metadata": { "specialization": "data-science-and-big-data" },
+    "createdAt": "2024-10-01T11:00:00Z"
+  }
+]

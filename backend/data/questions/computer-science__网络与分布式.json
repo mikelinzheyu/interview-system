@@ -1,0 +1,34 @@
+[
+  {
+    "id": 970101,
+    "domainId": 1,
+    "type": "short_answer",
+    "title": "一致性协议对比：Raft 与 Paxos",
+    "question": "概述 Raft 与 Paxos 的设计目标、易用性与工程实现差异。",
+    "difficulty": "hard",
+    "tags": ["distributed", "consensus"],
+    "answer": "二者为容错一致性协议；Raft 强调可理解性与工程落地（领导者选举/日志复制清晰），Paxos 更抽象实现复杂。",
+    "explanation": "工程上常用 Raft 实现（etcd、Consul），Paxos在理论与特定系统中使用。",
+    "metadata": { "specialization": "网络与分布式" },
+    "createdAt": "2024-11-01T11:10:00Z"
+  },
+  {
+    "id": 970102,
+    "domainId": 1,
+    "type": "multiple_choice",
+    "title": "CAP 与分布式系统设计",
+    "question": "选择所有正确项",
+    "difficulty": "medium",
+    "choices": [
+      {"key": "A", "text": "网络分区发生时无法同时满足一致性与可用性"},
+      {"key": "B", "text": "BASE 模型是对 AP 系统的工程取舍"},
+      {"key": "C", "text": "CP 系统永远不可用"},
+      {"key": "D", "text": "最终一致性是强一致性"}
+    ],
+    "correctOptions": ["A", "B"],
+    "tags": ["cap", "base"],
+    "explanation": "CAP 指出分区时的取舍；BASE 通过业务容忍一致性延迟；CP 并非不可用；最终一致性非强一致性。",
+    "metadata": { "specialization": "网络与分布式" },
+    "createdAt": "2024-11-01T11:15:00Z"
+  }
+]

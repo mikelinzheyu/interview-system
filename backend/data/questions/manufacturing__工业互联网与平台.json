@@ -1,0 +1,34 @@
+[
+  {
+    "id": 983101,
+    "domainId": 1,
+    "type": "short_answer",
+    "title": "工业互联网参考架构层次",
+    "question": "概述感知层/网络层/平台层/应用层的角色与关键能力。",
+    "difficulty": "medium",
+    "tags": ["iiot", "platform"],
+    "answer": "感知采集数据，网络保障可靠连接，平台完成数据治理/模型与集成，应用层落地业务场景。",
+    "explanation": "平台层需具备接入/时序与时空数据/规则与流批处理/数字孪生等能力。",
+    "metadata": { "specialization": "工业互联网与平台" },
+    "createdAt": "2024-11-01T11:50:00Z"
+  },
+  {
+    "id": 983102,
+    "domainId": 1,
+    "type": "multiple_choice",
+    "title": "设备接入与安全",
+    "question": "选择所有正确项",
+    "difficulty": "medium",
+    "choices": [
+      {"key": "A", "text": "MQTT/OPC UA 常用于设备接入"},
+      {"key": "B", "text": "设备证书与双向认证提升安全"},
+      {"key": "C", "text": "明文传输足够"},
+      {"key": "D", "text": "网关可做协议转换与边缘计算"}
+    ],
+    "correctOptions": ["A", "B", "D"],
+    "tags": ["gateway", "security"],
+    "explanation": "工业场景强调安全与可靠，常用 TLS 与证书体系并结合边缘协同。",
+    "metadata": { "specialization": "工业互联网与平台" },
+    "createdAt": "2024-11-01T11:55:00Z"
+  }
+]

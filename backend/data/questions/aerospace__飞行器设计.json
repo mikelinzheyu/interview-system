@@ -1,0 +1,34 @@
+[
+  {
+    "id": 930101,
+    "domainId": 1,
+    "type": "short_answer",
+    "title": "机翼气动外形对升阻的影响",
+    "question": "概述机翼展弦比、后掠角、翼型厚度对升力系数与阻力系数的影响。",
+    "difficulty": "medium",
+    "tags": ["aero", "airfoil", "wing"],
+    "answer": "展弦比增大利于升阻比、后掠角增大延迟跨音阻增但减升力、厚翼利于结构与低速升力但增阻。",
+    "explanation": "外形参数影响诱导阻力与跨音阻、边界层发展与临界马赫数，需在设计中权衡。",
+    "metadata": { "specialization": "飞行器设计" },
+    "createdAt": "2024-11-01T10:30:00Z"
+  },
+  {
+    "id": 930102,
+    "domainId": 1,
+    "type": "multiple_choice",
+    "title": "稳定与操纵性的设计权衡",
+    "question": "选择正确项",
+    "difficulty": "medium",
+    "choices": [
+      {"key": "A", "text": "纵向静稳定余度过大将降低操纵灵敏度"},
+      {"key": "B", "text": "增加垂尾面积通常提升方向稳定性"},
+      {"key": "C", "text": "静不稳定有时可用于提高经济性"},
+      {"key": "D", "text": "静稳定与操纵不相关"}
+    ],
+    "correctOptions": ["A", "B"],
+    "tags": ["stability", "control"],
+    "explanation": "稳定与操纵存在权衡；静不稳定需要电传增稳，一般民机不采用仅为经济性。",
+    "metadata": { "specialization": "飞行器设计" },
+    "createdAt": "2024-11-01T10:35:00Z"
+  }
+]

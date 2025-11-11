@@ -1,0 +1,125 @@
+[
+  {
+    "id": 950209,
+    "domainId": 1,
+    "type": "short_answer",
+    "title": "时间敏感网络（TSN）在工业中的应用",
+    "question": "概述 TSN 的时间同步、整形与调度机制，以及其在多轴协同/机器人/运动控制中的价值。",
+    "difficulty": "hard",
+    "tags": ["tsn", "time-sync", "determinism"],
+    "answer": "基于 IEEE 802.1AS 提供高精度同步，802.1Qbv/Qbu 等实现时隙调度与抢占，保障确定性时序；在多轴/机器人同步、视觉与执行协同中降低抖动与延迟。",
+    "explanation": "TSN 将以太网用于硬实时近实时场景，需系统性配置。",
+    "metadata": { "specialization": "人机协作与系统集成", "specialization_slug": "human-machine-collaboration-and-system-integration" },
+    "createdAt": "2025-11-09T10:20:00Z"
+  },
+  {
+    "id": 950210,
+    "domainId": 1,
+    "type": "multiple_choice",
+    "title": "OPC UA 信息模型，哪些正确？",
+    "question": "选择所有正确项",
+    "difficulty": "medium",
+    "choices": [
+      { "key": "A", "text": "NodeId 与 Namespace 共同唯一标识节点" },
+      { "key": "B", "text": "OPC UA 仅提供字节流传输，不涉及语义" },
+      { "key": "C", "text": "对象/变量/方法构成信息模型的基本元素" },
+      { "key": "D", "text": "基于 Companion Spec 可实现跨厂商语义互操作" }
+    ],
+    "correctOptions": ["A", "C", "D"],
+    "tags": ["opc-ua", "information-model"],
+    "explanation": "OPC UA 的价值在于统一的语义建模和服务接口。",
+    "metadata": { "specialization": "人机协作与系统集成", "specialization_slug": "human-machine-collaboration-and-system-integration" },
+    "createdAt": "2025-11-09T10:21:00Z"
+  },
+  {
+    "id": 950211,
+    "domainId": 1,
+    "type": "short_answer",
+    "title": "SLAM 与定位标识的取舍",
+    "question": "对比基于 SLAM 的无标记定位与基于标识（ArUco/AprilTag）的定位在柔性产线中的适用性。",
+    "difficulty": "medium",
+    "tags": ["slam", "fiducial", "localization"],
+    "answer": "SLAM 无需布设标识，灵活但对纹理/光照与计算要求高；标识法部署简单、鲁棒性强但需维护标识与受视线遮挡影响。可采用融合方案实现高可靠定位。",
+    "explanation": "根据环境可控性与成本选择或融合。",
+    "metadata": { "specialization": "人机协作与系统集成", "specialization_slug": "human-machine-collaboration-and-system-integration" },
+    "createdAt": "2025-11-09T10:22:00Z"
+  },
+  {
+    "id": 950212,
+    "domainId": 1,
+    "type": "multiple_choice",
+    "title": "SIT/FAT/SAT/UAT 测试分层",
+    "question": "选择所有正确项",
+    "difficulty": "easy",
+    "choices": [
+      { "key": "A", "text": "SIT 聚焦系统集成接口与数据流" },
+      { "key": "B", "text": "FAT 在供方场地进行出厂测试" },
+      { "key": "C", "text": "SAT/UAT 在现场/用户环境验证" },
+      { "key": "D", "text": "UAT 与 SAT 等同" }
+    ],
+    "correctOptions": ["A", "B", "C"],
+    "tags": ["sit", "fat", "sat", "uat"],
+    "explanation": "UAT 强调用户验收与业务目标；SAT 强调现场集成与功能。",
+    "metadata": { "specialization": "人机协作与系统集成", "specialization_slug": "human-machine-collaboration-and-system-integration" },
+    "createdAt": "2025-11-09T10:23:00Z"
+  },
+  {
+    "id": 950213,
+    "domainId": 1,
+    "type": "short_answer",
+    "title": "PLC 编程模式与安全状态",
+    "question": "说明基于状态机的 PLC 程序结构与故障/异常时的安全状态设计要点。",
+    "difficulty": "medium",
+    "tags": ["plc", "state-machine", "safety"],
+    "answer": "采用显式状态与转换表、去抖动与互锁；异常进入安全状态（SIL/PL 目标）并确保可诊断与可恢复；将 E-Stop/门锁置于独立安全回路。",
+    "explanation": "安全优先的控制逻辑可降低集成与维护风险。",
+    "metadata": { "specialization": "人机协作与系统集成", "specialization_slug": "human-machine-collaboration-and-system-integration" },
+    "createdAt": "2025-11-09T10:24:00Z"
+  },
+  {
+    "id": 950214,
+    "domainId": 1,
+    "type": "multiple_choice",
+    "title": "IEC 61131-3 语言，哪些表述正确？",
+    "question": "选择所有正确项",
+    "difficulty": "easy",
+    "choices": [
+      { "key": "A", "text": "包含梯形图、功能块图与结构化文本等" },
+      { "key": "B", "text": "结构化文本更适合复杂逻辑与数据结构" },
+      { "key": "C", "text": "梯形图最适合数学计算" },
+      { "key": "D", "text": "不同语言可在同一项目混合使用" }
+    ],
+    "correctOptions": ["A", "B", "D"],
+    "tags": ["iec61131-3", "ladder", "st", "fbd"],
+    "explanation": "梯形图直观表达继电/时序，但不擅长复杂计算。",
+    "metadata": { "specialization": "人机协作与系统集成", "specialization_slug": "human-machine-collaboration-and-system-integration" },
+    "createdAt": "2025-11-09T10:25:00Z"
+  },
+  {
+    "id": 950215,
+    "domainId": 1,
+    "type": "short_answer",
+    "title": "工业视觉光源选择",
+    "question": "比较背光、同轴、漫反射穹顶等光源在定位/缺陷检测中的适用性。",
+    "difficulty": "easy",
+    "tags": ["vision", "lighting", "inspection"],
+    "answer": "背光适合轮廓/定位；同轴抑制镜面反射；穹顶适合漫反射表面减少阴影；需结合工件材质与节拍选择光源与相机布置。",
+    "explanation": "正确光源比后续算法更影响效果与稳定性。",
+    "metadata": { "specialization": "人机协作与系统集成", "specialization_slug": "human-machine-collaboration-and-system-integration" },
+    "createdAt": "2025-11-09T10:26:00Z"
+  },
+  {
+    "id": 950216,
+    "domainId": 1,
+    "type": "short_answer",
+    "title": "边缘-云协同的典型分工",
+    "question": "说明在产线中边缘计算与云平台的典型分工与协同机制。",
+    "difficulty": "medium",
+    "tags": ["edge", "cloud", "iiot"],
+    "answer": "边缘承担实时控制/预处理/本地缓存与断点续传；云侧负责集中训练、长周期分析与全局优化；以消息总线与数字孪生同步模型参数与配置，实现在线/离线协同。",
+    "explanation": "将实时性与全局性需求拆分有助于可靠与可扩展。",
+    "metadata": { "specialization": "人机协作与系统集成", "specialization_slug": "human-machine-collaboration-and-system-integration" },
+    "createdAt": "2025-11-09T10:27:00Z"
+  }
+]
+

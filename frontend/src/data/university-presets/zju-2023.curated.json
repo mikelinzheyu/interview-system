@@ -1,0 +1,338 @@
+{
+  "meta": {
+    "university": "浙江大学",
+    "year": "2023",
+    "profile": "zju-2023.curated",
+    "scope": "重点学院初版精修",
+    "curated": true,
+    "updatedAt": "2025-11-08T00:00:00Z"
+  },
+  "majors": [
+    {
+      "name": "计算机科学与技术",
+      "aliases": ["计算机科学"],
+      "specializations": [
+        {"name": "数据结构与算法", "description": "数据结构、算法设计与分析", "coreCourses": ["数据结构", "算法设计与分析", "离散数学"], "relatedSkills": ["时间/空间复杂度", "问题建模"], "questionCount": 60},
+        {"name": "系统与操作系统", "description": "计算机系统、OS、并发与存储", "coreCourses": ["计算机系统", "操作系统", "计算机组成原理"], "relatedSkills": ["并发编程", "内存管理"], "questionCount": 48},
+        {"name": "网络与分布式", "description": "网络协议、分布式系统与一致性", "coreCourses": ["计算机网络", "分布式系统"], "relatedSkills": ["RPC", "一致性协议"], "questionCount": 42},
+        {"name": "数据库与信息检索", "description": "事务、索引、查询优化与IR", "coreCourses": ["数据库系统", "信息检索"], "relatedSkills": ["SQL 优化", "索引设计"], "questionCount": 36}
+      ]
+    },
+    {
+      "name": "测绘工程",
+      "specializations": [
+        {"name": "测量与误差理论", "description": "测量原理/误差与调整", "coreCourses": ["测量学", "误差理论与测量平差"], "relatedSkills": ["外业采集"], "questionCount": 14},
+        {"name": "摄影测量与遥感", "description": "摄影测量/遥感处理", "coreCourses": ["摄影测量", "遥感原理与应用"], "relatedSkills": ["影像解译"], "questionCount": 14},
+        {"name": "工程测量与BIM", "description": "工程测量/BIM集成", "coreCourses": ["工程测量", "BIM 技术"], "relatedSkills": ["协同与交付"], "questionCount": 12}
+      ]
+    },
+    {
+      "name": "遥感科学与技术",
+      "specializations": [
+        {"name": "遥感成像机理", "description": "传感器/成像机理", "coreCourses": ["遥感物理", "成像技术"], "relatedSkills": ["标定与校正"], "questionCount": 14},
+        {"name": "遥感数据处理", "description": "预处理/分类/变化检测", "coreCourses": ["遥感数字图像处理"], "relatedSkills": ["特征提取"], "questionCount": 14},
+        {"name": "专题应用", "description": "土地/生态/灾害", "coreCourses": ["专题遥感"], "relatedSkills": ["专题分析"], "questionCount": 12}
+      ]
+    },
+    {
+      "name": "地理信息科学",
+      "specializations": [
+        {"name": "GIS 基础与数据模型", "description": "空间数据结构/投影/坐标", "coreCourses": ["GIS 原理", "地图投影"], "relatedSkills": ["坐标与投影"], "questionCount": 14},
+        {"name": "空间分析与建模", "description": "空间分析/网络/地统计", "coreCourses": ["空间分析", "地统计学"], "relatedSkills": ["模型构建"], "questionCount": 14},
+        {"name": "GIS 开发与应用", "description": "二次开发/引擎", "coreCourses": ["GIS 开发", "WebGIS"], "relatedSkills": ["工程实现"], "questionCount": 12}
+      ]
+    },
+    {
+      "name": "光电信息科学与工程",
+      "specializations": [
+        {"name": "光学与光学工程", "description": "几何光学/物理光学", "coreCourses": ["光学", "电磁场与电磁波"], "relatedSkills": ["光学实验"], "questionCount": 16},
+        {"name": "光电子与激光", "description": "激光/光电器件", "coreCourses": ["激光原理", "光电子技术"], "relatedSkills": ["器件与表征"], "questionCount": 16},
+        {"name": "光通信与传感", "description": "光纤通信/传感", "coreCourses": ["光纤通信", "光纤传感"], "relatedSkills": ["系统调测"], "questionCount": 14}
+      ]
+    },
+    {
+      "name": "测控技术与仪器",
+      "specializations": [
+        {"name": "传感与检测", "description": "传感器/信号调理", "coreCourses": ["传感器原理", "信号与系统"], "relatedSkills": ["测量电路"], "questionCount": 14},
+        {"name": "测控系统与仪器", "description": "测控系统/仪器设计", "coreCourses": ["测控系统", "仪器设计"], "relatedSkills": ["系统集成"], "questionCount": 14},
+        {"name": "智能检测与诊断", "description": "智能检测/故障诊断", "coreCourses": ["智能检测", "故障诊断"], "relatedSkills": ["数据分析"], "questionCount": 12}
+      ]
+    },
+    {
+      "name": "化学工程与工艺",
+      "specializations": [
+        {"name": "反应工程", "description": "反应动力学/反应器", "coreCourses": ["化学反应工程"], "relatedSkills": ["放大与优化"], "questionCount": 16},
+        {"name": "分离工程", "description": "蒸馏/吸收/萃取", "coreCourses": ["分离工程"], "relatedSkills": ["流程模拟"], "questionCount": 16},
+        {"name": "过程系统工程", "description": "系统建模/优化/控制", "coreCourses": ["过程系统工程"], "relatedSkills": ["优化控制"], "questionCount": 14}
+      ]
+    },
+    {
+      "name": "船舶与海洋工程",
+      "specializations": [
+        {"name": "船舶总体与结构", "description": "总体性能/结构设计", "coreCourses": ["船舶总体", "船体结构"], "relatedSkills": ["强度与稳定性"], "questionCount": 14},
+        {"name": "海洋平台与装备", "description": "海工平台/装备", "coreCourses": ["海洋工程", "海工装备"], "relatedSkills": ["工程集成"], "questionCount": 12},
+        {"name": "流体与推进", "description": "流体/推进/耐波性", "coreCourses": ["船舶流体力学", "推进装置"], "relatedSkills": ["水池试验"], "questionCount": 12}
+      ]
+    },
+    {
+      "name": "水利水电工程",
+      "specializations": [
+        {"name": "水力学与水文", "description": "水力学/水文学", "coreCourses": ["水力学", "水文学"], "relatedSkills": ["数值模拟"], "questionCount": 14},
+        {"name": "水工结构", "description": "结构/施工/运行", "coreCourses": ["水工结构", "施工技术"], "relatedSkills": ["现场管理"], "questionCount": 14},
+        {"name": "电站与运行", "description": "水电站/调度与运行", "coreCourses": ["水电站工程", "电力系统"], "relatedSkills": ["运维与调度"], "questionCount": 12}
+      ]
+    },
+    {
+      "name": "电子商务",
+      "specializations": [
+        {"name": "平台与运营", "description": "平台体系/运营管理", "coreCourses": ["电商平台", "运营管理"], "relatedSkills": ["策划与增长"], "questionCount": 14},
+        {"name": "用户与增长", "description": "用户洞察/增长实验", "coreCourses": ["用户研究", "增长实验"], "relatedSkills": ["A/B 测试"], "questionCount": 14},
+        {"name": "供应链与履约", "description": "供应链/物流/履约", "coreCourses": ["供应链管理", "物流管理"], "relatedSkills": ["协同与优化"], "questionCount": 12}
+      ]
+    },
+    {
+      "name": "物流管理",
+      "specializations": [
+        {"name": "仓储与配送", "description": "仓储/分拣/配送", "coreCourses": ["仓储管理", "配送系统"], "relatedSkills": ["路径规划"], "questionCount": 14},
+        {"name": "供应链管理", "description": "计划/执行/协同", "coreCourses": ["供应链计划", "供应链金融"], "relatedSkills": ["协同管理"], "questionCount": 14},
+        {"name": "物流信息化", "description": "WMS/TMS/可视化", "coreCourses": ["物流信息系统"], "relatedSkills": ["实施与集成"], "questionCount": 12}
+      ]
+    },
+    {
+      "name": "国际经济与贸易",
+      "specializations": [
+        {"name": "国际贸易实务", "description": "进出口/结算/单证", "coreCourses": ["国际贸易实务"], "relatedSkills": ["实务操作"], "questionCount": 14},
+        {"name": "国际市场与渠道", "description": "市场分析/渠道管理", "coreCourses": ["国际市场营销"], "relatedSkills": ["谈判"], "questionCount": 14},
+        {"name": "跨境电商与合规", "description": "平台/合规/物流", "coreCourses": ["跨境电商", "国际物流"], "relatedSkills": ["运营与合规"], "questionCount": 12}
+      ]
+    }
+    {
+      "name": "物联网工程",
+      "specializations": [
+        {"name": "传感器与嵌入式", "description": "传感器/MCU/驱动", "coreCourses": ["传感器技术", "嵌入式系统"], "relatedSkills": ["硬件与驱动"], "questionCount": 16},
+        {"name": "物联网通信与协议", "description": "LPWAN/5G/协议栈", "coreCourses": ["物联网通信", "协议与网络"], "relatedSkills": ["连接与路由"], "questionCount": 16},
+        {"name": "边缘计算与网关", "description": "边缘智能/网关平台", "coreCourses": ["边缘计算", "网关系统"], "relatedSkills": ["部署与管理"], "questionCount": 14},
+        {"name": "平台与安全", "description": "物联网平台/安全治理", "coreCourses": ["物联网平台", "安全工程"], "relatedSkills": ["设备管理/安全"], "questionCount": 14}
+      ]
+    },
+    {
+      "name": "新能源科学与工程",
+      "specializations": [
+        {"name": "光伏与储能", "description": "光伏材料/储能技术", "coreCourses": ["光伏原理", "储能技术"], "relatedSkills": ["器件/系统"], "questionCount": 18},
+        {"name": "风电与并网", "description": "风电系统/并网控制", "coreCourses": ["风力发电", "并网技术"], "relatedSkills": ["控制与并网"], "questionCount": 16},
+        {"name": "燃料电池与氢能", "description": "燃料电池/氢能", "coreCourses": ["燃料电池", "氢能技术"], "relatedSkills": ["系统集成"], "questionCount": 14},
+        {"name": "能源系统与管理", "description": "综合能源/能效", "coreCourses": ["综合能源系统", "能效管理"], "relatedSkills": ["优化"], "questionCount": 14}
+      ]
+    },
+    {
+      "name": "航空航天工程",
+      "specializations": [
+        {"name": "飞行器设计", "description": "气动/结构/控制", "coreCourses": ["飞行器设计", "空气动力学"], "relatedSkills": ["试验与验证"], "questionCount": 16},
+        {"name": "航空推进", "description": "推进系统/热力", "coreCourses": ["航空发动机", "传热学"], "relatedSkills": ["部件设计"], "questionCount": 14},
+        {"name": "航电与测试", "description": "航电系统/试验", "coreCourses": ["航空电子", "测试技术"], "relatedSkills": ["集成调试"], "questionCount": 12}
+      ]
+    },
+    {
+      "name": "交通工程",
+      "specializations": [
+        {"name": "交通规划", "description": "规划与评价", "coreCourses": ["交通规划", "交通评价"], "relatedSkills": ["模型与仿真"], "questionCount": 14},
+        {"name": "交通控制", "description": "信号与控制", "coreCourses": ["交通控制", "信号系统"], "relatedSkills": ["优化控制"], "questionCount": 14},
+        {"name": "设施与运营", "description": "设施/运营/管理", "coreCourses": ["交通设施", "运营管理"], "relatedSkills": ["组织管理"], "questionCount": 12}
+      ]
+    },
+    {
+      "name": "智能制造工程",
+      "specializations": [
+        {"name": "数字化设计", "description": "数字孪生/CAD/PLM", "coreCourses": ["数字化设计", "PLM"], "relatedSkills": ["建模与管理"], "questionCount": 16},
+        {"name": "制造系统与物流", "description": "生产系统/物流工程", "coreCourses": ["生产系统工程", "物流工程"], "relatedSkills": ["调度与优化"], "questionCount": 16},
+        {"name": "工业互联网与平台", "description": "工业互联网/平台架构", "coreCourses": ["工业互联网", "平台设计"], "relatedSkills": ["数据/平台"], "questionCount": 14},
+        {"name": "质量与可靠性", "description": "质量工程/可靠性工程", "coreCourses": ["质量工程", "可靠性工程"], "relatedSkills": ["统计与DOE"], "questionCount": 14}
+      ]
+    }
+    {
+      "name": "软件工程",
+      "specializations": [
+        {"name": "需求与产品工程", "description": "需求获取/分析与产品设计", "coreCourses": ["需求工程", "交互设计", "产品管理"], "relatedSkills": ["用户研究", "原型设计"], "questionCount": 30},
+        {"name": "架构与微服务", "description": "领域建模、微服务与治理", "coreCourses": ["软件架构", "微服务工程"], "relatedSkills": ["DDD", "服务治理"], "questionCount": 34},
+        {"name": "质量与测试", "description": "测试金字塔、自动化与CI/CD", "coreCourses": ["软件测试", "持续集成"], "relatedSkills": ["覆盖率", "质量度量"], "questionCount": 26},
+        {"name": "DevOps 与可观测性", "description": "交付、运维与可观测", "coreCourses": ["DevOps", "SRE"], "relatedSkills": ["监控告警", "故障演练"], "questionCount": 22}
+      ]
+    },
+    {
+      "name": "人工智能",
+      "aliases": ["智能科学与技术"],
+      "specializations": [
+        {"name": "机器学习", "description": "监督/无监督/集成", "coreCourses": ["机器学习", "概率图模型"], "relatedSkills": ["特征工程", "模型选择"], "questionCount": 28},
+        {"name": "深度学习", "description": "CNN/RNN/Transformer 与训练技巧", "coreCourses": ["深度学习", "优化方法"], "relatedSkills": ["正则化", "分布式训练"], "questionCount": 28},
+        {"name": "自然语言处理", "description": "预训练/微调/提示工程", "coreCourses": ["自然语言处理", "大模型技术"], "relatedSkills": ["Prompt 设计", "评测"], "questionCount": 24},
+        {"name": "计算机视觉", "description": "检测/分割/多模态", "coreCourses": ["计算机视觉", "多模态感知"], "relatedSkills": ["部署推理"], "questionCount": 22}
+      ]
+    },
+    {
+      "name": "数据科学与大数据技术",
+      "aliases": ["数据科学", "大数据"],
+      "specializations": [
+        {"name": "数据工程", "description": "采集、清洗、建模与治理", "coreCourses": ["数据建模", "ETL 工程", "数据治理"], "relatedSkills": ["数据质量", "血缘管理"], "questionCount": 32},
+        {"name": "机器学习工程", "description": "特征工程、训练、上线与MLOps", "coreCourses": ["特征工程", "MLOps"], "relatedSkills": ["实验管理", "部署"], "questionCount": 30},
+        {"name": "实时流与数据平台", "description": "流处理、计算与平台治理", "coreCourses": ["分布式计算", "流式计算"], "relatedSkills": ["Flink", "Kafka"], "questionCount": 26},
+        {"name": "数据可视化与BI", "description": "可视分析与商务智能", "coreCourses": ["数据可视化", "BI"], "relatedSkills": ["讲故事"], "questionCount": 18}
+      ]
+    },
+    {
+      "name": "网络空间安全",
+      "aliases": ["信息安全"],
+      "specializations": [
+        {"name": "密码学与协议", "description": "对称/非对称/协议", "coreCourses": ["密码学", "安全协议"], "relatedSkills": ["算法实现"], "questionCount": 22},
+        {"name": "系统与二进制安全", "description": "漏洞利用/防护/对抗", "coreCourses": ["操作系统安全", "二进制安全"], "relatedSkills": ["攻防思维"], "questionCount": 20},
+        {"name": "应用与Web安全", "description": "Web/移动/SDL", "coreCourses": ["Web 安全", "SDL"], "relatedSkills": ["工程化"], "questionCount": 24}
+      ]
+    },
+    {
+      "name": "电子信息工程",
+      "specializations": [
+        {"name": "数字电路与嵌入式", "description": "数字系统/嵌入式设计", "coreCourses": ["数字电路", "嵌入式系统"], "relatedSkills": ["硬件调试"], "questionCount": 24},
+        {"name": "信号与系统", "description": "信号处理/滤波/谱分析", "coreCourses": ["信号与系统", "数字信号处理"], "relatedSkills": ["MATLAB 仿真"], "questionCount": 20},
+        {"name": "通信与接口", "description": "通信原理/总线接口", "coreCourses": ["通信原理", "接口协议"], "relatedSkills": ["协议分析"], "questionCount": 20}
+      ]
+    },
+    {
+      "name": "通信工程",
+      "specializations": [
+        {"name": "无线通信", "description": "调制/信道/蜂窝", "coreCourses": ["移动通信", "无线网络"], "relatedSkills": ["频谱分析"], "questionCount": 18},
+        {"name": "光通信", "description": "光纤/器件/WDM", "coreCourses": ["光通信", "光电子技术"], "relatedSkills": ["设备调测"], "questionCount": 16},
+        {"name": "数据通信与网络", "description": "交换/路由/数据中心", "coreCourses": ["数据通信", "网络工程"], "relatedSkills": ["网络规划"], "questionCount": 16}
+      ]
+    },
+    {
+      "name": "电子科学与技术",
+      "specializations": [
+        {"name": "半导体器件与工艺", "description": "器件物理与制程", "coreCourses": ["半导体物理", "微纳加工"], "relatedSkills": ["器件表征"], "questionCount": 18},
+        {"name": "集成电路设计", "description": "数字/模拟 IC 设计", "coreCourses": ["数字 IC", "模拟 IC"], "relatedSkills": ["EDA 工具"], "questionCount": 18},
+        {"name": "光电与传感", "description": "光电材料与传感", "coreCourses": ["光电子学", "传感器"], "relatedSkills": ["信号调理"], "questionCount": 16}
+      ]
+    },
+    {
+      "name": "自动化",
+      "specializations": [
+        {"name": "控制理论与工程", "description": "经典/现代控制", "coreCourses": ["自动控制原理", "现代控制理论"], "relatedSkills": ["系统辨识"], "questionCount": 22},
+        {"name": "过程控制", "description": "连续/离散过程控制", "coreCourses": ["过程控制", "DCS/PLC"], "relatedSkills": ["现场调试"], "questionCount": 20},
+        {"name": "机器人控制", "description": "运动/轨迹/视觉", "coreCourses": ["机器人学", "视觉"], "relatedSkills": ["系统集成"], "questionCount": 20}
+      ]
+    },
+    {
+      "name": "机器人工程",
+      "specializations": [
+        {"name": "机器人感知与视觉", "description": "视觉/SLAM/多模态", "coreCourses": ["计算机视觉", "SLAM"], "relatedSkills": ["传感融合"], "questionCount": 18},
+        {"name": "运动规划与控制", "description": "轨迹规划/控制", "coreCourses": ["机器人运动学", "最优控制"], "relatedSkills": ["轨迹规划"], "questionCount": 18},
+        {"name": "人机协作与系统集成", "description": "协作/柔性/安全", "coreCourses": ["人机协作", "系统集成"], "relatedSkills": ["功能安全"], "questionCount": 16}
+      ]
+    },
+    {
+      "name": "电气工程及其自动化",
+      "aliases": ["电气工程"],
+      "specializations": [
+        {"name": "电机与电力电子", "description": "电机控制/功率变换", "coreCourses": ["电力电子技术", "电机控制"], "relatedSkills": ["仿真与调试"], "questionCount": 22},
+        {"name": "自动控制", "description": "控制理论与实现", "coreCourses": ["控制理论", "控制工程实践"], "relatedSkills": ["参数整定"], "questionCount": 20},
+        {"name": "配电与保护", "description": "配电系统/继保", "coreCourses": ["电力系统分析", "继电保护"], "relatedSkills": ["现场测试"], "questionCount": 18}
+      ]
+    },
+    {
+      "name": "机械工程",
+      "specializations": [
+        {"name": "机械设计与制造", "description": "设计方法与制造工艺", "coreCourses": ["机械设计", "制造工艺学"], "relatedSkills": ["工艺规划"], "questionCount": 22},
+        {"name": "机电一体化", "description": "机电系统集成", "coreCourses": ["机电一体化", "控制工程"], "relatedSkills": ["系统集成"], "questionCount": 20},
+        {"name": "CAD/CAE", "description": "三维建模与仿真分析", "coreCourses": ["CAD", "CAE"], "relatedSkills": ["仿真优化"], "questionCount": 18}
+      ]
+    },
+    {
+      "name": "车辆工程",
+      "specializations": [
+        {"name": "整车设计", "description": "结构/匹配/可靠性", "coreCourses": ["汽车构造", "整车设计"], "relatedSkills": ["NVH"], "questionCount": 18},
+        {"name": "底盘与动力", "description": "底盘/动力总成", "coreCourses": ["底盘系统", "内燃机原理"], "relatedSkills": ["标定"], "questionCount": 18},
+        {"name": "电动与智能", "description": "三电/电子电气/智能网联", "coreCourses": ["电驱动", "整车电子电气"], "relatedSkills": ["软件与控制"], "questionCount": 18}
+      ]
+    },
+    {
+      "name": "工业工程",
+      "specializations": [
+        {"name": "生产系统与优化", "description": "生产计划/调度/优化", "coreCourses": ["运筹学", "生产运作管理"], "relatedSkills": ["MILP"], "questionCount": 16},
+        {"name": "质量与可靠性", "description": "质量管理/六西格玛", "coreCourses": ["质量工程", "可靠性工程"], "relatedSkills": ["DOE"], "questionCount": 16},
+        {"name": "人因与工效", "description": "人机/工效/安全", "coreCourses": ["人因工程", "安全工程"], "relatedSkills": ["评估"], "questionCount": 14}
+      ]
+    },
+    {
+      "name": "土木工程",
+      "specializations": [
+        {"name": "结构工程", "description": "结构分析与设计", "coreCourses": ["结构力学", "钢筋混凝土"], "relatedSkills": ["建模分析"], "questionCount": 22},
+        {"name": "岩土与基础", "description": "岩土勘察与基础", "coreCourses": ["土力学", "基础工程"], "relatedSkills": ["现场试验"], "questionCount": 20},
+        {"name": "施工与BIM", "description": "施工组织与BIM", "coreCourses": ["施工组织", "BIM 技术"], "relatedSkills": ["协同与交付"], "questionCount": 18}
+      ]
+    },
+    {
+      "name": "建筑学",
+      "specializations": [
+        {"name": "建筑设计", "description": "方案/深化/表达", "coreCourses": ["建筑设计", "建筑表达"], "relatedSkills": ["方案推敲"], "questionCount": 18},
+        {"name": "城市与景观", "description": "城市空间/景观设计", "coreCourses": ["城市设计", "景观设计"], "relatedSkills": ["空间协调"], "questionCount": 16},
+        {"name": "建筑技术", "description": "物理/构造/节能", "coreCourses": ["建筑物理", "建筑构造"], "relatedSkills": ["节能设计"], "questionCount": 16}
+      ]
+    },
+    {
+      "name": "生物医学工程",
+      "specializations": [
+        {"name": "医学影像与仪器", "description": "影像成像/仪器", "coreCourses": ["医学成像", "生物医学仪器"], "relatedSkills": ["图像处理"], "questionCount": 18},
+        {"name": "生物材料与工程", "description": "材料/器械/植入", "coreCourses": ["生物材料", "组织工程"], "relatedSkills": ["材料表征"], "questionCount": 16},
+        {"name": "医疗信息与AI", "description": "医疗信息化/AI", "coreCourses": ["医学信息学", "医学 AI"], "relatedSkills": ["数据治理"], "questionCount": 16}
+      ]
+    },
+    {
+      "name": "临床医学",
+      "specializations": [
+        {"name": "内科学", "description": "内科系统疾病", "coreCourses": ["内科学"], "relatedSkills": ["临床思维"], "questionCount": 20},
+        {"name": "外科学", "description": "普外/骨外等", "coreCourses": ["外科学"], "relatedSkills": ["手术操作"], "questionCount": 20},
+        {"name": "妇产科学", "description": "孕产/妇科", "coreCourses": ["妇产科学"], "relatedSkills": ["临床操作"], "questionCount": 18},
+        {"name": "儿科学", "description": "儿科常见病", "coreCourses": ["儿科学"], "relatedSkills": ["临床操作"], "questionCount": 18}
+      ]
+    },
+    {
+      "name": "工商管理",
+      "specializations": [
+        {"name": "战略管理", "description": "竞争策略与定位", "coreCourses": ["战略管理"], "relatedSkills": ["分析"], "questionCount": 14},
+        {"name": "运营与供应链", "description": "流程/供应链/改进", "coreCourses": ["运营管理", "供应链管理"], "relatedSkills": ["优化"], "questionCount": 14},
+        {"name": "市场与组织", "description": "市场/HR/组织", "coreCourses": ["市场营销", "组织行为学"], "relatedSkills": ["沟通"], "questionCount": 14}
+      ]
+    },
+    {
+      "name": "会计学",
+      "specializations": [
+        {"name": "财务会计", "description": "会计准则/报表", "coreCourses": ["财务会计", "中级会计"], "relatedSkills": ["核算"], "questionCount": 14},
+        {"name": "管理会计", "description": "成本/预算/绩效", "coreCourses": ["管理会计", "预算管理"], "relatedSkills": ["分析"], "questionCount": 14},
+        {"name": "审计与税务", "description": "审计/税务/筹划", "coreCourses": ["审计学", "税法"], "relatedSkills": ["合规"], "questionCount": 14}
+      ]
+    },
+    {
+      "name": "信息管理与信息系统",
+      "specializations": [
+        {"name": "信息系统分析与设计", "description": "需求/分析/建模", "coreCourses": ["系统分析与设计", "业务流程建模"], "relatedSkills": ["流程与建模"], "questionCount": 14},
+        {"name": "数据与商业智能", "description": "数据仓库/BI/分析", "coreCourses": ["数据仓库", "BI"], "relatedSkills": ["指标体系"], "questionCount": 14},
+        {"name": "IT 治理与安全", "description": "治理/安全/合规", "coreCourses": ["IT 治理", "信息安全"], "relatedSkills": ["合规管理"], "questionCount": 12}
+      ]
+    },
+    {
+      "name": "数学与应用数学",
+      "aliases": ["数学"],
+      "specializations": [
+        {"name": "代数与几何", "description": "抽象代数/几何基础", "coreCourses": ["抽象代数", "几何学"], "relatedSkills": ["逻辑证明"], "questionCount": 20},
+        {"name": "数学分析与偏微分", "description": "高等数学/实变/泛函", "coreCourses": ["数学分析", "实变函数"], "relatedSkills": ["严密证明"], "questionCount": 20},
+        {"name": "概率统计与随机过程", "description": "概率/数理统计/随机过程", "coreCourses": ["概率论", "数理统计"], "relatedSkills": ["建模"], "questionCount": 18}
+      ]
+    },
+    {
+      "name": "信息与计算科学",
+      "specializations": [
+        {"name": "计算数学与优化", "description": "数值分析/最优化", "coreCourses": ["数值分析", "最优化方法"], "relatedSkills": ["数值计算"], "questionCount": 18},
+        {"name": "科学计算与仿真", "description": "高性能/科学计算", "coreCourses": ["高性能计算", "科学计算"], "relatedSkills": ["并行计算"], "questionCount": 16},
+        {"name": "数据与统计计算", "description": "统计计算/贝叶斯", "coreCourses": ["统计计算", "贝叶斯分析"], "relatedSkills": ["仿真"], "questionCount": 16}
+      ]
+    }
+  ]
+}

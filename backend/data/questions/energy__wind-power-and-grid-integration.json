@@ -1,0 +1,125 @@
+[
+  {
+    "id": 940201,
+    "domainId": 1,
+    "type": "short_answer",
+    "title": "风机控制：桨距与最大功率点跟踪（MPPT）",
+    "question": "简述风机在不同风速区间的控制策略与 MPPT 的作用。",
+    "difficulty": "easy",
+    "tags": ["wind", "mppt", "pitch-control"],
+    "answer": "切入/额定/切出风速区间采用不同控制：低风速区通过转速/桨距协同实现 MPPT；额定以上以桨距限功；过高风速停机保护。",
+    "explanation": "桨距调节用于维持气动效率与限制载荷，MPPT 优化能量捕获。",
+    "metadata": { "specialization": "风电与并网", "specialization_slug": "wind-power-and-grid-integration" },
+    "createdAt": "2025-11-09T09:40:00Z"
+  },
+  {
+    "id": 940202,
+    "domainId": 1,
+    "type": "multiple_choice",
+    "title": "并网规范与电网编码（Grid Code）",
+    "question": "选择所有正确项",
+    "difficulty": "medium",
+    "choices": [
+      { "key": "A", "text": "LVRT 要求故障期间机组保持并网" },
+      { "key": "B", "text": "并网点应具备无功支撑能力与功率因数要求" },
+      { "key": "C", "text": "逆变器并网无需考虑谐波限值" },
+      { "key": "D", "text": "有/无功调节需满足响应时间规范" }
+    ],
+    "correctOptions": ["A", "B", "D"],
+    "tags": ["grid-code", "lvrt", "reactive-power"],
+    "explanation": "并网规范涵盖电压/频率支撑、谐波/闪变、低电压穿越等要求。",
+    "metadata": { "specialization": "风电与并网", "specialization_slug": "wind-power-and-grid-integration" },
+    "createdAt": "2025-11-09T09:41:00Z"
+  },
+  {
+    "id": 940203,
+    "domainId": 1,
+    "type": "short_answer",
+    "title": "无功控制策略",
+    "question": "说明 Volt/Var 曲线、定功率因数与电压下垂控制的差异与适用。",
+    "difficulty": "medium",
+    "tags": ["reactive-power", "volt-var", "droop"],
+    "answer": "VV 曲线按电压区段调节无功；定功率因数简单但灵活性低；下垂控制适合并联系统分布式协调。",
+    "explanation": "实际工程常结合多策略并叠加限制与优先级。",
+    "metadata": { "specialization": "风电与并网", "specialization_slug": "wind-power-and-grid-integration" },
+    "createdAt": "2025-11-09T09:42:00Z"
+  },
+  {
+    "id": 940204,
+    "domainId": 1,
+    "type": "multiple_choice",
+    "title": "并网测量与验收",
+    "question": "选择所有正确项",
+    "difficulty": "medium",
+    "choices": [
+      { "key": "A", "text": "PCC（公共耦合点）的定义与测量位置至关重要" },
+      { "key": "B", "text": "SCADA 量测足以满足精确计量与功率质量评估" },
+      { "key": "C", "text": "IEC 61400-21 规定了风机功率质量测试方法" },
+      { "key": "D", "text": "闪变仅与照明有关，与风电无关" }
+    ],
+    "correctOptions": ["A", "C"],
+    "tags": ["measurement", "pcc", "iec-61400-21"],
+    "explanation": "功率质量评估需专用仪表与规范方法；SCADA 多为运维监视用途。",
+    "metadata": { "specialization": "风电与并网", "specialization_slug": "wind-power-and-grid-integration" },
+    "createdAt": "2025-11-09T09:43:00Z"
+  },
+  {
+    "id": 940205,
+    "domainId": 1,
+    "type": "short_answer",
+    "title": "故障穿越（FRT）与保护协调",
+    "question": "解释 LVRT/FRT 的控制策略（如 Crowbar、直流母线控制）以及继电保护定值协调。",
+    "difficulty": "hard",
+    "tags": ["frt", "protection", "lvrt"],
+    "answer": "DFIG 常用 Crowbar 保护转子并协同直流母线能量管理；全功率机型通过控制器电流限幅与无功支撑维持并网；继电保护需与机组控制配合设定避免误动。",
+    "explanation": "穿越策略兼顾设备安全与电网支撑能力。",
+    "metadata": { "specialization": "风电与并网", "specialization_slug": "wind-power-and-grid-integration" },
+    "createdAt": "2025-11-09T09:44:00Z"
+  },
+  {
+    "id": 940206,
+    "domainId": 1,
+    "type": "multiple_choice",
+    "title": "变流器与并网滤波",
+    "question": "选择所有正确项",
+    "difficulty": "medium",
+    "choices": [
+      { "key": "A", "text": "全功率变流器常用于直驱同步机" },
+      { "key": "B", "text": "DFIG 依赖滑环与部分额定变流器" },
+      { "key": "C", "text": "全功率变流器无法实现无功控制" },
+      { "key": "D", "text": "LCL 滤波常用于抑制高次谐波" }
+    ],
+    "correctOptions": ["A", "B", "D"],
+    "tags": ["converter", "filter", "dfig"],
+    "explanation": "全功率拓扑具备良好并网控制能力；DFIG 通过部分额定并网器控制转子侧。",
+    "metadata": { "specialization": "风电与并网", "specialization_slug": "wind-power-and-grid-integration" },
+    "createdAt": "2025-11-09T09:45:00Z"
+  },
+  {
+    "id": 940207,
+    "domainId": 1,
+    "type": "short_answer",
+    "title": "SCADA 数据质量与调度互动",
+    "question": "阐述 SCADA 数据的延迟/精度与调度（AGC/PFR）互动的注意事项。",
+    "difficulty": "medium",
+    "tags": ["scada", "agc", "data-quality"],
+    "answer": "确保时间同步与时间戳对齐、处理缺失与异常值、区分事件/度量通道；与 AGC/PFR 策略协调采样与响应周期，避免交互振荡。",
+    "explanation": "数据治理是并网控制与评估的基础。",
+    "metadata": { "specialization": "风电与并网", "specialization_slug": "wind-power-and-grid-integration" },
+    "createdAt": "2025-11-09T09:46:00Z"
+  },
+  {
+    "id": 940208,
+    "domainId": 1,
+    "type": "short_answer",
+    "title": "风电场并网流程要点",
+    "question": "从方案评审、并网前检查、保护定值、试运行到验收，概述关键步骤。",
+    "difficulty": "easy",
+    "tags": ["commissioning", "grid-connection"],
+    "answer": "开展电能质量与潮流短路仿真；确认设备铭牌与接线；整定保护与联动试验；并网试运行期间验证功率因数/无功支撑/穿越能力；形成测试报告并归档。",
+    "explanation": "流程化与记录可追溯是合规验收的关键。",
+    "metadata": { "specialization": "风电与并网", "specialization_slug": "wind-power-and-grid-integration" },
+    "createdAt": "2025-11-09T09:47:00Z"
+  }
+]
+

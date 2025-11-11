@@ -1,0 +1,125 @@
+[
+  {
+    "id": 980201,
+    "domainId": 1,
+    "type": "short_answer",
+    "title": "测试金字塔与反金字塔的取舍",
+    "question": "对比测试金字塔与反金字塔（过度端到端）的优劣，结合交付速度与质量保障谈如何落地并避免走极端。",
+    "difficulty": "medium",
+    "tags": ["testing", "test-pyramid", "e2e", "quality"],
+    "answer": "测试金字塔强调单元多、集成适中、端到端少，性价比高且定位问题迅速；反金字塔端到端过多，成本高且脆弱。落地时应以可快速反馈的单元/组件测试为主，关键跨域流程用少量稳定的端到端覆盖，叠加契约测试与监控以降低系统性风险。",
+    "explanation": "端到端测试验证价值高但维护成本大、定位困难；单元/组件测试可在开发期提供快速反馈。健康配比应结合变更频率、系统耦合和关键路径来确定。",
+    "metadata": { "specialization": "质量与测试", "specialization_slug": "quality-and-testing" },
+    "createdAt": "2025-11-09T09:00:00Z"
+  },
+  {
+    "id": 980202,
+    "domainId": 1,
+    "type": "multiple_choice",
+    "title": "关于 Test Double 的说法，哪些正确？",
+    "question": "选择所有正确项",
+    "difficulty": "medium",
+    "choices": [
+      { "key": "A", "text": "Mock 关注行为验证；Stub 关注状态/返回值" },
+      { "key": "B", "text": "集成测试应大量使用 Mock 隔离外部系统以提升稳定性" },
+      { "key": "C", "text": "通过重试与宽松断言可完全消除 Flaky 测试" },
+      { "key": "D", "text": "端到端测试中可酌情以 Test Double 隔离不受控第三方" }
+    ],
+    "correctOptions": ["A", "D"],
+    "tags": ["testing", "mock", "stub", "integration"],
+    "explanation": "A 正确；B 违背集成测试目的；C 不可能完全消除不稳定性；D 在满足测试目标前提下可接受。",
+    "metadata": { "specialization": "质量与测试", "specialization_slug": "quality-and-testing" },
+    "createdAt": "2025-11-09T09:01:00Z"
+  },
+  {
+    "id": 980203,
+    "domainId": 1,
+    "type": "short_answer",
+    "title": "Flaky 测试的常见根因与治理",
+    "question": "归纳导致测试不稳定的原因，并给出定位与治理手段。",
+    "difficulty": "hard",
+    "tags": ["flaky", "stability", "ci"],
+    "answer": "常见根因：时间/并发竞态、外部依赖不确定、环境时钟/随机性、资源泄漏、未隔离的全局状态。治理：显式等待/去除睡眠、幂等化与去副作用、稳定测试数据与隔离环境、模拟时钟、串行化易冲突用例、记录与重放、在 CI 启用重试与隔离容器。",
+    "explanation": "先复现并收集日志/种子/随机数，缩小到最小可复现；引入诊断钩子与更细粒度断言可加速定位。",
+    "metadata": { "specialization": "质量与测试", "specialization_slug": "quality-and-testing" },
+    "createdAt": "2025-11-09T09:02:00Z"
+  },
+  {
+    "id": 980204,
+    "domainId": 1,
+    "type": "multiple_choice",
+    "title": "代码覆盖率与变异测试",
+    "question": "选择所有正确项",
+    "difficulty": "easy",
+    "choices": [
+      { "key": "A", "text": "高覆盖率不代表高质量" },
+      { "key": "B", "text": "语句覆盖优于分支覆盖" },
+      { "key": "C", "text": "变异测试有助于发现断言不充分" },
+      { "key": "D", "text": "应以 100% 覆盖率作为硬性目标" }
+    ],
+    "correctOptions": ["A", "C"],
+    "tags": ["coverage", "mutation-testing"],
+    "explanation": "覆盖率仅反映执行到达度；分支/条件覆盖强于语句覆盖；变异测试衡量断言有效性；100% 并非普适目标。",
+    "metadata": { "specialization": "质量与测试", "specialization_slug": "quality-and-testing" },
+    "createdAt": "2025-11-09T09:03:00Z"
+  },
+  {
+    "id": 980205,
+    "domainId": 1,
+    "type": "short_answer",
+    "title": "微服务契约测试的价值与落地",
+    "question": "说明契约测试在微服务中的作用、Consumer/Provider 职责及在 CI/CD 中的集成方式。",
+    "difficulty": "medium",
+    "tags": ["contract-testing", "pact", "microservices"],
+    "answer": "契约测试通过约束请求/响应契约，降低独立演进带来的集成风险。Consumer 提交期望契约，Provider 校验并发布版本；在 CI 中先本地校验，再在集成环境进行 Provider 验证并打破向后不兼容变更。",
+    "explanation": "契约测试补齐端到端覆盖不足且成本低，适合服务规模化协作。",
+    "metadata": { "specialization": "质量与测试", "specialization_slug": "quality-and-testing" },
+    "createdAt": "2025-11-09T09:04:00Z"
+  },
+  {
+    "id": 980206,
+    "domainId": 1,
+    "type": "multiple_choice",
+    "title": "持续集成中的测试编排",
+    "question": "选择所有正确项",
+    "difficulty": "medium",
+    "choices": [
+      { "key": "A", "text": "快测并行、慢测离线回归可缩短反馈回路" },
+      { "key": "B", "text": "仅在主干执行测试可显著提升效率" },
+      { "key": "C", "text": "Fail-fast 策略能节约资源并加速定位" },
+      { "key": "D", "text": "随机化用例顺序总是有害" }
+    ],
+    "correctOptions": ["A", "C"],
+    "tags": ["ci", "pipeline", "orchestration"],
+    "explanation": "PR/分支即测以缩短反馈；主干-only 反而延迟缺陷发现；失败即停和测试分层是常见优化；随机化可暴露隐含依赖。",
+    "metadata": { "specialization": "质量与测试", "specialization_slug": "quality-and-testing" },
+    "createdAt": "2025-11-09T09:05:00Z"
+  },
+  {
+    "id": 980207,
+    "domainId": 1,
+    "type": "short_answer",
+    "title": "测试数据管理（TDM）要点",
+    "question": "如何管理测试数据以实现可重复、可审计与隐私合规？",
+    "difficulty": "medium",
+    "tags": ["tdm", "privacy", "repeatability"],
+    "answer": "采用可版本化的数据快照与数据工厂生成，划分金/银/铜级数据集；对敏感数据做脱敏/合成，使用子集抽样保持分布；隔离环境、按场景装载和回滚；记录数据血缘与用例绑定。",
+    "explanation": "TDM 直接影响用例稳定性与合规风险，需与环境编排、权限管控协同。",
+    "metadata": { "specialization": "质量与测试", "specialization_slug": "quality-and-testing" },
+    "createdAt": "2025-11-09T09:06:00Z"
+  },
+  {
+    "id": 980208,
+    "domainId": 1,
+    "type": "short_answer",
+    "title": "为何引入变异测试（Mutation Testing）",
+    "question": "说明变异测试衡量测试有效性的原理与落地注意事项。",
+    "difficulty": "hard",
+    "tags": ["mutation-testing", "coverage", "assertion"],
+    "answer": "通过对被测代码做小幅“变异”，观察测试是否能杀死变异体，以评估断言有效性与冗余测试。注意控制变异算子与执行时间、过滤等价变异、聚焦关键模块并与覆盖率联合解读。",
+    "explanation": "变异分数能揭示“覆盖率高但断言弱”的问题，但计算成本较高，应按风险优先投放。",
+    "metadata": { "specialization": "质量与测试", "specialization_slug": "quality-and-testing" },
+    "createdAt": "2025-11-09T09:07:00Z"
+  }
+]
+

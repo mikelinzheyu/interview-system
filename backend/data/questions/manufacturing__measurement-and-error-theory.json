@@ -1,0 +1,125 @@
+[
+  {
+    "id": 950301,
+    "domainId": 1,
+    "type": "short_answer",
+    "title": "误差分类与概念",
+    "question": "区分系统误差、随机误差与粗大误差，并说明其对测量结果的影响。",
+    "difficulty": "easy",
+    "tags": ["metrology", "error", "systematic"],
+    "answer": "系统误差具有方向性与可重复性，会引入偏倚；随机误差呈零均值波动，影响精度；粗大误差源于异常操作/设备故障，应检测并剔除。",
+    "explanation": "偏倚影响准确度，随机性影响精密度；二者需分别治理。",
+    "metadata": { "specialization": "测量与误差理论", "specialization_slug": "measurement-and-error-theory" },
+    "createdAt": "2025-11-09T09:50:00Z"
+  },
+  {
+    "id": 950302,
+    "domainId": 1,
+    "type": "multiple_choice",
+    "title": "置信区间与小样本推断",
+    "question": "选择所有正确项",
+    "difficulty": "medium",
+    "choices": [
+      { "key": "A", "text": "总体方差未知且样本量小常用 t 分布" },
+      { "key": "B", "text": "大样本下中心极限定理可近似正态" },
+      { "key": "C", "text": "置信度越高，区间越窄" },
+      { "key": "D", "text": "“该样本的95%置信区间含真值的概率为95%”并不严谨" }
+    ],
+    "correctOptions": ["A", "B", "D"],
+    "tags": ["statistics", "confidence-interval", "t-test"],
+    "explanation": "置信度提高区间更宽；频率学解释基于重复抽样覆盖率。",
+    "metadata": { "specialization": "测量与误差理论", "specialization_slug": "measurement-and-error-theory" },
+    "createdAt": "2025-11-09T09:51:00Z"
+  },
+  {
+    "id": 950303,
+    "domainId": 1,
+    "type": "short_answer",
+    "title": "误差传播与不确定度合成",
+    "question": "给出函数 y=f(x1,...,xn) 的不确定度传播公式及合成方法。",
+    "difficulty": "hard",
+    "tags": ["uncertainty", "propagation", "gum"],
+    "answer": "一阶近似下 u_y^2 = \u2211 (\u2202f/\u2202x_i)^2 u_{x_i}^2 + 2\u2211\u2211 (\u2202f/\u2202x_i)(\u2202f/\u2202x_j) cov(x_i,x_j)；合成不确定度按方差加权（RSS）合成。",
+    "explanation": "相关性不可忽略时需计入协方差项。",
+    "metadata": { "specialization": "测量与误差理论", "specialization_slug": "measurement-and-error-theory" },
+    "createdAt": "2025-11-09T09:52:00Z"
+  },
+  {
+    "id": 950304,
+    "domainId": 1,
+    "type": "multiple_choice",
+    "title": "A/B 类不确定度与扩展不确定度",
+    "question": "选择所有正确项",
+    "difficulty": "medium",
+    "choices": [
+      { "key": "A", "text": "A 类不确定度基于重复性统计" },
+      { "key": "B", "text": "B 类不确定度基于先验/标定/资料" },
+      { "key": "C", "text": "合成不确定度直接相加更保守" },
+      { "key": "D", "text": "扩展不确定度常取 k=2 约 95% 覆盖" }
+    ],
+    "correctOptions": ["A", "B", "D"],
+    "tags": ["gum", "type-a", "type-b"],
+    "explanation": "合成应采用方差加和的平方根（RSS），非算术相加。",
+    "metadata": { "specialization": "测量与误差理论", "specialization_slug": "measurement-and-error-theory" },
+    "createdAt": "2025-11-09T09:53:00Z"
+  },
+  {
+    "id": 950305,
+    "domainId": 1,
+    "type": "short_answer",
+    "title": "最小二乘与鲁棒估计",
+    "question": "比较普通最小二乘（OLS）与鲁棒估计（如 M-估计/RANSAC）的适用场景。",
+    "difficulty": "medium",
+    "tags": ["least-squares", "robust", "ransac"],
+    "answer": "OLS 在高斯噪声下最优但对离群点敏感；鲁棒方法牺牲部分效率以换取对异常值的抗性，适用于存在离群点的测量与拟合。",
+    "explanation": "可先用鲁棒方法识别离群点，再用 OLS 精化参数。",
+    "metadata": { "specialization": "测量与误差理论", "specialization_slug": "measurement-and-error-theory" },
+    "createdAt": "2025-11-09T09:54:00Z"
+  },
+  {
+    "id": 950306,
+    "domainId": 1,
+    "type": "multiple_choice",
+    "title": "采样定理与频谱分析",
+    "question": "选择所有正确项",
+    "difficulty": "easy",
+    "choices": [
+      { "key": "A", "text": "采样频率需大于最高频率的两倍" },
+      { "key": "B", "text": "反走样滤波可降低混叠风险" },
+      { "key": "C", "text": "窗函数可完全消除谱泄漏" },
+      { "key": "D", "text": "过采样总能提高测量准确度" }
+    ],
+    "correctOptions": ["A", "B"],
+    "tags": ["sampling", "fft", "anti-alias"],
+    "explanation": "窗函数仅权衡泄漏与分辨率；过采样受噪声/量化/带宽限制。",
+    "metadata": { "specialization": "测量与误差理论", "specialization_slug": "measurement-and-error-theory" },
+    "createdAt": "2025-11-09T09:55:00Z"
+  },
+  {
+    "id": 950307,
+    "domainId": 1,
+    "type": "short_answer",
+    "title": "校准与溯源",
+    "question": "说明设备校准曲线拟合、量值溯源链与不确定度预算的核心要点。",
+    "difficulty": "medium",
+    "tags": ["calibration", "traceability", "uncertainty"],
+    "answer": "采用可逆/单调区段拟合校准曲线并验证残差；保持标准器与国家基准的溯源链；编制不确定度预算表并定期复核。",
+    "explanation": "校准与溯源是测量可信度的基础。",
+    "metadata": { "specialization": "测量与误差理论", "specialization_slug": "measurement-and-error-theory" },
+    "createdAt": "2025-11-09T09:56:00Z"
+  },
+  {
+    "id": 950308,
+    "domainId": 1,
+    "type": "short_answer",
+    "title": "MSA（测量系统分析）",
+    "question": "简述 GRR、偏倚与线性度评估方法及判据。",
+    "difficulty": "medium",
+    "tags": ["msa", "grr", "measurement-system"],
+    "answer": "GRR 分解重复性与再现性；评估偏倚看系统性偏差，线性度看量程内偏差随真值的变化；以 P/T、%GRR 等指标判断是否可接受。",
+    "explanation": "MSA 保证测量系统对过程能力评估的可信度。",
+    "metadata": { "specialization": "测量与误差理论", "specialization_slug": "measurement-and-error-theory" },
+    "createdAt": "2025-11-09T09:57:00Z"
+  }
+]
+

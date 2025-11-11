@@ -1,0 +1,125 @@
+[
+  {
+    "id": 980301,
+    "domainId": 1,
+    "type": "short_answer",
+    "title": "如何划分微服务边界（Bounded Context）",
+    "question": "结合领域驱动设计（DDD），说明如何依据领域语言、事务一致性、团队认知与变更韵律来划分服务边界。",
+    "difficulty": "hard",
+    "tags": ["architecture", "ddd", "bounded-context"],
+    "answer": "以限界上下文为单位承载统一领域语言与内聚模型，围绕强一致事务边界与团队协作边界切分，遵循高内聚低耦合；基于变更历史与耦合图识别热点模块，避免跨服务聊天式协作与分布式单体。",
+    "explanation": "以业务能力与信息隐藏为核心；技术边界（如数据表）不等于领域边界。",
+    "metadata": { "specialization": "架构与微服务", "specialization_slug": "architecture-and-microservices" },
+    "createdAt": "2025-11-09T09:10:00Z"
+  },
+  {
+    "id": 980302,
+    "domainId": 1,
+    "type": "multiple_choice",
+    "title": "Saga 与 Outbox 的说法，哪些正确？",
+    "question": "选择所有正确项",
+    "difficulty": "medium",
+    "choices": [
+      { "key": "A", "text": "Saga 通过本地事务与补偿实现最终一致性" },
+      { "key": "B", "text": "Outbox 将消息持久化纳入本地事务避免丢失" },
+      { "key": "C", "text": "二者可保证全局强一致的 ACID 语义" },
+      { "key": "D", "text": "Saga 需要明确补偿逻辑与端到端幂等性保障" }
+    ],
+    "correctOptions": ["A", "B", "D"],
+    "tags": ["saga", "outbox", "consistency"],
+    "explanation": "Saga/Outbox 面向最终一致；强一致需集中式事务或特殊设计。",
+    "metadata": { "specialization": "架构与微服务", "specialization_slug": "architecture-and-microservices" },
+    "createdAt": "2025-11-09T09:11:00Z"
+  },
+  {
+    "id": 980303,
+    "domainId": 1,
+    "type": "short_answer",
+    "title": "幂等性设计的常见手段",
+    "question": "列举在订单/支付/消息处理等场景保证幂等性的实现策略。",
+    "difficulty": "medium",
+    "tags": ["idempotency", "design"],
+    "answer": "使用自然键/业务唯一键、幂等键（Idempotency-Key）去重、去重表与唯一索引、幂等状态机、去重窗口、Exactly-Once 语义下的“有效一次”处理；端到端要求输入去重与下游操作判定相结合。",
+    "explanation": "幂等需覆盖接口层、存储层与消息层，避免只做一侧导致漏网。",
+    "metadata": { "specialization": "架构与微服务", "specialization_slug": "architecture-and-microservices" },
+    "createdAt": "2025-11-09T09:12:00Z"
+  },
+  {
+    "id": 980304,
+    "domainId": 1,
+    "type": "multiple_choice",
+    "title": "API 网关的职责",
+    "question": "选择所有正确项",
+    "difficulty": "easy",
+    "choices": [
+      { "key": "A", "text": "统一认证鉴权与路由聚合" },
+      { "key": "B", "text": "承载核心领域业务以减少服务数量" },
+      { "key": "C", "text": "限流、熔断、超时与重试策略" },
+      { "key": "D", "text": "协议转换（HTTP/gRPC）、跨域与观测埋点" }
+    ],
+    "correctOptions": ["A", "C", "D"],
+    "tags": ["api-gateway", "security", "resilience"],
+    "explanation": "网关不应承载核心业务逻辑；关注横切能力。",
+    "metadata": { "specialization": "架构与微服务", "specialization_slug": "architecture-and-microservices" },
+    "createdAt": "2025-11-09T09:13:00Z"
+  },
+  {
+    "id": 980305,
+    "domainId": 1,
+    "type": "short_answer",
+    "title": "消息系统中的 \"Exactly-Once\" 幻觉",
+    "question": "解释为何严格的 Exactly-Once 难以实现，以及如何通过端到端幂等与事务外盒（Outbox）实现有效一次（Effectively-Once）。",
+    "difficulty": "hard",
+    "tags": ["messaging", "kafka", "exactly-once"],
+    "answer": "跨系统时钟/故障/网络分区使严格一次语义不可达；可用生产者幂等、事务写入 Outbox、原子发布/消费、下游幂等更新与去重窗口组合，实现端到端有效一次。",
+    "explanation": "将一次性要求转化为“无副作用重复执行”，比追求严格一次更工程可行。",
+    "metadata": { "specialization": "架构与微服务", "specialization_slug": "architecture-and-microservices" },
+    "createdAt": "2025-11-09T09:14:00Z"
+  },
+  {
+    "id": 980306,
+    "domainId": 1,
+    "type": "multiple_choice",
+    "title": "弹性与韧性模式（Resilience）",
+    "question": "选择所有正确项",
+    "difficulty": "medium",
+    "choices": [
+      { "key": "A", "text": "熔断用于快速失败保护下游" },
+      { "key": "B", "text": "指数退避+抖动可缓解惊群" },
+      { "key": "C", "text": "断路器打开时应增加重试次数以自愈" },
+      { "key": "D", "text": "隔板（Bulkhead）提升故障隔离能力" }
+    ],
+    "correctOptions": ["A", "B", "D"],
+    "tags": ["resilience", "circuit-breaker", "retry"],
+    "explanation": "断路器打开时应快速失败并退避，避免级联放大。",
+    "metadata": { "specialization": "架构与微服务", "specialization_slug": "architecture-and-microservices" },
+    "createdAt": "2025-11-09T09:15:00Z"
+  },
+  {
+    "id": 980307,
+    "domainId": 1,
+    "type": "short_answer",
+    "title": "接口版本演进与兼容策略",
+    "question": "简述后向兼容与前向兼容、宽容读取（Tolerant Reader）、蓝绿/金丝雀发布与契约测试的协同。",
+    "difficulty": "medium",
+    "tags": ["versioning", "compatibility", "release"],
+    "answer": "接口变更优先保持后向兼容；采用可选字段与宽容解析以提升前向兼容；通过金丝雀/蓝绿降低风险，并用消费者驱动契约测试防止破坏性变更；弃用策略需提供迁移窗口。",
+    "explanation": "兼容性管理贯穿设计-发布-下线全流程，需与监控/回滚策略联动。",
+    "metadata": { "specialization": "架构与微服务", "specialization_slug": "architecture-and-microservices" },
+    "createdAt": "2025-11-09T09:16:00Z"
+  },
+  {
+    "id": 980308,
+    "domainId": 1,
+    "type": "short_answer",
+    "title": "Service Mesh 与零信任",
+    "question": "说明 Sidecar/Mesh 提供的 mTLS、流量治理与可观测能力，以及其与零信任网络的关系。",
+    "difficulty": "easy",
+    "tags": ["service-mesh", "mtls", "zero-trust"],
+    "answer": "Mesh 以 Sidecar 注入统一实现 mTLS、流量路由、限流与熔断，并统一采集指标与分布式追踪；结合零信任，服务间强制身份与最小权限，边界内外一视同仁。",
+    "explanation": "将横切能力下沉至数据面，可减少业务侵入并提升一致性。",
+    "metadata": { "specialization": "架构与微服务", "specialization_slug": "architecture-and-microservices" },
+    "createdAt": "2025-11-09T09:17:00Z"
+  }
+]
+

@@ -1,0 +1,125 @@
+[
+  {
+    "id": 930209,
+    "domainId": 1,
+    "type": "short_answer",
+    "title": "卡尔曼滤波在航电融合中的应用",
+    "question": "概述线性/扩展卡尔曼滤波在 IMU/GNSS 融合中的状态、观测与误差建模要点。",
+    "difficulty": "hard",
+    "tags": ["kalman", "sensor-fusion", "imu", "gnss"],
+    "answer": "状态含姿态/速度/位置与传感器偏置；观测包括 GNSS 位置/速度、磁航向等；需建模过程噪声、量测噪声与偏置漂移，并处理非线性（EKF/UKF）。",
+    "explanation": "良好的噪声与误差模型直接决定融合效果与收敛性。",
+    "metadata": { "specialization": "飞行器航电与测试", "specialization_slug": "avionics-and-testing" },
+    "createdAt": "2025-11-09T10:30:00Z"
+  },
+  {
+    "id": 930210,
+    "domainId": 1,
+    "type": "multiple_choice",
+    "title": "GNSS 完整性与 RAIM",
+    "question": "选择所有正确项",
+    "difficulty": "medium",
+    "choices": [
+      { "key": "A", "text": "RAIM 可检测并排除异常卫星测量" },
+      { "key": "B", "text": "完整性监测与可用性、精度无关" },
+      { "key": "C", "text": "增广（SBAS/GBAS）可提升完整性与可用性" },
+      { "key": "D", "text": "RAIM 不需要冗余观测" }
+    ],
+    "correctOptions": ["A", "C"],
+    "tags": ["gnss", "raim", "integrity"],
+    "explanation": "RAIM 需要冗余观测进行一致性检验；完整性与可用性紧密相关。",
+    "metadata": { "specialization": "飞行器航电与测试", "specialization_slug": "avionics-and-testing" },
+    "createdAt": "2025-11-09T10:31:00Z"
+  },
+  {
+    "id": 930211,
+    "domainId": 1,
+    "type": "short_answer",
+    "title": "空速与静压系统（皮托-静压）的误差来源",
+    "question": "列举安置误差、仪表误差与气动干扰的来源及改正方法。",
+    "difficulty": "medium",
+    "tags": ["pitot-static", "airspeed", "calibration"],
+    "answer": "安置误差来自安装位置与姿态；仪表误差来自传感/标定；气动干扰来自机体流场。改正包括地面/飞行标定、数据融合与误差表。",
+    "explanation": "准确的空速/高度依赖严格的标定流程。",
+    "metadata": { "specialization": "飞行器航电与测试", "specialization_slug": "avionics-and-testing" },
+    "createdAt": "2025-11-09T10:32:00Z"
+  },
+  {
+    "id": 930212,
+    "domainId": 1,
+    "type": "multiple_choice",
+    "title": "飞控冗余与容错，哪些正确？",
+    "question": "选择所有正确项",
+    "difficulty": "hard",
+    "choices": [
+      { "key": "A", "text": "三余度投票可抑制单通道失效" },
+      { "key": "B", "text": "异构冗余可降低同源失效风险" },
+      { "key": "C", "text": "冗余越多越好，与复杂度无关" },
+      { "key": "D", "text": "交叉监测和一致性校验是冗余的关键" }
+    ],
+    "correctOptions": ["A", "B", "D"],
+    "tags": ["fcs", "redundancy", "reliability"],
+    "explanation": "冗余增加复杂度与成本，需权衡并证明安全性。",
+    "metadata": { "specialization": "飞行器航电与测试", "specialization_slug": "avionics-and-testing" },
+    "createdAt": "2025-11-09T10:33:00Z"
+  },
+  {
+    "id": 930213,
+    "domainId": 1,
+    "type": "short_answer",
+    "title": "DO-331 模型化开发补充条款",
+    "question": "说明 DO-331 相对 DO-178C 在模型化开发（MBD）上的补充点与证据要求。",
+    "difficulty": "medium",
+    "tags": ["do331", "mbd", "do178c"],
+    "answer": "针对模型与自动代码生成引入额外验证：模型标准、可追踪、模型审查与覆盖、代码生成器合格性（或等效证明），并保持工件一致性。",
+    "explanation": "MBD 带来效率同时引入工具/模型合规性挑战。",
+    "metadata": { "specialization": "飞行器航电与测试", "specialization_slug": "avionics-and-testing" },
+    "createdAt": "2025-11-09T10:34:00Z"
+  },
+  {
+    "id": 930214,
+    "domainId": 1,
+    "type": "multiple_choice",
+    "title": "ADS-B 与 Mode S",
+    "question": "选择所有正确项",
+    "difficulty": "medium",
+    "choices": [
+      { "key": "A", "text": "ADS-B 广播自身位置/速度等状态" },
+      { "key": "B", "text": "Mode S 支持选择性应答与数据链路" },
+      { "key": "C", "text": "二者完全等价" },
+      { "key": "D", "text": "ADS-B 依赖 GNSS 供给位置" }
+    ],
+    "correctOptions": ["A", "B", "D"],
+    "tags": ["ads-b", "mode-s", "surveillance"],
+    "explanation": "ADS-B 为广播监视；Mode S 为雷达应答机协议，用途不同。",
+    "metadata": { "specialization": "飞行器航电与测试", "specialization_slug": "avionics-and-testing" },
+    "createdAt": "2025-11-09T10:35:00Z"
+  },
+  {
+    "id": 930215,
+    "domainId": 1,
+    "type": "short_answer",
+    "title": "飞行试验分级与安全评审",
+    "question": "简述飞行试验任务分级、试飞风险评审与放行条件。",
+    "difficulty": "medium",
+    "tags": ["flight-test", "safety", "release"],
+    "answer": "依据风险等级划分试验任务（功能/性能/包线扩展等）；进行危害分析与缓解；满足放行条件（配置冻结、地面试验完成、应急预案）后逐步扩展。",
+    "explanation": "稳健的分级与风控是飞试安全的前提。",
+    "metadata": { "specialization": "飞行器航电与测试", "specialization_slug": "avionics-and-testing" },
+    "createdAt": "2025-11-09T10:36:00Z"
+  },
+  {
+    "id": 930216,
+    "domainId": 1,
+    "type": "short_answer",
+    "title": "AFDX 虚拟链路（VL）参数设计",
+    "question": "说明 BAG、Lmax 等参数对带宽与抖动的影响，以及如何进行 VL 规划。",
+    "difficulty": "hard",
+    "tags": ["afdx", "vl", "network"],
+    "answer": "BAG 限制最小帧间隔，Lmax 限制最大帧大小；需根据端系统流量与确定性要求进行 VL 分配与整形，确保端到端时延与丢包目标。",
+    "explanation": "正确的 VL 规划是 AFDX 确定性保证的核心。",
+    "metadata": { "specialization": "飞行器航电与测试", "specialization_slug": "avionics-and-testing" },
+    "createdAt": "2025-11-09T10:37:00Z"
+  }
+]
+

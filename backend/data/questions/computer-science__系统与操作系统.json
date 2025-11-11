@@ -1,0 +1,34 @@
+[
+  {
+    "id": 960101,
+    "domainId": 1,
+    "type": "short_answer",
+    "title": "虚拟内存与页置换策略",
+    "question": "解释虚拟内存的作用，并对比 LRU 与 Clock 算法的优缺点。",
+    "difficulty": "medium",
+    "tags": ["os", "vm", "paging"],
+    "answer": "虚拟内存提供大地址空间与隔离；LRU 近似最佳但开销大，Clock 近似LRU且开销较小。",
+    "explanation": "页置换策略需在精准性与开销间权衡，结合访问局部性提升命中率。",
+    "metadata": { "specialization": "系统与操作系统" },
+    "createdAt": "2024-11-01T11:00:00Z"
+  },
+  {
+    "id": 960102,
+    "domainId": 1,
+    "type": "multiple_choice",
+    "title": "多核并发中的互斥与可见性",
+    "question": "选择所有正确项",
+    "difficulty": "medium",
+    "choices": [
+      {"key": "A", "text": "互斥不一定保证可见性"},
+      {"key": "B", "text": "内存屏障可提升可见性顺序"},
+      {"key": "C", "text": "CAS 可避免全部锁开销"},
+      {"key": "D", "text": "自旋锁适合长临界区"}
+    ],
+    "correctOptions": ["A", "B"],
+    "tags": ["concurrency", "memory-model"],
+    "explanation": "互斥与可见性需配合内存语义；CAS 并非万能；自旋锁适合短临界区。",
+    "metadata": { "specialization": "系统与操作系统" },
+    "createdAt": "2024-11-01T11:05:00Z"
+  }
+]

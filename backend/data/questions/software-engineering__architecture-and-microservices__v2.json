@@ -1,0 +1,125 @@
+[
+  {
+    "id": 980309,
+    "domainId": 1,
+    "type": "short_answer",
+    "title": "事件驱动：编排 vs. 扭转（Orchestration vs. Choreography）",
+    "question": "对比编排与扭转在复杂业务流程中的优缺点与适用性。",
+    "difficulty": "medium",
+    "tags": ["eda", "orchestration", "choreography"],
+    "answer": "编排中心化、可观测与治理强但耦合于协调器；扭转去中心化、演进灵活但全局可见性与一致性治理难；复杂跨域流程多采用混合模式，关键路径显式编排，其余事件扭转。",
+    "explanation": "根据业务复杂度与可观测需求选择或组合。",
+    "metadata": { "specialization": "架构与微服务", "specialization_slug": "architecture-and-microservices" },
+    "createdAt": "2025-11-09T10:10:00Z"
+  },
+  {
+    "id": 980310,
+    "domainId": 1,
+    "type": "multiple_choice",
+    "title": "CQRS 与事件溯源，哪些正确？",
+    "question": "选择所有正确项",
+    "difficulty": "hard",
+    "choices": [
+      { "key": "A", "text": "CQRS 分离读写模型以优化扩展性" },
+      { "key": "B", "text": "事件溯源以事件日志为事实来源" },
+      { "key": "C", "text": "事件溯源无需考虑演进与重放" },
+      { "key": "D", "text": "读模型可通过订阅事件进行物化视图构建" }
+    ],
+    "correctOptions": ["A", "B", "D"],
+    "tags": ["cqrs", "event-sourcing"],
+    "explanation": "事件模式需考虑版本、重放与幂等；并非免费午餐。",
+    "metadata": { "specialization": "架构与微服务", "specialization_slug": "architecture-and-microservices" },
+    "createdAt": "2025-11-09T10:11:00Z"
+  },
+  {
+    "id": 980311,
+    "domainId": 1,
+    "type": "short_answer",
+    "title": "分布式锁 vs. 唯一约束",
+    "question": "阐述在去重、幂等与互斥需求下，分布式锁与数据库唯一约束的取舍。",
+    "difficulty": "medium",
+    "tags": ["lock", "unique-constraint", "idempotency"],
+    "answer": "唯一约束简单可靠、天然持久化，适合幂等与去重；分布式锁适合短期互斥但需处理续约/脑裂与超时；优先用唯一键/幂等键+去重表，必要时以锁补充局部互斥。",
+    "explanation": "数据层约束比进程级锁更稳健，可作为第一选择。",
+    "metadata": { "specialization": "架构与微服务", "specialization_slug": "architecture-and-microservices" },
+    "createdAt": "2025-11-09T10:12:00Z"
+  },
+  {
+    "id": 980312,
+    "domainId": 1,
+    "type": "multiple_choice",
+    "title": "分片与路由键设计",
+    "question": "选择所有正确项",
+    "difficulty": "medium",
+    "choices": [
+      { "key": "A", "text": "哈希分片可均衡负载但不利于范围查询" },
+      { "key": "B", "text": "基于时间的分区便于冷热分层与归档" },
+      { "key": "C", "text": "迁移与扩容需考虑再平衡成本" },
+      { "key": "D", "text": "随机路由键总是最佳选择" }
+    ],
+    "correctOptions": ["A", "B", "C"],
+    "tags": ["sharding", "routing-key"],
+    "explanation": "路由键设计需兼顾查询模式、写入分布与演进。",
+    "metadata": { "specialization": "架构与微服务", "specialization_slug": "architecture-and-microservices" },
+    "createdAt": "2025-11-09T10:13:00Z"
+  },
+  {
+    "id": 980313,
+    "domainId": 1,
+    "type": "short_answer",
+    "title": "多租户隔离策略",
+    "question": "比较同库同表、同库异表、独立库实例三种多租户方案的权衡与治理要点。",
+    "difficulty": "medium",
+    "tags": ["multi-tenancy", "isolation"],
+    "answer": "同表成本低但隔离弱与复杂度高；异表隔离更好但运维膨胀；独立库最强隔离与合规但成本最高。治理：租户标识、限流配额、数据加密、备份灾备与迁移能力。",
+    "explanation": "根据安全与合规等级选择隔离级别，并设计可迁移。",
+    "metadata": { "specialization": "架构与微服务", "specialization_slug": "architecture-and-microservices" },
+    "createdAt": "2025-11-09T10:14:00Z"
+  },
+  {
+    "id": 980314,
+    "domainId": 1,
+    "type": "multiple_choice",
+    "title": "服务端背压与流控",
+    "question": "选择所有正确项",
+    "difficulty": "hard",
+    "choices": [
+      { "key": "A", "text": "消费者速率应受生产者可持续速率约束" },
+      { "key": "B", "text": "无界队列会掩盖问题并导致 OOM" },
+      { "key": "C", "text": "丢弃策略与优先级可结合业务价值" },
+      { "key": "D", "text": "背压只能在同步 HTTP 中实现" }
+    ],
+    "correctOptions": ["A", "B", "C"],
+    "tags": ["backpressure", "flow-control", "queue"],
+    "explanation": "消息系统与流式协议同样可实现背压与速率匹配。",
+    "metadata": { "specialization": "架构与微服务", "specialization_slug": "architecture-and-microservices" },
+    "createdAt": "2025-11-09T10:15:00Z"
+  },
+  {
+    "id": 980315,
+    "domainId": 1,
+    "type": "short_answer",
+    "title": "缓存策略与雪崩防护",
+    "question": "比较旁路（Cache-Aside）、直写（Write-Through）、回写（Write-Back），并说明如何防止击穿与雪崩。",
+    "difficulty": "medium",
+    "tags": ["cache", "stampede", "ttl"],
+    "answer": "旁路读写灵活但易脏读；直写一致性好；回写延迟落库但吞吐高。防护：互斥/分布式锁、随机化 TTL、预热与异步刷新、热点隔离与降级。",
+    "explanation": "缓存策略需结合一致性、延迟与成本权衡。",
+    "metadata": { "specialization": "架构与微服务", "specialization_slug": "architecture-and-microservices" },
+    "createdAt": "2025-11-09T10:16:00Z"
+  },
+  {
+    "id": 980316,
+    "domainId": 1,
+    "type": "short_answer",
+    "title": "Sidecar 与库内植入的取舍",
+    "question": "对比 Sidecar/Mesh 与库内 SDK 植入在可观测性与流量治理上的优劣。",
+    "difficulty": "easy",
+    "tags": ["service-mesh", "sdk", "observability"],
+    "answer": "Sidecar 一致性强、零侵入、统一治理，但资源开销与复杂度更高；SDK 轻量灵活但易分裂与版本困境。小团队/简单场景优先 SDK，规模化平台化则倾向 Mesh。",
+    "explanation": "选择取决于团队规模、异构程度与平台能力。",
+    "metadata": { "specialization": "架构与微服务", "specialization_slug": "architecture-and-microservices" },
+    "createdAt": "2025-11-09T10:17:00Z"
+  }
+]
+

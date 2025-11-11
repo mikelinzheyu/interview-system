@@ -1,0 +1,34 @@
+[
+  {
+    "id": 940101,
+    "domainId": 1,
+    "type": "short_answer",
+    "title": "光伏组件 I-V 曲线关键点",
+    "question": "说明开路电压、短路电流、最大功率点的物理意义与影响因素。",
+    "difficulty": "easy",
+    "tags": ["pv", "iv-curve"],
+    "answer": "Voc 受温度与材料带隙影响，Isc 受辐照度影响，MPP 为最大输出点，受温度/辐照与串并联配置影响。",
+    "explanation": "温度升高通常降低 Voc；辐照增强提高 Isc；MPPT 跟踪可提升系统效率。",
+    "metadata": { "specialization": "光伏与储能" },
+    "createdAt": "2024-11-01T10:40:00Z"
+  },
+  {
+    "id": 940102,
+    "domainId": 1,
+    "type": "multiple_choice",
+    "title": "储能系统选型关键参数",
+    "question": "选择所有正确项",
+    "difficulty": "medium",
+    "choices": [
+      {"key": "A", "text": "循环寿命"},
+      {"key": "B", "text": "倍率能力"},
+      {"key": "C", "text": "能量密度"},
+      {"key": "D", "text": "颜色"}
+    ],
+    "correctOptions": ["A", "B", "C"],
+    "tags": ["battery", "storage"],
+    "explanation": "储能选型关注寿命、倍率、能量密度、安全与成本等多维指标。",
+    "metadata": { "specialization": "光伏与储能" },
+    "createdAt": "2024-11-01T10:45:00Z"
+  }
+]

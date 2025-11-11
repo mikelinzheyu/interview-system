@@ -1,0 +1,125 @@
+[
+  {
+    "id": 940209,
+    "domainId": 1,
+    "type": "short_answer",
+    "title": "尾流效应与风场布置",
+    "question": "说明尾流对下游机组的影响与典型布置原则（间距、排布）。",
+    "difficulty": "medium",
+    "tags": ["wake", "layout", "wind-farm"],
+    "answer": "尾流降低风速并增加湍流，影响发电与寿命；布置遵循主风向较大纵向间距、横向合理错列与复杂地形定制优化；结合 CFD/实测优化。",
+    "explanation": "合理布置提升年发电量并降低载荷。",
+    "metadata": { "specialization": "风电与并网", "specialization_slug": "wind-power-and-grid-integration" },
+    "createdAt": "2025-11-09T10:40:00Z"
+  },
+  {
+    "id": 940210,
+    "domainId": 1,
+    "type": "multiple_choice",
+    "title": "功率曲线测试（IEC 61400-12-1）",
+    "question": "选择所有正确项",
+    "difficulty": "hard",
+    "choices": [
+      { "key": "A", "text": "需标准化风速测点与测高" },
+      { "key": "B", "text": "空气密度修正并非必须" },
+      { "key": "C", "text": "数据筛选与分箱是评估的关键步骤" },
+      { "key": "D", "text": "湍流强度对曲线评估无影响" }
+    ],
+    "correctOptions": ["A", "C"],
+    "tags": ["power-curve", "iec-61400-12-1"],
+    "explanation": "空气密度与湍流均影响评估，需修正与筛选。",
+    "metadata": { "specialization": "风电与并网", "specialization_slug": "wind-power-and-grid-integration" },
+    "createdAt": "2025-11-09T10:41:00Z"
+  },
+  {
+    "id": 940211,
+    "domainId": 1,
+    "type": "short_answer",
+    "title": "风电功率预测与调度",
+    "question": "简述短期/超短期预测方法与与备用调度的关系。",
+    "difficulty": "medium",
+    "tags": ["forecast", "scheduling", "reserve"],
+    "answer": "超短期可用时序/物理模型与 SCADA 融合，短期融合数值天气预报；预测误差用于确定旋转备用与爬坡约束，优化机组与储能协同。",
+    "explanation": "预测—调度闭环提升并网友好性与经济性。",
+    "metadata": { "specialization": "风电与并网", "specialization_slug": "wind-power-and-grid-integration" },
+    "createdAt": "2025-11-09T10:42:00Z"
+  },
+  {
+    "id": 940212,
+    "domainId": 1,
+    "type": "multiple_choice",
+    "title": "高电压穿越（HVRT）与低电压穿越（LVRT）",
+    "question": "选择所有正确项",
+    "difficulty": "medium",
+    "choices": [
+      { "key": "A", "text": "LVRT 要求低压故障期间保持并网并提供无功支撑" },
+      { "key": "B", "text": "HVRT 要求高压暂态时设备不误动" },
+      { "key": "C", "text": "穿越能力与逆变器控制策略无关" },
+      { "key": "D", "text": "不同电网规范的穿越曲线要求不同" }
+    ],
+    "correctOptions": ["A", "B", "D"],
+    "tags": ["lvrt", "hvrt", "grid-code"],
+    "explanation": "穿越能力与控制硬件/策略密切相关。",
+    "metadata": { "specialization": "风电与并网", "specialization_slug": "wind-power-and-grid-integration" },
+    "createdAt": "2025-11-09T10:43:00Z"
+  },
+  {
+    "id": 940213,
+    "domainId": 1,
+    "type": "short_answer",
+    "title": "无功补偿设备：STATCOM vs SVC",
+    "question": "对比两者在响应速度、运行区域与成本上的差异及应用。",
+    "difficulty": "medium",
+    "tags": ["statcom", "svc", "reactive"],
+    "answer": "STATCOM 基于电力电子响应快、低电压下输出能力强；SVC 基于可控电抗器/电容，成本低但响应慢；并网点电压支撑与动态响应要求高时优选 STATCOM。",
+    "explanation": "选择取决于并网点性能指标与经济性。",
+    "metadata": { "specialization": "风电与并网", "specialization_slug": "wind-power-and-grid-integration" },
+    "createdAt": "2025-11-09T10:44:00Z"
+  },
+  {
+    "id": 940214,
+    "domainId": 1,
+    "type": "multiple_choice",
+    "title": "谐波与闪变测量",
+    "question": "选择所有正确项",
+    "difficulty": "hard",
+    "choices": [
+      { "key": "A", "text": "谐波评估需符合相关仪表等级与采样要求" },
+      { "key": "B", "text": "闪变仅与照明相关，与并网无关" },
+      { "key": "C", "text": "风电并网引起的电压波动可能导致闪变" },
+      { "key": "D", "text": "SCADA 数据可直接用于谐波合规评估" }
+    ],
+    "correctOptions": ["A", "C"],
+    "tags": ["harmonics", "flicker", "measurement"],
+    "explanation": "谐波/闪变评估需要专用测量设备与方法。",
+    "metadata": { "specialization": "风电与并网", "specialization_slug": "wind-power-and-grid-integration" },
+    "createdAt": "2025-11-09T10:45:00Z"
+  },
+  {
+    "id": 940215,
+    "domainId": 1,
+    "type": "short_answer",
+    "title": "孤岛检测与微电网",
+    "question": "概述并网逆变器主动/被动孤岛检测方法与微电网下的处理策略。",
+    "difficulty": "medium",
+    "tags": ["islanding", "microgrid", "detection"],
+    "answer": "被动法监测电压/频率/相位，主动法注入扰动（如 Slip Mode）；在微电网需结合同步控制、下垂控制与保护配合实现安全切换与重合闸。",
+    "explanation": "不同场景需要不同的检测灵敏度与选择性。",
+    "metadata": { "specialization": "风电与并网", "specialization_slug": "wind-power-and-grid-integration" },
+    "createdAt": "2025-11-09T10:46:00Z"
+  },
+  {
+    "id": 940216,
+    "domainId": 1,
+    "type": "short_answer",
+    "title": "并网逆变器的下垂控制",
+    "question": "解释 P-f/Q-V 下垂控制的原理与并联运行时的功率分配。",
+    "difficulty": "medium",
+    "tags": ["droop", "inverter", "parallel"],
+    "answer": "通过频率与有功、母线电压与无功之间的线性（或分段）下垂关系实现功率分配；并联系统通过一致的下垂参数与虚拟阻抗稳定运行。",
+    "explanation": "下垂控制是无主从并联系统的基础策略。",
+    "metadata": { "specialization": "风电与并网", "specialization_slug": "wind-power-and-grid-integration" },
+    "createdAt": "2025-11-09T10:47:00Z"
+  }
+]
+

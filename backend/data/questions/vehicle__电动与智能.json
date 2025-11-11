@@ -1,0 +1,34 @@
+[
+  {
+    "id": 982101,
+    "domainId": 1,
+    "type": "short_answer",
+    "title": "电驱系统关键参数",
+    "question": "简述电机额定功率/峰值功率/扭矩与效率地图的关系，并说明整车标定关注点。",
+    "difficulty": "medium",
+    "tags": ["ev", "powertrain"],
+    "answer": "额定/峰值功率与扭矩受热管理与逆变器限制；效率地图决定能耗与热负荷；标定关注 NVH、能耗、响应性。",
+    "explanation": "整车匹配需综合电池倍率/热管理/驱动策略。",
+    "metadata": { "specialization": "电动与智能" },
+    "createdAt": "2024-11-01T11:40:00Z"
+  },
+  {
+    "id": 982102,
+    "domainId": 1,
+    "type": "multiple_choice",
+    "title": "智能网联系统组成",
+    "question": "选择所有正确项",
+    "difficulty": "easy",
+    "choices": [
+      {"key": "A", "text": "传感器与融合"},
+      {"key": "B", "text": "决策与控制"},
+      {"key": "C", "text": "车载通信与安全"},
+      {"key": "D", "text": "仅车机娱乐"}
+    ],
+    "correctOptions": ["A", "B", "C"],
+    "tags": ["v2x", "adas"],
+    "explanation": "智能网联涵盖感知/决策/执行与通信安全，不等同于信息娱乐系统。",
+    "metadata": { "specialization": "电动与智能" },
+    "createdAt": "2024-11-01T11:45:00Z"
+  }
+]

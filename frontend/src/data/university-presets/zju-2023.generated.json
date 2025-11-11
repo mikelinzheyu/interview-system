@@ -1,0 +1,6196 @@
+{
+  "meta": {
+    "university": "浙江大学",
+    "year": "2023",
+    "version": 1,
+    "generatedFrom": "disciplines-complete.json",
+    "generatedAt": "2025-11-08T14:17:44.068Z"
+  },
+  "majors": [
+    {
+      "name": "计算机科学与技术",
+      "aliases": [
+        "计算机科学",
+        "计算机科学技术"
+      ],
+      "specializations": [
+        {
+          "name": "数据结构与算法",
+          "description": "数据结构/算法设计/复杂度",
+          "coreCourses": [
+            "数据结构",
+            "算法设计",
+            "复杂度分析"
+          ],
+          "relatedSkills": [
+            "逻辑推理",
+            "代码实现"
+          ],
+          "questionCount": 60
+        },
+        {
+          "name": "操作系统与系统编程",
+          "description": "进程/内存/并发/IO",
+          "coreCourses": [
+            "操作系统",
+            "系统编程"
+          ],
+          "relatedSkills": [
+            "调试",
+            "系统思维"
+          ],
+          "questionCount": 48
+        },
+        {
+          "name": "计算机网络与分布式系统",
+          "description": "网络协议/分布式一致性",
+          "coreCourses": [
+            "计算机网络",
+            "分布式系统"
+          ],
+          "relatedSkills": [
+            "排障",
+            "系统设计"
+          ],
+          "questionCount": 42
+        },
+        {
+          "name": "数据库与存储系统",
+          "description": "事务/索引/NoSQL",
+          "coreCourses": [
+            "数据库系统",
+            "事务与并发"
+          ],
+          "relatedSkills": [
+            "数据建模",
+            "调优"
+          ],
+          "questionCount": 36
+        }
+      ]
+    },
+    {
+      "name": "软件工程",
+      "specializations": [
+        {
+          "name": "需求与产品工程",
+          "description": "需求获取/分析/管理",
+          "coreCourses": [
+            "需求工程",
+            "产品设计"
+          ],
+          "relatedSkills": [
+            "沟通协作"
+          ],
+          "questionCount": 28
+        },
+        {
+          "name": "架构与微服务",
+          "description": "领域建模/微服务治理",
+          "coreCourses": [
+            "架构设计",
+            "微服务"
+          ],
+          "relatedSkills": [
+            "系统设计"
+          ],
+          "questionCount": 34
+        },
+        {
+          "name": "质量与测试",
+          "description": "自动化测试/质量保障",
+          "coreCourses": [
+            "测试金字塔",
+            "持续集成"
+          ],
+          "relatedSkills": [
+            "质量意识"
+          ],
+          "questionCount": 26
+        },
+        {
+          "name": "DevOps 与运维",
+          "description": "持续交付/可观测性",
+          "coreCourses": [
+            "DevOps",
+            "SRE"
+          ],
+          "relatedSkills": [
+            "运维实践"
+          ],
+          "questionCount": 22
+        }
+      ]
+    },
+    {
+      "name": "数据科学与大数据技术",
+      "aliases": [
+        "大数据",
+        "数据科学"
+      ],
+      "specializations": [
+        {
+          "name": "数据工程",
+          "description": "采集/清洗/建模/治理",
+          "coreCourses": [
+            "数据建模",
+            "ETL"
+          ],
+          "relatedSkills": [
+            "工程实践"
+          ],
+          "questionCount": 32
+        },
+        {
+          "name": "机器学习工程",
+          "description": "特征工程/训练/部署",
+          "coreCourses": [
+            "机器学习",
+            "MLOps"
+          ],
+          "relatedSkills": [
+            "实验设计",
+            "部署"
+          ],
+          "questionCount": 30
+        },
+        {
+          "name": "大数据平台与实时流",
+          "description": "Hadoop/Spark/Kafka/Flink",
+          "coreCourses": [
+            "分布式计算",
+            "流计算"
+          ],
+          "relatedSkills": [
+            "分布式思维"
+          ],
+          "questionCount": 26
+        },
+        {
+          "name": "可视化与BI",
+          "description": "可视分析/商务智能",
+          "coreCourses": [
+            "数据可视化",
+            "BI"
+          ],
+          "relatedSkills": [
+            "表达沟通"
+          ],
+          "questionCount": 18
+        }
+      ]
+    },
+    {
+      "name": "网络空间安全",
+      "aliases": [
+        "信息安全"
+      ],
+      "specializations": [
+        {
+          "name": "密码学与协议",
+          "description": "对称/非对称/协议",
+          "coreCourses": [
+            "密码学",
+            "安全协议"
+          ],
+          "relatedSkills": [
+            "数学基础"
+          ],
+          "questionCount": 22
+        },
+        {
+          "name": "系统与二进制安全",
+          "description": "漏洞利用/防护",
+          "coreCourses": [
+            "操作系统安全",
+            "二进制"
+          ],
+          "relatedSkills": [
+            "攻防思维"
+          ],
+          "questionCount": 20
+        },
+        {
+          "name": "应用与Web安全",
+          "description": "Web/移动/SDL",
+          "coreCourses": [
+            "Web 安全",
+            "SDL"
+          ],
+          "relatedSkills": [
+            "工程化"
+          ],
+          "questionCount": 24
+        }
+      ]
+    },
+    {
+      "name": "人工智能",
+      "aliases": [
+        "智能科学与技术"
+      ],
+      "specializations": [
+        {
+          "name": "机器学习",
+          "description": "监督/无监督/集成",
+          "coreCourses": [
+            "机器学习",
+            "优化"
+          ],
+          "relatedSkills": [
+            "数学建模"
+          ],
+          "questionCount": 28
+        },
+        {
+          "name": "深度学习",
+          "description": "CNN/RNN/Transformer",
+          "coreCourses": [
+            "深度学习",
+            "算子优化"
+          ],
+          "relatedSkills": [
+            "调参"
+          ],
+          "questionCount": 28
+        },
+        {
+          "name": "自然语言处理",
+          "description": "预训练/提示/应用",
+          "coreCourses": [
+            "NLP",
+            "LLM"
+          ],
+          "relatedSkills": [
+            "Prompt 设计"
+          ],
+          "questionCount": 24
+        },
+        {
+          "name": "计算机视觉",
+          "description": "检测/分割/多模态",
+          "coreCourses": [
+            "CV",
+            "多模态"
+          ],
+          "relatedSkills": [
+            "工程部署"
+          ],
+          "questionCount": 22
+        }
+      ]
+    },
+    {
+      "name": "电子信息工程",
+      "specializations": [
+        {
+          "name": "数字电路与嵌入式",
+          "description": "数字系统/嵌入式",
+          "coreCourses": [
+            "数字电路",
+            "MCU/FPGA"
+          ],
+          "relatedSkills": [
+            "硬件调试"
+          ],
+          "questionCount": 24
+        },
+        {
+          "name": "信号与系统",
+          "description": "信号处理/滤波",
+          "coreCourses": [
+            "信号处理",
+            "滤波"
+          ],
+          "relatedSkills": [
+            "MATLAB"
+          ],
+          "questionCount": 20
+        },
+        {
+          "name": "通信与接口",
+          "description": "通信原理/总线接口",
+          "coreCourses": [
+            "通信原理",
+            "接口协议"
+          ],
+          "relatedSkills": [
+            "协议分析"
+          ],
+          "questionCount": 20
+        }
+      ]
+    },
+    {
+      "name": "自动化",
+      "specializations": [
+        {
+          "name": "控制理论与工程",
+          "description": "经典/现代控制",
+          "coreCourses": [
+            "控制理论",
+            "系统辨识"
+          ],
+          "relatedSkills": [
+            "仿真"
+          ],
+          "questionCount": 22
+        },
+        {
+          "name": "过程控制",
+          "description": "工业过程控制",
+          "coreCourses": [
+            "DCS",
+            "PLC"
+          ],
+          "relatedSkills": [
+            "现场"
+          ],
+          "questionCount": 20
+        },
+        {
+          "name": "机器人控制",
+          "description": "运动/轨迹/视觉",
+          "coreCourses": [
+            "运动控制",
+            "视觉"
+          ],
+          "relatedSkills": [
+            "集成"
+          ],
+          "questionCount": 20
+        }
+      ]
+    },
+    {
+      "name": "电气工程及其自动化",
+      "aliases": [
+        "电气工程"
+      ],
+      "specializations": [
+        {
+          "name": "电机与电力电子",
+          "description": "电机控制/功率变换",
+          "coreCourses": [
+            "电力电子",
+            "电机控制"
+          ],
+          "relatedSkills": [
+            "仿真"
+          ],
+          "questionCount": 22
+        },
+        {
+          "name": "自动控制",
+          "description": "控制理论与实现",
+          "coreCourses": [
+            "控制理论",
+            "控制实现"
+          ],
+          "relatedSkills": [
+            "调参"
+          ],
+          "questionCount": 20
+        },
+        {
+          "name": "配电与保护",
+          "description": "配电系统/继电保护",
+          "coreCourses": [
+            "配电",
+            "保护"
+          ],
+          "relatedSkills": [
+            "现场调试"
+          ],
+          "questionCount": 18
+        }
+      ]
+    },
+    {
+      "name": "机械工程",
+      "specializations": [
+        {
+          "name": "机械设计与制造",
+          "description": "设计方法与制造工艺",
+          "coreCourses": [
+            "设计",
+            "制造"
+          ],
+          "relatedSkills": [
+            "工艺"
+          ],
+          "questionCount": 22
+        },
+        {
+          "name": "机电一体化",
+          "description": "机电系统集成",
+          "coreCourses": [
+            "机电",
+            "控制"
+          ],
+          "relatedSkills": [
+            "集成"
+          ],
+          "questionCount": 20
+        },
+        {
+          "name": "CAD/CAE",
+          "description": "建模与仿真",
+          "coreCourses": [
+            "CAD",
+            "CAE"
+          ],
+          "relatedSkills": [
+            "仿真"
+          ],
+          "questionCount": 18
+        }
+      ]
+    },
+    {
+      "name": "土木工程",
+      "specializations": [
+        {
+          "name": "结构工程",
+          "description": "结构分析与设计",
+          "coreCourses": [
+            "结构",
+            "受力"
+          ],
+          "relatedSkills": [
+            "建模"
+          ],
+          "questionCount": 22
+        },
+        {
+          "name": "岩土与基础",
+          "description": "岩土勘察与基础",
+          "coreCourses": [
+            "岩土",
+            "基础"
+          ],
+          "relatedSkills": [
+            "施工"
+          ],
+          "questionCount": 20
+        },
+        {
+          "name": "施工与BIM",
+          "description": "施工组织与BIM",
+          "coreCourses": [
+            "施工",
+            "BIM"
+          ],
+          "relatedSkills": [
+            "协同"
+          ],
+          "questionCount": 18
+        }
+      ]
+    },
+    {
+      "name": "材料科学与工程",
+      "specializations": [
+        {
+          "name": "材料结构与性能",
+          "description": "结构/性能与表征",
+          "coreCourses": [
+            "材料学",
+            "表征"
+          ],
+          "relatedSkills": [
+            "实验"
+          ],
+          "questionCount": 20
+        },
+        {
+          "name": "高分子与复合材料",
+          "description": "高分子/复合材料",
+          "coreCourses": [
+            "高分子",
+            "复材"
+          ],
+          "relatedSkills": [
+            "制备"
+          ],
+          "questionCount": 18
+        },
+        {
+          "name": "功能材料",
+          "description": "新能源/光电等",
+          "coreCourses": [
+            "功能材料"
+          ],
+          "relatedSkills": [
+            "器件"
+          ],
+          "questionCount": 18
+        }
+      ]
+    },
+    {
+      "name": "工商管理",
+      "specializations": [
+        {
+          "name": "战略管理",
+          "description": "竞争策略与定位",
+          "coreCourses": [
+            "战略管理"
+          ],
+          "relatedSkills": [
+            "分析"
+          ],
+          "questionCount": 14
+        },
+        {
+          "name": "运营管理",
+          "description": "流程与供应链",
+          "coreCourses": [
+            "运营管理",
+            "供应链"
+          ],
+          "relatedSkills": [
+            "改进"
+          ],
+          "questionCount": 14
+        },
+        {
+          "name": "市场与人力",
+          "description": "市场/HR 管理",
+          "coreCourses": [
+            "市场营销",
+            "人力资源"
+          ],
+          "relatedSkills": [
+            "沟通"
+          ],
+          "questionCount": 14
+        }
+      ]
+    },
+    {
+      "name": "金融学",
+      "specializations": [
+        {
+          "name": "公司金融",
+          "description": "资本结构与估值",
+          "coreCourses": [
+            "公司金融"
+          ],
+          "relatedSkills": [
+            "建模"
+          ],
+          "questionCount": 16
+        },
+        {
+          "name": "投资学",
+          "description": "资产定价与组合",
+          "coreCourses": [
+            "投资学"
+          ],
+          "relatedSkills": [
+            "风控"
+          ],
+          "questionCount": 16
+        },
+        {
+          "name": "金融市场与机构",
+          "description": "市场机制与机构运作",
+          "coreCourses": [
+            "金融市场",
+            "金融机构"
+          ],
+          "relatedSkills": [
+            "合规"
+          ],
+          "questionCount": 14
+        }
+      ]
+    },
+    {
+      "name": "法学",
+      "specializations": [
+        {
+          "name": "宪法与行政法",
+          "description": "公法框架与实践",
+          "coreCourses": [
+            "宪法",
+            "行政法"
+          ],
+          "relatedSkills": [
+            "案例分析"
+          ],
+          "questionCount": 14
+        },
+        {
+          "name": "民商法",
+          "description": "民法/商法核心",
+          "coreCourses": [
+            "民法",
+            "商法"
+          ],
+          "relatedSkills": [
+            "条文检索"
+          ],
+          "questionCount": 16
+        },
+        {
+          "name": "刑法与刑诉",
+          "description": "刑法体系与程序",
+          "coreCourses": [
+            "刑法",
+            "刑事诉讼法"
+          ],
+          "relatedSkills": [
+            "裁判思维"
+          ],
+          "questionCount": 14
+        }
+      ]
+    },
+    {
+      "name": "数学与应用数学",
+      "aliases": [
+        "数学"
+      ],
+      "specializations": [
+        {
+          "name": "代数与几何",
+          "description": "抽象代数/几何基础",
+          "coreCourses": [
+            "抽象代数",
+            "几何学"
+          ],
+          "relatedSkills": [
+            "逻辑推理"
+          ],
+          "questionCount": 20
+        },
+        {
+          "name": "数学分析与偏微分",
+          "description": "高等数学/实变/泛函",
+          "coreCourses": [
+            "数学分析",
+            "实变函数"
+          ],
+          "relatedSkills": [
+            "严密证明"
+          ],
+          "questionCount": 20
+        },
+        {
+          "name": "概率统计与随机过程",
+          "description": "概率/数理统计/随机过程",
+          "coreCourses": [
+            "概率论",
+            "数理统计"
+          ],
+          "relatedSkills": [
+            "建模"
+          ],
+          "questionCount": 18
+        },
+        {
+          "name": "计算数学与优化",
+          "description": "数值分析/最优化",
+          "coreCourses": [
+            "数值分析",
+            "最优化"
+          ],
+          "relatedSkills": [
+            "数值计算"
+          ],
+          "questionCount": 18
+        }
+      ]
+    },
+    {
+      "name": "统计学",
+      "specializations": [
+        {
+          "name": "理论统计",
+          "description": "概率基础/推断理论",
+          "coreCourses": [
+            "概率论",
+            "统计推断"
+          ],
+          "relatedSkills": [
+            "理论分析"
+          ],
+          "questionCount": 18
+        },
+        {
+          "name": "应用统计与建模",
+          "description": "回归/多元/贝叶斯",
+          "coreCourses": [
+            "回归分析",
+            "多元统计"
+          ],
+          "relatedSkills": [
+            "建模"
+          ],
+          "questionCount": 18
+        },
+        {
+          "name": "时间序列与计量",
+          "description": "时间序列/计量经济",
+          "coreCourses": [
+            "时间序列",
+            "计量经济学"
+          ],
+          "relatedSkills": [
+            "实证分析"
+          ],
+          "questionCount": 16
+        }
+      ]
+    },
+    {
+      "name": "物理学",
+      "specializations": [
+        {
+          "name": "凝聚态物理",
+          "description": "固体/半导体/纳米",
+          "coreCourses": [
+            "固体物理",
+            "量子力学"
+          ],
+          "relatedSkills": [
+            "实验/仿真"
+          ],
+          "questionCount": 18
+        },
+        {
+          "name": "光学与光电子",
+          "description": "光学/激光/光电器件",
+          "coreCourses": [
+            "电动力学",
+            "光学"
+          ],
+          "relatedSkills": [
+            "光学实验"
+          ],
+          "questionCount": 16
+        },
+        {
+          "name": "量子信息与计算",
+          "description": "量子信息/量子计算",
+          "coreCourses": [
+            "量子信息",
+            "量子计算"
+          ],
+          "relatedSkills": [
+            "算法/实现"
+          ],
+          "questionCount": 14
+        }
+      ]
+    },
+    {
+      "name": "化学",
+      "specializations": [
+        {
+          "name": "有机化学",
+          "description": "反应机理与合成",
+          "coreCourses": [
+            "有机化学",
+            "谱学分析"
+          ],
+          "relatedSkills": [
+            "合成"
+          ],
+          "questionCount": 18
+        },
+        {
+          "name": "无机化学",
+          "description": "配位/固体/材料",
+          "coreCourses": [
+            "无机化学",
+            "固体化学"
+          ],
+          "relatedSkills": [
+            "晶体学"
+          ],
+          "questionCount": 16
+        },
+        {
+          "name": "物理化学",
+          "description": "热力学/动力学/电化学",
+          "coreCourses": [
+            "物理化学",
+            "化学动力学"
+          ],
+          "relatedSkills": [
+            "建模"
+          ],
+          "questionCount": 16
+        },
+        {
+          "name": "分析化学",
+          "description": "仪器分析/色谱质谱",
+          "coreCourses": [
+            "分析化学",
+            "仪器分析"
+          ],
+          "relatedSkills": [
+            "数据处理"
+          ],
+          "questionCount": 16
+        }
+      ]
+    },
+    {
+      "name": "应用化学",
+      "specializations": [
+        {
+          "name": "精细化工",
+          "description": "精细化工工艺",
+          "coreCourses": [
+            "化工原理",
+            "分离工程"
+          ],
+          "relatedSkills": [
+            "工艺设计"
+          ],
+          "questionCount": 16
+        },
+        {
+          "name": "高分子材料",
+          "description": "高分子合成与表征",
+          "coreCourses": [
+            "高分子化学",
+            "材料表征"
+          ],
+          "relatedSkills": [
+            "制备"
+          ],
+          "questionCount": 16
+        },
+        {
+          "name": "催化与表面",
+          "description": "催化材料与表界面",
+          "coreCourses": [
+            "表面化学",
+            "催化原理"
+          ],
+          "relatedSkills": [
+            "表征"
+          ],
+          "questionCount": 14
+        }
+      ]
+    },
+    {
+      "name": "生物科学",
+      "specializations": [
+        {
+          "name": "分子与细胞生物学",
+          "description": "分子/细胞机制",
+          "coreCourses": [
+            "分子生物学",
+            "细胞生物学"
+          ],
+          "relatedSkills": [
+            "实验技术"
+          ],
+          "questionCount": 18
+        },
+        {
+          "name": "遗传与发育",
+          "description": "遗传学/发育生物",
+          "coreCourses": [
+            "遗传学",
+            "发育生物学"
+          ],
+          "relatedSkills": [
+            "实验设计"
+          ],
+          "questionCount": 16
+        },
+        {
+          "name": "生态与进化",
+          "description": "生态学/进化生物",
+          "coreCourses": [
+            "生态学",
+            "进化生物学"
+          ],
+          "relatedSkills": [
+            "数据分析"
+          ],
+          "questionCount": 14
+        }
+      ]
+    },
+    {
+      "name": "生物技术",
+      "specializations": [
+        {
+          "name": "基因工程",
+          "description": "基因克隆/编辑",
+          "coreCourses": [
+            "基因工程",
+            "生物信息学"
+          ],
+          "relatedSkills": [
+            "测序/分析"
+          ],
+          "questionCount": 16
+        },
+        {
+          "name": "蛋白质工程",
+          "description": "表达/纯化/工程化",
+          "coreCourses": [
+            "蛋白质工程",
+            "结构生物学"
+          ],
+          "relatedSkills": [
+            "表征"
+          ],
+          "questionCount": 16
+        },
+        {
+          "name": "合成生物学",
+          "description": "底盘/回路/应用",
+          "coreCourses": [
+            "合成生物学"
+          ],
+          "relatedSkills": [
+            "设计/构建"
+          ],
+          "questionCount": 14
+        }
+      ]
+    },
+    {
+      "name": "环境科学",
+      "specializations": [
+        {
+          "name": "环境监测与分析",
+          "description": "监测/分析/评价",
+          "coreCourses": [
+            "环境监测",
+            "环境化学"
+          ],
+          "relatedSkills": [
+            "数据分析"
+          ],
+          "questionCount": 16
+        },
+        {
+          "name": "污染治理",
+          "description": "水/气/固污染控制",
+          "coreCourses": [
+            "水污染控制",
+            "大气污染控制"
+          ],
+          "relatedSkills": [
+            "工艺设计"
+          ],
+          "questionCount": 16
+        },
+        {
+          "name": "生态环境与管理",
+          "description": "生态/管理/法规",
+          "coreCourses": [
+            "生态学",
+            "环境管理"
+          ],
+          "relatedSkills": [
+            "评估"
+          ],
+          "questionCount": 14
+        }
+      ]
+    },
+    {
+      "name": "食品科学与工程",
+      "specializations": [
+        {
+          "name": "食品化学与营养",
+          "description": "化学/营养/功能",
+          "coreCourses": [
+            "食品化学",
+            "营养学"
+          ],
+          "relatedSkills": [
+            "检测"
+          ],
+          "questionCount": 16
+        },
+        {
+          "name": "食品加工与工程",
+          "description": "加工/设备/工艺",
+          "coreCourses": [
+            "食品工艺学",
+            "食品机械"
+          ],
+          "relatedSkills": [
+            "工艺"
+          ],
+          "questionCount": 16
+        },
+        {
+          "name": "食品微生物与安全",
+          "description": "微生物/安全/法规",
+          "coreCourses": [
+            "食品微生物",
+            "食品安全"
+          ],
+          "relatedSkills": [
+            "质量管理"
+          ],
+          "questionCount": 14
+        }
+      ]
+    },
+    {
+      "name": "临床医学",
+      "specializations": [
+        {
+          "name": "内科学",
+          "description": "内科系统疾病",
+          "coreCourses": [
+            "内科学"
+          ],
+          "relatedSkills": [
+            "临床思维"
+          ],
+          "questionCount": 20
+        },
+        {
+          "name": "外科学",
+          "description": "普外/骨外等",
+          "coreCourses": [
+            "外科学"
+          ],
+          "relatedSkills": [
+            "手术操作"
+          ],
+          "questionCount": 20
+        },
+        {
+          "name": "妇产科学",
+          "description": "孕产/妇科",
+          "coreCourses": [
+            "妇产科学"
+          ],
+          "relatedSkills": [
+            "临床"
+          ],
+          "questionCount": 18
+        },
+        {
+          "name": "儿科学",
+          "description": "儿科常见病",
+          "coreCourses": [
+            "儿科学"
+          ],
+          "relatedSkills": [
+            "临床"
+          ],
+          "questionCount": 18
+        }
+      ]
+    },
+    {
+      "name": "口腔医学",
+      "specializations": [
+        {
+          "name": "口腔内科",
+          "description": "牙体牙髓/牙周",
+          "coreCourses": [
+            "口腔内科学"
+          ],
+          "relatedSkills": [
+            "治疗技术"
+          ],
+          "questionCount": 16
+        },
+        {
+          "name": "口腔外科",
+          "description": "手术/颌面",
+          "coreCourses": [
+            "口腔外科学"
+          ],
+          "relatedSkills": [
+            "手术操作"
+          ],
+          "questionCount": 16
+        },
+        {
+          "name": "修复与正畸",
+          "description": "修复/正畸",
+          "coreCourses": [
+            "口腔修复",
+            "口腔正畸"
+          ],
+          "relatedSkills": [
+            "器械应用"
+          ],
+          "questionCount": 16
+        }
+      ]
+    },
+    {
+      "name": "护理学",
+      "specializations": [
+        {
+          "name": "内外科护理",
+          "description": "内外科常见病护理",
+          "coreCourses": [
+            "内科护理",
+            "外科护理"
+          ],
+          "relatedSkills": [
+            "临床操作"
+          ],
+          "questionCount": 16
+        },
+        {
+          "name": "急危重症护理",
+          "description": "急救/ICU",
+          "coreCourses": [
+            "急救护理",
+            "重症护理"
+          ],
+          "relatedSkills": [
+            "应急"
+          ],
+          "questionCount": 16
+        },
+        {
+          "name": "护理管理与教育",
+          "description": "管理/教学",
+          "coreCourses": [
+            "护理管理",
+            "护理教育"
+          ],
+          "relatedSkills": [
+            "组织"
+          ],
+          "questionCount": 14
+        }
+      ]
+    },
+    {
+      "name": "药学",
+      "specializations": [
+        {
+          "name": "药物化学",
+          "description": "药物设计/合成",
+          "coreCourses": [
+            "药物化学"
+          ],
+          "relatedSkills": [
+            "合成"
+          ],
+          "questionCount": 16
+        },
+        {
+          "name": "药剂学",
+          "description": "剂型/工艺",
+          "coreCourses": [
+            "药剂学"
+          ],
+          "relatedSkills": [
+            "GMP"
+          ],
+          "questionCount": 14
+        },
+        {
+          "name": "药理学",
+          "description": "药效/毒理",
+          "coreCourses": [
+            "药理学"
+          ],
+          "relatedSkills": [
+            "评估"
+          ],
+          "questionCount": 14
+        }
+      ]
+    },
+    {
+      "name": "国际经济与贸易",
+      "specializations": [
+        {
+          "name": "国际贸易实务",
+          "description": "进出口/结算/单证",
+          "coreCourses": [
+            "国际贸易实务"
+          ],
+          "relatedSkills": [
+            "实务操作"
+          ],
+          "questionCount": 14
+        },
+        {
+          "name": "国际市场与渠道",
+          "description": "市场分析/渠道管理",
+          "coreCourses": [
+            "国际市场营销"
+          ],
+          "relatedSkills": [
+            "谈判"
+          ],
+          "questionCount": 14
+        },
+        {
+          "name": "跨境电商与合规",
+          "description": "平台/合规/物流",
+          "coreCourses": [
+            "跨境电商"
+          ],
+          "relatedSkills": [
+            "运营"
+          ],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "信息管理与信息系统",
+      "specializations": [
+        {
+          "name": "信息系统分析与设计",
+          "description": "需求/分析/建模",
+          "coreCourses": [
+            "系统分析",
+            "面向对象分析设计"
+          ],
+          "relatedSkills": [
+            "流程建模"
+          ],
+          "questionCount": 14
+        },
+        {
+          "name": "数据与商业智能",
+          "description": "数据仓库/BI",
+          "coreCourses": [
+            "数据仓库",
+            "BI"
+          ],
+          "relatedSkills": [
+            "分析"
+          ],
+          "questionCount": 14
+        },
+        {
+          "name": "IT 治理与安全",
+          "description": "治理/安全/合规",
+          "coreCourses": [
+            "IT 治理",
+            "信息安全"
+          ],
+          "relatedSkills": [
+            "合规"
+          ],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "会计学",
+      "specializations": [
+        {
+          "name": "财务会计",
+          "description": "会计准则/报表",
+          "coreCourses": [
+            "会计学",
+            "财务会计"
+          ],
+          "relatedSkills": [
+            "核算"
+          ],
+          "questionCount": 14
+        },
+        {
+          "name": "管理会计",
+          "description": "成本/预算/绩效",
+          "coreCourses": [
+            "管理会计"
+          ],
+          "relatedSkills": [
+            "分析"
+          ],
+          "questionCount": 14
+        },
+        {
+          "name": "审计与税务",
+          "description": "审计/税务/筹划",
+          "coreCourses": [
+            "审计学",
+            "税法"
+          ],
+          "relatedSkills": [
+            "合规"
+          ],
+          "questionCount": 14
+        }
+      ]
+    },
+    {
+      "name": "市场营销",
+      "specializations": [
+        {
+          "name": "消费者行为与洞察",
+          "description": "调研/洞察",
+          "coreCourses": [
+            "消费者行为学"
+          ],
+          "relatedSkills": [
+            "分析"
+          ],
+          "questionCount": 14
+        },
+        {
+          "name": "品牌管理与传播",
+          "description": "品牌/传播",
+          "coreCourses": [
+            "品牌管理",
+            "整合营销传播"
+          ],
+          "relatedSkills": [
+            "策划"
+          ],
+          "questionCount": 14
+        },
+        {
+          "name": "数字营销与增长",
+          "description": "SEO/SEM/投放",
+          "coreCourses": [
+            "数字营销"
+          ],
+          "relatedSkills": [
+            "增长"
+          ],
+          "questionCount": 14
+        }
+      ]
+    },
+    {
+      "name": "公共管理",
+      "specializations": [
+        {
+          "name": "公共政策",
+          "description": "政策制定/评估",
+          "coreCourses": [
+            "公共政策"
+          ],
+          "relatedSkills": [
+            "研究"
+          ],
+          "questionCount": 12
+        },
+        {
+          "name": "公共服务与治理",
+          "description": "服务/治理/协同",
+          "coreCourses": [
+            "公共管理",
+            "社会治理"
+          ],
+          "relatedSkills": [
+            "协调"
+          ],
+          "questionCount": 12
+        },
+        {
+          "name": "非营利组织管理",
+          "description": "组织/筹资/项目",
+          "coreCourses": [
+            "非营利组织管理"
+          ],
+          "relatedSkills": [
+            "组织管理"
+          ],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "汉语言文学",
+      "specializations": [
+        {
+          "name": "古代文学",
+          "description": "先秦至明清",
+          "coreCourses": [
+            "古代文学",
+            "古典文献"
+          ],
+          "relatedSkills": [
+            "鉴赏"
+          ],
+          "questionCount": 12
+        },
+        {
+          "name": "现当代文学",
+          "description": "现代/当代文学",
+          "coreCourses": [
+            "现当代文学"
+          ],
+          "relatedSkills": [
+            "批评"
+          ],
+          "questionCount": 12
+        },
+        {
+          "name": "语言学与应用",
+          "description": "语言学/写作/应用",
+          "coreCourses": [
+            "语言学概论",
+            "写作"
+          ],
+          "relatedSkills": [
+            "表达"
+          ],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "英语",
+      "specializations": [
+        {
+          "name": "语言能力",
+          "description": "听说读写译",
+          "coreCourses": [
+            "综合英语",
+            "翻译"
+          ],
+          "relatedSkills": [
+            "沟通"
+          ],
+          "questionCount": 12
+        },
+        {
+          "name": "语言学与教学法",
+          "description": "语言学/教学法",
+          "coreCourses": [
+            "语言学",
+            "英语教学法"
+          ],
+          "relatedSkills": [
+            "教研"
+          ],
+          "questionCount": 12
+        },
+        {
+          "name": "跨文化与商务",
+          "description": "跨文化/商务英语",
+          "coreCourses": [
+            "跨文化交际",
+            "商务英语"
+          ],
+          "relatedSkills": [
+            "谈判"
+          ],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "新闻学",
+      "specializations": [
+        {
+          "name": "新闻采编",
+          "description": "采写编评",
+          "coreCourses": [
+            "新闻学概论",
+            "新闻采访与写作"
+          ],
+          "relatedSkills": [
+            "表达"
+          ],
+          "questionCount": 12
+        },
+        {
+          "name": "新媒体",
+          "description": "平台/内容/运营",
+          "coreCourses": [
+            "新媒体",
+            "内容运营"
+          ],
+          "relatedSkills": [
+            "增长"
+          ],
+          "questionCount": 12
+        },
+        {
+          "name": "数据新闻",
+          "description": "数据分析/可视化",
+          "coreCourses": [
+            "数据可视化",
+            "数据分析"
+          ],
+          "relatedSkills": [
+            "报道"
+          ],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "广告学",
+      "specializations": [
+        {
+          "name": "品牌与创意",
+          "description": "品牌策略与创意",
+          "coreCourses": [
+            "品牌管理",
+            "广告创意"
+          ],
+          "relatedSkills": [
+            "策划"
+          ],
+          "questionCount": 12
+        },
+        {
+          "name": "媒介与投放",
+          "description": "媒介策略与投放",
+          "coreCourses": [
+            "媒介策划"
+          ],
+          "relatedSkills": [
+            "优化"
+          ],
+          "questionCount": 12
+        },
+        {
+          "name": "数字整合营销",
+          "description": "整合营销/增长",
+          "coreCourses": [
+            "整合营销"
+          ],
+          "relatedSkills": [
+            "分析"
+          ],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "基础医学",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "基础医学·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "基础医学·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "基础医学·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "基础医学·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "预防医学",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "预防医学·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "预防医学·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "预防医学·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "预防医学·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "中医学",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "中医学·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "中医学·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "中医学·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "中医学·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "临床药学",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "临床药学·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "临床药学·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "临床药学·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "临床药学·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "中药学",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "中药学·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "中药学·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "中药学·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "中药学·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "医学检验技术",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "医学检验技术·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "医学检验技术·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "医学检验技术·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "医学检验技术·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "医学影像技术",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "医学影像技术·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "医学影像技术·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "医学影像技术·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "医学影像技术·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "军事学",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "军事学·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "军事学·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "军事学·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "军事学·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "管理科学",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "管理科学·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "管理科学·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "管理科学·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "管理科学·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "工程管理",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "工程管理·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "工程管理·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "工程管理·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "工程管理·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "财务管理",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "财务管理·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "财务管理·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "财务管理·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "财务管理·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "人力资源管理",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "人力资源管理·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "人力资源管理·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "人力资源管理·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "人力资源管理·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "农林经济管理",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "农林经济管理·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "农林经济管理·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "农林经济管理·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "农林经济管理·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "公共事业管理",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "公共事业管理·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "公共事业管理·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "公共事业管理·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "公共事业管理·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "行政管理",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "行政管理·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "行政管理·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "行政管理·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "行政管理·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "劳动与社会保障",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "劳动与社会保障·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "劳动与社会保障·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "劳动与社会保障·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "劳动与社会保障·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "图书馆学",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "图书馆学·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "图书馆学·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "图书馆学·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "图书馆学·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "档案学",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "档案学·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "档案学·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "档案学·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "档案学·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "物流管理",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "物流管理·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "物流管理·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "物流管理·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "物流管理·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "工业工程",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "工业工程·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "工业工程·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "工业工程·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "工业工程·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "电子商务",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "电子商务·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "电子商务·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "电子商务·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "电子商务·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "旅游管理",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "旅游管理·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "旅游管理·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "旅游管理·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "旅游管理·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "酒店管理",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "酒店管理·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "酒店管理·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "酒店管理·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "酒店管理·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "艺术史论",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "艺术史论·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "艺术史论·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "艺术史论·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "艺术史论·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "音乐表演",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "音乐表演·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "音乐表演·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "音乐表演·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "音乐表演·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "音乐学",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "音乐学·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "音乐学·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "音乐学·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "音乐学·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "舞蹈表演",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "舞蹈表演·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "舞蹈表演·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "舞蹈表演·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "舞蹈表演·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "舞蹈学",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "舞蹈学·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "舞蹈学·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "舞蹈学·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "舞蹈学·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "表演",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "表演·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "表演·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "表演·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "表演·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "戏剧影视文学",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "戏剧影视文学·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "戏剧影视文学·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "戏剧影视文学·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "戏剧影视文学·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "广播电视编导",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "广播电视编导·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "广播电视编导·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "广播电视编导·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "广播电视编导·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "戏剧影视导演",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "戏剧影视导演·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "戏剧影视导演·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "戏剧影视导演·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "戏剧影视导演·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "美术学",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "美术学·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "美术学·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "美术学·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "美术学·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "绘画",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "绘画·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "绘画·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "绘画·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "绘画·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "雕塑",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "雕塑·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "雕塑·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "雕塑·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "雕塑·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "艺术设计学",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "艺术设计学·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "艺术设计学·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "艺术设计学·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "艺术设计学·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "视觉传达设计",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "视觉传达设计·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "视觉传达设计·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "视觉传达设计·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "视觉传达设计·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "环境设计",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "环境设计·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "环境设计·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "环境设计·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "环境设计·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "产品设计",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "产品设计·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "产品设计·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "产品设计·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "产品设计·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "服装与服饰设计",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "服装与服饰设计·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "服装与服饰设计·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "服装与服饰设计·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "服装与服饰设计·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "数字媒体艺术",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "数字媒体艺术·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "数字媒体艺术·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "数字媒体艺术·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "数字媒体艺术·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "哲学",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "哲学·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "哲学·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "哲学·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "哲学·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "逻辑学",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "逻辑学·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "逻辑学·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "逻辑学·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "逻辑学·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "宗教学",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "宗教学·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "宗教学·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "宗教学·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "宗教学·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "国民经济学",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "国民经济学·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "国民经济学·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "国民经济学·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "国民经济学·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "经济学",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "经济学·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "经济学·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "经济学·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "经济学·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "经济统计学",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "经济统计学·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "经济统计学·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "经济统计学·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "经济统计学·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "国民经济管理",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "国民经济管理·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "国民经济管理·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "国民经济管理·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "国民经济管理·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "资源与环境经济学",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "资源与环境经济学·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "资源与环境经济学·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "资源与环境经济学·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "资源与环境经济学·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "商务经济学",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "商务经济学·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "商务经济学·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "商务经济学·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "商务经济学·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "能源经济",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "能源经济·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "能源经济·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "能源经济·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "能源经济·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "财政学",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "财政学·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "财政学·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "财政学·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "财政学·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "税收学",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "税收学·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "税收学·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "税收学·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "税收学·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "金融工程",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "金融工程·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "金融工程·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "金融工程·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "金融工程·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "保险学",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "保险学·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "保险学·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "保险学·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "保险学·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "投资学",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "投资学·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "投资学·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "投资学·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "投资学·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "金融数学",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "金融数学·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "金融数学·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "金融数学·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "金融数学·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "信用管理",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "信用管理·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "信用管理·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "信用管理·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "信用管理·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "经济与金融",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "经济与金融·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "经济与金融·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "经济与金融·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "经济与金融·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "贸易经济",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "贸易经济·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "贸易经济·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "贸易经济·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "贸易经济·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "政治学与行政学",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "政治学与行政学·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "政治学与行政学·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "政治学与行政学·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "政治学与行政学·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "国际政治",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "国际政治·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "国际政治·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "国际政治·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "国际政治·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "外交学",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "外交学·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "外交学·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "外交学·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "外交学·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "社会学",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "社会学·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "社会学·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "社会学·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "社会学·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "社会工作",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "社会工作·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "社会工作·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "社会工作·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "社会工作·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "民族学",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "民族学·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "民族学·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "民族学·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "民族学·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "科学社会主义",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "科学社会主义·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "科学社会主义·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "科学社会主义·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "科学社会主义·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "中国共产党历史",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "中国共产党历史·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "中国共产党历史·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "中国共产党历史·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "中国共产党历史·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "思想政治教育",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "思想政治教育·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "思想政治教育·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "思想政治教育·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "思想政治教育·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "治安学",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "治安学·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "治安学·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "治安学·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "治安学·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "侦查学",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "侦查学·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "侦查学·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "侦查学·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "侦查学·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "边防管理",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "边防管理·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "边防管理·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "边防管理·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "边防管理·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "教育学",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "教育学·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "教育学·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "教育学·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "教育学·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "科学教育",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "科学教育·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "科学教育·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "科学教育·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "科学教育·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "学前教育",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "学前教育·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "学前教育·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "学前教育·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "学前教育·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "特殊教育",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "特殊教育·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "特殊教育·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "特殊教育·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "特殊教育·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "体育教育",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "体育教育·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "体育教育·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "体育教育·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "体育教育·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "运动训练",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "运动训练·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "运动训练·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "运动训练·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "运动训练·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "社会体育指导与管理",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "社会体育指导与管理·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "社会体育指导与管理·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "社会体育指导与管理·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "社会体育指导与管理·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "汉语言",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "汉语言·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "汉语言·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "汉语言·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "汉语言·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "汉语国际教育",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "汉语国际教育·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "汉语国际教育·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "汉语国际教育·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "汉语国际教育·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "俄语",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "俄语·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "俄语·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "俄语·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "俄语·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "德语",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "德语·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "德语·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "德语·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "德语·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "法语",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "法语·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "法语·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "法语·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "法语·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "西班牙语",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "西班牙语·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "西班牙语·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "西班牙语·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "西班牙语·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "日语",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "日语·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "日语·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "日语·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "日语·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "广播电视学",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "广播电视学·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "广播电视学·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "广播电视学·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "广播电视学·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "传播学",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "传播学·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "传播学·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "传播学·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "传播学·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "编辑出版学",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "编辑出版学·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "编辑出版学·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "编辑出版学·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "编辑出版学·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "网络与新媒体",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "网络与新媒体·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "网络与新媒体·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "网络与新媒体·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "网络与新媒体·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "历史学",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "历史学·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "历史学·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "历史学·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "历史学·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "世界史",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "世界史·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "世界史·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "世界史·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "世界史·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "考古学",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "考古学·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "考古学·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "考古学·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "考古学·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "文物与博物馆学",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "文物与博物馆学·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "文物与博物馆学·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "文物与博物馆学·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "文物与博物馆学·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "信息与计算科学",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "信息与计算科学·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "信息与计算科学·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "信息与计算科学·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "信息与计算科学·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "应用物理学",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "应用物理学·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "应用物理学·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "应用物理学·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "应用物理学·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "天文学",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "天文学·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "天文学·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "天文学·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "天文学·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "地理科学",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "地理科学·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "地理科学·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "地理科学·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "地理科学·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "自然地理与资源环境",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "自然地理与资源环境·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "自然地理与资源环境·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "自然地理与资源环境·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "自然地理与资源环境·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "人文地理与城乡规划",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "人文地理与城乡规划·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "人文地理与城乡规划·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "人文地理与城乡规划·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "人文地理与城乡规划·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "大气科学",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "大气科学·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "大气科学·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "大气科学·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "大气科学·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "应用气象学",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "应用气象学·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "应用气象学·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "应用气象学·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "应用气象学·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "海洋科学",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "海洋科学·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "海洋科学·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "海洋科学·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "海洋科学·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "海洋技术",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "海洋技术·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "海洋技术·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "海洋技术·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "海洋技术·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "地球物理学",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "地球物理学·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "地球物理学·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "地球物理学·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "地球物理学·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "地质学",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "地质学·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "地质学·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "地质学·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "地质学·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "地球化学",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "地球化学·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "地球化学·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "地球化学·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "地球化学·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "心理学",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "心理学·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "心理学·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "心理学·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "心理学·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "应用心理学",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "应用心理学·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "应用心理学·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "应用心理学·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "应用心理学·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "应用统计学",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "应用统计学·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "应用统计学·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "应用统计学·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "应用统计学·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "理论与应用力学",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "理论与应用力学·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "理论与应用力学·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "理论与应用力学·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "理论与应用力学·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "机械设计制造及其自动化",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "机械设计制造及其自动化·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "机械设计制造及其自动化·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "机械设计制造及其自动化·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "机械设计制造及其自动化·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "车辆工程",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "车辆工程·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "车辆工程·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "车辆工程·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "车辆工程·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "材料物理",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "材料物理·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "材料物理·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "材料物理·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "材料物理·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "材料化学",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "材料化学·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "材料化学·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "材料化学·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "材料化学·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "电子科学与技术",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "电子科学与技术·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "电子科学与技术·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "电子科学与技术·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "电子科学与技术·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "通信工程",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "通信工程·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "通信工程·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "通信工程·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "通信工程·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "光电信息科学与工程",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "光电信息科学与工程·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "光电信息科学与工程·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "光电信息科学与工程·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "光电信息科学与工程·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "网络工程",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "网络工程·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "网络工程·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "网络工程·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "网络工程·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "信息安全",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "信息安全·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "信息安全·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "信息安全·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "信息安全·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "物联网工程",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "物联网工程·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "物联网工程·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "物联网工程·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "物联网工程·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "数字媒体技术",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "数字媒体技术·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "数字媒体技术·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "数字媒体技术·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "数字媒体技术·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "区块链工程",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "区块链工程·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "区块链工程·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "区块链工程·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "区块链工程·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "水利水电工程",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "水利水电工程·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "水利水电工程·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "水利水电工程·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "水利水电工程·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "化学工程与工艺",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "化学工程与工艺·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "化学工程与工艺·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "化学工程与工艺·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "化学工程与工艺·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "制药工程",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "制药工程·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "制药工程·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "制药工程·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "制药工程·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "航空航天工程",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "航空航天工程·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "航空航天工程·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "航空航天工程·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "航空航天工程·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "飞行器设计与工程",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "飞行器设计与工程·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "飞行器设计与工程·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "飞行器设计与工程·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "飞行器设计与工程·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "农学",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "农学·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "农学·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "农学·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "农学·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "园艺",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "园艺·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "园艺·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "园艺·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "园艺·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "农业资源与环境",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "农业资源与环境·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "农业资源与环境·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "农业资源与环境·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "农业资源与环境·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "动物科学",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "动物科学·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "动物科学·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "动物科学·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "动物科学·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "动物医学",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "动物医学·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "动物医学·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "动物医学·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "动物医学·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "林学",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "林学·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "林学·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "林学·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "林学·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "水产养殖学",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "水产养殖学·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "水产养殖学·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "水产养殖学·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "水产养殖学·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    },
+    {
+      "name": "草业科学",
+      "aliases": [],
+      "specializations": [
+        {
+          "name": "草业科学·基础方向",
+          "description": "基础理论与核心概念",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "草业科学·工程实践",
+          "description": "工程与项目实践",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "草业科学·进阶专题",
+          "description": "前沿与专题深化",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        },
+        {
+          "name": "草业科学·应用场景",
+          "description": "典型应用与案例",
+          "coreCourses": [],
+          "relatedSkills": [],
+          "questionCount": 12
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,81 @@
+[
+  {
+    "id": 980317,
+    "domainId": 1,
+    "type": "short_answer",
+    "title": "案例：订单-支付-库存的 Saga 设计",
+    "question": "为订单创建流程设计 Saga。给出本地事务、补偿动作、失败分支（库存不足/支付失败）与超时处理，说明如何保证幂等与去重。",
+    "difficulty": "hard",
+    "tags": ["case", "saga", "idempotency"],
+    "answer": "T1: 创建订单(状态=Pending)；T2: 预占库存（补偿：释放预占）；T3: 发起支付（补偿：退款/撤销）；T4: 确认订单。失败分支触发相应补偿并终态化订单。幂等：业务键/幂等键+唯一索引，消息去重表；补偿与状态机均幂等；超时通过定时/补偿队列回查。",
+    "explanation": "明确状态机与补偿路径并端到端幂等，才能稳定落地 Saga。",
+    "metadata": { "specialization": "架构与微服务", "specialization_slug": "architecture-and-microservices" },
+    "createdAt": "2025-11-09T11:10:00Z"
+  },
+  {
+    "id": 980318,
+    "domainId": 1,
+    "type": "short_answer",
+    "title": "计算：Outbox 吞吐与延迟",
+    "question": "单库 Outbox 表，事件 2k/s，平均每事务 1 事件，DB 提交开销 4ms，批量转发器每批 500 条、批间 20ms。估算端到端事件可见延迟的主要构成并给出优化方向。",
+    "difficulty": "medium",
+    "tags": ["calculation", "outbox", "throughput"],
+    "answer": "入库路径延迟≈事务提交 4ms；出库批处理：500/2000s=0.25s 聚满，批间隔 20ms，消费与发布开销略。端到端 p50≈~250-300ms。优化：多分区/表分片、减小批量或并行批、拉直链路（CDC/事务日志）、限压与背压对齐生产速率。",
+    "explanation": "批处理与聚满等待是主要延迟来源，需并行化/CDC 降低。",
+    "metadata": { "specialization": "架构与微服务", "specialization_slug": "architecture-and-microservices" },
+    "createdAt": "2025-11-09T11:11:00Z"
+  },
+  {
+    "id": 980319,
+    "domainId": 1,
+    "type": "short_answer",
+    "title": "案例：缓存击穿与 TTL 抖动",
+    "question": "商品详情缓存 QPS 10万，单键热点。统一 TTL 300s 导致击穿风暴。给出防护方案并估算引入 ±10% 抖动后的同时失效概率变化趋势。",
+    "difficulty": "medium",
+    "tags": ["case", "cache", "stampede"],
+    "answer": "互斥/请求合并、随机化 TTL、预热与后台刷新、热点隔离、降级兜底。±10% 抖动将失效时间在 [270,330]s 区间均匀分散，大幅降低同一时刻集中失效的概率，显著缓解风暴。",
+    "explanation": "时间去同步化是治理击穿的关键手段之一。",
+    "metadata": { "specialization": "架构与微服务", "specialization_slug": "architecture-and-microservices" },
+    "createdAt": "2025-11-09T11:12:00Z"
+  },
+  {
+    "id": 980320,
+    "domainId": 1,
+    "type": "short_answer",
+    "title": "计算：一致性哈希扩容的迁移比例",
+    "question": "从 128 分片扩容到 192 分片，采用一致性哈希（足够虚拟节点）。估算期望数据迁移占比，并说明如何降低冷热迁移影响。",
+    "difficulty": "easy",
+    "tags": ["calculation", "consistent-hash", "sharding"],
+    "answer": "期望迁移占比≈1-128/192≈1/3≈33%。降低影响：限速迁移、优先非热点分片、双写比对与校验、灰度扩容与回滚、读写分流与缓存旁路。",
+    "explanation": "一致性哈希扩容的平均移动比例与分片数之比相关。",
+    "metadata": { "specialization": "架构与微服务", "specialization_slug": "architecture-and-microservices" },
+    "createdAt": "2025-11-09T11:13:00Z"
+  },
+  {
+    "id": 980321,
+    "domainId": 1,
+    "type": "short_answer",
+    "title": "案例：多区域主动-主动与 RPO/RTO",
+    "question": "业务需 RPO≈0、RTO<30s。请给出多区域主动-主动方案（全局一致标识、写入仲裁、拓扑隔离）与降级策略，并说明在网络分区下的一致性与可用性取舍。",
+    "difficulty": "hard",
+    "tags": ["case", "multi-region", "rpo-rto"],
+    "answer": "采用跨区复制+仲裁（如 Quorum/Paxos/Raft 派生），全局ID与去重保障幂等；读本地写仲裁或单主多从+快速主切；分区时降级为区域内一致并限制跨区写（牺牲一致/可用其一）；RTO 通过健康探测与自动切换满足，RPO≈0 需同步仲裁写。",
+    "explanation": "CAP 权衡决定在分区时的一致性/可用性选择。",
+    "metadata": { "specialization": "架构与微服务", "specialization_slug": "architecture-and-microservices" },
+    "createdAt": "2025-11-09T11:14:00Z"
+  },
+  {
+    "id": 980322,
+    "domainId": 1,
+    "type": "short_answer",
+    "title": "计算：令牌桶限流参数",
+    "question": "期望峰值 1000 RPS、允许瞬时突发 200。请给出令牌桶的令牌填充速率与桶容量设置，并说明在网关级落地的注意事项。",
+    "difficulty": "easy",
+    "tags": ["calculation", "rate-limit", "token-bucket"],
+    "answer": "填充速率≈1000 令牌/秒，桶容量≈200。注意：多实例一致性、时钟偏差、分布式限流（全局维度）、维度隔离（IP/用户/接口）、与后端的背压/重试/熔断协同。",
+    "explanation": "容量=允许的瞬时突发量，填充速率≈稳态目标吞吐。",
+    "metadata": { "specialization": "架构与微服务", "specialization_slug": "architecture-and-microservices" },
+    "createdAt": "2025-11-09T11:15:00Z"
+  }
+]
+

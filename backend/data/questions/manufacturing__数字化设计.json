@@ -1,0 +1,34 @@
+[
+  {
+    "id": 950101,
+    "domainId": 1,
+    "type": "short_answer",
+    "title": "数字孪生在产品全生命周期的作用",
+    "question": "简述数字孪生在设计/制造/运维阶段的价值与典型数据来源。",
+    "difficulty": "medium",
+    "tags": ["digital-twin", "plm"],
+    "answer": "设计阶段验证与优化、制造阶段工艺与质量监控、运维阶段状态监测与预测维护；数据来自CAD/CAE、MES/SCADA、IoT。",
+    "explanation": "数字孪生连接虚实，通过数据与模型闭环提升效率与质量。",
+    "metadata": { "specialization": "数字化设计" },
+    "createdAt": "2024-11-01T10:50:00Z"
+  },
+  {
+    "id": 950102,
+    "domainId": 1,
+    "type": "multiple_choice",
+    "title": "PLM 与 CAD/CAE 的关系",
+    "question": "选择所有正确项",
+    "difficulty": "easy",
+    "choices": [
+      {"key": "A", "text": "PLM 管理产品数据与流程"},
+      {"key": "B", "text": "CAD/CAE 生成与分析模型数据"},
+      {"key": "C", "text": "PLM 完全替代 CAD/CAE"},
+      {"key": "D", "text": "PLM 与 CAD/CAE 集成可追溯变更"}
+    ],
+    "correctOptions": ["A", "B", "D"],
+    "tags": ["plm", "cad", "cae"],
+    "explanation": "PLM 管理全生命周期，CAD/CAE 负责建模分析，二者集成提升一致性与追溯。",
+    "metadata": { "specialization": "数字化设计" },
+    "createdAt": "2024-11-01T10:55:00Z"
+  }
+]

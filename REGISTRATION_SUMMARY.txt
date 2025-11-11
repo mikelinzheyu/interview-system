@@ -1,0 +1,260 @@
+================================================================================
+  智能面试系统 - 用户注册系统详细指南
+================================================================================
+
+## 1. 核心API端点
+
+注册API:
+  POST /api/v1/auth/register
+  请求体: {
+    "username": "user123",
+    "email": "user@example.com",
+    "password": "Pass123",
+    "realName": "张三",
+    "phone": "13800138000"
+  }
+  响应: { user object, token }
+
+登录API:
+  POST /api/v1/auth/login
+  请求体: {
+    "email": "user@example.com",
+    "password": "Pass123",
+    "remember": true
+  }
+  响应: { user object, token, expires_at }
+
+================================================================================
+## 2. 数据库User表字段
+
+id               - 用户ID (自增)
+username         - 用户名 (唯一, 3-50字符)
+email            - 邮箱 (唯一)
+password         - 密码 (BCrypt加密)
+real_name        - 真实姓名
+phone            - 手机号
+avatar           - 头像URL
+bio              - 个人简介
+status           - 用户状态 (active/inactive/banned)
+total_answered   - 总答题数
+correct_answered - 正确答题数
+accuracy_rate    - 准确率
+study_time       - 学习时长
+interview_count  - 面试次数
+created_at       - 创建时间
+updated_at       - 更新时间
+
+================================================================================
+## 3. 前端验证规则
+
+username: 
+  - 必填, 3-20字符
+  - 仅字母/数字/下划线
+
+real_name:
+  - 必填, 2-10字符
+
+password:
+  - 必填, 6-20字符
+  - 必须包含字母和数字
+
+phone:
+  - 必填, 11位
+  - 格式: 1[3-9]开头的中国手机号
+
+code:
+  - 必填, 恰好6位数字
+
+================================================================================
+## 4. 后端验证规则
+
+username:
+  - @NotBlank
+  - @Size(min=3, max=50)
+  - 检查唯一性
+
+email:
+  - @NotBlank
+  - @Email
+  - 检查唯一性
+
+password:
+  - @NotBlank
+  - @Size(min=6, max=32)
+  - 通过BCryptPasswordEncoder加密
+
+================================================================================
+## 5. 注册流程
+
+前端:
+  1. 用户填写表单
+  2. 验证表单数据 (本地验证)
+  3. 显示滑块验证 (vue3-puzzle-vcode)
+  4. 验证通过后发送短信验证码 (POST /api/auth/sms/send)
+  5. 用户输入验证码
+  6. 点击"立即注册"发起注册请求
+  7. 保存token和用户信息到localStorage
+  8. 跳转到首页 (/home)
+
+后端:
+  1. 接收UserRegisterDto
+  2. 验证username唯一性
+  3. 验证email唯一性
+  4. 创建User对象
+  5. 使用BCryptPasswordEncoder加密密码
+  6. 设置初始状态和统计数据
+  7. 插入到users表
+  8. 生成JWT Token
+  9. 返回User对象 + Token
+
+================================================================================
+## 6. 登录流程
+
+1. 接收UserLoginDto (email, password)
+2. 根据email/username查询用户
+   - 不存在 → 401 "用户不存在"
+3. 验证密码 (passwordEncoder.matches)
+   - 不匹配 → 401 "密码错误"
+4. 检查用户状态
+   - 非'active' → 403 "用户已被禁用"
+5. 生成JWT Token
+6. 返回User + Token + Expiration
+
+================================================================================
+## 7. 创建测试用户 - API方式
+
+使用curl:
+  curl -X POST http://localhost:8080/api/v1/auth/register \
+    -H "Content-Type: application/json" \
+    -d '{
+      "username": "testuser123",
+      "email": "testuser@example.com",
+      "password": "Test@123456",
+      "realName": "测试用户",
+      "phone": "13800138000"
+    }'
+
+使用JavaScript:
+  const response = await fetch('/api/v1/auth/register', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      username: 'testuser123',
+      email: 'testuser@example.com',
+      password: 'Test@123456',
+      realName: '测试用户',
+      phone: '13800138000'
+    })
+  })
+  const result = await response.json()
+  console.log(result.data.token)
+  console.log(result.data.user)
+
+================================================================================
+## 8. 创建测试用户 - SQL方式
+
+INSERT INTO users (
+  username, email, password, real_name, phone, status,
+  total_answered, correct_answered, accuracy_rate, study_time,
+  interview_count, created_at, updated_at
+) VALUES (
+  'testuser123',
+  'testuser@example.com',
+  '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcg7b3XeKeUxWdeS86E36XQIi2m',
+  '测试用户',
+  '13800138000',
+  'active',
+  0, 0, 0.0, 0, 0,
+  NOW(), NOW()
+);
+
+注意: password必须是BCrypt加密的哈希值
+
+================================================================================
+## 9. JWT Token信息
+
+配置:
+  secret: JWT_SECRET环境变量或默认值
+  expiration: 86400000ms (24小时)
+  prefix: "Bearer "
+
+Token内容:
+  - Subject: username
+  - Claims: userId
+  - Issued At: 当前时间
+  - Expiration: 当前时间 + 24小时
+  - Signature: HS512算法
+
+使用:
+  Authorization: Bearer <token>
+
+提取信息:
+  Long userId = jwtUtils.getUserIdFromToken(token)
+  String username = jwtUtils.getUsernameFromToken(token)
+
+================================================================================
+## 10. 密码加密
+
+方式: BCryptPasswordEncoder (Spring Security)
+
+强度: 10级
+
+加密:
+  BCryptPasswordEncoder encoder = new BCryptPasswordEncoder()
+  String hashedPassword = encoder.encode("Test@123456")
+
+验证:
+  passwordEncoder.matches(inputPassword, storedHash)
+
+================================================================================
+## 11. API错误响应
+
+409: 用户名已存在
+409: 邮箱已被注册
+401: 用户不存在
+401: 密码错误
+403: 用户已被禁用
+404: 用户不存在
+400: 字段验证失败
+
+================================================================================
+## 12. 相关文件位置
+
+后端:
+  AuthController: backend/main/java/.../controller/AuthController.java
+  UserService: backend/main/java/.../service/UserService.java
+  UserServiceImpl: backend/main/java/.../service/impl/UserServiceImpl.java
+  UserMapper: backend/main/java/.../mapper/UserMapper.java
+  UserMapper.xml: backend/main/resources/mapper/UserMapper.xml
+  User Entity: backend/main/java/.../entity/User.java
+  UserRegisterDto: backend/main/java/.../dto/UserRegisterDto.java
+  UserLoginDto: backend/main/java/.../dto/UserLoginDto.java
+  JwtUtils: backend/main/java/.../util/JwtUtils.java
+  SecurityConfig: backend/main/java/.../config/SecurityConfig.java
+  application.yml: backend/main/resources/application.yml
+
+前端:
+  Register.vue: frontend/src/views/auth/Register.vue
+  Login.vue: frontend/src/views/auth/Login.vue
+  auth.js: frontend/src/api/auth.js
+  user.js: frontend/src/api/user.js
+  user store: frontend/src/stores/user.js
+
+数据库:
+  Schema: frontend/interview_system.sql
+  Test Schema: backend/test/resources/schema.sql
+
+================================================================================
+## 13. 测试用户凭证示例
+
+用户名: testuser123
+邮箱: testuser@example.com
+密码: Test@123456
+真实姓名: 测试用户
+手机号: 13800138000
+
+登录时使用:
+  邮箱或用户名: testuser@example.com (或 testuser123)
+  密码: Test@123456
+
+================================================================================

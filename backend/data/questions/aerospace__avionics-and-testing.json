@@ -1,0 +1,125 @@
+[
+  {
+    "id": 930201,
+    "domainId": 1,
+    "type": "short_answer",
+    "title": "ARINC 429 与 AFDX 的差异",
+    "question": "比较 ARINC 429 与 ARINC 664/AFDX 的链路/拓扑、带宽与确定性保障机制及适用场景。",
+    "difficulty": "medium",
+    "tags": ["avionics", "arinc429", "afdx"],
+    "answer": "ARINC 429 为点对多点的单向总线，速率低、简单可靠；AFDX 基于以太网提供虚拟链路（VL）与带宽/抖动保证，适合高带宽与多主通信。429 适合简单传感与指令，AFDX 适合综合航电网络。",
+    "explanation": "AFDX 通过带宽分配与流量整形提供确定性，429 依赖简单协议与布线隔离保障可靠。",
+    "metadata": { "specialization": "飞行器航电与测试", "specialization_slug": "avionics-and-testing" },
+    "createdAt": "2025-11-09T09:30:00Z"
+  },
+  {
+    "id": 930202,
+    "domainId": 1,
+    "type": "multiple_choice",
+    "title": "航电总线与标准，哪些说法正确？",
+    "question": "选择所有正确项",
+    "difficulty": "easy",
+    "choices": [
+      { "key": "A", "text": "MIL-STD-1553 采用双冗余总线" },
+      { "key": "B", "text": "AFDX 基于以太网并提供确定性传输" },
+      { "key": "C", "text": "ARINC 429 支持多主对等通信" },
+      { "key": "D", "text": "DO-178C 与 DO-254 分别规范软件与硬件开发流程" }
+    ],
+    "correctOptions": ["A", "B", "D"],
+    "tags": ["standards", "1553", "do178c", "do254"],
+    "explanation": "429 为单向点对多点；1553 为总线控制器/远端终端结构且双冗余；AFDX 在以太之上实现 VL 与带宽保证。",
+    "metadata": { "specialization": "飞行器航电与测试", "specialization_slug": "avionics-and-testing" },
+    "createdAt": "2025-11-09T09:31:00Z"
+  },
+  {
+    "id": 930203,
+    "domainId": 1,
+    "type": "short_answer",
+    "title": "DO-178C DAL 级别与证据",
+    "question": "说明 DAL A–E 的含义、与安全评估的关系，以及需产出的关键证据（需求可追踪、代码审查、结构覆盖等）。",
+    "difficulty": "hard",
+    "tags": ["do178c", "dal", "safety"],
+    "answer": "DAL 依据失效后果分级（A 最高），决定验证严苛程度；需建立从高层需求到测试的可追踪，执行单元/集成/系统级验证，DAL A 要求结构覆盖达 MC/DC，并提供独立性与配置管理证据。",
+    "explanation": "DAL 并非质量等级，而是与失效危害相关的保证强度。",
+    "metadata": { "specialization": "飞行器航电与测试", "specialization_slug": "avionics-and-testing" },
+    "createdAt": "2025-11-09T09:32:00Z"
+  },
+  {
+    "id": 930204,
+    "domainId": 1,
+    "type": "multiple_choice",
+    "title": "SIL/HIL 与 Iron Bird",
+    "question": "选择所有正确项",
+    "difficulty": "medium",
+    "choices": [
+      { "key": "A", "text": "Iron Bird 用于系统集成与地面试验验证" },
+      { "key": "B", "text": "HIL 是在仿真环境中接入真实硬件" },
+      { "key": "C", "text": "SIL 指软件在目标硬件上运行" },
+      { "key": "D", "text": "地面与飞行试验可由仿真完全替代" }
+    ],
+    "correctOptions": ["A", "B"],
+    "tags": ["hil", "sil", "integration"],
+    "explanation": "SIL 在仿真环境中运行软件；仿真无法替代全部环境与安全验证。",
+    "metadata": { "specialization": "飞行器航电与测试", "specialization_slug": "avionics-and-testing" },
+    "createdAt": "2025-11-09T09:33:00Z"
+  },
+  {
+    "id": 930205,
+    "domainId": 1,
+    "type": "short_answer",
+    "title": "冗余与 FDIR 设计",
+    "question": "简述三余度/异构冗余、交叉监测与故障检测隔离恢复（FDIR）的思路。",
+    "difficulty": "medium",
+    "tags": ["redundancy", "fdir", "reliability"],
+    "answer": "通过三余度投票或异构冗余提高抗同源失效能力；跨通道交叉监测与一致性校验；FDIR 以检测-隔离-重构闭环，触发降级/重构策略，保持关键功能。",
+    "explanation": "异构+隔离可降低共因失效风险，但成本与复杂度上升。",
+    "metadata": { "specialization": "飞行器航电与测试", "specialization_slug": "avionics-and-testing" },
+    "createdAt": "2025-11-09T09:34:00Z"
+  },
+  {
+    "id": 930206,
+    "domainId": 1,
+    "type": "multiple_choice",
+    "title": "实时与调度保证",
+    "question": "选择所有正确项",
+    "difficulty": "hard",
+    "choices": [
+      { "key": "A", "text": "ARINC 653 提供空间与时间分区" },
+      { "key": "B", "text": "固定优先级调度可结合响应时间分析进行验证" },
+      { "key": "C", "text": "非抢占调度总优于抢占调度" },
+      { "key": "D", "text": "随机调度策略可提升硬实时确定性" }
+    ],
+    "correctOptions": ["A", "B"],
+    "tags": ["rtos", "arinc653", "scheduling"],
+    "explanation": "是否抢占需结合工作负载与证明难度权衡；随机性不利于确定性。",
+    "metadata": { "specialization": "飞行器航电与测试", "specialization_slug": "avionics-and-testing" },
+    "createdAt": "2025-11-09T09:35:00Z"
+  },
+  {
+    "id": 930207,
+    "domainId": 1,
+    "type": "short_answer",
+    "title": "DO-160 环境试验要点",
+    "question": "概述温度湿度、震动、EMI/EMC 等环境试验类别与对设计的影响。",
+    "difficulty": "medium",
+    "tags": ["do160", "emi", "emc"],
+    "answer": "DO-160 定义多类环境测试（温湿/高度/振动/冲击/EMI/EMC 等）；设计需考虑去耦与滤波、屏蔽接地、热设计与结构加固，以满足对应等级要求。",
+    "explanation": "早期考虑环境约束可降低后期整改代价。",
+    "metadata": { "specialization": "飞行器航电与测试", "specialization_slug": "avionics-and-testing" },
+    "createdAt": "2025-11-09T09:36:00Z"
+  },
+  {
+    "id": 930208,
+    "domainId": 1,
+    "type": "short_answer",
+    "title": "IMU/AHRS 标定与对准",
+    "question": "说明陀螺与加计的偏置/比例因子/安装误差标定及地面/空中对准流程要点。",
+    "difficulty": "hard",
+    "tags": ["imu", "ahrs", "calibration"],
+    "answer": "通过多姿态/多温度标定估计零偏与比例因子并补偿安装误差；对准可用静态/动态方法，结合地磁/气压/卫星导航融合；关注观测可观与收敛速度。",
+    "explanation": "高质量建模与温漂补偿直接影响导航精度与鲁棒性。",
+    "metadata": { "specialization": "飞行器航电与测试", "specialization_slug": "avionics-and-testing" },
+    "createdAt": "2025-11-09T09:37:00Z"
+  }
+]
+

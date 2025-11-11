@@ -1,0 +1,131 @@
+[
+  {
+    "id": 980209,
+    "domainId": 1,
+    "type": "short_answer",
+    "title": "测试策略、测试计划与测试用例的区别",
+    "question": "区分测试策略（Strategy）、测试计划（Plan）与测试用例（Case），并说明三者如何在迭代中联动。",
+    "difficulty": "easy",
+    "tags": ["test-strategy", "test-plan", "test-case"],
+    "answer": "策略定方向（范围、方法、风险优先级）、计划落地资源与排期、用例落实可执行检查；迭代中策略指导计划，计划分解为用例集，回归数据反哺策略与计划调整。",
+    "explanation": "确保战略-战术-执行三层闭环，持续依据风险与数据调整。",
+    "metadata": { "specialization": "质量与测试", "specialization_slug": "quality-and-testing" },
+    "createdAt": "2025-11-09T10:00:00Z"
+  },
+  {
+    "id": 980210,
+    "domainId": 1,
+    "type": "multiple_choice",
+    "title": "性能测试类型与目标，哪些正确？",
+    "question": "选择所有正确项",
+    "difficulty": "medium",
+    "choices": [
+      { "key": "A", "text": "负载测试关注在目标吞吐下的稳定性" },
+      { "key": "B", "text": "压力测试旨在找到系统崩溃的阈值" },
+      { "key": "C", "text": "疲劳/浸泡测试用于发现长期资源泄漏" },
+      { "key": "D", "text": "冲击测试（Spike）关注极端平均负载表现" }
+    ],
+    "correctOptions": ["A", "B", "C"],
+    "tags": ["performance", "load", "stress", "soak"],
+    "explanation": "Spike 关注瞬时脉冲与弹性，非平均负载。",
+    "metadata": { "specialization": "质量与测试", "specialization_slug": "quality-and-testing" },
+    "createdAt": "2025-11-09T10:01:00Z"
+  },
+  {
+    "id": 980211,
+    "domainId": 1,
+    "type": "short_answer",
+    "title": "契约测试在流水线中的集成",
+    "question": "描述消费者驱动契约在 CI/CD 中的发布与验证流程（含 Pact Broker 类似机制）。",
+    "difficulty": "medium",
+    "tags": ["contract-testing", "pact", "ci"],
+    "answer": "Consumer 在构建阶段生成契约并发布到 Broker；Provider 在其流水线拉取所有相关契约进行验证，通过后发布兼容版本并标记；部署前通过标签/矩阵选择兼容组合进行验收。",
+    "explanation": "通过 Broker 实现契约可见与版本治理，减少集成不确定性。",
+    "metadata": { "specialization": "质量与测试", "specialization_slug": "quality-and-testing" },
+    "createdAt": "2025-11-09T10:02:00Z"
+  },
+  {
+    "id": 980212,
+    "domainId": 1,
+    "type": "multiple_choice",
+    "title": "测试数据脱敏与合成，哪些表述合理？",
+    "question": "选择所有正确项",
+    "difficulty": "medium",
+    "choices": [
+      { "key": "A", "text": "直接复制生产数据最真实，合规风险可忽略" },
+      { "key": "B", "text": "合成数据需保持统计分布与边界条件" },
+      { "key": "C", "text": "脱敏应兼顾可逆性与链路可用性" },
+      { "key": "D", "text": "子集抽样可降低成本但需验证代表性" }
+    ],
+    "correctOptions": ["B", "C", "D"],
+    "tags": ["tdm", "privacy", "synthetic-data"],
+    "explanation": "生产直拷存在重大合规风险；需基于策略与工具保障可用与合规。",
+    "metadata": { "specialization": "质量与测试", "specialization_slug": "quality-and-testing" },
+    "createdAt": "2025-11-09T10:03:00Z"
+  },
+  {
+    "id": 980213,
+    "domainId": 1,
+    "type": "short_answer",
+    "title": "可观测性驱动的端到端测试",
+    "question": "如何利用指标、日志、追踪提升 E2E 测试问题定位效率？",
+    "difficulty": "medium",
+    "tags": ["observability", "tracing", "e2e"],
+    "answer": "在测试注入 Trace Context，链路中埋点关键业务事件与断言侧车；利用指标设定 SLO/告警门限，日志结构化与采样策略优化；失败时基于 Trace 与指标回溯瓶颈并定位责任域。",
+    "explanation": "可观测性让端到端测试从“黑盒”变“透明盒”。",
+    "metadata": { "specialization": "质量与测试", "specialization_slug": "quality-and-testing" },
+    "createdAt": "2025-11-09T10:04:00Z"
+  },
+  {
+    "id": 980214,
+    "domainId": 1,
+    "type": "multiple_choice",
+    "title": "灰度发布与实验设计",
+    "question": "选择所有正确项",
+    "difficulty": "hard",
+    "choices": [
+      { "key": "A", "text": "金丝雀发布应有回滚与熔断预案" },
+      { "key": "B", "text": "A/B 测试需确保样本独立与指标守护栏（Guardrail）" },
+      { "key": "C", "text": "只看转化率即可全面评估实验影响" },
+      { "key": "D", "text": "分层抽样可降低方差并加速显著性检验" }
+    ],
+    "correctOptions": ["A", "B", "D"],
+    "tags": ["canary", "ab-test", "guardrail"],
+    "explanation": "单指标易引入副作用；Guardrail 保障稳定性与健康度。",
+    "metadata": { "specialization": "质量与测试", "specialization_slug": "quality-and-testing" },
+    "createdAt": "2025-11-09T10:05:00Z"
+  },
+  {
+    "id": 980215,
+    "domainId": 1,
+    "type": "short_answer",
+    "title": "测试用例设计准则",
+    "question": "阐述 AAA/Given-When-Then、边界值/等价类、避免在测试中写业务逻辑等准则。",
+    "difficulty": "easy",
+    "tags": ["unit-test", "design"],
+    "answer": "Arrange-Act-Assert 明确结构；用等价类与边界值覆盖输入空间；测试应简单、可读、无分支，避免在测试中出现复杂逻辑与隐藏依赖。",
+    "explanation": "简单可靠的测试更易维护并能最快给出反馈。",
+    "metadata": { "specialization": "质量与测试", "specialization_slug": "quality-and-testing" },
+    "createdAt": "2025-11-09T10:06:00Z"
+  },
+  {
+    "id": 980216,
+    "domainId": 1,
+    "type": "multiple_choice",
+    "title": "Flaky 测试的分类与处置",
+    "question": "选择所有正确项",
+    "difficulty": "medium",
+    "choices": [
+      { "key": "A", "text": "产品缺陷引起的真实失败不应归为 Flaky" },
+      { "key": "B", "text": "基础设施问题（网络/依赖）可通过隔离与重试缓解" },
+      { "key": "C", "text": "测试代码缺陷需修复而非永久重试掩盖" },
+      { "key": "D", "text": "标记忽略是首选策略" }
+    ],
+    "correctOptions": ["A", "B", "C"],
+    "tags": ["flaky", "stability"],
+    "explanation": "忽略仅用于临时隔离，需建立修复与回归的闭环。",
+    "metadata": { "specialization": "质量与测试", "specialization_slug": "quality-and-testing" },
+    "createdAt": "2025-11-09T10:07:00Z"
+  }
+]
+
