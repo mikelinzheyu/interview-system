@@ -25,6 +25,7 @@
       <el-button text size="small" @click="$emit('menu', 'video')" title="视频通话">
         <el-icon><VideoCamera /></el-icon>
       </el-button>
+      <ThemeSwitcher :show-menu="true" />
       <el-dropdown @command="handleMoreMenu">
         <el-button text size="small" title="更多">
           <el-icon><MoreFilled /></el-icon>
@@ -44,6 +45,7 @@
 
 <script setup>
 import { Search, Phone, VideoCamera, MoreFilled } from '@element-plus/icons-vue'
+import ThemeSwitcher from './Theme/ThemeSwitcher.vue'
 
 const props = defineProps({
   room: {
@@ -65,8 +67,9 @@ function handleMoreMenu(command) {
   justify-content: space-between;
   align-items: center;
   padding: 12px 20px;
-  border-bottom: 1px solid #e5e7eb;
-  background: #ffffff;
+  border-bottom: 1px solid var(--color-border, #e5e7eb);
+  background: var(--color-bg, #ffffff);
+  color: var(--color-text, #333);
 }
 
 .toolbar-left {
@@ -85,12 +88,12 @@ function handleMoreMenu(command) {
 .group-name {
   font-size: 14px;
   font-weight: 600;
-  color: #333;
+  color: var(--color-text, #333);
 }
 
 .group-meta {
   font-size: 12px;
-  color: #999;
+  color: var(--color-text-secondary, #999);
 }
 
 .online-status {

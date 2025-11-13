@@ -1,5 +1,5 @@
 {
-  "timestamp": "2025-10-23T07:03:02.261Z",
+  "timestamp": "2025-11-12T15:41:04.373Z",
   "version": "1.0.0",
   "results": {
     "environment": {
@@ -24,7 +24,7 @@
     "dependencies": {
       "packageJson": {
         "status": "ok",
-        "dependencies": 15,
+        "dependencies": 21,
         "devDependencies": 11
       },
       "nodeModules": {
@@ -49,45 +49,130 @@
     "services": {
       "results": [
         {
-          "name": "Backend API",
-          "url": "http://localhost:8080/api/actuator/health",
+          "name": "API Mock Server",
+          "url": "http://localhost:3001/api/health",
+          "method": "GET",
+          "status": "healthy",
+          "statusCode": 200,
+          "critical": true,
+          "responseTime": 27,
+          "responseData": {
+            "code": 200,
+            "message": "Success",
+            "data": {
+              "status": "UP",
+              "timestamp": "2025-11-12T13:30:50.174Z",
+              "version": "1.0.0"
+            },
+            "timestamp": "2025-11-12T15:41:04.367Z"
+          }
+        },
+        {
+          "name": "Spring Boot API (optional)",
+          "url": "http://localhost:8080/api/v1/actuator/health",
           "method": "GET",
           "status": "error",
           "error": "",
-          "critical": true,
-          "responseTime": 24
+          "critical": false,
+          "responseTime": 8
         },
         {
           "name": "Frontend Dev Server",
           "url": "http://localhost:5174",
           "method": "GET",
-          "status": "unhealthy",
-          "statusCode": 404,
+          "status": "healthy",
+          "statusCode": 200,
           "critical": false,
-          "responseTime": 7
+          "responseTime": 11
         },
         {
           "name": "Basic Analysis API",
-          "url": "http://localhost:8080/api/interview/analyze",
+          "url": "http://localhost:3001/api/interview/analyze",
           "method": "POST",
-          "status": "error",
-          "error": "",
+          "status": "healthy",
+          "statusCode": 200,
           "critical": true,
-          "responseTime": 6
+          "responseTime": 10,
+          "responseData": {
+            "code": 200,
+            "message": "回答分析完成",
+            "data": {
+              "overallScore": 78,
+              "dimensions": {
+                "technical": 90,
+                "communication": 94,
+                "logic": 79,
+                "comprehensive": 82,
+                "innovation": 88
+              },
+              "feedback": "回答思路清晰，技术理解到位，建议在实际应用场景方面多举例说明。",
+              "suggestions": [
+                "可以结合具体的项目经验来说明",
+                "建议补充相关的最佳实践",
+                "可以提及一些常见的陷阱和解决方案"
+              ],
+              "analyzedAt": "2025-11-12T15:41:04.368Z",
+              "processingTime": 2187
+            },
+            "timestamp": "2025-11-12T15:41:04.368Z"
+          }
         },
         {
           "name": "Advanced Analysis API",
-          "url": "http://localhost:8080/api/interview/analyze-advanced",
+          "url": "http://localhost:3001/api/interview/analyze-advanced",
           "method": "POST",
-          "status": "error",
-          "error": "",
+          "status": "healthy",
+          "statusCode": 200,
           "critical": false,
-          "responseTime": 6
+          "responseTime": 9,
+          "responseData": {
+            "code": 200,
+            "message": "五维度分析完成",
+            "data": {
+              "overallScore": 90,
+              "dimensions": {
+                "technical": 73,
+                "communication": 83,
+                "logic": 72,
+                "comprehensive": 86,
+                "innovation": 84
+              },
+              "detailAnalysis": {
+                "strengths": [
+                  "技术概念理解准确",
+                  "表达逻辑清晰",
+                  "回答结构完整"
+                ],
+                "weaknesses": [
+                  "实际应用场景举例不足",
+                  "深度分析可进一步加强"
+                ],
+                "improvements": [
+                  "建议结合具体项目经验",
+                  "可以补充相关技术对比",
+                  "增加最佳实践说明"
+                ]
+              },
+              "feedback": "回答展现出良好的技术基础，逻辑思维清晰。建议在实际应用和深度分析方面进一步完善。",
+              "suggestions": [
+                "结合具体的项目场景进行说明",
+                "补充技术方案的优缺点对比",
+                "提及相关的最佳实践和注意事项",
+                "可以分享一些实际遇到的问题和解决方案"
+              ],
+              "smartGeneration": true,
+              "algorithmVersion": "v3.0",
+              "confidenceScore": 0.9535088988017114,
+              "analyzedAt": "2025-11-12T15:41:04.369Z",
+              "processingTime": 2597
+            },
+            "timestamp": "2025-11-12T15:41:04.369Z"
+          }
         }
       ],
-      "healthy": 0,
-      "total": 4,
-      "status": "error"
+      "healthy": 4,
+      "total": 5,
+      "status": "ok"
     },
     "configuration": {
       "files": {
@@ -113,19 +198,19 @@
     "system": {
       "memory": {
         "used": 5,
-        "total": 7,
-        "status": "ok"
+        "total": 6,
+        "status": "warning"
       },
       "ports": {
         "3306": {
           "inUse": true,
           "status": "ok",
-          "process": "TCP    0.0.0.0:3306           0.0.0.0:0              LISTENING       10344"
+          "process": "TCP    0.0.0.0:3306           0.0.0.0:0              LISTENING       7736"
         },
         "5174": {
           "inUse": true,
           "status": "ok",
-          "process": "TCP    0.0.0.0:5174           0.0.0.0:0              LISTENING       30392"
+          "process": "TCP    0.0.0.0:5174           0.0.0.0:0              LISTENING       29528"
         },
         "8080": {
           "inUse": false,
@@ -134,11 +219,11 @@
         }
       }
     },
-    "overall": "fair",
+    "overall": "excellent",
     "score": {
-      "current": 61,
+      "current": 91,
       "max": 100,
-      "percentage": 61
+      "percentage": 91
     }
   }
 }

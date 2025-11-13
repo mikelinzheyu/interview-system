@@ -152,6 +152,12 @@ export default defineConfig(({ mode }) => {
               console.log(formatLog(level, 'PROXY', `${req.method} ${req.url} <- ${status}`))
             })
           }
+        },
+        '/socket.io': {
+          target: proxyTarget,
+          ws: true,
+          changeOrigin: true,
+          secure: false
         }
       }
     }

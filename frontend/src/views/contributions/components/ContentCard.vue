@@ -171,7 +171,7 @@ const formatTime = (time) => {
 
 // 点击卡片
 const handleClick = () => {
-  router.push(`/contributions/question/${props.content.id}`)
+  router.push(`/community/posts/${props.content.id}`)
 }
 
 // 点赞

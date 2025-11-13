@@ -8,11 +8,26 @@
         </div>
 
         <CommandPalette
+          v-show="false"
           :domains="domainStore.domains"
           :categories="hierarchicalCategories"
+          :questions="questionStore.list"
           @search="handleSearch"
           @navigate="handleNavigate"
+          @filter="handleAdvancedFilter"
         />
+
+        <!-- 居中头部搜索框：放在"学习中心"和"更多功能"之间 -->
+        <div class="header-search">
+          <EnhancedSearchInput
+            :domains="domainStore.domains"
+            :categories="hierarchicalCategories"
+            :questions="questionStore.list"
+            @search="handleSearch"
+            @select="handleSearchSelect"
+            @navigate="handleNavigate"
+          />
+        </div>
 
         <div class="header-actions">
           <el-dropdown @command="handleNavigationCommand">
@@ -95,7 +110,7 @@
 </template>
 
 <script setup>
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
 import { ElMessage } from 'element-plus'
@@ -108,6 +123,7 @@ import DisciplineExplorerSection from '@/views/questions/components/DisciplineEx
 import DomainDetailSection from '@/views/questions/components/DomainDetailSection.vue'
 import MyProgressPanel from '@/views/questions/components/MyProgressPanel.vue'
 import MyFavoritesPanel from '@/views/questions/components/MyFavoritesPanel.vue'
+import EnhancedSearchInput from '@/views/questions/components/EnhancedSearchInput.vue'
 
 import { useDomainStore } from '@/stores/domain'
 import { useQuestionBankStore } from '@/stores/questions'
@@ -144,6 +160,7 @@ const domainProgress = computed(() => {
 
 const domainPreviewQuestions = computed(() => {
   if (!currentDomain.value) return []
+  // questionStore.list 已经被按 domainId 过滤，只需取前4个
   return questionStore.list.slice(0, 4)
 })
 
@@ -262,21 +279,46 @@ function formatActivityTimestamp(value) {
 
 function handleSelectDomain(domain) {
   currentDomain.value = domain
+  // 加载该领域的题目
+  loadQuestionsForDomain(domain)
+}
+
+async function loadQuestionsForDomain(domain) {
+  if (!domain) return
+  const domainId = domain.id || domain.slug
+  if (!domainId) return
+
+  detailLoading.value = true
+  try {
+    questionStore.setDomain(domainId)
+    await questionStore.loadQuestions({ domainId, page: 1, size: 20 })
+  } catch (e) {
+    console.error('加载领域题目失败', e)
+    ElMessage.error('加载题目失败，请重试')
+  } finally {
+    detailLoading.value = false
+  }
 }
 
 function backToDisciplines() {
   currentDomain.value = null
+  // 重置题目过滤
+  questionStore.setDomain(null)
 }
 
 function continueLearning(domain) {
   if (!domain) return
-  const slug = domain.slug || domain.id
-  if (slug) router.push({ name: 'QuestionBankPage', params: { domainSlug: slug } })
+  let slug = domain.slug || domain.id
+  if (!domain.slug && domain.id) {
+    const found = domainStore.findDomainById?.(domain.id)
+    if (found?.slug) slug = found.slug
+  }
+  if (slug) router.push({ name: 'QuestionBankPage', params: { domainSlug: String(slug) } })
 }
 
 function openQuestionFromPreview(question) {
   if (!question) return
-  router.push({ name: 'QuestionBankPage', query: { questionId: question.id } })
+  router.push({ name: 'QuestionBankPage', params: { domainSlug: currentDomain.value?.slug || 'all' }, query: { questionId: question.id } })
 }
 
 function handleFavoriteContinue(item) {
@@ -304,7 +346,79 @@ async function handleSearch(keyword) {
   if (!value) return
   questionStore.setKeyword(value)
   await questionStore.applyFilters({ resetPage: true })
-  router.push({ name: 'QuestionBankPage' })
+  router.push({ name: 'QuestionBankPage', params: { domainSlug: currentDomain.value?.slug || 'all' } })
+}
+
+function resolveDomainSlugFromQuestion(q) {
+  if (!q || typeof q !== 'object') return currentDomain.value?.slug || 'all'
+  const directSlug = q.domainSlug || q.domain_slug || q.domain?.slug
+  if (directSlug) return directSlug
+  const domainId = q.domainId ?? q.domain_id ?? q.domain?.id
+  if (domainId != null) {
+    const found = domainStore.findDomainById?.(domainId)
+    if (found?.slug) return found.slug
+  }
+  return currentDomain.value?.slug || 'all'
+}
+
+function handleSearchSelect(payload) {
+  if (!payload) return
+  const { type, payload: data } = payload
+
+  switch (type) {
+    case 'question':
+      // 导航到题目详情
+      router.push({
+        name: 'QuestionBankPage',
+        params: { domainSlug: resolveDomainSlugFromQuestion(data) },
+        query: { questionId: data.id || data.questionId || data.uid }
+      })
+      break
+    case 'domain':
+      // 选择领域
+      handleSelectDomain(data)
+      continueLearning(data)
+      break
+    case 'category':
+      // 选择分类
+      handleSelectCategory(data)
+      break
+    case 'tag':
+      // 应用标签筛选
+      try {
+        if (questionStore.resetFilters) questionStore.resetFilters()
+        if (questionStore.toggleFilterValue) {
+          questionStore.toggleFilterValue('tags', data.id)
+        } else if (questionStore.filters?.tags) {
+          const k = data.id
+          if (!questionStore.filters.tags.includes(k)) questionStore.filters.tags.push(k)
+        }
+        questionStore.applyFilters?.({ resetPage: true })
+      } catch (e) {
+        console.error('Failed to apply tag filter:', e)
+      }
+      router.push({ name: 'QuestionBankPage', params: { domainSlug: currentDomain.value?.slug || 'all' } })
+      break
+    default:
+      break
+  }
+}
+
+function handleAdvancedFilter(filters) {
+  // 应用高级过滤条件
+  if (filters.difficulty && filters.difficulty.length) {
+    questionStore.filters.difficulty = filters.difficulty
+  }
+  if (filters.type && filters.type.length) {
+    questionStore.filters.type = filters.type
+  }
+  if (filters.tags && filters.tags.length) {
+    questionStore.filters.tags = filters.tags
+  }
+  // 应用并导航到题库页面
+  questionStore.applyFilters({ resetPage: true }).then(() => {
+    router.push({ name: 'QuestionBankPage', params: { domainSlug: currentDomain.value?.slug || 'all' } })
+  })
 }
 
 function handleNavigate(payload) {
@@ -317,7 +431,12 @@ function handleNavigate(payload) {
     continueLearning(payload.payload)
   } else if (payload.type === 'question') {
     const q = payload.payload || {}
-    router.push({ name: 'QuestionBankPage', query: { questionId: q.id || q.questionId || q.uid } })
+    // 搜索到题目后，导航到题库页面并显示该题目详情
+    router.push({
+      name: 'QuestionBankPage',
+      params: { domainSlug: resolveDomainSlugFromQuestion(q) },
+      query: { questionId: q.id || q.questionId || q.uid }
+    })
   } else if (payload.type === 'tag') {
     try {
       if (questionStore.resetFilters) questionStore.resetFilters()
@@ -329,7 +448,7 @@ function handleNavigate(payload) {
       }
       questionStore.applyFilters?.({ resetPage: true })
     } catch {}
-    router.push({ name: 'QuestionBankPage' })
+    router.push({ name: 'QuestionBankPage', params: { domainSlug: currentDomain.value?.slug || 'all' } })
   } else if (payload.type === 'command') {
     switch (payload.id) {
       case 'hot':
@@ -341,9 +460,21 @@ function handleNavigate(payload) {
       case 'progress':
         showMyProgress.value = true
         break
+      case 'create':
+        router.push({ name: 'QuestionCreate' })
+        break
       default:
         break
     }
+  } else if (payload.type === 'recommend') {
+    const title = payload.title || ''
+    if (title) {
+      try {
+        questionStore.setKeyword(title)
+        questionStore.applyFilters({ resetPage: true })
+      } catch {}
+    }
+    router.push({ name: 'QuestionBankPage', params: { domainSlug: currentDomain.value?.slug || 'all' } })
   }
 }
 
@@ -386,12 +517,12 @@ function handleNavigationCommand(command) {
   border-bottom: 1px solid #e5e7eb;
 
   .header-content {
-    max-width: 1400px;
+    max-width: 1500px;
     margin: 0 auto;
     padding: 12px 24px;
-    display: flex;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
     align-items: center;
-    justify-content: space-between;
     gap: 24px;
   }
 }
@@ -419,6 +550,14 @@ function handleNavigationCommand(command) {
   display: flex;
   gap: 8px;
   flex-shrink: 0;
+}
+
+.header-search {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex: 1;
+  max-width: 1500px;
 }
 
 .hub-main {

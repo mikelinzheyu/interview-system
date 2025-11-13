@@ -1,0 +1,304 @@
+项目结构探索总结
+
+=== 1. 项目整体架构 ===
+
+前端（Vue 3）:
+  /frontend/src/
+  ├── views/community/          # 社区论坛页面
+  │   ├── ForumList.vue        # 论坛板块列表
+  │   ├── PostList.vue         # 帖子列表（按板块/搜索）
+  │   ├── PostDetail.vue       # 帖子详情页
+  │   ├── CreatePost.vue       # 发布新帖页
+  │   ├── FollowList.vue       # 关注列表
+  │   ├── Leaderboard.vue      # 排行榜
+  │   └── components/          # 子组件
+  │       ├── PostCard.vue     # 帖子卡片（509行）
+  │       ├── CommentForm.vue  # 评论表单
+  │       ├── CommentItem.vue  # 评论项
+  │       ├── CommentList.vue  # 评论列表
+  │       ├── NotificationCenter.vue  # 通知中心
+  │       └── NotificationItem.vue    # 通知项
+  ├── api/                      # API接口层
+  │   ├── community.js         # 基础API函数
+  │   ├── communityMock.js     # Mock数据生成（604行）
+  │   └── communityWithCache.js # 高级API（缓存、重试）
+  ├── composables/              # 组合式函数
+  │   ├── usePostList.js       # 帖子列表逻辑（217行）
+  │   └── usePostActions.js    # 帖子操作逻辑（220行）
+  └── data/                     # 静态数据
+      ├── disciplines-complete.json
+      ├── mock-domains.json
+      └── university-presets/
+
+后端（Node.js Mock）:
+  /backend/
+  ├── mock-server.js           # 完整Mock服务器（292KB）
+  ├── controllers/             # 控制器
+  ├── models/                  # 数据模型
+  ├── routes/                  # 路由
+  ├── middleware/              # 中间件
+  └── uploads/                 # 文件上传目录
+
+=== 2. Community 页面路由配置 ===
+
+/community                      # 主路由入口 → CommunityHub.vue
+/community/forums              # 论坛板块列表页
+/community/forums/:slug        # 特定板块的帖子列表
+/community/posts               # 所有帖子列表（支持搜索）
+/community/posts/:id           # 帖子详情页
+/community/create-post         # 发布新帖页
+/community/follow-list         # 关注列表页
+/community/leaderboard         # 排行榜页
+
+=== 3. Post 数据结构 ===
+
+核心字段:
+  {
+    id: 1                          # 帖子ID
+    forumId: 1                     # 所属板块ID
+    forumSlug: 'frontend'          # 板块slug（路由参数）
+    
+    author: {                      # 作者信息
+      userId: 'user1'
+      name: '张三'
+      avatar: 'https://...'
+    }
+    
+    title: '帖子标题'               # 帖子标题
+    content: '帖子内容...'          # 帖子内容（支持Markdown）
+    tags: ['Vue3', '响应式']       # 标签数组
+    
+    solved: false                  # 是否已解决
+    pinned: false                  # 是否置顶
+    likes: 15                      # 点赞数
+    viewCount: 120                 # 浏览数
+    commentCount: 3                # 评论数
+    comments: [...]                # 评论数组（详情页）
+    
+    aiReviewScore: 0.95            # AI审核得分
+    createdAt: '2024-11-10T...'   # 创建时间
+    updatedAt: '2024-11-11T...'   # 更新时间
+  }
+
+=== 4. 论坛板块（Forum）数据结构 ===
+
+  {
+    id: 1                          # 板块ID
+    name: '前端技术'               # 板块名称
+    slug: 'frontend'               # slug（路由参数）
+    description: '讨论内容...'     # 描述
+    icon: '🌐'                     # emoji图标
+    postCount: 45                  # 帖子数量
+    active: true                   # 是否活跃
+    category: 'development'        # 分类
+    sortOrder: 1                   # 排序序号
+  }
+
+前端现有的Mock板块:
+  1. 前端技术 (frontend) - 45篇
+  2. 后端开发 (backend) - 38篇
+  3. 数据库与存储 (database) - 28篇
+  4. 项目分享 (projects) - 32篇
+  5. 职业发展 (career) - 25篇
+  6. 学习资源 (resources) - 42篇
+
+=== 5. Mock 数据存放位置 ===
+
+前端Mock数据文件:
+  位置: /frontend/src/api/communityMock.js（604行）
+  
+  包含:
+  - mockForums[]        # 6个论坛板块定义
+  - mockPosts[]         # 30+条帖子示例数据
+  - users[]             # 12个用户数据
+  - generateMockPosts(params)    # 生成帖子列表（支持搜索、排序、分页）
+  - generateMockForums()         # 返回论坛列表
+  - generateMockHotTags()        # 生成热门标签
+  - getPostDetailMock(id)        # 获取单个帖子详情
+
+后端Mock数据:
+  位置: /backend/mock-server.js（第1511-1800行）
+  
+  包含:
+  - forums[]            # 5个论坛板块
+  - posts[]             # 5个帖子
+  - comments[]          # 评论示例
+  - 完整的REST API实现
+
+=== 6. API 接口流程 ===
+
+调用链路:
+  组件（PostList.vue等）
+    ↓
+  Composable（usePostList）
+    ↓
+  communityAPI（communityWithCache.js）
+    ├─ 检查缓存 (Map结构)
+    ├─ 检查Mock模式
+    ├─ 调用community.js基础API
+    └─ 降级到Mock数据（如果API失败）
+    
+主要API端点:
+  GET /api/community/forums
+  GET /api/community/forums/:slug/posts
+  GET /api/community/posts?page=1&pageSize=20&sortBy=latest
+  GET /api/community/posts/:id
+  POST /api/community/posts
+  PUT /api/community/posts/:id
+  DELETE /api/community/posts/:id
+  POST /api/community/posts/:id/like
+  POST /api/community/posts/:id/comments
+  GET /api/community/tags/hot
+
+=== 7. Composables 功能 ===
+
+usePostList.js（217行）:
+  状态: posts, loading, currentPage, pageSize, total, sortBy, searchKeyword
+  方法: fetchPosts(), handleSearch(), handleSortChange(), handlePageChange()
+        handlePageSizeChange(), clearSearch(), refreshPosts(), updatePost(), removePost()
+
+usePostActions.js（220行）:
+  方法: toggleLikePost()          # 点赞/取消点赞（含乐观更新）
+        toggleLikeComment()       # 点赞评论
+        isPostLiked()             # 检查是否已点赞
+        canEditPost()             # 权限检查
+        canDeletePost()           # 权限检查
+        deletePost()              # 删除帖子
+        reportContent()           # 举报内容
+
+=== 8. Mock 数据开关方式 ===
+
+默认配置:
+  /frontend/src/api/communityWithCache.js 第32行
+  useMockData: import.meta.env.VITE_USE_MOCK_DATA !== 'false'  # 默认使用Mock
+  
+环境变量配置:
+  .env 或 .env.production
+  VITE_USE_MOCK_DATA=true   # 使用Mock（默认）
+  VITE_USE_MOCK_DATA=false  # 使用真实API
+  
+运行时切换:
+  import communityAPI from '@/api/communityWithCache'
+  communityAPI.setUseMockData(true)   # 启用Mock
+  communityAPI.setUseMockData(false)  # 禁用Mock
+  communityAPI.isUsingMockData()      # 检查状态
+
+=== 9. 缓存策略 ===
+
+缓存时间配置（CACHE_TIME）:
+  FORUMS: 10分钟            # 论坛列表（变化不频繁）
+  POSTS: 3分钟              # 帖子列表（需要快速更新）
+  POST_DETAIL: 5分钟        # 帖子详情
+  TAGS: 30分钟              # 热门标签
+  STATS: 1分钟              # 统计数据（最频繁）
+
+缓存实现:
+  - 使用 Map 结构存储
+  - 带时间戳的过期机制
+  - 请求去重（pending Map 避免并发请求）
+  - 自动重试（最多3次，指数退避）
+
+=== 10. 组件统计 ===
+
+页面组件:
+  - ForumList.vue:     ~200行    # 板块列表
+  - PostList.vue:      212行     # 帖子列表（搜索、排序、分页）
+  - PostDetail.vue:    368行     # 帖子详情
+  - CreatePost.vue:    ~280行    # 发布新帖
+  - FollowList.vue:    ~280行    # 关注列表
+  - Leaderboard.vue:   ~300行    # 排行榜
+
+子组件:
+  - PostCard.vue:      509行     # 帖子卡片（含多种操作）
+  - CommentForm.vue:   ~100行    # 评论表单
+  - CommentItem.vue:   ~80行     # 单条评论
+  - CommentList.vue:   ~100行    # 评论列表
+  - NotificationCenter.vue: 复杂组件
+  - NotificationItem.vue:   子组件
+
+=== 11. 关键特性 ===
+
+搜索功能:
+  - 支持关键字搜索（标题、内容）
+  - 支持标签过滤
+  - 防抖搜索输入
+  - 搜索结果自动分页
+
+排序功能:
+  - 最新（按创建时间降序）
+  - 最热（按浏览数+点赞数）
+  - 最多点赞（按点赞数降序）
+
+分页功能:
+  - 支持10/20/50条每页
+  - 总数统计（显示 X-Y 篇）
+  - 跳转页码
+
+点赞功能:
+  - 乐观更新（即时反馈）
+  - 请求失败自动回滚
+  - 点赞数实时更新
+
+权限控制:
+  - 编辑：仅作者或管理员
+  - 删除：仅作者或管理员
+  - 发表评论：已登录用户
+
+社交功能:
+  - 举报帖子/评论
+  - 分享帖子（复制链接或Web Share API）
+  - 收藏帖子
+  - 关注用户
+
+=== 12. 后端 Mock 服务器 ===
+
+位置: /backend/mock-server.js（292KB 大文件）
+
+特点:
+  - 完整的Express服务器
+  - 支持所有社区CRUD操作
+  - WebSocket 实时通信
+  - 文件上传处理
+  - 请求缓存机制
+  - 实时日志输出
+
+启动:
+  cd backend
+  npm install
+  node mock-server.js
+  
+访问: http://localhost:3001/
+
+=== 13. 快速参考 ===
+
+查看帖子列表流程:
+  1. 访问 /community/posts
+  2. PostList.vue 加载
+  3. usePostList() 初始化
+  4. fetchPosts() 调用 communityAPI.getPosts()
+  5. communityWithCache 检查缓存 → 调用Mock或API
+  6. 返回数据渲染 PostCard 数组
+
+修改Mock数据:
+  1. 编辑 /frontend/src/api/communityMock.js
+  2. 修改 mockForums[] 或 mockPosts[]
+  3. 刷新页面查看效果
+
+添加新API:
+  1. 在 community.js 定义基础调用
+  2. 在 communityWithCache.js 添加缓存逻辑
+  3. 在 communityMock.js 提供Mock数据
+  4. 在 backend/mock-server.js 实现服务端
+
+=== 14. 重要文件路径 ===
+
+/frontend/src/api/communityWithCache.js         # 核心API
+/frontend/src/api/communityMock.js             # Mock数据（604行）
+/frontend/src/composables/usePostList.js       # 列表逻辑（217行）
+/frontend/src/composables/usePostActions.js    # 操作逻辑（220行）
+/frontend/src/views/community/PostList.vue     # 列表页（212行）
+/frontend/src/views/community/PostDetail.vue   # 详情页（368行）
+/frontend/src/views/community/components/PostCard.vue  # 卡片（509行）
+/frontend/src/router/index.js                  # 路由配置（第193-287行）
+/backend/mock-server.js                        # 后端Mock（292KB）
+

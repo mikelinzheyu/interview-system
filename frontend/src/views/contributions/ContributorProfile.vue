@@ -138,7 +138,7 @@ onMounted(async () => {
 function getExpertiseType(level) {
   const typeMap = {
     beginner: 'info',
-    intermediate: '',
+    intermediate: 'primary',
     advanced: 'warning',
     expert: 'success'
   }

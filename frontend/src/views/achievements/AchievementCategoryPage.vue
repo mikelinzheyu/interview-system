@@ -136,21 +136,14 @@ const handleAchievementClick = (achievement) => {
   })
 }
 
+import { useShare } from ''@/composables/useShare''
+const { triggerShare } = useShare()
+
 const handleAchievementShare = (achievement) => {
-  if (navigator.share) {
-    navigator.share({
-      title: `我解锁了成就：${achievement.title}`,
-      text: achievement.description,
-      url: window.location.href
-    }).catch(console.error)
-  } else {
-    const text = `我解锁了成就：${achievement.title} - ${achievement.description}`
-    navigator.clipboard.writeText(text).then(() => {
-      ElMessage.success('成就信息已复制到剪贴板')
-    }).catch(() => {
-      ElMessage.error('分享功能不支持')
-    })
-  }
+    const title = 我解锁了成就：`r
+  const text = achievement.description
+  const url = window.location.href
+  triggerShare({ title, text, url })
 }
 
 const handleViewDetail = (achievement) => {

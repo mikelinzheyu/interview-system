@@ -25,14 +25,16 @@ async function initRedisClient() {
     redisClient = redis.createClient({
       socket: {
         host: REDIS_CONFIG.host,
-        port: REDIS_CONFIG.port
+        port: REDIS_CONFIG.port,
+        reconnectStrategy: (retries) => Math.min(retries * 50, 500), // 快速放弃重连
+        connectTimeout: 2000  // 2秒连接超时
       },
       password: REDIS_CONFIG.password,
       database: REDIS_CONFIG.db
     })
 
     redisClient.on('error', (err) => {
-      console.error('❌ Redis 客户端错误:', err)
+      console.error('❌ Redis 客户端错误:', err.code || err.message)
       isRedisAvailable = false
     })
 
@@ -46,7 +48,10 @@ async function initRedisClient() {
       isRedisAvailable = true
     })
 
-    await redisClient.connect()
+    await Promise.race([
+      redisClient.connect(),
+      new Promise((_, reject) => setTimeout(() => reject(new Error('Redis 连接超时')), 3000))
+    ])
 
     console.log('🔧 Redis 配置:', {
       host: REDIS_CONFIG.host,
@@ -58,7 +63,7 @@ async function initRedisClient() {
     return true
   } catch (error) {
     console.error('❌ Redis 初始化失败:', error.message)
-    console.warn('⚠️  将使用内存存储作为降级方案')
+    console.warn('⚠️  将使用内存存储作为降级方案 (Redis 不可用)')
     isRedisAvailable = false
     return false
   }
@@ -264,6 +269,171 @@ function isRedisReady() {
   return isRedisAvailable
 }
 
+/**
+ * 保存对话历史到 Redis
+ * @param {string} conversationId - 对话 ID
+ * @param {string} userId - 用户 ID (post-${postId}-user-${userId})
+ * @param {Array} messages - 对话消息列表
+ * @param {number} ttl - 过期时间（秒），默认 24 小时
+ * @returns {Promise<boolean>}
+ */
+async function saveConversation(conversationId, userId, messages, ttl = 24 * 60 * 60) {
+  const key = `chat:conversation:${conversationId}:${userId}`
+  const value = JSON.stringify({
+    conversationId,
+    userId,
+    messages,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  })
+
+  try {
+    if (isRedisAvailable && redisClient) {
+      await redisClient.setEx(key, ttl, value)
+      console.log(`💾 对话已保存到 Redis: ${conversationId}`)
+      return true
+    } else {
+      // 降级到内存存储
+      memoryStorage.set(key, {
+        value,
+        expiresAt: Date.now() + (ttl * 1000)
+      })
+      console.log(`💾 对话已保存到内存: ${conversationId} (Redis不可用)`)
+      return true
+    }
+  } catch (error) {
+    console.error(`❌ 保存对话失败 (${conversationId}):`, error)
+    // 降级到内存存储
+    try {
+      memoryStorage.set(key, {
+        value,
+        expiresAt: Date.now() + (ttl * 1000)
+      })
+      return true
+    } catch (memError) {
+      console.error(`❌ 内存保存也失败:`, memError)
+      return false
+    }
+  }
+}
+
+/**
+ * 加载对话历史从 Redis
+ * @param {string} conversationId - 对话 ID
+ * @param {string} userId - 用户 ID
+ * @returns {Promise<Object|null>}
+ */
+async function loadConversation(conversationId, userId) {
+  const key = `chat:conversation:${conversationId}:${userId}`
+
+  try {
+    if (isRedisAvailable && redisClient) {
+      const value = await redisClient.get(key)
+      if (value) {
+        console.log(`📂 从 Redis 加载对话: ${conversationId}`)
+        return JSON.parse(value)
+      }
+      return null
+    } else {
+      // 从内存加载
+      const stored = memoryStorage.get(key)
+      if (stored) {
+        if (Date.now() < stored.expiresAt) {
+          console.log(`📂 从内存加载对话: ${conversationId} (Redis不可用)`)
+          return JSON.parse(stored.value)
+        } else {
+          memoryStorage.delete(key)
+          return null
+        }
+      }
+      return null
+    }
+  } catch (error) {
+    console.error(`❌ 加载对话失败 (${conversationId}):`, error)
+    return null
+  }
+}
+
+/**
+ * 删除对话历史
+ * @param {string} conversationId - 对话 ID
+ * @param {string} userId - 用户 ID
+ * @returns {Promise<boolean>}
+ */
+async function deleteConversation(conversationId, userId) {
+  const key = `chat:conversation:${conversationId}:${userId}`
+
+  try {
+    if (isRedisAvailable && redisClient) {
+      await redisClient.del(key)
+      console.log(`🗑️  已从 Redis 删除对话: ${conversationId}`)
+    }
+    memoryStorage.delete(key)
+    return true
+  } catch (error) {
+    console.error(`❌ 删除对话失败 (${conversationId}):`, error)
+    memoryStorage.delete(key)
+    return false
+  }
+}
+
+/**
+ * 更新对话的 TTL
+ * @param {string} conversationId - 对话 ID
+ * @param {string} userId - 用户 ID
+ * @param {number} ttl - 过期时间（秒）
+ * @returns {Promise<boolean>}
+ */
+async function touchConversation(conversationId, userId, ttl = 24 * 60 * 60) {
+  const key = `chat:conversation:${conversationId}:${userId}`
+
+  try {
+    if (isRedisAvailable && redisClient) {
+      const result = await redisClient.expire(key, ttl)
+      if (result) {
+        console.log(`⏱️  已更新对话TTL: ${conversationId}`)
+        return true
+      }
+    } else {
+      const stored = memoryStorage.get(key)
+      if (stored) {
+        stored.expiresAt = Date.now() + (ttl * 1000)
+        return true
+      }
+    }
+    return false
+  } catch (error) {
+    console.error(`❌ 更新对话TTL失败 (${conversationId}):`, error)
+    return false
+  }
+}
+
+/**
+ * 添加消息到对话
+ * @param {string} conversationId - 对话 ID
+ * @param {string} userId - 用户 ID
+ * @param {Object} message - 消息对象 {role, content, timestamp}
+ * @returns {Promise<boolean>}
+ */
+async function addMessageToConversation(conversationId, userId, message) {
+  const conversation = await loadConversation(conversationId, userId)
+
+  if (conversation) {
+    conversation.messages.push({
+      ...message,
+      timestamp: message.timestamp || new Date().toISOString()
+    })
+    conversation.updatedAt = new Date().toISOString()
+    return await saveConversation(conversationId, userId, conversation.messages)
+  } else {
+    // 如果对话不存在，创建新对话
+    return await saveConversation(conversationId, userId, [{
+      ...message,
+      timestamp: message.timestamp || new Date().toISOString()
+    }])
+  }
+}
+
 module.exports = {
   initRedisClient,
   saveSession,
@@ -272,5 +442,10 @@ module.exports = {
   touchSession,
   getAllSessionIds,
   closeRedisClient,
-  isRedisReady
+  isRedisReady,
+  saveConversation,
+  loadConversation,
+  deleteConversation,
+  touchConversation,
+  addMessageToConversation
 }

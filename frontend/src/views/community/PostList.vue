@@ -7,20 +7,14 @@
     </el-page-header>
 
     <div class="list-controls">
-      <el-input
-        v-model="searchKeyword"
-        placeholder="搜索帖子..."
-        clearable
-        style="width: 300px"
-        @keyup.enter="handleSearch"
-        @input="handleSearchInput"
-      >
-        <template #prefix>
-          <el-icon><Search /></el-icon>
-        </template>
-      </el-input>
+      <!-- 新增：增强版搜索框 -->
+      <PostSearchInput
+        :posts="posts"
+        @search="handleSearchInput"
+        @filter="handleFilterChange"
+      />
 
-      <el-select v-model="sortBy" placeholder="排序方式" @change="handleSortChange">
+      <el-select v-model="sortBy" placeholder="排序方式" @change="handleSortChange" class="sort-select">
         <el-option label="最新" value="latest" />
         <el-option label="最热" value="hot" />
         <el-option label="最多点赞" value="popular" />
@@ -76,11 +70,12 @@
 import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import { Search, Refresh } from '@element-plus/icons-vue'
+import { Refresh } from '@element-plus/icons-vue'
 import communityAPI from '@/api/communityWithCache'
 import { usePostList } from '@/composables/usePostList'
 import { usePostActions } from '@/composables/usePostActions'
 import PostCard from './components/PostCard.vue'
+import PostSearchInput from './components/PostSearchInput.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -152,11 +147,24 @@ const handleRefresh = async () => {
   ElMessage.success('刷新成功')
 }
 
-// 处理搜索输入（防抖）
-const handleSearchInput = () => {
-  // 实际搜索由 handleSearch 方法处理（在按回车或点击搜索时）
+// 处理搜索输入（来自 PostSearchInput）
+const handleSearchInput = (keyword) => {
+  const q = (keyword || '').trim()
+  const query = { ...route.query }
+  if (q) query.search = q
+  else delete query.search
+  router.replace({ path: route.path, query })
+  handleSearch()
 }
 
+// 处理过滤变化（来自 PostSearchInput）
+const handleFilterChange = (filter) => {
+  if (filter.type === 'tag') {
+    router.push(`/community/posts?tag=${encodeURIComponent(filter.value)}`)
+  } else if (filter.type === 'sort') {
+    handleSortChange(filter.value)
+  }
+}
 </script>
 
 <style scoped lang="scss">
@@ -182,6 +190,15 @@ const handleSearchInput = () => {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
   flex-wrap: wrap;
 
+  > div:first-child {
+    flex: 1;
+    min-width: 300px;
+  }
+
+  .sort-select {
+    min-width: 150px;
+  }
+
   .stats-info {
     margin-left: auto;
     font-size: 14px;
@@ -200,3 +217,4 @@ const handleSearchInput = () => {
   }
 }
 </style>
+

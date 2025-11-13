@@ -19,16 +19,23 @@
         v-for="member in members"
         :key="member.userId"
         class="member-item"
-        @click="$emit('member-click', member)"
+        @click="handleMemberClick(member)"
       >
-        <el-avatar :size="32" :src="member.avatar">
-          {{ member.name?.charAt(0) || '?' }}
-        </el-avatar>
+        <div class="member-avatar-wrapper">
+          <el-avatar :size="32" :src="member.avatar">
+            {{ member.name?.charAt(0) || '?' }}
+          </el-avatar>
+          <!-- 用户状态指示器 -->
+          <UserStatusIndicator
+            :status="getUserStatus(member.userId)"
+            class="status-indicator"
+          />
+        </div>
         <div class="member-info">
           <div class="member-name">{{ member.name }}</div>
-          <div class="member-role">{{ member.role === 'owner' ? '群主' : '成员' }}</div>
+          <div class="member-status">{{ getStatusLabel(member.userId) }}</div>
         </div>
-        <div v-if="member.isOnline" class="online-dot" />
+        <div v-if="member.role === 'owner'" class="owner-badge">群主</div>
       </div>
     </div>
 
@@ -43,6 +50,10 @@
         <span class="value">{{ room.memberCount }} 人</span>
       </div>
       <div class="detail-item">
+        <span class="label">在线人数</span>
+        <span class="value">{{ onlineCount }} 人</span>
+      </div>
+      <div class="detail-item">
         <span class="label">群公告</span>
         <span class="value">{{ room.announcement }}</span>
       </div>
@@ -52,11 +63,25 @@
       </div>
     </div>
   </div>
+
+  <!-- 用户资料卡 -->
+  <UserProfileCard
+    v-if="selectedUser"
+    :visible="profileCardVisible"
+    :user="selectedUser"
+    :primary-color="'#5c6af0'"
+    @update:visible="profileCardVisible = $event"
+    @close="profileCardVisible = false"
+    @send-message="$emit('send-message', $event)"
+  />
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import dayjs from 'dayjs'
+import UserStatusIndicator from './UserPresence/UserStatusIndicator.vue'
+import UserProfileCard from './UserPresence/UserProfileCard.vue'
+import { useUserPresenceStore } from '@/stores/userPresence'
 
 const props = defineProps({
   room: {
@@ -69,10 +94,35 @@ const props = defineProps({
   }
 })
 
-defineEmits(['member-click', 'close'])
+const emit = defineEmits(['member-click', 'close', 'send-message'])
+
+const presenceStore = useUserPresenceStore()
 
 const activeTab = ref('members')
 const tabs = ['members', 'info']
+const profileCardVisible = ref(false)
+const selectedUser = ref(null)
+
+const onlineCount = computed(() => {
+  return presenceStore.onlineUsers.length
+})
+
+function handleMemberClick(member) {
+  selectedUser.value = member
+  profileCardVisible.value = true
+  emit('member-click', member)
+}
+
+function getUserStatus(userId) {
+  const status = presenceStore.getUserStatus(userId)
+  return status.status || 'offline'
+}
+
+function getStatusLabel(userId) {
+  const status = presenceStore.getUserStatus(userId)
+  const config = presenceStore.getStatusConfig(status.status)
+  return config.label
+}
 
 function formatTime(timestamp) {
   return dayjs(timestamp).format('YYYY-MM-DD HH:mm')
@@ -82,16 +132,17 @@ function formatTime(timestamp) {
 <style scoped>
 .right-sidebar {
   width: 280px;
-  background: #ffffff;
-  border-left: 1px solid #e5e7eb;
+  background: var(--color-bg, #ffffff);
+  border-left: 1px solid var(--color-border, #e5e7eb);
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  color: var(--color-text, #333);
 }
 
 .sidebar-tabs {
   display: flex;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid var(--color-border, #e5e7eb);
   padding: 0 12px;
 }
 
@@ -102,7 +153,7 @@ function formatTime(timestamp) {
   background: none;
   cursor: pointer;
   font-size: 13px;
-  color: #666;
+  color: var(--color-text-secondary, #666);
   border-bottom: 2px solid transparent;
   transition: all 0.2s;
 }
@@ -132,7 +183,21 @@ function formatTime(timestamp) {
 }
 
 .member-item:hover {
-  background: #f5f5f5;
+  background: var(--color-bg-secondary, #f5f5f5);
+}
+
+.member-avatar-wrapper {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.status-indicator {
+  position: absolute;
+  bottom: -2px;
+  right: -2px;
+  background: var(--color-bg, #ffffff);
+  border-radius: 50%;
+  padding: 1px;
 }
 
 .member-info {
@@ -140,36 +205,31 @@ function formatTime(timestamp) {
   display: flex;
   flex-direction: column;
   gap: 2px;
+  min-width: 0;
 }
 
 .member-name {
   font-size: 13px;
   font-weight: 500;
-  color: #333;
+  color: var(--color-text, #333);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.member-role {
+.member-status {
   font-size: 11px;
-  color: #999;
+  color: var(--color-text-secondary, #999);
 }
 
-.online-dot {
-  width: 8px;
-  height: 8px;
-  background: #67c23a;
-  border-radius: 50%;
-  border: 2px solid rgba(103, 194, 58, 0.3);
-  box-shadow: 0 0 6px rgba(103, 194, 58, 0.6);
-  animation: pulse 2s infinite;
-}
-
-@keyframes pulse {
-  0%, 100% {
-    box-shadow: 0 0 6px rgba(103, 194, 58, 0.6), 0 0 0 0 rgba(103, 194, 58, 0.4);
-  }
-  50% {
-    box-shadow: 0 0 6px rgba(103, 194, 58, 0.6), 0 0 8px 4px rgba(103, 194, 58, 0.1);
-  }
+.owner-badge {
+  font-size: 10px;
+  background: #ffd666;
+  color: #333;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: 600;
+  flex-shrink: 0;
 }
 
 .group-details {
@@ -178,6 +238,7 @@ function formatTime(timestamp) {
   display: flex;
   flex-direction: column;
   gap: 12px;
+  overflow-y: auto;
 }
 
 .detail-item {
@@ -188,12 +249,13 @@ function formatTime(timestamp) {
 
 .label {
   font-size: 12px;
-  color: #999;
+  color: var(--color-text-secondary, #999);
   font-weight: 600;
 }
 
 .value {
   font-size: 13px;
-  color: #333;
+  color: var(--color-text, #333);
+  word-break: break-word;
 }
 </style>

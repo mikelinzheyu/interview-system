@@ -7,7 +7,7 @@ echo 启动后端Mock API服务器
 echo ========================================
 echo.
 
-cd /d "%~dp0backend"
+cd /d "%~dp0..\\..\\backend"
 
 REM 检查node_modules是否存在
 if not exist "node_modules" (

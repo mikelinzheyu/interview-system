@@ -52,9 +52,12 @@
             <!-- 消息气泡 -->
             <div class="message-bubble-wrapper">
               <div class="message-bubble" :class="`bubble-${msg.type}`">
-                <!-- 文本消息 -->
+                <!-- 文本消息 - 使用 MarkdownRenderer -->
                 <div v-if="msg.type === 'text'" class="message-text">
-                  {{ msg.content }}
+                  <MarkdownRenderer
+                    :content="msg.content"
+                    :content-type="MessageFormattingService.parseMessageType(msg.content)"
+                  />
                 </div>
 
                 <!-- 图片消息 -->
@@ -87,7 +90,13 @@
               </div>
 
               <!-- 消息状态 -->
-              <div v-if="msg.isOwn" class="message-status" :class="`status-${msg.status}`">
+              <div
+                v-if="msg.isOwn"
+                class="message-status"
+                :class="`status-${msg.status}`"
+                @click="handleReadReceiptClick(msg)"
+                role="button"
+              >
                 <span v-if="msg.status === 'pending'" class="status-text">发送中...</span>
                 <span v-else-if="msg.status === 'failed'" class="status-text error">发送失败</span>
                 <el-icon v-else-if="msg.status === 'delivered'" class="status-icon">
@@ -111,6 +120,22 @@
                 <el-icon><MoreFilled /></el-icon>
               </el-button>
             </div>
+
+            <!-- 消息反应 -->
+            <MessageReactions
+              :reactions="store.getMessageReactions(store.activeConversationId, msg.id)"
+              :message-id="msg.id"
+              @add-reaction="handleAddReaction"
+              @remove-reaction="handleRemoveReaction"
+            />
+
+            <!-- 消息线程 -->
+            <MessageThread
+              :messages="props.messages"
+              :parent-message-id="msg.id"
+              :replying-to="replyingToMessageId === msg.id ? msg : null"
+              @reply-clear="replyingToMessageId = null"
+            />
           </div>
 
           <!-- 右对齐头像（自己的消息） -->
@@ -138,6 +163,15 @@
       </div>
     </div>
   </div>
+
+  <!-- 已读回执对话框 -->
+  <ReadReceiptModal
+    v-if="selectedReadReceiptMessage"
+    :visible="readReceiptModalVisible"
+    :message="selectedReadReceiptMessage"
+    :read-receipts="store.getMessageReadReceipts(store.activeConversationId, selectedReadReceiptMessage.id)"
+    @update:visible="readReceiptModalVisible = $event"
+  />
 </template>
 
 <script setup>
@@ -145,6 +179,12 @@ import { ref, computed, nextTick, onMounted } from 'vue'
 import { ElIcon, ElButton, ElAvatar, ElEmpty, ElSkeleton } from 'element-plus'
 import { Loading, Check, Document, CircleClose, ChatDotRound, MoreFilled } from '@element-plus/icons-vue'
 import dayjs from 'dayjs'
+import MarkdownRenderer from './MessageEnhancements/MarkdownRenderer.vue'
+import MessageReactions from './Reactions/MessageReactions.vue'
+import ReadReceiptModal from './ReadReceipts/ReadReceiptModal.vue'
+import MessageThread from './MessageThread.vue'
+import MessageFormattingService from '@/services/messageFormattingService'
+import { useChatWorkspaceStore } from '@/stores/chatWorkspace'
 
 // Props
 const props = defineProps({
@@ -169,10 +209,17 @@ const props = defineProps({
 // Emits
 const emit = defineEmits(['load-more', 'message-action', 'scroll'])
 
+// Store
+const store = useChatWorkspaceStore()
+
 // State
 const hoveredMessageId = ref(null)
 const scrollContainer = ref(null)
 let autoScrollToBottom = true
+const readReceiptModalVisible = ref(false)
+const selectedReadReceiptMessage = ref(null)
+const replyingToMessageId = ref(null)
+const selectedThreadMessageId = ref(null)
 
 // 计算属性：按时间分组的消息
 const messageGroups = computed(() => {
@@ -243,14 +290,43 @@ function handleContextMenu(event, message) {
 function handleMessageAction(message, action) {
   if (action === 'more') {
     handleContextMenu(new MouseEvent('contextmenu'), message)
-  } else {
-    // 其他操作
+  } else if (action === 'reply') {
+    replyingToMessageId.value = message.id
   }
+}
+
+// 处理添加反应
+function handleAddReaction(payload) {
+  const { messageId, emoji, action } = payload
+  const conversationId = store.activeConversationId
+
+  if (action === 'toggle') {
+    store.addReaction(conversationId, messageId, emoji)
+  } else if (action === 'add') {
+    store.addReaction(conversationId, messageId, emoji)
+  }
+
+  // 这里可以添加 WebSocket 事件，同步反应到其他客户端
+  // ChatSocketService.emit('message.reaction', { messageId, emoji, action })
+}
+
+// 处理移除反应
+function handleRemoveReaction(payload) {
+  const { messageId, emoji } = payload
+  const conversationId = store.activeConversationId
+  store.removeReaction(conversationId, messageId, emoji)
+
+  // 这里可以添加 WebSocket 事件
 }
 
 function handleImagePreview(attachment) {
   // 图片预览逻辑
   window.open(attachment.url, '_blank')
+}
+
+function handleReadReceiptClick(message) {
+  selectedReadReceiptMessage.value = message
+  readReceiptModalVisible.value = true
 }
 
 function handleScroll(event) {
@@ -288,7 +364,8 @@ defineExpose({
   flex-direction: column;
   flex: 1;
   overflow: hidden;
-  background: #ffffff;
+  background: var(--color-bg, #ffffff);
+  color: var(--color-text, #333);
 }
 
 .loading-state {
@@ -317,12 +394,12 @@ defineExpose({
 
 .time-label {
   font-size: 12px;
-  color: #999;
-  background: #f5f5f5;
+  color: var(--color-text-secondary, #999);
+  background: var(--color-bg-secondary, #f5f5f5);
   padding: 4px 12px;
   border-radius: 12px;
   transition: all 0.2s ease;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--color-border, #e5e7eb);
 }
 
 @keyframes fadeinScaleUp {
@@ -392,16 +469,16 @@ defineExpose({
   display: flex;
   gap: 8px;
   font-size: 12px;
-  color: #999;
+  color: var(--color-text-secondary, #999);
 }
 
 .sender-name {
   font-weight: 600;
-  color: #333;
+  color: var(--color-text, #333);
 }
 
 .timestamp {
-  color: #999;
+  color: var(--color-text-secondary, #999);
 }
 
 /* 消息气泡 */
@@ -419,15 +496,15 @@ defineExpose({
   padding: 10px 14px;
   border-radius: 16px;
   word-break: break-word;
-  background: #f0f0f0;
-  color: #333;
+  background: var(--color-bg-secondary, #f0f0f0);
+  color: var(--color-text, #333);
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 1px 2px var(--color-shadow, rgba(0, 0, 0, 0.05));
   border: 1px solid transparent;
 }
 
 .message-item:hover .message-bubble {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 4px 12px var(--color-shadow-lg, rgba(0, 0, 0, 0.12));
   transform: translateY(-1px);
 }
 
@@ -480,7 +557,7 @@ defineExpose({
   align-items: center;
   gap: 10px;
   padding: 8px 12px;
-  background: rgba(0, 0, 0, 0.05);
+  background: var(--color-bg-tertiary, rgba(0, 0, 0, 0.05));
   border-radius: 8px;
   cursor: pointer;
 }
@@ -496,11 +573,12 @@ defineExpose({
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  color: var(--color-text, #333);
 }
 
 .file-size {
   font-size: 12px;
-  color: #999;
+  color: var(--color-text-secondary, #999);
   margin-top: 2px;
 }
 
@@ -510,7 +588,7 @@ defineExpose({
   align-items: center;
   gap: 4px;
   font-size: 13px;
-  color: #999;
+  color: var(--color-text-secondary, #999);
   font-style: italic;
 }
 
@@ -519,6 +597,14 @@ defineExpose({
   font-size: 12px;
   color: #999;
   margin-left: 4px;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.message-status:hover {
+  background: rgba(92, 106, 240, 0.1);
 }
 
 .message-status.status-pending {
@@ -531,6 +617,11 @@ defineExpose({
 
 .message-status.status-delivered {
   color: #999;
+}
+
+.message-status.status-delivered:hover,
+.message-status.status-read:hover {
+  background: rgba(103, 194, 58, 0.1);
 }
 
 .message-status.status-read {
@@ -557,7 +648,7 @@ defineExpose({
 /* 右对齐时间戳 */
 .timestamp-own {
   font-size: 12px;
-  color: #ccc;
+  color: var(--color-text-tertiary, #ccc);
   margin-left: 4px;
 }
 
@@ -580,7 +671,7 @@ defineExpose({
   align-items: center;
   gap: 6px;
   font-size: 13px;
-  color: #999;
+  color: var(--color-text-secondary, #999);
   padding: 12px 0;
 }
 
@@ -620,7 +711,7 @@ defineExpose({
 }
 
 .load-more-trigger:hover {
-  background: #f5f5f5;
+  background: var(--color-bg-secondary, #f5f5f5);
   border-radius: 8px;
 }
 </style>

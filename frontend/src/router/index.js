@@ -53,6 +53,18 @@ const routes = [
     }
   },
 
+  // 搜索引擎风格页面
+  {
+    path: '/search',
+    name: 'SearchHub',
+    component: () => import('@/views/questions/LearningHubPage.vue'),
+    meta: {
+      requiresAuth: true,
+      title: '搜索',
+      description: '搜索题目和知识点'
+    }
+  },
+
   // 题库页面（具体学科/专业的题目列表）
   {
     path: '/learning-hub/:domainSlug',
@@ -280,6 +292,12 @@ const routes = [
     path: '/contributions/submit',
     name: 'SubmitQuestion',
     component: () => import('@/views/contributions/SubmitQuestion.vue'),
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/contributions/upload',
+    name: 'UploadResource',
+    component: () => import('@/views/contributions/UploadResource.vue'),
     meta: { requiresAuth: true }
   },
   {

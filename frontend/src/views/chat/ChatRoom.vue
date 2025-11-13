@@ -3,6 +3,17 @@
     <TopToolbar v-if="activeConversation" :room="activeConversation" @menu="handleTopMenu" />
 
     <div class="chat-container">
+      <!-- 左侧：对话列表 -->
+      <ConversationList
+        :conversations="allConversations"
+        :active-conversation-id="store.activeConversationId"
+        :all-users="activeParticipants"
+        @select-conversation="handleSelectConversation"
+        @create-channel="handleCreateChannel"
+        @create-dm="handleCreateDM"
+      />
+
+      <!-- 中间：主聊天区域 -->
       <div class="chat-main">
         <MessageListNew
           :messages="uiMessages"
@@ -42,8 +53,8 @@
       />
     </div>
 
-    <el-drawer v-model="showSearchPanel" title="搜索消息" :size="searchPanelWidth">
-      <MessageSearch
+    <el-drawer v-model="showSearchPanel" title="高级搜索" :size="searchPanelWidth">
+      <AdvancedSearchPanel
         :messages="store.activeMessages"
         :conversation-id="String(store.activeConversationId || '')"
         :senders="activeParticipants"
@@ -105,8 +116,9 @@ import { ref, computed, onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import MessageListNew from '@/components/chat/MessageListNew.vue'
 import MessageInputNew from '@/components/chat/MessageInputNew.vue'
+import ConversationList from '@/components/chat/LeftSidebar/ConversationList.vue'
 import RightSidebar from '@/components/chat/RightSidebar.vue'
-import MessageSearch from '@/components/chat/MessageSearch.vue'
+import AdvancedSearchPanel from '@/components/chat/Search/AdvancedSearchPanel.vue'
 import ContextMenu from '@/components/chat/ContextMenu.vue'
 import TopToolbar from '@/components/chat/TopToolbar.vue'
 import { useChatWorkspaceStore } from '@/stores/chatWorkspace'
@@ -255,6 +267,43 @@ function handleTopMenu(action) {
   else if (action === 'info') showSidebar.value = !showSidebar.value
 }
 
+function handleSelectConversation(conversationId) {
+  store.activeConversationId = conversationId
+  store.ensureConversation(conversationId)
+}
+
+function handleCreateChannel(channelData) {
+  const channel = {
+    id: Date.now(),
+    name: channelData.name,
+    description: channelData.description,
+    type: 'channel',
+    memberCount: 1,
+    createdAt: new Date().toISOString()
+  }
+  store.conversations.push(channel)
+  handleSelectConversation(channel.id)
+}
+
+function handleCreateDM(userId) {
+  const user = activeParticipants.value.find(u => u.id === userId)
+  if (!user) return
+  const dm = {
+    id: `dm_${userId}`,
+    name: user.name,
+    avatar: user.avatar,
+    type: 'dm',
+    participantId: userId,
+    participantCount: 2,
+    createdAt: new Date().toISOString()
+  }
+  const existing = store.conversations.find(c => c.participantId === userId)
+  if (!existing) {
+    store.conversations.push(dm)
+  }
+  handleSelectConversation(dm.id)
+}
+
 function handleMemberClick(member) { console.log('member-click', member) }
 
 function closeContextMenu() { showContextMenu.value = false; contextMenuItems.value = [] }
@@ -306,22 +355,160 @@ function handleSearchCollectMessage(result) { console.log('collect from search',
 </script>
 
 <style scoped>
-.chat-room.page { display: flex; flex-direction: column; height: 100%; }
-.chat-container { display: grid; grid-template-columns: 1fr 280px; }
-.chat-main { display: flex; flex-direction: column; gap: 8px; height: calc(100vh - 120px); max-width: 1100px; padding: 12px 12px 24px 12px; }
+.chat-room.page {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: var(--color-bg, #ffffff);
+  color: var(--color-text, #333);
+}
 
-.reply-box { padding: 8px 12px; margin: 0 12px 8px 12px; background: #f5f7fa; border-radius: 8px; border: 1px solid #e5e7eb; }
-.reply-content { display: flex; gap: 8px; align-items: center; }
-.reply-label { font-weight: 600; color: #606266; }
-.reply-text { color: #909399; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.chat-container {
+  display: grid;
+  grid-template-columns: 280px 1fr 280px;
+  background: var(--color-bg, #ffffff);
+  flex: 1;
+  overflow: hidden;
+}
 
-.forward-dialog { display: flex; flex-direction: column; gap: 12px; }
-.forward-preview { padding: 8px; background: #f5f7fa; border-radius: 8px; border: 1px solid #e5e7eb; }
-.preview-header { font-weight: 600; margin-bottom: 4px; }
-.forward-targets { display: flex; flex-direction: column; gap: 8px; }
-.targets-header { font-weight: 600; color: #606266; }
-.conversation-list { display: flex; flex-direction: column; gap: 8px; max-height: 320px; overflow: auto; }
-.conversation-item { display: flex; align-items: center; gap: 10px; padding: 8px; border-radius: 8px; border: 1px solid #f0f0f0; cursor: pointer; }
-.conversation-item.selected { border-color: #409eff; background: rgba(64,158,255,0.08); }
+.chat-main {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  height: calc(100vh - 120px);
+  max-width: 100%;
+  padding: 12px 12px 24px 12px;
+  background: var(--color-bg, #ffffff);
+  border-left: 1px solid var(--color-border, #e0e0e0);
+  border-right: 1px solid var(--color-border, #e0e0e0);
+}
+
+.reply-box {
+  padding: 8px 12px;
+  margin: 0 12px 8px 12px;
+  background: var(--color-bg-secondary, #f5f7fa);
+  border-radius: 8px;
+  border: 1px solid var(--color-border, #e5e7eb);
+}
+
+.reply-content {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.reply-label {
+  font-weight: 600;
+  color: var(--color-text-secondary, #606266);
+}
+
+.reply-text {
+  color: var(--color-text-tertiary, #909399);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.forward-dialog {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.forward-preview {
+  padding: 8px;
+  background: var(--color-bg-secondary, #f5f7fa);
+  border-radius: 8px;
+  border: 1px solid var(--color-border, #e5e7eb);
+}
+
+.preview-header {
+  font-weight: 600;
+  margin-bottom: 4px;
+  color: var(--color-text, #333);
+}
+
+.forward-targets {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.targets-header {
+  font-weight: 600;
+  color: var(--color-text-secondary, #606266);
+}
+
+.conversation-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 320px;
+  overflow: auto;
+}
+
+.conversation-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px;
+  border-radius: 8px;
+  border: 1px solid var(--color-border, #f0f0f0);
+  cursor: pointer;
+  color: var(--color-text, #333);
+  transition: all 0.2s;
+}
+
+.conversation-item.selected {
+  border-color: #409eff;
+  background: rgba(64, 158, 255, 0.08);
+}
+
+.conversation-item:hover {
+  background: var(--color-bg-secondary, #f5f5f5);
+}
+
+.conv-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.conv-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text, #333);
+}
+
+.conv-meta {
+  font-size: 12px;
+  color: var(--color-text-secondary, #999);
+}
+
+/* 响应式 - 隐藏侧栏当屏幕太小 */
+@media (max-width: 1400px) {
+  .chat-container {
+    grid-template-columns: 240px 1fr 240px;
+  }
+}
+
+@media (max-width: 1200px) {
+  .chat-container {
+    grid-template-columns: 1fr 240px;
+  }
+
+  .chat-main {
+    border-left: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .chat-container {
+    grid-template-columns: 1fr;
+  }
+
+  .chat-main {
+    border-right: none;
+  }
+}
 </style>
 

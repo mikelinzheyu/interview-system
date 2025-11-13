@@ -197,6 +197,10 @@ export const useChatWorkspaceStore = defineStore('chat-workspace', () => {
   const participantsMap = reactive({})
   const participantsLoadingMap = reactive({})
 
+  const reactionsMap = reactive({}) // { [conversationId]: { [messageId]: [{ emoji, count, users: [userId], isReacted }] } }
+
+  const readReceiptsMap = reactive({}) // { [conversationId]: { [messageId]: [{ userId, readAt, userName, userAvatar }] } }
+
   const typingMap = reactive({})
   const typingStateMap = reactive({})
   const typingCleanupTimers = new Map()
@@ -857,6 +861,258 @@ export const useChatWorkspaceStore = defineStore('chat-workspace', () => {
     resetTypingState(conversationId)
   }
 
+  // ============ 反应功能 (Reactions) ============
+
+  /**
+   * 获取消息的反应列表
+   */
+  function getMessageReactions(conversationId, messageId) {
+    if (!conversationId || !messageId) return []
+    const convReactions = reactionsMap[conversationId]
+    if (!convReactions) return []
+    return convReactions[messageId] || []
+  }
+
+  /**
+   * 添加或切换反应
+   */
+  function addReaction(conversationId, messageId, emoji, userId = currentUserId.value) {
+    if (!conversationId || !messageId || !emoji) return null
+
+    // 确保结构存在
+    if (!reactionsMap[conversationId]) {
+      reactionsMap[conversationId] = {}
+    }
+    if (!reactionsMap[conversationId][messageId]) {
+      reactionsMap[conversationId][messageId] = []
+    }
+
+    const messageReactions = reactionsMap[conversationId][messageId]
+    let reactionItem = messageReactions.find(r => r.emoji === emoji)
+
+    if (!reactionItem) {
+      // 创建新的反应
+      reactionItem = {
+        emoji,
+        count: 1,
+        users: [userId],
+        isReacted: userId === currentUserId.value
+      }
+      messageReactions.push(reactionItem)
+    } else {
+      // 如果用户已经反应过，则移除；否则添加
+      const userIndex = reactionItem.users.indexOf(userId)
+      if (userIndex >= 0) {
+        reactionItem.users.splice(userIndex, 1)
+        reactionItem.count = Math.max(0, reactionItem.count - 1)
+        reactionItem.isReacted = false
+      } else {
+        reactionItem.users.push(userId)
+        reactionItem.count += 1
+        reactionItem.isReacted = userId === currentUserId.value
+      }
+
+      // 如果没有用户反应了，删除这个反应
+      if (reactionItem.count === 0) {
+        const index = messageReactions.findIndex(r => r.emoji === emoji)
+        if (index >= 0) {
+          messageReactions.splice(index, 1)
+        }
+      }
+    }
+
+    // 触发更新
+    reactionsMap[conversationId][messageId] = [...messageReactions]
+    return reactionItem
+  }
+
+  /**
+   * 移除反应
+   */
+  function removeReaction(conversationId, messageId, emoji, userId = currentUserId.value) {
+    if (!conversationId || !messageId || !emoji) return
+
+    const messageReactions = getMessageReactions(conversationId, messageId)
+    if (!messageReactions.length) return
+
+    const reactionItem = messageReactions.find(r => r.emoji === emoji)
+    if (!reactionItem) return
+
+    const userIndex = reactionItem.users.indexOf(userId)
+    if (userIndex >= 0) {
+      reactionItem.users.splice(userIndex, 1)
+      reactionItem.count = Math.max(0, reactionItem.count - 1)
+
+      // 如果没有用户反应了，删除这个反应
+      if (reactionItem.count === 0) {
+        const index = messageReactions.findIndex(r => r.emoji === emoji)
+        if (index >= 0) {
+          messageReactions.splice(index, 1)
+        }
+      }
+    }
+
+    // 触发更新
+    if (reactionsMap[conversationId] && reactionsMap[conversationId][messageId]) {
+      reactionsMap[conversationId][messageId] = [...reactionsMap[conversationId][messageId]]
+    }
+  }
+
+  /**
+   * 从服务器同步反应数据
+   */
+  function syncReactions(conversationId, messageId, reactions = []) {
+    if (!conversationId || !messageId) return
+
+    if (!reactionsMap[conversationId]) {
+      reactionsMap[conversationId] = {}
+    }
+
+    const normalized = reactions.map(r => ({
+      emoji: r.emoji,
+      count: r.count || r.users?.length || 0,
+      users: Array.isArray(r.users) ? r.users : (r.userIds || []),
+      isReacted: r.isReacted || (Array.isArray(r.users) ? r.users.includes(currentUserId.value) : false)
+    }))
+
+    reactionsMap[conversationId][messageId] = normalized
+  }
+
+  /**
+   * 清除某个消息的所有反应
+   */
+  function clearMessageReactions(conversationId, messageId) {
+    if (!conversationId || !messageId) return
+    if (reactionsMap[conversationId]) {
+      delete reactionsMap[conversationId][messageId]
+    }
+  }
+
+  /**
+   * 清除某个会话的所有反应
+   */
+  function clearConversationReactions(conversationId) {
+    if (!conversationId) return
+    delete reactionsMap[conversationId]
+  }
+
+  // ============ 已读回执功能 (Read Receipts) ============
+
+  /**
+   * 获取消息的已读用户列表
+   */
+  function getMessageReadReceipts(conversationId, messageId) {
+    if (!conversationId || !messageId) return []
+    const convReceipts = readReceiptsMap[conversationId]
+    if (!convReceipts) return []
+    return convReceipts[messageId] || []
+  }
+
+  /**
+   * 添加已读回执
+   */
+  function addReadReceipt(conversationId, messageId, userId, userName, userAvatar) {
+    if (!conversationId || !messageId || !userId) return
+
+    // 确保结构存在
+    if (!readReceiptsMap[conversationId]) {
+      readReceiptsMap[conversationId] = {}
+    }
+    if (!readReceiptsMap[conversationId][messageId]) {
+      readReceiptsMap[conversationId][messageId] = []
+    }
+
+    const receipts = readReceiptsMap[conversationId][messageId]
+    const existingIndex = receipts.findIndex(r => r.userId === userId)
+
+    if (existingIndex < 0) {
+      // 添加新的已读记录
+      receipts.push({
+        userId,
+        userName: userName || 'Unknown',
+        userAvatar: userAvatar || '',
+        readAt: new Date().toISOString()
+      })
+    } else {
+      // 更新已读时间
+      receipts[existingIndex].readAt = new Date().toISOString()
+    }
+
+    // 触发更新
+    readReceiptsMap[conversationId][messageId] = [...receipts]
+  }
+
+  /**
+   * 批量添加已读回执
+   */
+  function batchAddReadReceipts(conversationId, receipts = []) {
+    if (!conversationId) return
+
+    receipts.forEach(receipt => {
+      addReadReceipt(
+        conversationId,
+        receipt.messageId,
+        receipt.userId,
+        receipt.userName,
+        receipt.userAvatar
+      )
+    })
+  }
+
+  /**
+   * 同步已读回执数据（从服务器）
+   */
+  function syncReadReceipts(conversationId, messageId, userReceipts = []) {
+    if (!conversationId || !messageId) return
+
+    if (!readReceiptsMap[conversationId]) {
+      readReceiptsMap[conversationId] = {}
+    }
+
+    const normalized = userReceipts.map(r => ({
+      userId: r.userId,
+      userName: r.userName || 'Unknown',
+      userAvatar: r.userAvatar || '',
+      readAt: r.readAt
+    }))
+
+    readReceiptsMap[conversationId][messageId] = normalized
+  }
+
+  /**
+   * 获取消息已读人数
+   */
+  function getMessageReadCount(conversationId, messageId) {
+    const receipts = getMessageReadReceipts(conversationId, messageId)
+    return receipts.length
+  }
+
+  /**
+   * 判断是否所有人都已读
+   */
+  function isMessageReadByAll(conversationId, messageId, totalParticipants) {
+    const readCount = getMessageReadCount(conversationId, messageId)
+    return readCount >= (totalParticipants - 1) // 排除发送者本身
+  }
+
+  /**
+   * 清除某个消息的已读回执
+   */
+  function clearMessageReadReceipts(conversationId, messageId) {
+    if (!conversationId || !messageId) return
+    if (readReceiptsMap[conversationId]) {
+      delete readReceiptsMap[conversationId][messageId]
+    }
+  }
+
+  /**
+   * 清除某个会话的所有已读回执
+   */
+  function clearConversationReadReceipts(conversationId) {
+    if (!conversationId) return
+    delete readReceiptsMap[conversationId]
+  }
+
   return {
     conversations,
     conversationsLoading,
@@ -896,6 +1152,22 @@ export const useChatWorkspaceStore = defineStore('chat-workspace', () => {
     applyReadReceipt,
     updateConversationMeta,
     setParticipantStatus,
-    upsertParticipant
+    upsertParticipant,
+    // 反应相关方法
+    getMessageReactions,
+    addReaction,
+    removeReaction,
+    syncReactions,
+    clearMessageReactions,
+    clearConversationReactions,
+    // 已读回执相关方法
+    getMessageReadReceipts,
+    addReadReceipt,
+    batchAddReadReceipts,
+    syncReadReceipts,
+    getMessageReadCount,
+    isMessageReadByAll,
+    clearMessageReadReceipts,
+    clearConversationReadReceipts
   }
 })

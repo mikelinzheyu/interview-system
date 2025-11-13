@@ -119,7 +119,7 @@
           <el-input
             v-model="editingNotes"
             type="textarea"
-            rows="6"
+            :rows="6"
             placeholder="Add your notes about this question..."
             maxlength="2000"
             show-word-limit

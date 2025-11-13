@@ -870,6 +870,21 @@ class CommunityAPI {
    * 获取热门搜索
    */
   getTrendingSearches() {
+    // 在 Mock 模式下直接返回模拟热门搜索，避免 404 和控制台噪音
+    if (this.config.useMockData) {
+      console.log('[Trending] Using mock data')
+      return Promise.resolve({
+        data: [
+          'Vue3 响应式',
+          'React Hooks',
+          '前端性能优化',
+          'TypeScript 实战',
+          'Node.js 最佳实践',
+          'CSS 布局技巧'
+        ]
+      })
+    }
+
     return this.getCached(
       'search:trending',
       () =>

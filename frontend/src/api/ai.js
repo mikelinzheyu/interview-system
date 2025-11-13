@@ -159,3 +159,49 @@ export function callDifyWorkflow(data) {
     data
   })
 }
+
+/**
+ * 社区文章 AI 助手接口
+ */
+
+/**
+ * 生成文章摘要
+ * @param {Object} data
+ * @param {string} data.content - 文章内容
+ * @param {string} data.postId - 文章 ID
+ * @returns {Promise}
+ */
+export function generateArticleSummary(data) {
+  return api({
+    url: '/ai/summary',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * 提取文章关键点
+ * @param {Object} data
+ * @param {string} data.content - 文章内容
+ * @param {string} data.postId - 文章 ID
+ * @returns {Promise}
+ */
+export function extractArticleKeypoints(data) {
+  return api({
+    url: '/ai/keypoints',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * 获取对话历史
+ * @param {string} conversationId - 对话 ID
+ * @returns {Promise}
+ */
+export function getChatHistory(conversationId) {
+  return api({
+    url: `/ai/chat/${conversationId}`,
+    method: 'get'
+  })
+}

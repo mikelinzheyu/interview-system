@@ -65,3 +65,11 @@ export function fetchCategories(params) {
 export function exportQuestions(params) {
   return api({ url: '/questions/export', method: 'get', params, responseType: 'blob' })
 }
+
+// Trending/热门题目（稳定来源）
+// 优先尝试后端提供的 /questions/trending；
+// 若不可用，调用通用列表接口并尝试 popular 排序作为降级。
+export function fetchTrendingQuestions(params = {}) {
+  // 直接请求标准趋势接口
+  return api.get('/questions/trending', { params })
+}

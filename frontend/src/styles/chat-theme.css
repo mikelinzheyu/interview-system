@@ -1,0 +1,418 @@
+/**
+ * 聊天室深色模式样式系统
+ * 使用 CSS 变量实现主题切换
+ */
+
+/* 浅色主题 CSS 变量 (默认) */
+:root {
+  /* 背景色 */
+  --color-bg: #ffffff;
+  --color-bg-secondary: #f9f9f9;
+  --color-bg-tertiary: #f0f0f0;
+
+  /* 文字色 */
+  --color-text: #333333;
+  --color-text-secondary: #666666;
+  --color-text-tertiary: #999999;
+
+  /* 边框色 */
+  --color-border: #e0e0e0;
+  --color-border-light: #f0f0f0;
+
+  /* 阴影 */
+  --color-shadow: rgba(0, 0, 0, 0.1);
+  --color-shadow-lg: rgba(0, 0, 0, 0.15);
+
+  /* 品牌色 */
+  --color-primary: #409eff;
+  --color-primary-light: #66b1ff;
+  --color-primary-lighter: #b3d8ff;
+
+  /* 功能色 */
+  --color-success: #67c23a;
+  --color-warning: #e6a23c;
+  --color-danger: #f56c6c;
+  --color-error: #f56c6c;
+  --color-info: #909399;
+}
+
+/* 深色主题 CSS 变量 */
+html.dark-mode {
+  --color-bg: #1a1a1a;
+  --color-bg-secondary: #2a2a2a;
+  --color-bg-tertiary: #3a3a3a;
+
+  --color-text: #e0e0e0;
+  --color-text-secondary: #b0b0b0;
+  --color-text-tertiary: #808080;
+
+  --color-border: #3a3a3a;
+  --color-border-light: #2a2a2a;
+
+  --color-shadow: rgba(0, 0, 0, 0.3);
+  --color-shadow-lg: rgba(0, 0, 0, 0.5);
+
+  --color-primary: #66b1ff;
+  --color-primary-light: #85c1ff;
+  --color-primary-lighter: #a8d8ff;
+
+  --color-success: #85ce61;
+  --color-warning: #e6a23c;
+  --color-danger: #f78989;
+  --color-error: #f78989;
+  --color-info: #a8abb2;
+}
+
+/* 应用深色模式到所有元素 */
+html.dark-mode {
+  background-color: var(--color-bg);
+  color: var(--color-text);
+
+  /* 页面背景 */
+  & body {
+    background-color: var(--color-bg);
+    color: var(--color-text);
+  }
+
+  /* 输入框 */
+  & .el-input__wrapper,
+  & .el-textarea__inner {
+    background-color: var(--color-bg-secondary);
+    color: var(--color-text);
+    border-color: var(--color-border);
+
+    &:hover {
+      border-color: var(--color-primary-light);
+    }
+  }
+
+  /* 按钮 */
+  & .el-button {
+    &.is-plain {
+      background-color: transparent;
+      border-color: var(--color-border);
+      color: var(--color-text);
+
+      &:hover {
+        background-color: var(--color-bg-secondary);
+        border-color: var(--color-primary);
+        color: var(--color-primary);
+      }
+    }
+  }
+
+  /* 对话框 */
+  & .el-dialog__wrapper {
+    background-color: var(--color-bg);
+  }
+
+  & .el-dialog {
+    background-color: var(--color-bg-secondary);
+    box-shadow: 0 2px 12px var(--color-shadow);
+  }
+
+  /* 下拉菜单 */
+  & .el-popper {
+    background-color: var(--color-bg-secondary);
+    border-color: var(--color-border);
+    color: var(--color-text);
+  }
+
+  /* 标签页 */
+  & .el-tabs__nav {
+    background-color: transparent;
+    border-color: var(--color-border);
+  }
+
+  & .el-tabs__item {
+    color: var(--color-text-secondary);
+
+    &:hover {
+      color: var(--color-primary);
+    }
+
+    &.is-active {
+      color: var(--color-primary);
+    }
+  }
+
+  /* 卡片 */
+  & .el-card {
+    background-color: var(--color-bg-secondary);
+    border-color: var(--color-border);
+    box-shadow: 0 2px 12px var(--color-shadow);
+  }
+
+  /* 消息气泡 */
+  & .message-bubble {
+    background-color: var(--color-bg-tertiary);
+    color: var(--color-text);
+    border-color: var(--color-border);
+
+    &.is-own {
+      background-color: var(--color-primary);
+      color: #ffffff;
+    }
+  }
+
+  /* 代码块 */
+  & .code-block,
+  & .hljs {
+    background-color: var(--color-bg-tertiary) !important;
+    color: var(--color-text) !important;
+    border-color: var(--color-border);
+  }
+
+  & .hljs-string {
+    color: #85ce61;
+  }
+
+  & .hljs-number,
+  & .hljs-literal,
+  & .hljs-attr,
+  & .hljs-attribute,
+  & .hljs-title,
+  & .hljs-function {
+    color: #66b1ff;
+  }
+
+  & .hljs-keyword {
+    color: #f78989;
+  }
+
+  & .hljs-comment {
+    color: #808080;
+    font-style: italic;
+  }
+
+  /* Markdown 内容 */
+  & .markdown-content {
+    color: var(--color-text);
+
+    & :deep(a) {
+      color: var(--color-primary-light);
+
+      &:hover {
+        color: var(--color-primary);
+      }
+    }
+
+    & :deep(blockquote) {
+      border-left-color: var(--color-primary);
+      color: var(--color-text-secondary);
+    }
+
+    & :deep(code) {
+      background-color: var(--color-bg-tertiary);
+      color: #85ce61;
+    }
+
+    & :deep(pre) {
+      background-color: var(--color-bg-tertiary);
+      border-color: var(--color-border);
+    }
+
+    & :deep(table) {
+      & th,
+      & td {
+        border-color: var(--color-border);
+      }
+
+      & th {
+        background-color: var(--color-bg-tertiary);
+      }
+    }
+
+    & :deep(hr) {
+      border-color: var(--color-border);
+    }
+  }
+
+  /* 侧边栏 */
+  & .sidebar {
+    background-color: var(--color-bg-secondary);
+    border-color: var(--color-border);
+  }
+
+  /* 列表项 */
+  & .list-item {
+    background-color: var(--color-bg-secondary);
+    border-color: var(--color-border);
+    color: var(--color-text);
+
+    &:hover {
+      background-color: var(--color-bg-tertiary);
+    }
+
+    &.active {
+      background-color: rgba(102, 177, 255, 0.2);
+    }
+  }
+
+  /* 表格 */
+  & table {
+    background-color: var(--color-bg-secondary);
+    color: var(--color-text);
+    border-color: var(--color-border);
+
+    & th {
+      background-color: var(--color-bg-tertiary);
+      border-color: var(--color-border);
+    }
+
+    & td {
+      border-color: var(--color-border);
+    }
+
+    & tr:hover {
+      background-color: var(--color-bg-tertiary);
+    }
+  }
+
+  /* 菜单 */
+  & .el-menu {
+    background-color: var(--color-bg-secondary);
+    border-color: var(--color-border);
+  }
+
+  & .el-menu-item,
+  & .el-sub-menu__title {
+    color: var(--color-text);
+
+    &:hover {
+      background-color: var(--color-bg-tertiary) !important;
+      color: var(--color-primary);
+    }
+  }
+
+  /* 头部 */
+  & header,
+  & .app-header,
+  & .page-header {
+    background-color: var(--color-bg-secondary);
+    border-color: var(--color-border);
+    color: var(--color-text);
+    box-shadow: 0 2px 12px var(--color-shadow);
+  }
+
+  /* 页脚 */
+  & footer,
+  & .app-footer {
+    background-color: var(--color-bg-secondary);
+    border-color: var(--color-border);
+    color: var(--color-text-secondary);
+  }
+
+  /* 分页 */
+  & .el-pagination .btn {
+    background-color: var(--color-bg-secondary);
+    color: var(--color-text);
+
+    &:hover {
+      color: var(--color-primary);
+    }
+  }
+
+  /* 进度条 */
+  & .el-progress__bar {
+    background-color: var(--color-primary);
+  }
+
+  /* 加载动画 */
+  & .el-loading-mask {
+    background-color: rgba(0, 0, 0, 0.5);
+  }
+
+  /* 选择框 */
+  & .el-checkbox__input.is-checked .el-checkbox__inner {
+    background-color: var(--color-primary);
+    border-color: var(--color-primary);
+  }
+
+  & .el-radio__input.is-checked .el-radio__inner {
+    background-color: var(--color-primary);
+    border-color: var(--color-primary);
+  }
+
+  /* 开关 */
+  & .el-switch.is-checked {
+    background-color: var(--color-primary);
+  }
+
+  /* 滑块 */
+  & .el-slider__button {
+    background-color: var(--color-primary);
+    border-color: var(--color-primary);
+  }
+
+  & .el-slider__track {
+    background-color: var(--color-primary);
+  }
+}
+
+/* 颜色实用类 */
+.text-primary {
+  color: var(--color-primary);
+}
+
+.text-secondary {
+  color: var(--color-text-secondary);
+}
+
+.text-tertiary {
+  color: var(--color-text-tertiary);
+}
+
+.bg-primary {
+  background-color: var(--color-bg-secondary);
+}
+
+.border-divider {
+  border-color: var(--color-border);
+}
+
+/* 过渡效果 */
+html,
+body,
+*,
+*::before,
+*::after {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+/* 避免某些元素的过渡效果影响 */
+.no-transition {
+  transition: none !important;
+}
+
+/* 深色模式特定的过渡 */
+html.dark-mode {
+  & .el-transition-box {
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+}
+
+/* 响应式适配 */
+@media (prefers-reduced-motion: reduce) {
+  html,
+  body,
+  *,
+  *::before,
+  *::after {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+
+/* 打印模式 */
+@media print {
+  html {
+    background-color: white;
+    color: black;
+  }
+
+  html.dark-mode {
+    background-color: white;
+    color: black;
+  }
+}

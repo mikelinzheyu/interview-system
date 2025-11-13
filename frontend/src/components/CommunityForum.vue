@@ -107,7 +107,7 @@
             <el-input
               v-model="newPost.content"
               type="textarea"
-              rows="6"
+              :rows="6"
               placeholder="输入帖子内容"
             />
           </el-form-item>
@@ -189,7 +189,7 @@
             v-model="newReply"
             type="textarea"
             placeholder="写下你的回复..."
-            rows="3"
+            :rows="3"
           />
           <el-button type="primary" @click="submitReply" style="margin-top: 12px">
             发布回复

@@ -18,4 +18,9 @@ app.use(createPinia())
 app.use(router)
 app.use(ElementPlus)
 
+// 初始化主题系统
+import { useThemeStore } from './stores/theme'
+const themeStore = useThemeStore(app._context.provides.pinia)
+themeStore.initTheme()
+
 app.mount('#app')

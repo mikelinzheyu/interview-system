@@ -369,23 +369,17 @@ const handleGoBack = () => {
   router.back()
 }
 
+import { useShare } from ''@/composables/useShare''
+const { triggerShare } = useShare()
+
 const handleShare = () => {
   if (!achievement.value) return
 
-  if (navigator.share) {
-    navigator.share({
-      title: `我解锁了成就：${achievement.value.title}`,
-      text: achievement.value.description,
-      url: window.location.href
-    }).catch(console.error)
-  } else {
-    const text = `我解锁了成就：${achievement.value.title} - ${achievement.value.description}`
-    navigator.clipboard.writeText(text).then(() => {
-      ElMessage.success('成就信息已复制到剪贴板')
-    }).catch(() => {
-      ElMessage.error('分享功能不支持')
-    })
-  }
+    if (!achievement.value) return
+  const title = 我解锁了成就：`r
+  const text = achievement.value.description
+  const url = window.location.href
+  triggerShare({ title, text, url })
 }
 
 const refreshDetail = async () => {

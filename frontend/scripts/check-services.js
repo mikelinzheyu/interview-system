@@ -11,10 +11,18 @@ const https = require('https')
 class ServiceChecker {
   constructor() {
     this.services = [
+      // Node Mock Backend (used in dev)
       {
-        name: 'Backend API',
-        url: 'http://localhost:8080/api/actuator/health',
+        name: 'API Mock Server',
+        url: 'http://localhost:3001/api/health',
         critical: true,
+        timeout: 5000
+      },
+      // Optional Spring Boot backend (if running)
+      {
+        name: 'Spring Boot API (optional)',
+        url: 'http://localhost:8080/api/v1/actuator/health',
+        critical: false,
         timeout: 5000
       },
       {
@@ -25,7 +33,7 @@ class ServiceChecker {
       },
       {
         name: 'Basic Analysis API',
-        url: 'http://localhost:8080/api/interview/analyze',
+        url: 'http://localhost:3001/api/interview/analyze',
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -40,7 +48,7 @@ class ServiceChecker {
       },
       {
         name: 'Advanced Analysis API',
-        url: 'http://localhost:8080/api/interview/analyze-advanced',
+        url: 'http://localhost:3001/api/interview/analyze-advanced',
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

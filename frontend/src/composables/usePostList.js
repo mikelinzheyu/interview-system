@@ -22,7 +22,8 @@ export function usePostList(options = {}) {
   const pageSize = ref(defaultPageSize)
   const total = ref(0)
   const sortBy = ref(route.query.sortBy || 'latest')
-  const searchKeyword = ref('')
+  const initialSearch = route.query.search || route.query.keyword || route.query.q || ''
+  const searchKeyword = ref(initialSearch)
   const selectedForumSlug = ref(route.params.slug || null)
   const selectedTag = ref(route.query.tag || null)
 
@@ -162,11 +163,12 @@ export function usePostList(options = {}) {
    * 监听路由变更
    */
   watch(
-    () => [route.params.slug, route.query.tag, route.query.sortBy],
+    () => [route.params.slug, route.query.tag, route.query.sortBy, route.query.search, route.query.keyword, route.query.q],
     () => {
       selectedForumSlug.value = route.params.slug || null
       selectedTag.value = route.query.tag || null
       sortBy.value = route.query.sortBy || 'latest'
+      searchKeyword.value = route.query.search || route.query.keyword || route.query.q || ''
       fetchPosts(true)
     }
   )

@@ -2,6 +2,8 @@
  * Mock API服务器 - 用于前端测试
  * 模拟后端API响应
  */
+require('dotenv').config() // ⬅️ 首先加载环境变量
+
 const http = require('http')
 const https = require('https')
 const url = require('url')
@@ -11,7 +13,7 @@ const crypto = require('crypto')
 const QRCode = require('qrcode')
 const { initializeWebSocket } = require('./websocket-server')
 const redisClient = require('./redis-client')
-require('dotenv').config()
+const chatWorkflowService = require('./services/chatWorkflowService') // ⬅️ 然后加载服务
 
 const PORT = 3001
 
@@ -2699,6 +2701,110 @@ function scheduleOnResult(record, result) {
   record.updatedAt = record.lastReviewedAt
 }
 
+// ==================== AI 聊天处理函数 ====================
+
+/**
+ * 处理本地聊天流 - 模拟响应
+ */
+function handleLocalChatStream(res) {
+  const mockResponse = [
+    '这是 AI 对',
+    '你提问的',
+    '一个回复。',
+    '它会逐字',
+    '显示在前',
+    '端。',
+  ]
+
+  let index = 0
+  const timer = setInterval(() => {
+    if (index < mockResponse.length) {
+      const chunk = mockResponse[index]
+      res.write(`data: ${JSON.stringify({ type: 'chunk', content: chunk, answer: chunk })}\n\n`)
+      index++
+    } else {
+      const conversationId = `conv-mock-${Date.now()}`
+      res.write(`data: ${JSON.stringify({ type: 'end', conversationId, messageId: 'mock-msg-' + Date.now() })}\n\n`)
+      res.write('event: done\n')
+      res.write(`data: ${JSON.stringify({ conversationId })}\n\n`)
+      res.end()
+      clearInterval(timer)
+    }
+  }, 100)
+}
+
+/**
+ * 处理 Dify Chat API 流
+ */
+async function handleDifyChatStream(res, message, userId, conversationId, articleContent = '') {
+  try {
+    console.log(`[Dify Chat] 开始流式响应 - 用户: ${userId}`)
+
+    let fullAnswer = ''
+    let finalConversationId = conversationId
+    let messageId = ''
+
+    // 调用 Dify Chat API
+    for await (const chunk of chatWorkflowService.sendMessage(message, userId, conversationId, articleContent)) {
+      if (chunk.type === 'chunk') {
+        // 发送内容块
+        const content = chunk.content || chunk.answer
+        fullAnswer += content
+        res.write(`data: ${JSON.stringify({
+          event: 'agent_message',
+          type: 'chunk',
+          answer: content,
+          content: content,
+        })}\n\n`)
+      } else if (chunk.type === 'end') {
+        // 保存对话ID和消息ID
+        finalConversationId = chunk.conversationId
+        messageId = chunk.messageId
+
+        // 发送对话结束
+        res.write(`data: ${JSON.stringify({
+          event: 'message_end',
+          type: 'end',
+          conversationId: finalConversationId,
+          messageId: messageId,
+        })}\n\n`)
+        res.write('event: done\n')
+        res.write(`data: ${JSON.stringify({ conversationId: finalConversationId })}\n\n`)
+
+        // 保存对话到 Redis
+        if (finalConversationId && userId) {
+          try {
+            await redisClient.addMessageToConversation(finalConversationId, userId, {
+              role: 'user',
+              content: message
+            })
+            await redisClient.addMessageToConversation(finalConversationId, userId, {
+              role: 'assistant',
+              content: fullAnswer,
+              messageId: messageId
+            })
+            console.log(`[Dify Chat] 对话已保存到 Redis: ${finalConversationId}`)
+          } catch (saveError) {
+            console.error(`[Dify Chat] 保存对话失败: ${saveError.message}`)
+          }
+        }
+      }
+    }
+
+    res.end()
+    console.log(`[Dify Chat] 流式响应完成 - 最终对话ID: ${finalConversationId}`)
+  } catch (error) {
+    console.error(`[Dify Chat] 错误: ${error.message}`)
+    // 错误时降级到本地模拟
+    try {
+      handleLocalChatStream(res)
+    } catch (e) {
+      res.write(`data: ${JSON.stringify({ type: 'error', error: error.message })}\n\n`)
+      res.end()
+    }
+  }
+}
+
 const routes = {
   // 健康检查
   'GET:/api/actuator/health': (req, res) => {
@@ -4095,6 +4201,47 @@ const routes = {
         feedback,
         evaluatedAt: new Date().toISOString()
       }, '题目质量评估成功')
+    })
+  },
+
+  // 19. 生成文章摘要（社区 AI 助手）
+  'POST:/api/ai/summary': (req, res) => {
+    let body = ''
+    req.on('data', chunk => { body += chunk })
+    req.on('end', () => {
+      try {
+        const { content, postId } = JSON.parse(body || '{}')
+        if (!content || !content.trim()) {
+          return sendResponse(res, 400, null, 'Content is required')
+        }
+        const preview = content.length > 30 ? content.substring(0, 30) + '...' : content
+        const summary = `这是一篇关于“${preview}”的文章摘要。`
+        sendResponse(res, 200, { summary, fromCache: false, mock: true }, 'OK')
+      } catch (e) {
+        sendResponse(res, 500, null, e.message || 'Failed to generate summary')
+      }
+    })
+  },
+
+  // 20. 提取文章关键点（社区 AI 助手）
+  'POST:/api/ai/keypoints': (req, res) => {
+    let body = ''
+    req.on('data', chunk => { body += chunk })
+    req.on('end', () => {
+      try {
+        const { content, postId } = JSON.parse(body || '{}')
+        if (!content || !content.trim()) {
+          return sendResponse(res, 400, null, 'Content is required')
+        }
+        const keypoints = [
+          '关键点1: 文章主题与背景',
+          '关键点2: 核心观点与论据',
+          '关键点3: 结论与启发'
+        ]
+        sendResponse(res, 200, { keypoints, fromCache: false, mock: true }, 'OK')
+      } catch (e) {
+        sendResponse(res, 500, null, e.message || 'Failed to extract keypoints')
+      }
     })
   },
 
@@ -6455,26 +6602,355 @@ const routes = {
 
   // 获取题目详情
   'GET:/api/contributions/questions/:id': (req, res) => {
-    const questionId = req.url.split('/').pop()
-    const mockQuestion = {
-      id: parseInt(questionId),
-      title: '实现一个防抖函数',
-      content: '# 题目描述\n\n请实现一个防抖函数 `debounce`，要求：\n\n1. 支持立即执行模式\n2. 支持取消功能\n3. 支持返回值\n\n## 示例\n\n```javascript\nconst debounced = debounce(fn, 300)\ndebounced() // 调用\n```',
-      difficulty: '中等',
-      category: 'frontend',
-      tags: ['JavaScript', 'Performance'],
-      author: '张三',
-      authorId: 1,
-      views: 1234,
-      discussions: 45,
-      favorites: 89,
-      isFavorited: false,
-      status: 'approved',
-      publishedAt: '2024-10-01',
-      bounty: null
-    }
+    const questionId = parseInt(req.url.split('/').pop())
 
-    sendResponse(res, 200, mockQuestion)
+    // 完整的问题库数据（与前端 CommunityHub.vue 同步）
+    const questionsDB = [
+      {
+        id: 1,
+        title: '手写实现 Promise.all 和 Promise.race',
+        content: '# 题目描述\n\n请实现 Promise.all 和 Promise.race 两个方法\n\n## Promise.all 要求\n1. 接收一个 Promise 数组\n2. 所有 Promise 都 resolve 时才 resolve\n3. 任意一个 reject 就立即 reject\n\n## Promise.race 要求\n1. 接收一个 Promise 数组\n2. 首先 resolve 或 reject 的 Promise 获胜\n\n## 示例\n```javascript\nconst p1 = Promise.resolve(3)\nconst p2 = new Promise(resolve => setTimeout(() => resolve(\'foo\'), 100))\n\nPromise.all([p1, p2]).then(values => {\n  console.log(values) // [3, \'foo\']\n})\n```',
+        difficulty: '中等',
+        category: '算法',
+        tags: ['JavaScript', 'Promise', '异步编程'],
+        author: '算法大师',
+        views: 15234,
+        discussions: 89,
+        favorites: 567,
+        isFavorited: false,
+        status: 'approved'
+      },
+      {
+        id: 2,
+        title: 'Vue3 Composition API 最佳实践',
+        content: '# Vue3 Composition API 最佳实践\n\nComposition API 是 Vue 3 的一个重要特性，提供了更灵活的代码组织方式。\n\n## 核心概念\n1. setup 函数 - 组件逻辑的入口\n2. reactive 和 ref - 数据响应式\n3. computed - 计算属性\n4. watch 和 watchEffect - 侦听器\n5. 生命周期 hooks - onMounted、onUnmounted 等\n\n## 实战建议\n- 对于复杂逻辑，优先使用 ref\n- 使用 computed 缓存计算结果\n- 合理划分 composable 功能\n- 避免过度抽象，保持代码可读性\n- 使用 TypeScript 增强类型安全\n\n## 常见模式\n```javascript\nimport { ref, computed, onMounted } from \'vue\'\n\nexport default {\n  setup() {\n    const count = ref(0)\n    const doubled = computed(() => count.value * 2)\n    \n    onMounted(() => {\n      console.log(\'Component mounted\')\n    })\n    \n    return { count, doubled }\n  }\n}\n```',
+        difficulty: '中等',
+        category: '前端',
+        tags: ['Vue3', 'Composition API', '前端框架'],
+        author: 'Vue专家',
+        views: 12890,
+        discussions: 67,
+        favorites: 489,
+        isFavorited: false,
+        status: 'approved'
+      },
+      {
+        id: 3,
+        title: '前端性能优化终极指南',
+        content: '# 前端性能优化完全指南\n\n性能优化是现代 Web 开发的核心话题。本文从多个维度讲解如何打造高性能应用。\n\n## 网络层优化\n- CDN 加速 - 地理位置优化\n- HTTP/2 推送 - 多路复用\n- 资源压缩 - gzip、brotli\n- 缓存策略 - 强缓存、协商缓存\n- DNS 预解析 - dns-prefetch\n\n## 代码层优化\n- 代码分割 - Code splitting\n- 懒加载 - 延迟加载非关键资源\n- Tree shaking - 移除未使用代码\n- 压缩混淆 - minify 和 uglify\n- Polyfill 优化 - 按需加载\n\n## 运行时优化\n- 虚拟滚动 - 只渲染可见区域\n- 防抖和节流 - 减少函数调用\n- 内存泄漏修复 - 及时清理引用\n- 长任务分割 - 使用 requestIdleCallback\n- 图片优化 - webp、responsive images',
+        difficulty: '困难',
+        category: '前端',
+        tags: ['性能优化', 'Webpack', '最佳实践'],
+        author: '性能优化专家',
+        views: 18765,
+        discussions: 234,
+        favorites: 678,
+        isFavorited: false,
+        status: 'approved'
+      },
+      {
+        id: 4,
+        title: 'React Hooks 深度解析',
+        content: '# React Hooks 深度解析\n\nHooks 是 React 16.8 引入的特性，彻底改变了 React 函数组件的编写方式。\n\n## 基础 Hooks\n- useState - 管理组件状态\n- useEffect - 处理副作用\n- useContext - 使用 Context 值\n\n## 进阶 Hooks\n- useReducer - 管理复杂状态\n- useMemo - 缓存计算结果\n- useCallback - 缓存回调函数\n- useRef - 获取 DOM 引用\n- useLayoutEffect - 同步执行副作用\n\n## 自定义 Hooks\n创建可复用的逻辑，遵循以下原则：\n- Hook 的名称必须以 use 开头\n- 只在函数组件或自定义 Hook 中调用\n- 不能在条件分支中调用\n\n## 常见陷阱\n1. 依赖数组遗漏 - 导致副作用重复执行\n2. 闭包陷阱 - 使用过期的变量值\n3. 性能问题 - 不必要的渲染\n4. 竞态条件 - 异步操作顺序问题',
+        difficulty: '中等',
+        category: '前端',
+        tags: ['React', 'Hooks', '源码解析'],
+        author: 'React狂热者',
+        views: 14567,
+        discussions: 178,
+        favorites: 534,
+        isFavorited: false,
+        status: 'approved'
+      },
+      {
+        id: 5,
+        title: '算法面试高频题精讲：链表专题',
+        content: '# 链表专题 - 面试必备\n\n链表是数据结构中的基础，也是面试的高频题目。掌握链表相关算法对找工作至关重要。\n\n## 基础操作\n- 链表反转 - 改变指针方向\n- 删除节点 - 跳过指针\n- 找中点 - 快慢指针\n- 检测环 - 推龟兔算法\n\n## 高频面试题\n1. **反转链表** (LeetCode 206)\n   - 递归解法\n   - 迭代解法\n   - 栈辅助解法\n\n2. **环形链表检测** (LeetCode 141)\n   - Floyd 算法\n   - 使用集合\n\n3. **合并两个有序链表** (LeetCode 21)\n   - 归并思想\n   - 递归实现\n\n4. **K 个一组翻转** (LeetCode 25)\n   - 分组处理\n   - 递归或迭代\n\n## 解题技巧\n- 使用双指针 - 快慢、前后\n- 递归解法 - 简洁优雅\n- 虚拟头节点 - 统一逻辑\n- 画图分析 - 清晰思路',
+        difficulty: '中等',
+        category: '算法',
+        tags: ['算法', '链表', '面试'],
+        author: '面试官',
+        views: 23456,
+        discussions: 312,
+        favorites: 891,
+        isFavorited: false,
+        status: 'approved'
+      },
+      {
+        id: 6,
+        title: 'TypeScript 高级类型系统详解',
+        content: '# TypeScript 高级类型系统\n\nTypeScript 的类型系统是其强大之处。掌握高级特性能写出更安全的代码。\n\n## 泛型 (Generics)\n- 泛型函数\n- 泛型类\n- 泛型约束\n- 泛型默认值\n\n## 条件类型 (Conditional Types)\n- 基本语法：`T extends U ? X : Y`\n- 分布式条件类型\n- `infer` 关键字\n\n## 映射类型 (Mapped Types)\n- 遍历对象属性\n- 属性修饰符\n- as 重新映射\n\n## 工具类型\n- Partial、Required、Readonly\n- Record、Pick、Omit\n- Extract、Exclude\n- Parameters、ReturnType\n\n## 实战示例\n```typescript\ntype Readonly<T> = {\n  readonly [K in keyof T]: T[K]\n}\n\ntype Getters<T> = {\n  [K in keyof T as `get${Capitalize<string & K>}`]: () => T[K]\n}\n```',
+        difficulty: '困难',
+        category: '前端',
+        tags: ['TypeScript', '类型系统', '高级技巧'],
+        author: 'TS专家',
+        views: 11234,
+        discussions: 145,
+        favorites: 423,
+        isFavorited: false,
+        status: 'approved'
+      },
+      {
+        id: 7,
+        title: '微服务架构设计与实践',
+        content: '# 微服务架构设计与实践\n\n微服务已成为大型系统的标准架构。本文分享在实际项目中的设计经验。\n\n## 核心概念\n- 服务拆分原则\n- API 网关\n- 服务注册与发现\n- 配置中心\n\n## 关键问题\n\n### 服务拆分\n- 按业务域拆分\n- 按技术能力拆分\n- 拆分粒度权衡\n\n### 服务治理\n- 限流熔断\n- 重试机制\n- 超时控制\n- 分布式追踪\n\n### 分布式事务\n- 两阶段提交\n- 补偿事务 (Saga)\n- 基于消息队列\n- 最终一致性\n\n### 部署运维\n- 容器化部署\n- Kubernetes 编排\n- 灰度发布\n- 监控告警',
+        difficulty: '困难',
+        category: '系统设计',
+        tags: ['微服务', '架构设计', '分布式'],
+        author: '架构师',
+        views: 16789,
+        discussions: 201,
+        favorites: 612,
+        isFavorited: false,
+        status: 'approved'
+      },
+      {
+        id: 8,
+        title: 'Node.js 性能调优实战',
+        content: '# Node.js 性能调优实战\n\nNode.js 应用性能优化是后端开发的重要课题。\n\n## 内存管理\n- 堆内存分析\n- 内存泄漏检测\n- 垃圾回收优化\n- Buffer 使用规范\n\n## CPU 优化\n- 事件循环理解\n- CPU 密集操作处理\n- Worker Threads\n- 进程池\n\n## I/O 优化\n- 流式处理\n- 连接池\n- 异步操作\n- 缓存策略\n\n## 监控工具\n- clinic.js\n- 0x\n- node-inspect\n- chromium devtools\n\n## 性能基准测试\n```javascript\nconst benchmark = require(\'benchmark\')\nconst suite = new benchmark.Suite()\n\nsuite\n  .add(\'方案A\', () => { /* ... */ })\n  .add(\'方案B\', () => { /* ... */ })\n  .on(\'complete\', () => { /* 结果 */ })\n  .run()\n```',
+        difficulty: '中等',
+        category: '后端',
+        tags: ['Node.js', '性能优化', '后端开发'],
+        author: 'Node大神',
+        views: 9876,
+        discussions: 98,
+        favorites: 345,
+        isFavorited: false,
+        status: 'approved'
+      },
+      {
+        id: 9,
+        title: '深入理解 JavaScript 事件循环机制',
+        content: '# 深入理解 JavaScript 事件循环\n\n事件循环是 JavaScript 运行时的核心机制。理解它对掌握异步编程至关重要。\n\n## 调用栈\n- 函数执行上下文\n- LIFO (后进先出)\n- 栈溢出错误\n\n## 任务队列\n\n### 宏任务 (Macrotask)\n- setTimeout\n- setInterval\n- setImmediate\n- requestAnimationFrame\n- I/O 操作\n\n### 微任务 (Microtask)\n- Promise.then/catch/finally\n- async/await\n- MutationObserver\n- queueMicrotask\n\n## 事件循环流程\n1. 执行同步代码（调用栈）\n2. 执行所有微任务\n3. 执行一个宏任务\n4. 检查是否有微任务，回到第 2 步\n5. 重复直到队列为空\n\n## 经典问题\n```javascript\nconsole.log(\'1\')\n\nsetTimeout(() => {\n  console.log(\'2\')\n}, 0)\n\nPromise.resolve()\n  .then(() => {\n    console.log(\'3\')\n  })\n\nconsole.log(\'4\')\n// 输出顺序：1, 4, 3, 2\n```',
+        difficulty: '困难',
+        category: '算法',
+        tags: ['JavaScript', '事件循环', '异步编程'],
+        author: '深度学习者',
+        views: 19234,
+        discussions: 245,
+        favorites: 756,
+        isFavorited: false,
+        status: 'approved'
+      },
+      {
+        id: 10,
+        title: 'CSS Grid 布局完全指南',
+        content: '# CSS Grid 布局完全指南\n\nCSS Grid 是现代 Web 布局的强大工具，比 Flexbox 更适合二维布局。\n\n## 基础概念\n- Grid Container\n- Grid Item\n- Grid Line\n- Grid Track\n- Grid Area\n- Grid Cell\n\n## 常用属性\n\n### 容器属性\n- display: grid\n- grid-template-columns\n- grid-template-rows\n- grid-gap (gap)\n- justify-items\n- align-items\n\n### 项目属性\n- grid-column-start/end\n- grid-row-start/end\n- grid-column\n- grid-row\n- justify-self\n- align-self\n\n## 响应式设计\n```css\n.grid {\n  display: grid;\n  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));\n  gap: 1rem;\n}\n```\n\n## 实战案例\n- 圣杯布局\n- 瀑布流\n- 响应式卡片网格\n- 复杂页面布局',
+        difficulty: '简单',
+        category: '前端',
+        tags: ['CSS', 'Grid布局', '响应式设计'],
+        author: 'CSS达人',
+        views: 10567,
+        discussions: 87,
+        favorites: 412,
+        isFavorited: false,
+        status: 'approved'
+      },
+      {
+        id: 11,
+        title: '如何优雅地处理错误异常',
+        content: '# 如何优雅地处理错误异常\n\n错误处理是健壮应用的基础。本文详解各种错误处理模式。\n\n## 同步错误处理\n\n### try-catch-finally\n```javascript\ntry {\n  // 可能抛出错误的代码\n} catch (error) {\n  // 处理错误\n} finally {\n  // 清理资源\n}\n```\n\n## 异步错误处理\n\n### Promise 错误处理\n```javascript\nPromise.resolve()\n  .then(result => { /* ... */ })\n  .catch(error => { /* 处理错误 */ })\n  .finally(() => { /* 清理 */ })\n```\n\n### async/await 错误处理\n```javascript\nasync function main() {\n  try {\n    const result = await asyncFunction()\n  } catch (error) {\n    // 处理错误\n  }\n}\n```\n\n## 错误分类\n- SyntaxError - 语法错误\n- ReferenceError - 引用错误\n- TypeError - 类型错误\n- RangeError - 范围错误\n- CustomError - 自定义错误\n\n## 最佳实践\n1. 区分可恢复和不可恢复错误\n2. 提供有意义的错误信息\n3. 记录错误日志\n4. 优雅降级\n5. 错误边界',
+        difficulty: '中等',
+        category: '前端',
+        tags: ['JavaScript', '错误处理', '最佳实践'],
+        author: '代码卫士',
+        views: 13456,
+        discussions: 156,
+        favorites: 521,
+        isFavorited: false,
+        status: 'approved'
+      },
+      {
+        id: 12,
+        title: '数据结构面试宝典：树与二叉树',
+        content: '# 树与二叉树 - 面试宝典\n\n树和二叉树是数据结构的核心。这些知识对大厂面试至关重要。\n\n## 基础概念\n- 根节点、叶子节点\n- 子树、深度、高度\n- 二叉树分类\n  - 满二叉树\n  - 完全二叉树\n  - 二叉搜索树\n  - 平衡二叉树\n\n## 遍历方法\n- **前序遍历** - 中、左、右\n- **中序遍历** - 左、中、右\n- **后序遍历** - 左、右、中\n- **层序遍历** - BFS\n\n## 高频面试题\n1. **二叉树遍历** (LeetCode 94, 144, 145, 102)\n2. **二叉树构建** (LeetCode 105, 106, 889)\n3. **最近公共祖先** (LeetCode 236)\n4. **路径和** (LeetCode 112, 113, 437)\n5. **序列化反序列化** (LeetCode 297)\n6. **展平树** (LeetCode 114)\n\n## 进阶内容\n- AVL 树\n- 红黑树\n- B 树\n- 字典树 (Trie)\n- 线段树',
+        difficulty: '困难',
+        category: '算法',
+        tags: ['算法', '数据结构', '二叉树', '面试'],
+        author: '算法导师',
+        views: 25678,
+        discussions: 378,
+        favorites: 945,
+        isFavorited: false,
+        status: 'approved'
+      },
+      {
+        id: 13,
+        title: 'Docker 与 Kubernetes 入门到精通',
+        content: '# Docker 与 Kubernetes 入门到精通\n\n容器化技术已成为现代开发必备技能。本文详解 Docker 和 K8s。\n\n## Docker 基础\n- 镜像和容器\n- Dockerfile 编写\n- 分层存储\n- 网络驱动\n- 数据卷\n\n## Docker Compose\n- 多容器编排\n- 服务依赖\n- 环境变量\n- 网络配置\n\n## Kubernetes 核心概念\n- Pod - 最小部署单位\n- Deployment - 服务管理\n- Service - 负载均衡\n- Ingress - 路由\n- ConfigMap & Secret\n- PersistentVolume\n\n## 部署实践\n```yaml\napiVersion: apps/v1\nkind: Deployment\nmetadata:\n  name: nginx\nspec:\n  replicas: 3\n  selector:\n    matchLabels:\n      app: nginx\n  template:\n    metadata:\n      labels:\n        app: nginx\n    spec:\n      containers:\n      - name: nginx\n        image: nginx:latest\n        ports:\n        - containerPort: 80\n```',
+        difficulty: '困难',
+        category: '系统设计',
+        tags: ['Docker', 'Kubernetes', '容器化', 'DevOps'],
+        author: 'DevOps工程师',
+        views: 16234,
+        discussions: 198,
+        favorites: 587,
+        isFavorited: false,
+        status: 'approved'
+      },
+      {
+        id: 14,
+        title: '数据库事务与并发控制详解',
+        content: '# 数据库事务与并发控制\n\n事务和并发控制是数据库的核心特性。\n\n## ACID 特性\n- **原子性** (Atomicity) - 全部成功或全部失败\n- **一致性** (Consistency) - 数据满足完整性约束\n- **隔离性** (Isolation) - 事务间不相互影响\n- **持久性** (Durability) - 提交后永久保存\n\n## 隔离级别\n1. **READ UNCOMMITTED** - 读未提交\n   - 存在脏读\n2. **READ COMMITTED** - 读已提交\n   - 存在不可重复读\n3. **REPEATABLE READ** - 可重复读\n   - 存在幻读\n4. **SERIALIZABLE** - 序列化\n   - 完全隔离\n\n## 并发问题\n- 脏读\n- 不可重复读\n- 幻读\n- 第二类丢失更新\n\n## 锁机制\n- 共享锁 (S)\n- 排他锁 (X)\n- 意向锁\n- 死锁检测与恢复\n\n## 实战建议\n- 选择合适的隔离级别\n- 合理使用索引\n- 避免长事务\n- 监控死锁',
+        difficulty: '困难',
+        category: '数据结构',
+        tags: ['数据库', '事务', '并发控制', 'SQL'],
+        author: 'DB专家',
+        views: 14876,
+        discussions: 167,
+        favorites: 498,
+        isFavorited: false,
+        status: 'approved'
+      },
+      {
+        id: 15,
+        title: 'REST API 设计最佳实践',
+        content: '# REST API 设计最佳实践\n\n规范的 API 设计对项目长期维护至关重要。\n\n## RESTful 原则\n- 使用 HTTP 方法 (GET, POST, PUT, DELETE)\n- 资源导向而非操作导向\n- 使用状态码表示结果\n- 无状态设计\n\n## API 版本管理\n- URL 路径版本 `/api/v1/users`\n- 请求头版本 `Accept: application/vnd.myapi.v1+json`\n- 查询参数版本 `?version=1`\n\n## 响应格式设计\n```json\n{\n  "code": 200,\n  "message": "success",\n  "data": { /* ... */ },\n  "timestamp": 1234567890\n}\n```\n\n## 错误处理\n- 使用标准 HTTP 状态码\n- 提供详细的错误信息\n- 返回错误代码便于调试\n\n## 安全性\n- 使用 HTTPS\n- API 认证 (JWT, OAuth)\n- 速率限制\n- 输入验证\n\n## 文档和工具\n- OpenAPI/Swagger\n- API 文档自动生成\n- 在线测试工具',
+        difficulty: '中等',
+        category: '后端',
+        tags: ['API设计', 'REST', '后端开发'],
+        author: '架构设计师',
+        views: 12345,
+        discussions: 134,
+        favorites: 467,
+        isFavorited: false,
+        status: 'approved'
+      },
+      {
+        id: 16,
+        title: 'Web 安全防护指南',
+        content: '# Web 安全防护指南\n\n前端开发必须了解的安全知识，关系到用户数据安全。\n\n## 常见攻击类型\n\n### XSS (Cross-Site Scripting)\n- **反射型 XSS** - URL 注入\n- **存储型 XSS** - 数据库污染\n- **DOM 型 XSS** - JavaScript 操作 DOM\n\n防护方案：\n- 输入验证\n- 输出编码\n- 使用 Content Security Policy (CSP)\n\n### CSRF (Cross-Site Request Forgery)\n- Token 验证\n- SameSite Cookie\n- 自定义请求头\n\n### SQL 注入\n- 参数化查询\n- ORM 框架\n- 输入验证\n\n### XXE (XML External Entity)\n- 禁用外部实体\n- 验证 XML 内容\n\n## 安全最佳实践\n1. **HTTPS** - 传输层加密\n2. **HSTS** - 强制 HTTPS\n3. **安全头** - X-Frame-Options, X-Content-Type-Options\n4. **依赖管理** - 定期更新包\n5. **密钥管理** - 环境变量存储\n6. **日志审计** - 记录敏感操作',
+        difficulty: '困难',
+        category: '前端',
+        tags: ['安全', 'Web安全', 'XSS防护'],
+        author: '安全卫士',
+        views: 18976,
+        discussions: 267,
+        favorites: 723,
+        isFavorited: false,
+        status: 'approved'
+      },
+      {
+        id: 17,
+        title: '图论算法详解与应用',
+        content: '# 图论算法详解与应用\n\n图论是算法的重要分支。掌握图论算法对竞赛和面试都很重要。\n\n## 基础概念\n- 顶点和边\n- 有向图和无向图\n- 权重图\n- 邻接矩阵和邻接表\n\n## 遍历算法\n- **DFS (深度优先搜索)**\n  - 递归实现\n  - 迭代实现\n- **BFS (广度优先搜索)**\n  - 使用队列\n  - 最短路径\n\n## 最短路径\n- **Dijkstra 算法** - 单源最短路\n- **Bellman-Ford 算法** - 处理负权边\n- **Floyd-Warshall** - 全对最短路\n\n## 最小生成树\n- **Kruskal 算法** - 贪心 + 并查集\n- **Prim 算法** - 贪心优先级队列\n\n## 拓扑排序\n- DAG 检测\n- 任务调度\n\n## 高级内容\n- 二分图\n- 强连通分量 (SCC)\n- 欧拉路径/回路\n- 哈密顿路径',
+        difficulty: '困难',
+        category: '算法',
+        tags: ['算法', '图论', '高级技巧'],
+        author: '算法研究员',
+        views: 17654,
+        discussions: 289,
+        favorites: 632,
+        isFavorited: false,
+        status: 'approved'
+      },
+      {
+        id: 18,
+        title: 'Python 异步编程 asyncio 完全指南',
+        content: '# Python 异步编程 asyncio 完全指南\n\nasyncio 是 Python 的异步 I/O 库，适合构建高性能 I/O 密集型应用。\n\n## 核心概念\n- 事件循环\n- 协程\n- Future\n- Task\n\n## 基础用法\n```python\nimport asyncio\n\nasync def hello():\n    print(\'Hello\')\n    await asyncio.sleep(1)\n    print(\'World\')\n\nasyncio.run(hello())\n```\n\n## 异步函数\n- async def\n- await\n- async for\n- async with\n\n## 并发控制\n- asyncio.gather() - 并发执行\n- asyncio.wait() - 等待多个任务\n- Semaphore - 限制并发数\n- Lock - 互斥锁\n\n## 高级特性\n- 流 (Streams)\n- 子进程\n- 网络编程\n- 超时处理\n\n## 性能优化\n- 避免阻塞操作\n- 合理使用线程池\n- 监控事件循环\n- 调试异步代码\n\n## 实战案例\n- Web 爬虫\n- WebSocket 服务器\n- 实时数据处理',
+        difficulty: '中等',
+        category: '后端',
+        tags: ['Python', '异步编程', 'asyncio'],
+        author: 'Python高手',
+        views: 11234,
+        discussions: 123,
+        favorites: 389,
+        isFavorited: false,
+        status: 'approved'
+      },
+      {
+        id: 19,
+        title: '分布式事务处理方案对比',
+        content: '# 分布式事务处理方案对比\n\n分布式系统中的事务处理是难题。本文对比各种解决方案。\n\n## 两阶段提交 (2PC)\n- Prepare 阶段\n- Commit/Rollback 阶段\n- 优点：强一致性\n- 缺点：性能差、容易死锁\n\n## 补偿事务 (Saga)\n- Orchestration 模式\n- Choreography 模式\n- 优点：性能好、可扩展\n- 缺点：最终一致性、复杂度高\n\n## 本地消息表\n- 业务表和消息表\n- 定时任务轮询\n- 优点：实现简单\n- 缺点：需要定时扫描\n\n## 事件溯源 (Event Sourcing)\n- 存储所有状态变更\n- 重放事件恢复状态\n- 优点：天然支持审计\n- 缺点：存储成本大\n\n## 实际选择\n- 对一致性要求高：使用 2PC 或同步 Saga\n- 追求高可用：使用异步 Saga\n- 需要审计：使用 Event Sourcing\n- 团队能力：选择易维护方案',
+        difficulty: '困难',
+        category: '系统设计',
+        tags: ['分布式', '事务', '架构设计'],
+        author: '分布式架构师',
+        views: 15432,
+        discussions: 201,
+        favorites: 568,
+        isFavorited: false,
+        status: 'approved'
+      },
+      {
+        id: 20,
+        title: '现代前端构建工具对比：Webpack vs Vite vs Turbopack',
+        content: '# 现代前端构建工具对比\n\n构建工具是前端工程化的基础。选择合适的工具很重要。\n\n## Webpack\n- 市场占有率最高\n- 生态完善\n- 配置复杂\n- 构建速度较慢\n- 强大的插件系统\n\n## Vite\n- 基于 ES modules\n- 开发速度极快\n- 冷启动快\n- 生态相对较小\n- 适合新项目\n\n## Turbopack\n- Vercel 开发\n- 用 Rust 编写\n- 性能最优\n- 还在快速发展\n- 生态尚不完善\n\n## 性能对比\n| 工具 | 冷启动 | HMR | 构建 |\n|------|--------|-----|------|\n| Webpack | 很慢 | 中等 | 很慢 |\n| Vite | 快 | 很快 | 快 |\n| Turbopack | 很快 | 很快 | 很快 |\n\n## 选择建议\n- **新项目** → Vite 或 Turbopack\n- **现有项目** → 保持 Webpack（迁移成本大）\n- **企业项目** → Webpack（生态稳定）\n- **关注性能** → Turbopack\n\n## 迁移策略\n1. 评估迁移成本\n2. 先在非关键项目试用\n3. 建立完整的测试套件\n4. 逐步迁移',
+        difficulty: '中等',
+        category: '前端',
+        tags: ['Webpack', 'Vite', '构建工具', '性能优化'],
+        author: '构建工具专家',
+        views: 13879,
+        discussions: 156,
+        favorites: 521,
+        isFavorited: false,
+        status: 'approved'
+      },
+      {
+        id: 21,
+        title: '五分钟掌握动态规划思想',
+        content: '# 五分钟掌握动态规划思想\n\n动态规划 (Dynamic Programming) 是算法的皇冠。用最直观的方式讲解。\n\n## 核心思想\nDP = 分解子问题 + 记录状态 + 状态转移\n\n## 三个特征\n1. **最优子结构** - 大问题的最优解包含小问题的最优解\n2. **重叠子问题** - 相同的子问题重复出现\n3. **无后效性** - 当前状态只与之前状态有关\n\n## 解题步骤\n1. **定义状态** - dp[i] 表示什么？\n2. **状态转移方程** - dp[i] = f(dp[i-1], ...)\n3. **边界条件** - dp[0] = ?\n4. **计算顺序** - 通常从小到大\n\n## 经典问题\n- 斐波那契数列\n- 背包问题\n- 编辑距离\n- 最长上升子序列\n- 硬币兑换\n\n## 常见写法\n```python\n# 自顶向下 (记忆化搜索)\ndef fib(n, memo={}): \n    if n in memo: return memo[n]\n    if n <= 1: return n\n    memo[n] = fib(n-1) + fib(n-2)\n    return memo[n]\n\n# 自底向上 (递推)\ndef fib(n):\n    dp = [0] * (n + 1)\n    for i in range(1, n + 1):\n        dp[i] = dp[i-1] + dp[i-2]\n    return dp[n]\n```',
+        difficulty: '中等',
+        category: '算法',
+        tags: ['算法', '动态规划', '面试'],
+        author: '算法启蒙师',
+        views: 21345,
+        discussions: 298,
+        favorites: 847,
+        isFavorited: false,
+        status: 'approved'
+      },
+      {
+        id: 22,
+        title: '从零到一实现一个 Vue 组件库',
+        content: '# 从零到一实现一个 Vue 组件库\n\n设计和实现一个生产级别的 Vue 组件库是大工程。\n\n## 项目规划\n- 组件清单\n- API 设计\n- 文档计划\n- 发布策略\n\n## 技术选型\n- Vue 3 + TypeScript\n- Vite 构建\n- Storybook 文档\n- Vitest 测试\n\n## 项目结构\n```\ncomponent-lib/\n├── packages/\n│   ├── components/\n│   │   ├── Button/\n│   │   ├── Input/\n│   │   └── ...\n│   ├── utils/\n│   └── style/\n├── docs/\n├── examples/\n└── tests/\n```\n\n## 关键问题\n\n### 样式隔离\n- CSS Module\n- BEM 命名\n- CSS-in-JS\n\n### 组件通信\n- Props 验证\n- Event 定义\n- Slot 设计\n\n### 文档和示例\n- Storybook\n- VitePress\n- 代码示例\n\n### 发布和版本管理\n- npm 发布\n- 语义化版本\n- Changelog\n- CI/CD\n\n## 性能优化\n- 按需加载\n- Tree shaking\n- 代码分割\n\n## 开发流程\n1. 组件开发\n2. 单元测试\n3. 文档编写\n4. 代码审查\n5. 发布到 npm',
+        difficulty: '困难',
+        category: '前端',
+        tags: ['Vue', '组件库', '工程化'],
+        author: '开源贡献者',
+        views: 14567,
+        discussions: 189,
+        favorites: 512,
+        isFavorited: false,
+        status: 'approved'
+      },
+      {
+        id: 23,
+        title: '如何进行有效的代码审查',
+        content: '# 如何进行有效的代码审查\n\n代码审查 (Code Review) 不仅是为了发现 bug，更重要的是知识共享。\n\n## 为什么需要代码审查？\n- 发现潜在缺陷\n- 知识共享\n- 提高代码质量\n- 促进团队学习\n- 维持编码规范\n\n## 审查要点\n\n### 功能性\n- 是否实现了需求？\n- 是否有边界情况遗漏？\n- 是否引入新 bug？\n\n### 代码质量\n- 命名是否清晰？\n- 函数是否过长？\n- 是否有重复代码？\n\n### 性能\n- 算法复杂度是否合理？\n- 是否有性能瓶颈？\n- 是否浪费资源？\n\n### 安全性\n- 是否有安全漏洞？\n- 用户输入是否验证？\n- 敏感信息是否暴露？\n\n### 测试\n- 测试覆盖率如何？\n- 是否有测试边界情况？\n- 测试是否有效？\n\n## 最佳实践\n1. **及时反馈** - 不要延迟审查\n2. **尊重他人** - 友善的评论\n3. **重点突出** - 区分必须和建议\n4. **有则改之** - 开放接受意见\n5. **学以致用** - 不断改进\n\n## 工具和流程\n- GitHub Pull Request\n- GitLab Merge Request\n- Gerrit\n- 自动化检查 (Lint, 测试)',
+        difficulty: '简单',
+        category: '其他',
+        tags: ['代码审查', '团队协作', '最佳实践'],
+        author: '团队领导者',
+        views: 9876,
+        discussions: 98,
+        favorites: 356,
+        isFavorited: false,
+        status: 'approved'
+      },
+      {
+        id: 24,
+        title: '全栈开发必知的 SQL 优化技巧',
+        content: '# 全栈开发必知的 SQL 优化技巧\n\nSQL 优化是数据库性能的关键。掌握这些技巧能显著提升应用性能。\n\n## 索引设计\n\n### 索引类型\n- 聚集索引 - 决定数据物理顺序\n- 非聚集索引 - 逻辑顺序不同\n- 唯一索引 - 保证唯一性\n- 复合索引 - 多列索引\n\n### 索引原则\n- 选择性高的列\n- WHERE 和 JOIN 列\n- 避免过多索引\n- 避免在计算列建索引\n\n## 查询优化\n\n### 执行计划分析\n```sql\nEXPLAIN SELECT * FROM users WHERE id = 1\n```\n\n### 常见问题\n- 全表扫描\n- 索引失效\n- 排序不走索引\n- 类型转换\n\n### 优化技巧\n1. **避免 SELECT *** - 只选需要的列\n2. **条件下推** - 尽早过滤\n3. **Join 优化** - 驱动表选择\n4. **子查询改写** - 使用 JOIN\n5. **分页优化** - LIMIT 偏移量\n\n## 表结构优化\n- 范式设计\n- 避免冗余\n- 合理分割大表\n- 分区表\n\n## 索引失效场景\n- LIKE \'%abc\'\n- OR 条件\n- 函数调用\n- 类型不匹配\n- 复合索引不遵循最左匹配\n\n## 实战案例\n- 千万级数据查询优化\n- 批量插入优化\n- 统计查询优化\n- 实时查询优化',
+        difficulty: '中等',
+        category: '数据结构',
+        tags: ['SQL', '数据库', '性能优化'],
+        author: 'SQL优化师',
+        views: 13456,
+        discussions: 167,
+        favorites: 478,
+        isFavorited: false,
+        status: 'approved'
+      }
+    ]
+
+    const question = questionsDB.find(q => q.id === questionId)
+
+    if (question) {
+      sendResponse(res, 200, question)
+    } else {
+      sendResponse(res, 404, null, '题目不存在')
+    }
   },
 
   // 收藏题目
@@ -7032,6 +7508,22 @@ const routes = {
 
     let posts = mockData.posts.filter(p => p.forumId === forum.id)
 
+    // 关键词搜索（兼容 search/keyword/q）
+    try {
+      const kw = ((query.keyword || query.search || query.q || '') + '').trim().toLowerCase()
+      if (kw) {
+        posts = posts.filter(p =>
+          ((p.title || '') + '').toLowerCase().includes(kw) ||
+          ((p.content || '') + '').toLowerCase().includes(kw)
+        )
+      }
+    } catch (_) { /* no-op */ }
+
+    // 标签过滤
+    if (query.tag) {
+      posts = posts.filter(p => Array.isArray(p.tags) && p.tags.includes(query.tag))
+    }
+
     // 排序：置顶优先，然后按更新时间
     posts.sort((a, b) => {
       if (a.isPinned !== b.isPinned) {
@@ -7040,7 +7532,8 @@ const routes = {
       return new Date(b.updatedAt) - new Date(a.updatedAt)
     })
 
-    const paginatedResult = paginate(posts, query.page, query.size || 20)
+    const sizeParam = query.pageSize || query.size || 20
+    const paginatedResult = paginate(posts, query.page, sizeParam)
     sendResponse(res, 200, paginatedResult, '获取帖子列表成功')
   },
 
@@ -7062,13 +7555,15 @@ const routes = {
     }
 
     // 关键词搜索
-    if (query.keyword) {
-      const keyword = query.keyword.toLowerCase()
-      posts = posts.filter(p =>
-        p.title.toLowerCase().includes(keyword) ||
-        p.content.toLowerCase().includes(keyword)
-      )
-    }
+    try {
+      const kwAll = ((query.keyword || query.search || query.q || '') + '').trim().toLowerCase()
+      if (kwAll) {
+        posts = posts.filter(p =>
+          ((p.title || '') + '').toLowerCase().includes(kwAll) ||
+          ((p.content || '') + '').toLowerCase().includes(kwAll)
+        )
+      }
+    } catch (_) { /* no-op */ }
 
     // 排序
     const sortBy = query.sortBy || 'latest'
@@ -7080,7 +7575,8 @@ const routes = {
       posts.sort((a, b) => b.likeCount - a.likeCount)
     }
 
-    const paginatedResult = paginate(posts, query.page, query.size || 20)
+    const sizeAll = query.pageSize || query.size || 20
+    const paginatedResult = paginate(posts, query.page, sizeAll)
     sendResponse(res, 200, paginatedResult, '获取帖子列表成功')
   },
 
@@ -8788,6 +9284,187 @@ const payload = { ...paginatedResult, items }
     sendResponse(res, 200, record, '已标记为继续复习')
   },
 
+  // ==================== AI 工作流 API ====================
+
+  'POST:/api/ai/summary': (req, res) => {
+    try {
+      let body = ''
+      req.on('data', chunk => { body += chunk.toString() })
+      req.on('end', () => {
+        try {
+          const { content, postId } = JSON.parse(body)
+          if (!content) {
+            return sendResponse(res, 400, null, 'Content is required')
+          }
+
+          // 生成摘要（模拟）
+          const summary = `这是一篇关于"${content.substring(0, 30)}..."的文章摘要。`
+          sendResponse(res, 200, {
+            summary,
+            fromCache: false,
+            mock: true,
+          }, 'OK')
+        } catch (e) {
+          sendResponse(res, 500, null, e.message)
+        }
+      })
+    } catch (e) {
+      sendResponse(res, 500, null, e.message)
+    }
+  },
+
+  'POST:/api/ai/keypoints': (req, res) => {
+    try {
+      let body = ''
+      req.on('data', chunk => { body += chunk.toString() })
+      req.on('end', () => {
+        try {
+          const { content, postId } = JSON.parse(body)
+          if (!content) {
+            return sendResponse(res, 400, null, 'Content is required')
+          }
+
+          // 提取关键点（模拟）
+          const keypoints = [
+            '关键点 1: 这是内容的第一个要点',
+            '关键点 2: 这是内容的第二个要点',
+            '关键点 3: 这是内容的第三个要点'
+          ]
+          sendResponse(res, 200, {
+            keypoints,
+            fromCache: false,
+            mock: true,
+          }, 'OK')
+        } catch (e) {
+          sendResponse(res, 500, null, e.message)
+        }
+      })
+    } catch (e) {
+      sendResponse(res, 500, null, e.message)
+    }
+  },
+
+  'GET:/api/ai/chat/stream': (req, res) => {
+    // 设置 SSE 响应头
+    res.writeHead(200, {
+      'Content-Type': 'text/event-stream',
+      'Cache-Control': 'no-cache',
+      'Connection': 'keep-alive',
+      'Access-Control-Allow-Origin': '*',
+    })
+
+    // 解析查询参数
+    const parsedUrl = url.parse(req.url, true)
+    const { workflow = 'local', message, articleContent, conversationId, postId } = parsedUrl.query
+
+    const userId = `post-${postId || 'unknown'}-user-anonymous`
+
+    console.log(`[AI Chat] GET 请求 - 工作流: '${workflow}' (type: ${typeof workflow}), 用户: ${userId}, 消息长度: ${message ? message.length : 0}`)
+    console.log(`[AI Chat] 是否 workflow==='chat'? ${workflow === 'chat'}`)
+    console.log(`[AI Chat] ChatService configured? ${chatWorkflowService.checkConfiguration()}`)
+
+    // 根据工作流类型路由
+    if (workflow === 'chat') {
+      // 使用 Dify Chat API
+      if (!chatWorkflowService.checkConfiguration()) {
+        console.warn('[AI Chat] Chat API 未配置，降级到本地模拟')
+        handleLocalChatStream(res)
+        return
+      }
+
+      console.log('[AI Chat] ✅ 调用 Dify Chat API')
+      handleDifyChatStream(res, message, userId, conversationId, articleContent)
+    } else {
+      // 使用本地模拟数据
+      console.log(`[AI Chat] ❌ workflow不是'chat'，使用本地模拟。实际值: '${workflow}'`)
+      handleLocalChatStream(res)
+    }
+  },
+
+  'POST:/api/ai/chat/stream': (req, res) => {
+    // 设置 SSE 响应头
+    res.writeHead(200, {
+      'Content-Type': 'text/event-stream',
+      'Cache-Control': 'no-cache',
+      'Connection': 'keep-alive',
+      'Access-Control-Allow-Origin': '*',
+    })
+
+    // 从请求体读取数据
+    let body = ''
+    req.on('data', chunk => { body += chunk.toString() })
+    req.on('end', () => {
+      try {
+        const { workflow = 'local', message, articleContent, conversationId, postId } = JSON.parse(body)
+
+        const userId = `post-${postId || 'unknown'}-user-anonymous`
+
+        console.log(`[AI Chat] POST 请求 - 工作流: ${workflow}, 用户: ${userId}, 消息长度: ${message ? message.length : 0}`)
+
+        // 根据工作流类型路由
+        if (workflow === 'chat') {
+          // 使用 Dify Chat API
+          if (!chatWorkflowService.checkConfiguration()) {
+            console.warn('[AI Chat] Chat API 未配置，降级到本地模拟')
+            handleLocalChatStream(res)
+            return
+          }
+
+          handleDifyChatStream(res, message, userId, conversationId, articleContent)
+        } else {
+          // 使用本地模拟数据
+          handleLocalChatStream(res)
+        }
+      } catch (error) {
+        console.error('[AI Chat] 解析请求体错误:', error.message)
+        res.write(`data: ${JSON.stringify({ type: 'error', error: '请求格式错误' })}\n\n`)
+        res.end()
+      }
+    })
+  },
+
+  'GET:/api/ai/chat/:conversationId': async (req, res) => {
+    try {
+      const conversationId = req.params.conversationId
+      const userId = req.query.userId || `post-${req.query.postId || 'unknown'}-user-anonymous`
+
+      console.log(`[AI Chat] 获取对话历史 - 对话ID: ${conversationId}, 用户: ${userId}`)
+
+      // 从 Redis 加载对话
+      const conversation = await redisClient.loadConversation(conversationId, userId)
+
+      if (conversation) {
+        sendResponse(res, 200, conversation, 'OK')
+      } else {
+        sendResponse(res, 404, null, '对话不存在或已过期')
+      }
+    } catch (error) {
+      console.error('[AI Chat] 获取对话历史失败:', error.message)
+      sendResponse(res, 500, null, '获取对话失败')
+    }
+  },
+
+  'DELETE:/api/ai/chat/:conversationId': async (req, res) => {
+    try {
+      const conversationId = req.params.conversationId
+      const userId = req.query.userId || `post-${req.query.postId || 'unknown'}-user-anonymous`
+
+      console.log(`[AI Chat] 删除对话 - 对话ID: ${conversationId}, 用户: ${userId}`)
+
+      // 从 Redis 删除对话
+      const success = await redisClient.deleteConversation(conversationId, userId)
+
+      if (success) {
+        sendResponse(res, 200, { conversationId }, '对话已删除')
+      } else {
+        sendResponse(res, 500, null, '删除对话失败')
+      }
+    } catch (error) {
+      console.error('[AI Chat] 删除对话失败:', error.message)
+      sendResponse(res, 500, null, '删除对话失败')
+    }
+  },
+
   // 默认404处理
   'default': (req, res) => {
     sendResponse(res, 404, null, 'API接口不存在')
@@ -8872,6 +9549,19 @@ server.listen(PORT, async () => {
   // 初始化 Redis 客户端
   console.log('\n🔄 正在初始化 Redis 客户端...')
   await redisClient.initRedisClient()
+
+  // 检查 Dify Chat API 配置
+  console.log('\n🤖 Dify Chat API 配置状态:')
+  const chatStatus = chatWorkflowService.getStatus()
+  console.log(`   已配置: ${chatStatus.configured ? '✅' : '❌'}`)
+  console.log(`   API Key: ${chatStatus.apiKey}`)
+  console.log(`   App ID: ${chatStatus.appId}`)
+  console.log(`   Base URL: ${chatStatus.baseURL}`)
+  if (chatStatus.configured) {
+    console.log(`   🎉 Dify Chat API 已就绪，将使用真实 API`)
+  } else {
+    console.log(`   ⚠️  Dify Chat API 未配置，将降级到本地模拟`)
+  }
 
   console.log(`\n📝 可用接口:`)
   console.log(`   GET  /api/health - 健康检查`)

@@ -1,5 +1,6 @@
 ﻿@import url('./design-tokens.css');
 @import url('./modules/chat.css');
+@import url('./chat-theme.css');
 /* 鍏ㄥ眬鏍峰紡 */
 * {
   margin: 0;
@@ -12,6 +13,11 @@ body {
   background-color: #f5f7fa;
   color: #333;
   line-height: 1.6;
+}
+
+/* 避免打开对话框时滚动条出现/消失导致的布局抖动 */
+html {
+  overflow-y: scroll;
 }
 
 /* 涓昏棰滆壊鍙橀噺 */

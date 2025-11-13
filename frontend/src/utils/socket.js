@@ -337,6 +337,302 @@ class SocketService {
   getSocketId() {
     return this.socket ? this.socket.id : null
   }
+
+  // ==================== Phase 4: 消息实时同步 ====================
+
+  /**
+   * 同步消息到服务器
+   * @param {number} roomId - 聊天室ID
+   * @param {Object} message - 消息对象
+   */
+  syncMessage(roomId, message) {
+    this.emit('message:sync', {
+      roomId,
+      message: {
+        id: message.id,
+        senderId: message.senderId,
+        senderName: message.senderName,
+        senderAvatar: message.senderAvatar,
+        content: message.content,
+        timestamp: message.timestamp || new Date().toISOString(),
+        type: message.type || 'text',
+        replyTo: message.replyTo || null,
+        encryptedContent: message.encryptedContent || null,
+        encryptionKeyId: message.encryptionKeyId || null
+      }
+    })
+  }
+
+  /**
+   * 监听消息实时同步
+   * @param {Function} callback - 回调函数
+   */
+  onMessageSync(callback) {
+    this.on('message:sync', callback)
+  }
+
+  /**
+   * 发送消息已读回执
+   * @param {number} messageId - 消息ID
+   * @param {number} roomId - 聊天室ID
+   */
+  sendReadReceipt(messageId, roomId) {
+    this.emit('message:read', {
+      messageId,
+      roomId,
+      readBy: this.socket?.userId,
+      readAt: new Date().toISOString()
+    })
+  }
+
+  /**
+   * 监听消息已读状态更新
+   * @param {Function} callback - 回调函数
+   */
+  onMessageRead(callback) {
+    this.on('message:read', callback)
+  }
+
+  // ==================== Phase 4: 用户状态管理 ====================
+
+  /**
+   * 更新用户在线状态
+   * @param {string} status - 状态: online, away, busy, dnd
+   */
+  updateUserStatus(status) {
+    this.emit('user:status:changed', {
+      userId: this.socket?.userId,
+      status,
+      timestamp: new Date().toISOString()
+    })
+  }
+
+  /**
+   * 监听用户状态变化
+   * @param {Function} callback - 回调函数
+   */
+  onUserStatusChanged(callback) {
+    this.on('user:status:changed', callback)
+  }
+
+  /**
+   * 监听用户在线状态更新
+   * @param {Function} callback - 回调函数
+   */
+  onUserPresenceUpdated(callback) {
+    this.on('user-presence-updated', callback)
+  }
+
+  /**
+   * 订阅用户的状态变化
+   * @param {number} userId - 用户ID
+   */
+  subscribeToUser(userId) {
+    this.emit('subscribe:user', { userId })
+  }
+
+  /**
+   * 取消订阅用户的状态变化
+   * @param {number} userId - 用户ID
+   */
+  unsubscribeFromUser(userId) {
+    this.emit('unsubscribe:user', { userId })
+  }
+
+  // ==================== Phase 4: 频道管理事件 ====================
+
+  /**
+   * 监听频道创建
+   * @param {Function} callback - 回调函数
+   */
+  onChannelCreated(callback) {
+    this.on('channel:created', callback)
+  }
+
+  /**
+   * 监听频道更新
+   * @param {Function} callback - 回调函数
+   */
+  onChannelUpdated(callback) {
+    this.on('channel:updated', callback)
+  }
+
+  /**
+   * 监听频道删除
+   * @param {Function} callback - 回调函数
+   */
+  onChannelDeleted(callback) {
+    this.on('channel:deleted', callback)
+  }
+
+  /**
+   * 订阅频道更新
+   * @param {number} channelId - 频道ID
+   */
+  subscribeToChannel(channelId) {
+    this.emit('subscribe:channel', { channelId })
+  }
+
+  /**
+   * 取消订阅频道更新
+   * @param {number} channelId - 频道ID
+   */
+  unsubscribeFromChannel(channelId) {
+    this.emit('unsubscribe:channel', { channelId })
+  }
+
+  // ==================== Phase 4: 表情反应实时更新 ====================
+
+  /**
+   * 监听表情反应添加
+   * @param {Function} callback - 回调函数
+   */
+  onReactionAdded(callback) {
+    this.on('reaction:added', callback)
+  }
+
+  /**
+   * 监听表情反应移除
+   * @param {Function} callback - 回调函数
+   */
+  onReactionRemoved(callback) {
+    this.on('reaction:removed', callback)
+  }
+
+  /**
+   * 发送表情反应
+   * @param {number} messageId - 消息ID
+   * @param {number} roomId - 聊天室ID
+   * @param {string} emoji - 表情符号
+   */
+  addReaction(messageId, roomId, emoji) {
+    this.emit('reaction:add', {
+      messageId,
+      roomId,
+      emoji,
+      userId: this.socket?.userId,
+      timestamp: new Date().toISOString()
+    })
+  }
+
+  /**
+   * 移除表情反应
+   * @param {number} messageId - 消息ID
+   * @param {number} roomId - 聊天室ID
+   * @param {string} emoji - 表情符号
+   */
+  removeReaction(messageId, roomId, emoji) {
+    this.emit('reaction:remove', {
+      messageId,
+      roomId,
+      emoji,
+      userId: this.socket?.userId,
+      timestamp: new Date().toISOString()
+    })
+  }
+
+  // ==================== Phase 4: 线程回复实时通知 ====================
+
+  /**
+   * 监听新的线程回复
+   * @param {Function} callback - 回调函数
+   */
+  onThreadReply(callback) {
+    this.on('thread:reply', callback)
+  }
+
+  /**
+   * 订阅线程更新
+   * @param {number} messageId - 原消息ID
+   * @param {number} roomId - 聊天室ID
+   */
+  subscribeToThread(messageId, roomId) {
+    this.emit('subscribe:thread', { messageId, roomId })
+  }
+
+  /**
+   * 取消订阅线程更新
+   * @param {number} messageId - 原消息ID
+   * @param {number} roomId - 聊天室ID
+   */
+  unsubscribeFromThread(messageId, roomId) {
+    this.emit('unsubscribe:thread', { messageId, roomId })
+  }
+
+  // ==================== Phase 4: 输入状态增强 ====================
+
+  /**
+   * 发送输入状态（增强版）
+   * @param {number} roomId - 聊天室ID
+   * @param {boolean} isTyping - 是否正在输入
+   * @param {string} draft - 草稿内容（可选）
+   */
+  sendTypingStatusEnhanced(roomId, isTyping, draft = null) {
+    this.emit('typing:status', {
+      roomId,
+      userId: this.socket?.userId,
+      isTyping,
+      draft,
+      timestamp: new Date().toISOString()
+    })
+  }
+
+  /**
+   * 监听草稿内容更新
+   * @param {Function} callback - 回调函数
+   */
+  onDraftUpdated(callback) {
+    this.on('draft:updated', callback)
+  }
+
+  // ==================== Phase 4: 通知和更新 ====================
+
+  /**
+   * 监听一般通知
+   * @param {Function} callback - 回调函数
+   */
+  onGeneralNotification(callback) {
+    this.on('notification:general', callback)
+  }
+
+  /**
+   * 发送系统消息给特定用户
+   * @param {number} targetUserId - 目标用户ID
+   * @param {Object} message - 消息内容
+   */
+  sendSystemMessage(targetUserId, message) {
+    this.emit('system:message', {
+      targetUserId,
+      message,
+      sentBy: this.socket?.userId,
+      timestamp: new Date().toISOString()
+    })
+  }
+
+  // ==================== 工具方法 ====================
+
+  /**
+   * 获取连接统计信息
+   */
+  getConnectionStats() {
+    return {
+      connected: this.connected,
+      socketId: this.getSocketId(),
+      socketUrl: this.socketUrl,
+      listenersCount: this.listeners.size,
+      reconnectAttempts: this.reconnectAttempts
+    }
+  }
+
+  /**
+   * 清除所有监听器（用于页面卸载）
+   */
+  clearAllListeners() {
+    console.log('[Socket] 清除所有监听器...')
+    for (const [event] of this.listeners.entries()) {
+      this.off(event)
+    }
+  }
 }
 
 // 导出单例

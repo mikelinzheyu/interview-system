@@ -344,15 +344,307 @@ const mockContentList = [
     likes: 345,
     liked: false,
     collected: false
+  },
+  {
+    id: 9,
+    title: '深入理解 JavaScript 事件循环机制',
+    description: '彻底掌握 JavaScript 事件循环，理解宏任务、微任务、调用栈、事件队列的关系，解决异步编程难题。',
+    category: '算法',
+    difficulty: '困难',
+    tags: ['JavaScript', '事件循环', '异步编程'],
+    author: '深度学习者',
+    authorAvatar: '',
+    publishTime: new Date(Date.now() - 3600000 * 3),
+    views: 19234,
+    comments: 245,
+    likes: 756,
+    liked: false,
+    collected: false
+  },
+  {
+    id: 10,
+    title: 'CSS Grid 布局完全指南',
+    description: 'CSS Grid 是现代 Web 布局的强大工具，本文详细讲解 Grid 的各种用法和高级技巧，助你掌握响应式布局。',
+    category: '前端',
+    difficulty: '简单',
+    tags: ['CSS', 'Grid布局', '响应式设计'],
+    author: 'CSS达人',
+    authorAvatar: '',
+    publishTime: new Date(Date.now() - 3600000 * 7),
+    views: 10567,
+    comments: 87,
+    likes: 412,
+    liked: false,
+    collected: false
+  },
+  {
+    id: 11,
+    title: '如何优雅地处理错误异常',
+    description: '系统讲解 JavaScript 中错误处理的最佳实践，包括 try-catch、Promise.catch、async-await 错误处理等。',
+    category: '前端',
+    difficulty: '中等',
+    tags: ['JavaScript', '错误处理', '最佳实践'],
+    author: '代码卫士',
+    authorAvatar: '',
+    publishTime: new Date(Date.now() - 3600000 * 15),
+    views: 13456,
+    comments: 156,
+    likes: 521,
+    liked: true,
+    collected: false
+  },
+  {
+    id: 12,
+    title: '数据结构面试宝典：树与二叉树',
+    description: '树和二叉树是数据结构的核心，本篇涵盖二叉树遍历、构建、最近公共祖先、路径和等高频面试题。',
+    category: '算法',
+    difficulty: '困难',
+    tags: ['算法', '数据结构', '二叉树', '面试'],
+    author: '算法导师',
+    authorAvatar: '',
+    publishTime: new Date(Date.now() - 3600000 * 11),
+    views: 25678,
+    comments: 378,
+    likes: 945,
+    liked: false,
+    collected: true
+  },
+  {
+    id: 13,
+    title: 'Docker 与 Kubernetes 入门到精通',
+    description: '容器化技术已成为现代开发必备技能，详解 Docker 基础、镜像构建、Kubernetes 编排等核心概念。',
+    category: '系统设计',
+    difficulty: '困难',
+    tags: ['Docker', 'Kubernetes', '容器化', 'DevOps'],
+    author: 'DevOps工程师',
+    authorAvatar: '',
+    publishTime: new Date(Date.now() - 3600000 * 20),
+    views: 16234,
+    comments: 198,
+    likes: 587,
+    liked: false,
+    collected: false
+  },
+  {
+    id: 14,
+    title: '数据库事务与并发控制详解',
+    description: '深入理解数据库事务的 ACID 特性、隔离级别、锁机制和并发控制，提升数据库应用设计能力。',
+    category: '数据结构',
+    difficulty: '困难',
+    tags: ['数据库', '事务', '并发控制', 'SQL'],
+    author: 'DB专家',
+    authorAvatar: '',
+    publishTime: new Date(Date.now() - 3600000 * 10),
+    views: 14876,
+    comments: 167,
+    likes: 498,
+    liked: false,
+    collected: false
+  },
+  {
+    id: 15,
+    title: 'REST API 设计最佳实践',
+    description: '规范的 API 设计对项目长期维护至关重要，详解 RESTful 设计原则、版本管理、文档生成等实战经验。',
+    category: '后端',
+    difficulty: '中等',
+    tags: ['API设计', 'REST', '后端开发'],
+    author: '架构设计师',
+    authorAvatar: '',
+    publishTime: new Date(Date.now() - 3600000 * 9),
+    views: 12345,
+    comments: 134,
+    likes: 467,
+    liked: true,
+    collected: false
+  },
+  {
+    id: 16,
+    title: 'Web 安全防护指南',
+    description: '前端开发必须了解的安全知识，包括 XSS、CSRF、SQL 注入、安全头设置等常见安全问题和防护方案。',
+    category: '前端',
+    difficulty: '困难',
+    tags: ['安全', 'Web安全', 'XSS防护'],
+    author: '安全卫士',
+    authorAvatar: '',
+    publishTime: new Date(Date.now() - 3600000 * 4),
+    views: 18976,
+    comments: 267,
+    likes: 723,
+    liked: false,
+    collected: true
+  },
+  {
+    id: 17,
+    title: '图论算法详解与应用',
+    description: '从 BFS、DFS 到最短路径、最小生成树，详解图论核心算法及其在实际场景中的应用。',
+    category: '算法',
+    difficulty: '困难',
+    tags: ['算法', '图论', '高级技巧'],
+    author: '算法研究员',
+    authorAvatar: '',
+    publishTime: new Date(Date.now() - 3600000 * 22),
+    views: 17654,
+    comments: 289,
+    likes: 632,
+    liked: false,
+    collected: false
+  },
+  {
+    id: 18,
+    title: 'Python 异步编程 asyncio 完全指南',
+    description: '深入讲解 Python asyncio 库的使用，从基础概念到高级技巧，掌握异步编程在 I/O 密集型应用的优势。',
+    category: '后端',
+    difficulty: '中等',
+    tags: ['Python', '异步编程', 'asyncio'],
+    author: 'Python高手',
+    authorAvatar: '',
+    publishTime: new Date(Date.now() - 3600000 * 14),
+    views: 11234,
+    comments: 123,
+    likes: 389,
+    liked: false,
+    collected: false
+  },
+  {
+    id: 19,
+    title: '分布式事务处理方案对比',
+    description: '系统对比两阶段提交、补偿事务、本地消息表等分布式事务方案，帮你选择最适合的解决方案。',
+    category: '系统设计',
+    difficulty: '困难',
+    tags: ['分布式', '事务', '架构设计'],
+    author: '分布式架构师',
+    authorAvatar: '',
+    publishTime: new Date(Date.now() - 3600000 * 25),
+    views: 15432,
+    comments: 201,
+    likes: 568,
+    liked: true,
+    collected: true
+  },
+  {
+    id: 20,
+    title: '现代前端构建工具对比：Webpack vs Vite vs Turbopack',
+    description: '对比三种现代前端构建工具的性能、功能和使用场景，帮助你选择最合适的构建工具。',
+    category: '前端',
+    difficulty: '中等',
+    tags: ['Webpack', 'Vite', '构建工具', '性能优化'],
+    author: '构建工具专家',
+    authorAvatar: '',
+    publishTime: new Date(Date.now() - 3600000 * 1),
+    views: 13879,
+    comments: 156,
+    likes: 521,
+    liked: false,
+    collected: false
+  },
+  {
+    id: 21,
+    title: '五分钟掌握动态规划思想',
+    description: '动态规划是算法的皇冠，本文用最直观的方式讲解 DP 的核心思想，附带经典问题详解。',
+    category: '算法',
+    difficulty: '中等',
+    tags: ['算法', '动态规划', '面试'],
+    author: '算法启蒙师',
+    authorAvatar: '',
+    publishTime: new Date(Date.now() - 3600000 * 19),
+    views: 21345,
+    comments: 298,
+    likes: 847,
+    liked: false,
+    collected: false
+  },
+  {
+    id: 22,
+    title: '从零到一实现一个 Vue 组件库',
+    description: '详细讲解如何设计和实现一个生产级别的 Vue 组件库，包括组件设计、文档生成、自动化测试等。',
+    category: '前端',
+    difficulty: '困难',
+    tags: ['Vue', '组件库', '工程化'],
+    author: '开源贡献者',
+    authorAvatar: '',
+    publishTime: new Date(Date.now() - 3600000 * 30),
+    views: 14567,
+    comments: 189,
+    likes: 512,
+    liked: false,
+    collected: false
+  },
+  {
+    id: 23,
+    title: '如何进行有效的代码审查',
+    description: '代码审查不仅是为了发现 bug，更重要的是知识共享和团队成长。学习如何进行高效的 Code Review。',
+    category: '其他',
+    difficulty: '简单',
+    tags: ['代码审查', '团队协作', '最佳实践'],
+    author: '团队领导者',
+    authorAvatar: '',
+    publishTime: new Date(Date.now() - 3600000 * 16),
+    views: 9876,
+    comments: 98,
+    likes: 356,
+    liked: false,
+    collected: false
+  },
+  {
+    id: 24,
+    title: '全栈开发必知的 SQL 优化技巧',
+    description: '索引使用、查询优化、执行计划分析、避免全表扫描等 SQL 优化核心技能一网打尽。',
+    category: '数据结构',
+    difficulty: '中等',
+    tags: ['SQL', '数据库', '性能优化'],
+    author: 'SQL优化师',
+    authorAvatar: '',
+    publishTime: new Date(Date.now() - 3600000 * 13),
+    views: 13456,
+    comments: 167,
+    likes: 478,
+    liked: true,
+    collected: false
   }
 ]
 
-// 加载内容列表
+// 加载内容列表（实现真正的分页）
 const loadContentList = () => {
   loading.value = true
   setTimeout(() => {
-    contentList.value = mockContentList
-    total.value = mockContentList.length
+    // 计算分页范围
+    const start = (currentPage.value - 1) * pageSize.value
+    const end = start + pageSize.value
+
+    // 根据筛选条件过滤数据
+    let filteredList = mockContentList
+
+    // 按标签过滤
+    if (selectedTag.value) {
+      filteredList = filteredList.filter(item => item.tags.includes(selectedTag.value))
+    }
+
+    // 按分类过滤
+    if (filterCategory.value) {
+      filteredList = filteredList.filter(item => item.category === filterCategory.value)
+    }
+
+    // 按难度过滤
+    if (filterDifficulty.value) {
+      filteredList = filteredList.filter(item => item.difficulty === filterDifficulty.value)
+    }
+
+    // 按排序方式排序
+    if (sortBy.value === 'latest') {
+      filteredList.sort((a, b) => new Date(b.publishTime) - new Date(a.publishTime))
+    } else if (sortBy.value === 'popular') {
+      filteredList.sort((a, b) => b.likes - a.likes)
+    } else if (sortBy.value === 'most-discussed') {
+      filteredList.sort((a, b) => b.comments - a.comments)
+    } else if (sortBy.value === 'highest-rated') {
+      filteredList.sort((a, b) => (b.views + b.likes + b.comments) - (a.views + a.likes + a.comments))
+    }
+
+    // 设置总数（用于分页器）
+    total.value = filteredList.length
+
+    // 截取当前页的数据，并根据标题注入差异化描述
+    contentList.value = filteredList.slice(start, end).map(enrichContentByTitle)
     loading.value = false
   }, 500)
 }
@@ -371,6 +663,8 @@ const applyFilters = () => {
     category: filterCategory.value,
     difficulty: filterDifficulty.value
   })
+  // 应用筛选时重置到第一页
+  currentPage.value = 1
   loadContentList()
 }
 
@@ -410,10 +704,15 @@ const handleTagClick = (tag) => {
   applyFilters()
 }
 
-// 处理搜索
+// 处理搜索：跳转到帖子列表并携带搜索关键词/标签
 const handleSearch = ({ query, type }) => {
-  console.log('搜索:', query, type)
-  ElMessage.info(`搜索: ${query}`)
+  const q = (query || '').trim()
+  if (!q) return
+  if (type === 'tag') {
+    router.push(`/community/posts?tag=${encodeURIComponent(q)}`)
+    return
+  }
+  router.push(`/community/posts?search=${encodeURIComponent(q)}`)
 }
 
 // 处理创建帖子
@@ -434,6 +733,41 @@ const handleShowSettings = () => {
 onMounted(() => {
   loadContentList()
 })
+
+// 根据标题生成差异化描述，避免内容重复
+function enrichContentByTitle(item) {
+  const t = (item.title || '').toLowerCase()
+  const desc = generateDescriptionFromTitle(item.title)
+  return { ...item, description: desc }
+}
+
+function generateDescriptionFromTitle(title = '') {
+  const t = title.toLowerCase()
+  if (t.includes('promise')) return '从微任务与宏任务入手，手写实现 Promise 关键静态方法，附完整测试用例与常见陷阱解析。'
+  if (t.includes('vue3')) return '系统拆解 Composition API 的最佳实践：逻辑复用、类型推断、解耦状态与副作用，提供可复用的示例代码片段。'
+  if (t.includes('性能') || t.includes('优化')) return '覆盖构建优化、网络传输、渲染性能与交互体验的全链路优化清单，结合真实案例逐步量化收益。'
+  if (t.includes('react') && t.includes('hooks')) return '围绕 useEffect/useMemo/useCallback 等核心 Hook，讲清闭包、依赖数组与渲染时机，辅以自定义 Hook 工程化模板。'
+  if (t.includes('链表')) return '精选高频链表面试题，配图剖析指针操作与边界条件，提供多语言解法与复杂度对比。'
+  if (t.includes('typescript')) return '用实际业务类型推导案例讲透条件类型、映射类型与工具类型，给出渐进式类型增强策略。'
+  if (t.includes('微服务')) return '从服务拆分、注册发现到观测治理，结合网关、熔断限流与分布式事务，提供可落地的服务模板。'
+  if (t.includes('node')) return '覆盖事件循环、V8 与内存模型，从 CPU/IO 维度给出诊断与优化手段，附常见性能问题排查指南。'
+  if (t.includes('事件循环')) return '以实际调度序列还原浏览器/Node 的事件循环，澄清宏微任务与渲染阶段的关系。'
+  if (t.includes('css grid')) return '通过示例掌握 Grid 的区域布局、轨道尺寸与自动布局，附响应式技巧与常见坑位说明。'
+  if (t.includes('错误') || t.includes('异常')) return '总结前后端错误边界与异常链路治理策略，提供统一上报、聚类与告警的工程实践。'
+  if (t.includes('动态规划') || t.includes('dp')) return '以表格推导与状态压缩为主线，拆解 DP 解题的套路与可视化思维路径。'
+  if (t.includes('组件') && t.includes('库')) return '从设计体系到工程化发布，覆盖文档生成、按需加载、可访问性与单元测试等关键细节。'
+  if (t.includes('代码审') || t.includes('review')) return '建立可执行的 Code Review 清单，覆盖一致性、复杂度、可维护性与安全性的评审维度。'
+  if (t.includes('sql')) return '结合执行计划与索引原理，提供典型慢 SQL 的诊断与改写手册，附常见反模式清单。'
+  if (t.includes('docker') || t.includes('kubernetes')) return '从容器镜像到集群编排，逐步搭建 CI/CD 流水线与可观察性，给出生产化配置模板。'
+  if (t.includes('事务') && t.includes('数据库')) return '对比锁与隔离级别，解释幻读/不可重复读成因，提供业务友好的并发控制策略。'
+  if (t.includes('rest')) return '落地资源建模、幂等设计、版本策略与错误语义，附 OpenAPI 驱动的协作流程。'
+  if (t.includes('安全') || t.includes('xss') || t.includes('csrf')) return '覆盖前后端常见安全风险与隔离手段，提供输入校验、内容安全与鉴权的系统方案。'
+  if (t.includes('图论')) return '从遍历到最短路/最小生成树，配合可视化示意与模板化代码，强化抽象建模能力。'
+  if (t.includes('python') && t.includes('asyncio')) return '基于协程与事件循环的 I/O 模型，给出网络服务与爬虫的异步化改造步骤。'
+  if (t.includes('分布式') && t.includes('事务')) return '对比 2PC/补偿事务/本地消息等方案的边界与成本，给出选型建议与落地清单。'
+  if (t.includes('webpack') || t.includes('vite') || t.includes('turbopack')) return '多维度评测三大构建工具的冷/热启动与增量性能，附迁移评估建议。'
+  return '精选高质量内容，围绕标题主题提供由浅入深的系统讲解与实战案例。'
+}
 </script>
 
 <style scoped>

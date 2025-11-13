@@ -117,7 +117,7 @@
             <el-input
               v-model="newGuide.description"
               type="textarea"
-              rows="2"
+              :rows="2"
               placeholder="输入指南简短描述"
             />
           </el-form-item>
@@ -137,7 +137,7 @@
             <el-input
               v-model="newGuide.content"
               type="textarea"
-              rows="6"
+              :rows="6"
               placeholder="输入指南详细内容（支持 Markdown）"
             />
           </el-form-item>

@@ -7,36 +7,9 @@
         <span class="brand-name">面试社区</span>
       </div>
 
-      <!-- 搜索框 -->
+      <!-- 搜索框（增强版） -->
       <div class="search-section">
-        <el-autocomplete
-          v-model="searchQuery"
-          :fetch-suggestions="querySearch"
-          placeholder="搜索题目、用户、标签..."
-          :trigger-on-focus="false"
-          clearable
-          class="search-input"
-          @select="handleSelect"
-          @keyup.enter="handleSearch"
-        >
-          <template #prefix>
-            <el-icon><Search /></el-icon>
-          </template>
-          <template #default="{ item }">
-            <div class="search-item">
-              <el-icon class="search-item-icon">
-                <Document v-if="item.type === 'question'" />
-                <User v-if="item.type === 'user'" />
-                <PriceTag v-if="item.type === 'tag'" />
-              </el-icon>
-              <span class="search-item-text">{{ item.value }}</span>
-              <el-tag size="small" :type="item.tagType">{{ item.typeLabel }}</el-tag>
-            </div>
-          </template>
-        </el-autocomplete>
-        <el-button type="primary" class="search-btn" @click="handleSearch">
-          <el-icon><Search /></el-icon>
-        </el-button>
+        <CommunityEnhancedSearch2 @search="(p) => emit('search', p)" />
       </div>
 
       <!-- 用户功能区 -->
@@ -89,47 +62,18 @@ import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/user'
 import {
-  Promotion, Search, EditPen, Bell, User, Document,
-  PriceTag, Setting, SwitchButton
+  Promotion, EditPen, Bell, User, Setting, SwitchButton
 } from '@element-plus/icons-vue'
+import CommunityEnhancedSearch2 from './CommunityEnhancedSearch2.vue'
 
 const router = useRouter()
 const userStore = useUserStore()
 
 const emit = defineEmits(['create-post', 'show-notifications', 'search'])
 
-const searchQuery = ref('')
 const unreadCount = ref(5)
 
 const userAvatar = computed(() => userStore.user?.avatar || '')
-
-// 模拟搜索建议
-const searchSuggestions = [
-  { value: '实现防抖函数', type: 'question', typeLabel: '题目', tagType: 'success' },
-  { value: 'Vue3 响应式原理', type: 'question', typeLabel: '题目', tagType: 'success' },
-  { value: '张三', type: 'user', typeLabel: '用户', tagType: 'info' },
-  { value: 'JavaScript', type: 'tag', typeLabel: '标签', tagType: 'warning' },
-  { value: 'React Hooks', type: 'question', typeLabel: '题目', tagType: 'success' }
-]
-
-const querySearch = (queryString, cb) => {
-  const results = queryString
-    ? searchSuggestions.filter(item =>
-        item.value.toLowerCase().includes(queryString.toLowerCase())
-      )
-    : searchSuggestions
-  cb(results)
-}
-
-const handleSelect = (item) => {
-  emit('search', { query: item.value, type: item.type })
-}
-
-const handleSearch = () => {
-  if (searchQuery.value.trim()) {
-    emit('search', { query: searchQuery.value.trim(), type: 'all' })
-  }
-}
 
 const handleCommand = (command) => {
   switch (command) {
@@ -200,38 +144,7 @@ const handleCommand = (command) => {
   display: flex;
   align-items: center;
   gap: 10px;
-  max-width: 600px;
-}
-
-.search-input {
-  flex: 1;
-}
-
-.search-input :deep(.el-input__wrapper) {
-  border-radius: 20px;
-  padding: 0 20px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-}
-
-.search-btn {
-  border-radius: 20px;
-  padding: 12px 20px;
-}
-
-.search-item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 5px 0;
-}
-
-.search-item-icon {
-  color: #909399;
-}
-
-.search-item-text {
-  flex: 1;
-  color: #303133;
+  max-width: 800px;
 }
 
 /* 用户功能区 */

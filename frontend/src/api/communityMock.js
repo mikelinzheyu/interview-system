@@ -565,8 +565,23 @@ export function getPostDetailMock(postId) {
   const post = mockPosts.find(p => String(p.id) === String(postId))
 
   if (!post) {
-    // 如果找不到，返回默认值或错误
-    return null
+    // 如果找不到，返回一个占位的帖子详情，避免触发额外的 API 请求
+    return {
+      id: String(postId),
+      title: `示例帖子 #${postId}`,
+      content: '该帖子暂无真实数据，当前显示的是本地模拟内容。',
+      tags: [],
+      likes: 0,
+      viewCount: 0,
+      commentCount: 0,
+      createdAt: new Date().toISOString(),
+      pinned: false,
+      isPinned: false,
+      author: { userId: 'user-default', name: '社区用户', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=default' },
+      userAvatar: null,
+      username: '社区用户',
+      comments: []
+    }
   }
 
   // 为帖子详情生成额外的数据

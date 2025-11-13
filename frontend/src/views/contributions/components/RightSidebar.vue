@@ -1,5 +1,30 @@
 <template>
   <div class="right-sidebar">
+    <!-- 社区公告 -->
+    <el-card class="sidebar-card notice-card">
+      <template #header>
+        <div class="card-header">
+          <el-icon class="header-icon"><BellFilled /></el-icon>
+          <span class="header-title">社区公告</span>
+        </div>
+      </template>
+      <div class="notice-list">
+        <div
+          v-for="notice in notices"
+          :key="notice.id"
+          class="notice-item"
+          @click="showNotice(notice)"
+        >
+          <el-icon class="notice-icon" :class="`notice-type-${notice.type}`">
+            <component :is="getNoticeIcon(notice.type)" />
+          </el-icon>
+          <div class="notice-content">
+            <div class="notice-title">{{ notice.title }}</div>
+            <div class="notice-time">{{ notice.time }}</div>
+          </div>
+        </div>
+      </div>
+    </el-card>
     <!-- 今日热榜 -->
     <el-card class="sidebar-card hot-list-card">
       <template #header>
@@ -62,32 +87,6 @@
           <el-button size="small" type="primary" plain @click.stop="followUser(author.id)">
             {{ author.followed ? '已关注' : '关注' }}
           </el-button>
-        </div>
-      </div>
-    </el-card>
-
-    <!-- 社区公告 -->
-    <el-card class="sidebar-card notice-card">
-      <template #header>
-        <div class="card-header">
-          <el-icon class="header-icon"><BellFilled /></el-icon>
-          <span class="header-title">社区公告</span>
-        </div>
-      </template>
-      <div class="notice-list">
-        <div
-          v-for="notice in notices"
-          :key="notice.id"
-          class="notice-item"
-          @click="showNotice(notice)"
-        >
-          <el-icon class="notice-icon" :class="`notice-type-${notice.type}`">
-            <component :is="getNoticeIcon(notice.type)" />
-          </el-icon>
-          <div class="notice-content">
-            <div class="notice-title">{{ notice.title }}</div>
-            <div class="notice-time">{{ notice.time }}</div>
-          </div>
         </div>
       </div>
     </el-card>
@@ -245,8 +244,9 @@ const handleAction = (action) => {
   display: flex;
   flex-direction: column;
   gap: 20px;
-  max-height: calc(100vh - 105px);
-  overflow-y: auto;
+  /* 取消整个侧栏独立滚动，仅让公告区域内部滚动 */
+  max-height: none;
+  overflow: visible;
   padding-bottom: 20px;
 }
 
@@ -411,6 +411,24 @@ const handleAction = (action) => {
   display: flex;
   flex-direction: column;
   gap: 12px;
+  /* 独立滚动区域 */
+  max-height: 320px;
+  overflow-y: auto;
+  padding-right: 6px; /* 为滚动条预留空间，避免内容抖动 */
+}
+
+/* 公告滚动条样式（仅影响公告区域） */
+.notice-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.notice-list::-webkit-scrollbar-thumb {
+  background: #dcdfe6;
+  border-radius: 3px;
+}
+
+.notice-list::-webkit-scrollbar-thumb:hover {
+  background: #c0c4cc;
 }
 
 .notice-item {

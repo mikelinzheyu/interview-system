@@ -99,7 +99,7 @@
           v-model="shareMessage"
           type="textarea"
           placeholder="分享你的学习心得..."
-          rows="4"
+          :rows="4"
           maxlength="200"
           show-word-limit
         />
