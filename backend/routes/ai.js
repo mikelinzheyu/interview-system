@@ -9,6 +9,7 @@ const { auth } = require('../middleware/auth');
 const { rateLimit } = require('../middleware/rateLimit');
 const cacheService = require('../services/cacheService');
 const difyService = require('../services/difyService');
+const chatWorkflowService = require('../services/chatWorkflowService');
 const logger = require('../utils/logger');
 
 /**
@@ -182,8 +183,8 @@ router.get('/chat/stream', auth, rateLimit(30, 60), (req, res) => {
       let finalConversationId = conversationId;
       let hasStarted = false;
 
-      if (!difyService.isConfigured()) {
-        logger.warn('[AI/Chat] Dify service not configured, using mock data');
+      if (!chatWorkflowService.checkConfiguration()) {
+        logger.warn('[AI/Chat] Chat API not configured, using mock data');
         // 使用模拟响应
         const mockResponse = [
           '这是 AI 对',
@@ -214,8 +215,9 @@ router.get('/chat/stream', auth, rateLimit(30, 60), (req, res) => {
         return;
       }
 
-      // 使用真实的 Dify 服务进行流式对话
-      for await (const chunk of difyService.streamChat(message, articleContent, conversationId, userId)) {
+      // 使用真实的 Dify Chat API 进行流式对话
+      const userId_generated = `post-${req.query.postId || 'unknown'}-user-${userId}`;
+      for await (const chunk of chatWorkflowService.sendMessage(message, userId_generated, conversationId, articleContent)) {
         if (chunk.type === 'chunk') {
           res.write(
             `data: ${JSON.stringify({ type: 'chunk', content: chunk.content })}\n\n`
@@ -280,8 +282,8 @@ router.post('/chat/stream', auth, rateLimit(30, 60), (req, res) => {
       let finalConversationId = conversationId;
       let hasStarted = false;
 
-      if (!difyService.isConfigured()) {
-        logger.warn('[AI/Chat] Dify service not configured, using mock data');
+      if (!chatWorkflowService.checkConfiguration()) {
+        logger.warn('[AI/Chat] Chat API not configured, using mock data');
         // 使用模拟响应
         const mockResponse = [
           '这是 AI 对',
@@ -312,8 +314,9 @@ router.post('/chat/stream', auth, rateLimit(30, 60), (req, res) => {
         return;
       }
 
-      // 使用真实的 Dify 服务进行流式对话
-      for await (const chunk of difyService.streamChat(message, articleContent, conversationId, userId)) {
+      // 使用真实的 Dify Chat API 进行流式对话
+      const userId_generated = `post-${req.body.postId || 'unknown'}-user-${userId}`;
+      for await (const chunk of chatWorkflowService.sendMessage(message, userId_generated, conversationId, articleContent)) {
         if (chunk.type === 'chunk') {
           res.write(
             `data: ${JSON.stringify({ type: 'chunk', content: chunk.content })}\n\n`
