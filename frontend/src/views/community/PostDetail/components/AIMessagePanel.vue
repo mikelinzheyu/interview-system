@@ -26,16 +26,44 @@
           <div v-else class="ai-message-block">
             <div class="message-html-content" v-html="renderMarkdown(message.content)"></div>
 
-            <!-- 消息操作按钮 -->
+            <!-- 消息操作按钮 - Phase 4: 扩展功能 -->
             <div class="message-actions">
-              <button @click="copyMessage(message.content)" class="action-btn" title="复制">
-                <span class="icon">📋</span>
-                <span class="text">复制</span>
-              </button>
-              <button @click="refreshMessage(message)" class="action-btn" title="刷新">
-                <span class="icon">🔄</span>
-                <span class="text">刷新</span>
-              </button>
+              <div class="action-group primary">
+                <button @click="copyMessage(message.content)" class="action-btn" title="复制">
+                  <span class="icon">📋</span>
+                  <span class="text">复制</span>
+                </button>
+                <button @click="refreshMessage(message)" class="action-btn" title="刷新">
+                  <span class="icon">🔄</span>
+                  <span class="text">刷新</span>
+                </button>
+              </div>
+
+              <!-- Phase 4: 交互反馈按钮 -->
+              <div class="action-group feedback">
+                <button
+                  @click="toggleLike(message)"
+                  class="action-btn"
+                  :class="{ active: message.liked }"
+                  title="点赞"
+                >
+                  <span class="icon">{{ message.liked ? '❤️' : '🤍' }}</span>
+                  <span class="text">{{ message.likeCount || 0 }}</span>
+                </button>
+                <button
+                  @click="toggleBookmark(message)"
+                  class="action-btn"
+                  :class="{ active: message.bookmarked }"
+                  title="收藏"
+                >
+                  <span class="icon">{{ message.bookmarked ? '⭐' : '☆' }}</span>
+                  <span class="text">收藏</span>
+                </button>
+                <button @click="shareMessage(message)" class="action-btn" title="分享">
+                  <span class="icon">🔗</span>
+                  <span class="text">分享</span>
+                </button>
+              </div>
             </div>
           </div>
 
@@ -115,6 +143,57 @@ const copyMessage = async (content) => {
 // 刷新消息
 const refreshMessage = (message) => {
   emit('refresh-message', message)
+}
+
+// Phase 4: 点赞消息
+const toggleLike = (message) => {
+  if (!message.liked) {
+    message.liked = true
+    message.likeCount = (message.likeCount || 0) + 1
+    ElMessage.success('感谢你的点赞！')
+  } else {
+    message.liked = false
+    message.likeCount = Math.max(0, (message.likeCount || 0) - 1)
+  }
+}
+
+// Phase 4: 收藏消息
+const toggleBookmark = (message) => {
+  if (!message.bookmarked) {
+    message.bookmarked = true
+    ElMessage.success('已收藏')
+  } else {
+    message.bookmarked = false
+    ElMessage.info('已取消收藏')
+  }
+}
+
+// Phase 4: 分享消息
+const shareMessage = async (message) => {
+  const shareText = message.content.replace(/<[^>]*>/g, '').substring(0, 100)
+  const shareData = {
+    title: 'AI Assistant',
+    text: shareText,
+    url: window.location.href,
+  }
+
+  try {
+    // 尝试使用 Web Share API
+    if (navigator.share) {
+      await navigator.share(shareData)
+      ElMessage.success('分享成功')
+    } else {
+      // 降级方案：复制分享链接
+      const shareUrl = `${window.location.href}?msg=${encodeURIComponent(shareText)}`
+      await navigator.clipboard.writeText(shareUrl)
+      ElMessage.success('分享链接已复制到剪贴板')
+    }
+  } catch (error) {
+    if (error.name !== 'AbortError') {
+      console.error('Share error:', error)
+      ElMessage.error('分享失败')
+    }
+  }
 }
 
 // 滚动事件处理
@@ -409,13 +488,28 @@ defineExpose({
   }
 }
 
-// 消息操作按钮
+// 消息操作按钮 - Phase 4: 扩展交互功能
 .message-actions {
   display: flex;
-  gap: 8px;
+  flex-direction: column;
+  gap: 10px;
   margin-top: 12px;
-  padding-top: 8px;
+  padding-top: 12px;
   border-top: 1px solid rgba(255, 255, 255, 0.05);
+
+  .action-group {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+
+    &.primary {
+      gap: 6px;
+    }
+
+    &.feedback {
+      gap: 8px;
+    }
+  }
 
   .action-btn {
     display: flex;
@@ -429,24 +523,57 @@ defineExpose({
     cursor: pointer;
     font-size: 12px;
     transition: all 0.2s;
+    user-select: none;
 
     .icon {
       font-size: 14px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 14px;
     }
 
     .text {
       font-weight: 500;
+      white-space: nowrap;
     }
 
     &:hover {
       background: rgba(102, 126, 234, 0.2);
       border-color: #667eea;
       color: #667eea;
+      transform: translateY(-1px);
     }
 
     &:active {
       transform: scale(0.96);
     }
+
+    // Phase 4: 点赞/收藏活跃状态
+    &.active {
+      background: rgba(255, 107, 107, 0.15);
+      border-color: rgba(255, 107, 107, 0.4);
+      color: #ff6b6b;
+
+      &:hover {
+        background: rgba(255, 107, 107, 0.25);
+        border-color: #ff6b6b;
+        color: #ff6b6b;
+      }
+
+      .icon {
+        animation: heartBeat 0.3s ease-in-out;
+      }
+    }
+  }
+}
+
+@keyframes heartBeat {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.2);
   }
 }
 
