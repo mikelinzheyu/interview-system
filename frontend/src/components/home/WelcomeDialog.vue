@@ -17,7 +17,7 @@
       </div>
 
       <!-- 欢迎文本 -->
-      <h2 class="welcome-title">欢迎加入智能面试系统</h2>
+      <h2 class="welcome-title">欢迎加入AI面试官</h2>
       <p class="welcome-subtitle">准备好开始您的面试之旅了吗？</p>
 
       <!-- 功能亮点 -->

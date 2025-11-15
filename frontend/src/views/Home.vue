@@ -10,7 +10,7 @@
           <el-icon :size="32" color="#409eff">
             <ChatRound />
           </el-icon>
-          <span class="logo-text">智能面试系统</span>
+          <span class="logo-text">AI面试官</span>
         </div>
         
         <div class="header-actions">
