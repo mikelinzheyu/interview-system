@@ -14,6 +14,7 @@
       ref="messagePanelRef"
       :messages="messages"
       @scroll-to-bottom="onScrollToBottom"
+      @refresh-message="handleRefreshMessage"
     />
 
     <!-- 聊天输入区 -->
@@ -244,6 +245,50 @@ const handleSendMessage = async (messageText) => {
 const selectQuestion = (question) => {
   chatInputRef.value?.focus()
   handleSendMessage(question)
+}
+
+// 刷新消息 - 重新生成AI回复
+const handleRefreshMessage = async (message) => {
+  if (message.role !== 'assistant') {
+    return
+  }
+
+  errorMessage.value = null
+
+  // 标记消息为加载中
+  const msgIndex = messages.value.findIndex(m => m.id === message.id)
+  if (msgIndex >= 0) {
+    messages.value[msgIndex] = {
+      ...messages.value[msgIndex],
+      loading: true,
+      content: '重新生成中...',
+    }
+  }
+
+  try {
+    // 获取用户的最后一条消息作为重新生成的参考
+    const userMessages = messages.value.filter(m => m.role === 'user')
+    const lastUserMessage = userMessages[userMessages.length - 1]
+
+    if (!lastUserMessage) {
+      throw new Error('找不到用户消息')
+    }
+
+    // 重新发送请求
+    await handleSendMessage(lastUserMessage.content)
+  } catch (error) {
+    console.error('Refresh message error:', error)
+    errorMessage.value = '重新生成失败，请重试'
+    ElMessage.error('重新生成失败')
+
+    // 恢复原消息
+    if (msgIndex >= 0) {
+      messages.value[msgIndex] = {
+        ...message,
+        loading: false,
+      }
+    }
+  }
 }
 
 // 滚动到底部
