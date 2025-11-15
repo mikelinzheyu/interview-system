@@ -313,15 +313,16 @@ defineExpose({
 </script>
 
 <style scoped lang="scss">
-// 主容器 - Phase 1: 新架构
+// 主容器 - Phase 1: 新架构 - 固定高度
 .ai-assistant-panel {
   display: flex;
   flex-direction: column;
-  height: 100%;
+  height: 680px;  // ✅ 固定高度（不随内容拉长）
+  max-height: 680px;  // ✅ 防止超出
   background: #1f1f2f;
   border: 1px solid #3d3d4d;
   border-radius: 8px;
-  overflow: hidden;
+  overflow: hidden;  // ✅ 确保内容不溢出
 
   // 子组件自动填充可用空间的合理分配
   > :nth-child(1) {
@@ -337,6 +338,7 @@ defineExpose({
   > :nth-child(3) {
     // AIMessagePanel - 可伸缩主体区域
     flex: 1;
+    overflow: hidden;  // ✅ 确保不溢出
   }
 
   > :nth-child(4) {
