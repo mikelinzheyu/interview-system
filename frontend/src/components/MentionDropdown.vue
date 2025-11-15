@@ -40,7 +40,7 @@
 <script setup>
 import { defineProps, defineEmits, ref, watch } from 'vue'
 
-defineProps({
+const props = defineProps({
   show: {
     type: Boolean,
     default: false
@@ -65,7 +65,7 @@ const selectedIndex = ref(0)
 
 // 监听suggestions变化，重置选中索引
 watch(
-  (props) => props.suggestions,
+  () => props.suggestions,
   () => {
     selectedIndex.value = 0
   },
@@ -79,7 +79,7 @@ const selectUser = (user) => {
 
 // 处理键盘导航
 const handleKeyDown = (e) => {
-  if (!show.value || suggestions.length === 0) return
+  if (!props.show || props.suggestions.length === 0) return
 
   switch (e.key) {
     case 'ArrowUp':
@@ -88,11 +88,11 @@ const handleKeyDown = (e) => {
       break
     case 'ArrowDown':
       e.preventDefault()
-      selectedIndex.value = Math.min(suggestions.length - 1, selectedIndex.value + 1)
+      selectedIndex.value = Math.min(props.suggestions.length - 1, selectedIndex.value + 1)
       break
     case 'Enter':
       e.preventDefault()
-      selectUser(suggestions[selectedIndex.value])
+      selectUser(props.suggestions[selectedIndex.value])
       break
     case 'Escape':
       e.preventDefault()
