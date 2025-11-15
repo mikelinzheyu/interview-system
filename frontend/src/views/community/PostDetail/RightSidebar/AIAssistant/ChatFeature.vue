@@ -11,7 +11,13 @@
           {{ msg.role === 'user' ? '👤' : '🤖' }}
         </div>
         <div class="message-content">
-          <p>{{ msg.text }}</p>
+          <!-- 用户消息：纯文本 -->
+          <p v-if="msg.role === 'user'">{{ msg.text }}</p>
+
+          <!-- AI消息：渲染为HTML（包含Markdown和复制按钮） -->
+          <div v-else-if="msg.htmlContent" class="ai-message-html" v-html="msg.htmlContent"></div>
+          <p v-else>{{ msg.text }}</p>
+
           <span v-if="msg.time" class="message-time">{{ msg.time }}</span>
         </div>
       </div>
@@ -83,9 +89,11 @@
 </template>
 
 <script setup>
-import { ref, defineProps, nextTick, computed, onUnmounted, onMounted } from 'vue'
+import { ref, defineProps, nextTick, computed, onUnmounted, onMounted, watch } from 'vue'
 import { ElMessage } from 'element-plus'
 import { Loading, Promotion } from '@element-plus/icons-vue'
+import { marked } from 'marked'
+import DOMPurify from 'dompurify'
 
 const props = defineProps({
   articleContent: {
@@ -114,6 +122,111 @@ const displaySpeed = ref(30) // 改到30ms，显示更快
 let typeoutTimer = null
 let isProcessing = ref(false) // 标志是否正在处理
 let streamComplete = ref(false) // 流式接收是否已完成
+
+/**
+ * DOMPurify 配置 - 用于安全渲染Markdown
+ */
+const PURIFY_CONFIG = {
+  ALLOWED_TAGS: [
+    'p', 'br', 'strong', 'em', 'u', 's',
+    'a', 'code', 'pre', 'div',
+    'ul', 'ol', 'li',
+    'blockquote', 'hr',
+    'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+    'button', 'span'
+  ],
+  ALLOWED_ATTR: {
+    'a': ['href', 'target', 'rel', 'title'],
+    'pre': ['class'],
+    'code': ['class'],
+    'div': ['class'],
+    'button': ['class', 'data-code'],
+    'span': ['class']
+  },
+  ALLOW_DATA_ATTR: false,
+  SAFE_FOR_TEMPLATES: true,
+  KEEP_CONTENT: true,
+}
+
+/**
+ * 渲染Markdown为HTML，并为代码块添加复制按钮
+ */
+const renderMarkdownWithCopyButtons = (content) => {
+  try {
+    // 1. 转换Markdown为HTML
+    let html = marked(content)
+
+    // 2. 使用DOMPurify清理HTML
+    let sanitized = DOMPurify.sanitize(html, PURIFY_CONFIG)
+
+    // 3. 为代码块添加复制按钮容器
+    const tempDiv = document.createElement('div')
+    tempDiv.innerHTML = sanitized
+
+    // 查找所有的pre标签
+    tempDiv.querySelectorAll('pre').forEach((preElement) => {
+      // 创建容器
+      const container = document.createElement('div')
+      container.className = 'code-block-container'
+
+      // 创建复制按钮
+      const copyBtn = document.createElement('button')
+      copyBtn.className = 'code-copy-btn'
+      copyBtn.textContent = '复制'
+      copyBtn.setAttribute('data-code', preElement.textContent)
+      copyBtn.type = 'button'
+
+      // 将pre元素移到容器中
+      preElement.parentNode.insertBefore(container, preElement)
+      container.appendChild(preElement)
+      container.appendChild(copyBtn)
+    })
+
+    return tempDiv.innerHTML
+  } catch (error) {
+    console.error('[ChatFeature] Markdown rendering error:', error)
+    // 降级方案：仅显示纯文本
+    return `<p>${DOMPurify.sanitize(content)}</p>`
+  }
+}
+
+/**
+ * 处理复制按钮点击事件
+ */
+const setupCopyButtons = (containerElement) => {
+  if (!containerElement) return
+
+  const copyBtns = containerElement.querySelectorAll('.code-copy-btn')
+  copyBtns.forEach((btn) => {
+    btn.addEventListener('click', async (e) => {
+      e.preventDefault()
+      e.stopPropagation()
+
+      const codeText = btn.getAttribute('data-code')
+      if (!codeText) return
+
+      try {
+        await navigator.clipboard.writeText(codeText)
+
+        // 显示反馈
+        const originalText = btn.textContent
+        btn.textContent = '✓ 已复制!'
+        btn.classList.add('copied')
+
+        setTimeout(() => {
+          btn.textContent = originalText
+          btn.classList.remove('copied')
+        }, 2000)
+      } catch (err) {
+        console.error('[ChatFeature] Copy failed:', err)
+        btn.textContent = '❌ 复制失败'
+        setTimeout(() => {
+          btn.textContent = '复制'
+        }, 2000)
+      }
+    })
+  })
+}
 
 /**
  * 简化的逐字输出处理 - 直接使用setTimeout而不是async/await
@@ -200,6 +313,7 @@ const loadConversationHistory = async () => {
         messages.value = data.map(msg => ({
           role: msg.role,
           text: msg.content,
+          htmlContent: msg.role === 'assistant' ? renderMarkdownWithCopyButtons(msg.content) : null,
           time: msg.timestamp ? new Date(msg.timestamp).toLocaleTimeString('zh-CN') : formatTime(),
         }))
         console.log(`[ChatFeature] 已加载 ${messages.value.length} 条历史消息`)
@@ -220,6 +334,25 @@ const loadConversationHistory = async () => {
 onMounted(() => {
   loadConversationHistory()
 })
+
+/**
+ * 监听消息变化，设置复制按钮
+ */
+watch(messages, (newMessages) => {
+  nextTick(() => {
+    // 设置所有的复制按钮
+    newMessages.forEach((msg, idx) => {
+      if (msg.role === 'assistant' && msg.htmlContent) {
+        const messageElement = document.querySelector(
+          `.message:nth-child(${idx + 1}) .ai-message-html`
+        )
+        if (messageElement) {
+          setupCopyButtons(messageElement)
+        }
+      }
+    })
+  })
+}, { deep: true })
 
 /**
  * 发送消息并处理流式响应
@@ -335,6 +468,7 @@ const handleSendMessage = async () => {
                 messages.value.push({
                   role: 'assistant',
                   text: streamingText.value,
+                  htmlContent: renderMarkdownWithCopyButtons(streamingText.value),
                   time: formatTime(),
                 })
                 console.log('[ChatFeature] 消息已保存到历史')
@@ -355,6 +489,7 @@ const handleSendMessage = async () => {
                 messages.value.push({
                   role: 'assistant',
                   text: streamingText.value,
+                  htmlContent: renderMarkdownWithCopyButtons(streamingText.value),
                   time: formatTime(),
                 })
               }
@@ -658,6 +793,139 @@ onUnmounted(() => {
   }
   50%, 100% {
     opacity: 0;
+  }
+}
+
+/* AI消息 HTML 内容样式 */
+.ai-message-html {
+  font-size: 13px;
+  line-height: 1.6;
+
+  p {
+    margin: 8px 0;
+    word-wrap: break-word;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  strong {
+    font-weight: 600;
+    color: #000;
+  }
+
+  em {
+    font-style: italic;
+  }
+
+  code {
+    background: #f5f5f5;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 12px;
+    color: #c41d7f;
+    font-family: 'Monaco', 'Courier New', monospace;
+  }
+
+  pre {
+    background: #f5f5f5;
+    padding: 12px;
+    border-radius: 4px;
+    overflow-x: auto;
+    max-height: 300px;
+    overflow-y: auto;
+    margin: 8px 0;
+
+    code {
+      background: none;
+      padding: 0;
+      color: #666;
+    }
+  }
+
+  a {
+    color: #409eff;
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  ul, ol {
+    margin: 8px 0 8px 20px;
+
+    li {
+      margin: 4px 0;
+    }
+  }
+
+  blockquote {
+    margin: 8px 0;
+    padding: 8px 12px;
+    background: #f0f0f0;
+    border-left: 3px solid #409eff;
+    color: #666;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    margin: 8px 0 4px 0;
+    font-weight: 600;
+  }
+
+  h1 { font-size: 18px; }
+  h2 { font-size: 16px; }
+  h3 { font-size: 14px; }
+  h4 { font-size: 13px; }
+  h5 { font-size: 12px; }
+  h6 { font-size: 11px; }
+}
+
+/* 代码块容器 */
+.code-block-container {
+  position: relative;
+  display: block;
+  margin: 8px 0;
+
+  &:hover .code-copy-btn {
+    opacity: 1;
+  }
+}
+
+/* 复制按钮样式 */
+.code-copy-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background-color: #555;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  opacity: 0;
+  transition: all 0.3s ease;
+  z-index: 10;
+  font-weight: 500;
+
+  &:hover {
+    background-color: #777;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  }
+
+  &.copied {
+    opacity: 1;
+    background-color: #67c23a;
+
+    &:hover {
+      background-color: #7cd237;
+    }
+  }
+
+  &:active {
+    transform: scale(0.95);
   }
 }
 </style>
