@@ -10,6 +10,7 @@ const { getControllers } = require('../services/dataService')
 const { eventBridge } = require('../services/eventBridge')
 const aiRouter = require('./ai')
 const communityRouter = require('./community')
+const messagesRouter = require('./messages')
 
 // ==================== 工具函数 ====================
 
@@ -1366,6 +1367,12 @@ router.post('/dms/:dmId/messages', auth, (req, res) => {
  * 提供社区功能：帖子、文章、评论、点赞等
  */
 router.use('/community', communityRouter)
+
+/**
+ * 挂载私信路由
+ * 提供一对一私信功能：对话列表、消息发送、消息已读等
+ */
+router.use('/messages', messagesRouter)
 
 /**
  * 挂载 AI 路由

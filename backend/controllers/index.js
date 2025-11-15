@@ -1255,4 +1255,6 @@ module.exports = {
   PermissionController,
   UserController,
   CryptoController,
-  CommunityController
+  CommunityController,
+  PrivateMessageController: require('./PrivateMessageController')
+}

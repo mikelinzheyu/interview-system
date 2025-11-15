@@ -33,9 +33,8 @@
 .floating-toc-container {
   position: sticky;
   top: var(--spacing-2xl);
-  max-height: calc(100vh - var(--spacing-4xl));
-  overflow-y: auto;
-  overflow-x: hidden;
+  max-height: none;
+  overflow: visible;
   /* 允许左侧小框微量侵占右侧内容区，不压缩中间区域 */
   /* 不重叠中间内容：使用 grid 列宽控制 */
   
