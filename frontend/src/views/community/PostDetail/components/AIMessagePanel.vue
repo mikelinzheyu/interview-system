@@ -130,8 +130,38 @@ const formatTime = (timestamp) => {
 // 复制消息
 const copyMessage = async (content) => {
   try {
-    // 去除HTML标签，只复制纯文本
-    const plainText = content.replace(/<[^>]*>/g, '')
+    // 清理Markdown格式符号，只复制纯文本
+    let plainText = content
+      // 移除标题符号 (###, ##, #)
+      .replace(/^#+\s+/gm, '')
+      // 移除粗体符号 (**text** or __text__)
+      .replace(/\*\*(.+?)\*\*/g, '$1')
+      .replace(/__(.+?)__/g, '$1')
+      // 移除斜体符号 (*text* or _text_)
+      .replace(/\*(.+?)\*/g, '$1')
+      .replace(/_(.+?)_/g, '$1')
+      // 移除代码块符号 (```code```)
+      .replace(/```[\s\S]*?```/g, '')
+      // 移除内联代码符号 (`code`)
+      .replace(/`(.+?)`/g, '$1')
+      // 移除链接格式 ([text](url))
+      .replace(/\[(.+?)\]\(.+?\)/g, '$1')
+      // 移除图片格式 (![alt](url))
+      .replace(/!\[(.+?)\]\(.+?\)/g, '')
+      // 移除引用符号 (> text)
+      .replace(/^>\s+/gm, '')
+      // 移除列表符号 (-, *, +)
+      .replace(/^[-*+]\s+/gm, '')
+      // 移除编号列表符号 (1., 2., etc)
+      .replace(/^\d+\.\s+/gm, '')
+      // 移除分隔线 (---, ***, ___)
+      .replace(/^[\*_-]{3,}$/gm, '')
+      // 移除HTML标签
+      .replace(/<[^>]*>/g, '')
+      // 移除多余空行
+      .replace(/\n\n+/g, '\n')
+      .trim()
+
     await navigator.clipboard.writeText(plainText)
     ElMessage.success('已复制到剪贴板')
   } catch (error) {
