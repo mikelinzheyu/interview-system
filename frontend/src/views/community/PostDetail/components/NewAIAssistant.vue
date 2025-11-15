@@ -1,37 +1,13 @@
 <template>
-  <SidebarCard class="ai-assistant-card">
-    <!-- 卡片头部 -->
-    <template #header>
-      <div class="ai-header-custom">
-        <span class="ai-title">
-          <el-icon class="ai-icon"><CirclePlus /></el-icon>
-          AI 助手
-        </span>
-        <!-- 对话计数器 -->
-        <span class="message-count">{{ messages.length }} 条对话</span>
-      </div>
-    </template>
+  <div class="ai-assistant-panel">
+    <!-- Phase 1: 头部区域 (新增) -->
+    <AssistantHeader />
 
-    <!-- AI 辅助功能区 -->
-    <div class="ai-reading-section">
-      <div class="section-title">
-        <span>AI 辅助阅读</span>
-        <el-icon class="title-icon"><Right /></el-icon>
-      </div>
-
-      <!-- 功能按钮 -->
-      <div class="feature-buttons">
-        <button class="feature-btn" @click="handleAIAnalysis" :disabled="isLoading">
-          <span class="btn-text">AI 解读 - 创析摘文结构及重点</span>
-          <el-icon class="btn-icon"><Right /></el-icon>
-        </button>
-
-        <button class="feature-btn" @click="handleAIChat" :disabled="isLoading">
-          <span class="btn-text">AI 对话 - 阅读助手及对话引导</span>
-          <el-icon class="btn-icon"><Right /></el-icon>
-        </button>
-      </div>
-    </div>
+    <!-- Phase 1: 快捷功能区域 (新增) -->
+    <QuickActions
+      @action="handleQuickAction"
+      :disabled="isLoading"
+    />
 
     <!-- 消息展示面板 -->
     <AIMessagePanel
@@ -58,16 +34,14 @@
       @close="errorMessage = null"
       class="error-alert"
     />
-  </SidebarCard>
+  </div>
 </template>
 
 <script setup>
 import { ref, defineProps, computed, watch, nextTick } from 'vue'
 import { ElMessage } from 'element-plus'
-import {
-  CirclePlus,
-  Right,
-} from '@element-plus/icons-vue'
+import AssistantHeader from './AssistantHeader.vue'
+import QuickActions from './QuickActions.vue'
 import SidebarCard from './SidebarCard.vue'
 import AIMessagePanel from './AIMessagePanel.vue'
 import AIChatInput from './AIChatInput.vue'
@@ -119,6 +93,15 @@ const updateMessage = (id, updates) => {
   const msg = messages.value.find(m => m.id === id)
   if (msg) {
     Object.assign(msg, updates)
+  }
+}
+
+// Phase 1: 快捷操作处理 (新增)
+const handleQuickAction = (actionId) => {
+  if (actionId === 'analyze') {
+    handleAIAnalysis()
+  } else if (actionId === 'chat') {
+    handleAIChat()
   }
 }
 
@@ -276,132 +259,44 @@ defineExpose({
 </script>
 
 <style scoped lang="scss">
-.ai-assistant-card {
+// 主容器 - Phase 1: 新架构
+.ai-assistant-panel {
   display: flex;
   flex-direction: column;
   height: 100%;
+  background: #1f1f2f;
+  border: 1px solid #3d3d4d;
+  border-radius: 8px;
+  overflow: hidden;
 
-  :deep(.sidebar-card) {
-    background: #2d2d3d !important;
-    border-color: #3d3d4d !important;
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-  }
-
-  :deep(.sidebar-card-header) {
-    background: #242434 !important;
-    border-bottom-color: #3d3d4d !important;
+  // 子组件自动填充可用空间的合理分配
+  > :nth-child(1) {
+    // AssistantHeader - 固定高度
     flex-shrink: 0;
   }
 
-  :deep(.sidebar-card-body) {
-    padding: 0 !important;
-    display: flex;
-    flex-direction: column;
+  > :nth-child(2) {
+    // QuickActions - 固定高度
+    flex-shrink: 0;
+  }
+
+  > :nth-child(3) {
+    // AIMessagePanel - 可伸缩主体区域
     flex: 1;
-    overflow: hidden;
+  }
+
+  > :nth-child(4) {
+    // AIChatInput - 固定高度输入区
+    flex-shrink: 0;
+  }
+
+  > :nth-child(5) {
+    // 错误提示 - 固定高度
+    flex-shrink: 0;
   }
 }
 
-// 卡片头部
-.ai-header-custom {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-  gap: 12px;
-
-  .ai-title {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 16px;
-    font-weight: 600;
-    color: #e0e0e0;
-
-    .ai-icon {
-      font-size: 20px;
-      color: #667eea;
-    }
-  }
-
-  .message-count {
-    font-size: 12px;
-    color: #888;
-    background: rgba(102, 126, 234, 0.1);
-    padding: 2px 8px;
-    border-radius: 4px;
-  }
-}
-
-// AI 辅助阅读区
-.ai-reading-section {
-  padding: 16px;
-  border-bottom: 1px solid #3d3d4d;
-  flex-shrink: 0;
-
-  .section-title {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 12px;
-    font-size: 14px;
-    font-weight: 600;
-    color: #e0e0e0;
-
-    .title-icon {
-      font-size: 16px;
-      color: #666;
-    }
-  }
-
-  .feature-buttons {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
-
-  .feature-btn {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    width: 100%;
-    padding: 10px 12px;
-    background: transparent;
-    border: 1px solid #3d3d4d;
-    border-radius: 6px;
-    color: #e0e0e0;
-    cursor: pointer;
-    transition: all 0.2s;
-    font-size: 13px;
-
-    &:hover:not(:disabled) {
-      background: rgba(102, 126, 234, 0.1);
-      border-color: #667eea;
-      color: #667eea;
-    }
-
-    &:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-
-    .btn-text {
-      flex: 1;
-      text-align: left;
-    }
-
-    .btn-icon {
-      flex-shrink: 0;
-      margin-left: 8px;
-      font-size: 14px;
-      color: #666;
-    }
-  }
-}
-
-// 错误提示
+// 错误提示样式
 .error-alert {
   margin: 12px;
   flex-shrink: 0;
