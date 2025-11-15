@@ -19,12 +19,17 @@
 
     <!-- 评论交互 -->
     <div class="comment-actions">
-      <el-button text size="small" @click="toggleLike">
+      <el-button
+        text
+        size="small"
+        :loading="isLoading(comment.id)"
+        @click="toggleLike"
+      >
         <el-icon>
           <StarFilled v-if="liked" />
           <Star v-else />
         </el-icon>
-        {{ comment.likes || 0 }}
+        {{ likeCount }}
       </el-button>
       <el-button text size="small" @click="toggleReplyForm">
         <el-icon><ChatDotRound /></el-icon>
@@ -82,11 +87,13 @@
 </template>
 
 <script setup>
-import { ref, defineProps, defineEmits, computed } from 'vue'
+import { ref, defineProps, defineEmits, computed, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Star, StarFilled, ChatDotRound, Delete } from '@element-plus/icons-vue'
 import MarkdownPreview from './MarkdownPreview.vue'
 import ReplyForm from './ReplyForm.vue'
+import { useCommentLikes } from '@/composables/useCommentLikes'
+import { useEditHistory } from '@/composables/useEditHistory'
 
 const props = defineProps({
   comment: {
@@ -106,11 +113,27 @@ const props = defineProps({
 const emit = defineEmits(['reply', 'delete'])
 
 const showReplyForm = ref(false)
-const liked = ref(false)
 const replyLiked = ref({})
 
 // 当前用户 ID（从认证信息获取）
 const currentUserId = ref('current-user-id')
+
+// 使用点赞管理 composable
+const { isLiked, getLikeCount, toggleLike: composableLike, setInitialLike, isLoading } = useCommentLikes(props.postId)
+
+// 使用编辑历史管理 composable
+const { recordEdit: recordCommentEdit, getHistory } = useEditHistory(props.comment.id, props.comment.content)
+
+// 初始化点赞状态
+onMounted(() => {
+  setInitialLike(props.comment.id, props.comment.likes || 0)
+})
+
+// 计算当前评论是否被点赞
+const liked = computed(() => isLiked(props.comment.id))
+
+// 计算当前评论的点赞数
+const likeCount = computed(() => getLikeCount(props.comment.id))
 
 // 权限检查
 const canDelete = computed(() => {
@@ -141,13 +164,15 @@ const formatTime = (timeStr) => {
 }
 
 const toggleLike = async () => {
-  try {
-    // TODO: 调用 API 点赞
-    liked.value = !liked.value
-    props.comment.likes = (props.comment.likes || 0) + (liked.value ? 1 : -1)
+  if (isLoading(props.comment.id)) {
+    return // 正在加载中，不允许重复点击
+  }
+
+  const success = await composableLike(props.comment.id, likeCount.value)
+  if (success) {
     ElMessage.success(liked.value ? '点赞成功' : '已取消点赞')
-  } catch (error) {
-    ElMessage.error('操作失败')
+  } else {
+    ElMessage.error('操作失败，请重试')
   }
 }
 
