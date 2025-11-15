@@ -108,21 +108,20 @@ const error = ref(null)
 const messagesContainer = ref(null)
 let eventSource = null
 
-// 逐字输出相关变量
+// 逐字输出相关变量 - 改进版本
 const typeoutQueue = ref('') // 等待输出的文本队列
-const displaySpeed = ref(100) // 每个字符显示的延迟（毫秒），增大到100ms以看到更明显的效果
+const displaySpeed = ref(50) // 改进到50ms，显示更流畅
 let typeoutTimer = null
 let isProcessing = ref(false) // 标志是否正在处理
+let streamComplete = ref(false) // 流式接收是否已完成
 
 /**
- * 逐字输出效果处理函数
- * 将文本逐个字符添加到显示内容中
+ * 改进的逐字输出效果处理函数 - 使用async/await确保正确的执行顺序
+ * 解决之前setTimeout递归导致的状态混乱问题
  */
-const processTypeout = () => {
-  isProcessing.value = true
-
-  if (typeoutQueue.value.length > 0) {
-    // 从队列中取出第一个字符
+const processTypeout = async () => {
+  // 持续处理队列中的字符，直到队列为空
+  while (typeoutQueue.value.length > 0) {
     const char = typeoutQueue.value.charAt(0)
     typeoutQueue.value = typeoutQueue.value.substring(1)
 
@@ -131,42 +130,48 @@ const processTypeout = () => {
 
     console.log(`[Typeout] 显示字符: "${char}" | 队列剩余: ${typeoutQueue.value.length} | 总输出: ${streamingText.value.length}`)
 
-    // 继续输出下一个字符
-    typeoutTimer = setTimeout(() => {
-      processTypeout()
-    }, displaySpeed.value)
-  } else {
-    // 队列为空，检查是否还在流式接收
-    isProcessing.value = false
-    if (!isStreaming.value && typeoutQueue.value.length === 0) {
-      // 流式接收已完成且队列为空
-      if (typeoutTimer) {
-        clearTimeout(typeoutTimer)
-        typeoutTimer = null
-      }
-      console.log('[Typeout] ✅ 逐字输出完成')
-    }
+    // 等待指定时间，使用Promise确保顺序执行
+    await new Promise(resolve => {
+      typeoutTimer = setTimeout(resolve, displaySpeed.value)
+    })
+
+    // 自动滚动到最新内容
+    await nextTick()
+    scrollToBottom()
   }
 
-  // 自动滚动
-  nextTick(() => {
+  // 处理队列为空的情况
+  typeoutTimer = null
+
+  if (streamComplete.value) {
+    // 流式接收已完成，输出完全完成
+    isProcessing.value = false
+    console.log('[Typeout] ✅ 逐字输出完成 - 流已关闭')
+    await nextTick()
     scrollToBottom()
-  })
+  } else {
+    // 流式接收还在进行，暂停输出等待新数据
+    isProcessing.value = false
+    console.log('[Typeout] ⏸️  逐字输出暂停 - 等待新数据...')
+  }
 }
 
 /**
  * 将文本添加到逐字输出队列
  */
 const addToTypeoutQueue = (text) => {
+  if (!text) return
+
   console.log(`[Typeout] 📝 添加到队列: "${text.substring(0, 50)}${text.length > 50 ? '...' : ''}" (长度: ${text.length})`)
   typeoutQueue.value += text
 
   // 如果没有正在进行的输出，启动输出过程
-  if (!typeoutTimer && !isProcessing.value) {
+  if (!isProcessing.value) {
     console.log('[Typeout] 🚀 启动逐字输出过程')
+    isProcessing.value = true
     processTypeout()
   } else {
-    console.log(`[Typeout] ⏳ 已在处理中，继续排队... (isProcessing: ${isProcessing.value}, hasTimer: ${!!typeoutTimer})`)
+    console.log(`[Typeout] ⏳ 继续排队处理... (队列长度: ${typeoutQueue.value.length})`)
   }
 }
 
@@ -306,6 +311,11 @@ const handleSendMessage = async () => {
         } else if (data.type === 'end') {
           // 对话结束 - 保存对话 ID
           console.log('[ChatFeature] 收到对话结束信号')
+
+          // 标记流式接收已完成（重要：让processTypeout知道流已关闭）
+          streamComplete.value = true
+          isStreaming.value = false
+
           if (data.conversationId) {
             const oldConversationId = conversationId.value
             conversationId.value = data.conversationId
@@ -316,31 +326,36 @@ const handleSendMessage = async () => {
               loadConversationHistory()
             }
           }
-          // 标记流式接收已完成
-          isStreaming.value = false
-          console.log('[ChatFeature] 将完整响应保存到历史')
 
-          // 等待逐字输出完成后再保存消息
-          const checkCompletion = () => {
-            if (typeoutQueue.value.length === 0 && !typeoutTimer) {
-              // 逐字输出已完成，保存消息
-              if (streamingText.value) {
-                messages.value.push({
-                  role: 'assistant',
-                  text: streamingText.value,
-                  time: formatTime(),
-                })
-              }
+          console.log('[ChatFeature] 流式接收已完成，等待逐字输出...')
+
+          // 异步等待逐字输出完成
+          ;(async () => {
+            // 等待processTypeout完成其工作
+            let attempts = 0
+            const maxAttempts = 300 // 最多等待30秒 (300 * 100ms)
+
+            while (isProcessing.value && attempts < maxAttempts) {
+              await new Promise(resolve => setTimeout(resolve, 100))
+              attempts++
+            }
+
+            // 逐字输出已完成，保存消息到历史
+            if (streamingText.value) {
+              console.log('[ChatFeature] 逐字输出完成，保存消息到历史')
+              messages.value.push({
+                role: 'assistant',
+                text: streamingText.value,
+                time: formatTime(),
+              })
               streamingText.value = ''
               typeoutQueue.value = ''
-              scrollToBottom()
-              console.log('[ChatFeature] 消息已保存到历史')
-            } else {
-              // 还在输出中，继续等待
-              setTimeout(checkCompletion, 100)
+              streamComplete.value = false // 重置标志以便下次使用
             }
-          }
-          checkCompletion()
+
+            scrollToBottom()
+            console.log('[ChatFeature] 消息已保存到历史')
+          })()
         } else if (data.type === 'error') {
           // 错误响应
           error.value = data.error || '发生错误，请重试'
