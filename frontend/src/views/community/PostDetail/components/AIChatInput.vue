@@ -3,9 +3,10 @@
     <!-- 输入框容器 -->
     <div class="input-wrapper">
       <textarea
+        ref="textareaRef"
         v-model="inputText"
         class="chat-textarea"
-        placeholder="输入你的问题..."
+        placeholder="输入内容，与 AI 对话"
         :disabled="isLoading"
         @keyup.enter.ctrl="handleSend"
         @keyup.meta.enter="handleSend"
@@ -28,34 +29,51 @@
       </button>
     </div>
 
-    <!-- 快速问题建议（可选） -->
-    <div v-if="suggestedQuestions.length > 0" class="suggested-questions">
-      <button
-        v-for="(question, index) in suggestedQuestions"
-        :key="index"
-        class="suggestion-btn"
-        :disabled="isLoading"
-        @click="selectQuestion(question)"
-      >
-        {{ question }}
-      </button>
-    </div>
+    <!-- 输入区底部控件 -->
+    <div class="input-footer">
+      <!-- Phase 3: 上下文切换开关 -->
+      <div class="context-toggle">
+        <el-switch
+          v-model="useArticleContext"
+          class="context-switch"
+          :disabled="isLoading"
+          @change="handleContextToggle"
+        />
+        <span class="toggle-label">结合博文对话</span>
+        <span class="toggle-hint" :class="{ active: useArticleContext }">
+          {{ useArticleContext ? '✓ 已启用' : '未启用' }}
+        </span>
+      </div>
 
-    <!-- 提示文本 -->
-    <div class="input-hint">
-      <span v-if="isLoading" class="hint-loading">
-        <el-icon><Loading /></el-icon>
-        AI 正在思考...
-      </span>
-      <span v-else class="hint-text">
-        💡 按 Ctrl+Enter 快速发送
-      </span>
+      <!-- 快速问题建议（可选） -->
+      <div v-if="suggestedQuestions.length > 0" class="suggested-questions">
+        <button
+          v-for="(question, index) in suggestedQuestions"
+          :key="index"
+          class="suggestion-btn"
+          :disabled="isLoading"
+          @click="selectQuestion(question)"
+        >
+          {{ question }}
+        </button>
+      </div>
+
+      <!-- 提示文本 -->
+      <div class="input-hint">
+        <span v-if="isLoading" class="hint-loading">
+          <el-icon><Loading /></el-icon>
+          AI 正在思考...
+        </span>
+        <span v-else class="hint-text">
+          💡 按 Ctrl+Enter 快速发送
+        </span>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref } from 'vue'
 import { Message, Loading } from '@element-plus/icons-vue'
 
 const props = defineProps({
@@ -69,10 +87,13 @@ const props = defineProps({
   },
 })
 
-const emit = defineEmits(['send-message', 'select-question'])
+const emit = defineEmits(['send-message', 'select-question', 'context-toggle'])
 
 const inputText = ref('')
 const textareaRef = ref(null)
+
+// Phase 3: 上下文切换状态
+const useArticleContext = ref(true)
 
 // 调整文本框高度
 const adjustHeight = (event) => {
@@ -100,33 +121,39 @@ const selectQuestion = (question) => {
   emit('select-question', question)
 }
 
+// Phase 3: 处理上下文切换
+const handleContextToggle = (value) => {
+  emit('context-toggle', value)
+}
+
 // 暴露方法给父组件
 defineExpose({
   focus: () => textareaRef.value?.focus(),
+  getContextMode: () => useArticleContext.value,
 })
 </script>
 
 <style scoped lang="scss">
-// 方案 B: AI 聊天输入容器 - 完全全宽
+// AI 聊天输入容器 - 完全全宽
 .ai-chat-input {
   display: flex;
   flex-direction: column;
-  gap: 0;  // ✅ 移除 gap，使用内部 padding 管理间距
-  padding: 0;  // ✅ 移除容器 padding，让子元素自己管理
+  gap: 0;
+  padding: 0;
   background: #2d2d3d;
   border-top: 1px solid #3d3d4d;
-  width: 100%;  // ✅ 确保容器 100% 宽度
+  width: 100%;
 }
 
-// 输入框容器 - 方案 B: 全宽块级
+// 输入框容器 - 全宽块级
 .input-wrapper {
   display: flex;
   gap: 8px;
   align-items: flex-end;
-  width: 100%;  // ✅ 填满宽度
+  width: 100%;
   background: #2d2d3d;
   border-top: 1px solid #3d3d4d;
-  padding: 8px 16px;  // 水平 padding 统一
+  padding: 8px 16px;
   transition: all 0.2s;
 
   &:focus-within {
@@ -137,9 +164,9 @@ defineExpose({
 
 // 文本区域 - 自适应全宽
 .chat-textarea {
-  flex: 1;  // ✅ 占据所有可用空间
-  width: 100%;  // ✅ 确保 100% 宽度
-  max-width: none;  // ✅ 移除宽度限制
+  flex: 1;
+  width: 100%;
+  max-width: none;
   padding: 8px;
   background: transparent;
   border: none;
@@ -208,13 +235,63 @@ defineExpose({
   }
 }
 
+// Phase 3: 输入区底部控件区域
+.input-footer {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 8px 16px;
+  background: #2d2d3d;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+// Phase 3: 上下文切换区域
+.context-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+
+  .context-switch {
+    :deep(.el-switch__core) {
+      background-color: #3d3d4d;
+      border-color: #4d4d5d;
+
+      &.is-checked {
+        background-color: #667eea;
+        border-color: #667eea;
+      }
+    }
+
+    :deep(.el-switch.is-disabled .el-switch__core) {
+      background-color: #2d2d3d;
+      opacity: 0.6;
+    }
+  }
+
+  .toggle-label {
+    color: #d0d0d0;
+    font-weight: 500;
+    user-select: none;
+  }
+
+  .toggle-hint {
+    color: #888;
+    font-size: 12px;
+    transition: color 0.2s;
+
+    &.active {
+      color: #667eea;
+    }
+  }
+}
+
 // 建议问题 - 全宽分布
 .suggested-questions {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
-  width: 100%;  // ✅ 全宽
-  padding: 0 16px;  // 统一 padding
+  gap: 6px;
+  width: 100%;
 }
 
 .suggestion-btn {
@@ -229,7 +306,7 @@ defineExpose({
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: none;  // ✅ 移除宽度限制
+  max-width: none;
 
   &:hover:not(:disabled) {
     background: rgba(102, 126, 234, 0.2);
@@ -251,7 +328,6 @@ defineExpose({
   align-items: center;
   justify-content: flex-end;
   gap: 4px;
-  padding: 0 16px;  // 统一 padding
 
   .hint-loading {
     color: #667eea;

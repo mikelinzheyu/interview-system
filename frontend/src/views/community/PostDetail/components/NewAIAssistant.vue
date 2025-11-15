@@ -24,6 +24,7 @@
       :suggested-questions="suggestedQuestions"
       @send-message="handleSendMessage"
       @select-question="selectQuestion"
+      @context-toggle="handleContextToggle"
     />
 
     <!-- 错误提示 -->
@@ -74,6 +75,8 @@ const suggestedQuestions = ref([
   '能否举个例子说明？',
   '如何在实践中应用？',
 ])
+// Phase 3: 上下文模式状态
+const useArticleContext = ref(true)
 let messageBuffer = '' // 用于流式拼接消息
 
 // 添加消息到列表
@@ -294,6 +297,12 @@ const handleRefreshMessage = async (message) => {
 // 滚动到底部
 const onScrollToBottom = () => {
   messagePanelRef.value?.scrollToBottom()
+}
+
+// Phase 3: 处理上下文切换
+const handleContextToggle = (value) => {
+  useArticleContext.value = value
+  console.log(`[AI Assistant] Context mode: ${value ? '结合博文' : '自由对话'}`)
 }
 
 // 暴露给父组件
