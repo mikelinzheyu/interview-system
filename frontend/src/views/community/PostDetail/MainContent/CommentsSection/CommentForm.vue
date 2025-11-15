@@ -35,11 +35,12 @@
             v-model="content"
             type="textarea"
             :rows="8"
-            placeholder="写下你的评论... 支持 Markdown 格式 (Ctrl/Cmd + Enter 快速提交)"
+            placeholder="写下你的评论... 支持 Markdown 格式 (Ctrl/Cmd + Enter 快速提交，@mention 提及用户)"
             :maxlength="2000"
             show-word-limit
             @keydown.ctrl.enter="handleKeyboardSubmit"
             @keydown.meta.enter="handleKeyboardSubmit"
+            @input="handleMentionInput"
             class="editor-textarea"
           />
 
@@ -99,6 +100,16 @@
         </div>
       </div>
 
+      <!-- @mention 下拉菜单 -->
+      <MentionDropdown
+        :show="showMentionList"
+        :suggestions="mentionedUsers"
+        :position="mentionDropdownPosition"
+        :query="mentionQuery"
+        @select="handleMentionSelect"
+        @close="showMentionList = false"
+      />
+
       <!-- 操作按钮 -->
       <div class="form-actions">
         <el-button @click="handleReset">清空</el-button>
@@ -116,7 +127,9 @@ import { ElMessage } from 'element-plus'
 import { EditPen, Edit, Link, Cpu, List, DocumentCopy, Picture } from '@element-plus/icons-vue'
 import MarkdownPreview from './MarkdownPreview.vue'
 import EmojiPicker from '@/components/EmojiPicker.vue'
+import MentionDropdown from '@/components/MentionDropdown.vue'
 import { useDraft } from '@/composables/useDraft'
+import { useMentions } from '@/composables/useMentions'
 
 const props = defineProps({
   postId: {
@@ -132,6 +145,20 @@ const { content, lastSaveTime, clearDraft: clearDraftFromStorage } = useDraft(`c
 
 const submitting = ref(false)
 const textareaRef = ref(null)
+
+// 使用 @mention 功能
+const {
+  mentionQuery,
+  mentionedUsers,
+  showMentionList,
+  mentionStartPos,
+  searchUsers,
+  selectMention,
+  clearMentions
+} = useMentions()
+
+// Mention 下拉菜单位置
+const mentionDropdownPosition = ref({ top: 0, left: 0 })
 
 const insertMarkdown = (before, after, placeholder) => {
   const textarea = document.querySelector('.comment-form-container textarea')
@@ -168,6 +195,65 @@ const insertEmoji = (emoji) => {
     const cursorPos = start + emoji.length
     textarea.setSelectionRange(cursorPos, cursorPos)
   }, 0)
+}
+
+// 处理 @mention 输入
+const handleMentionInput = (e) => {
+  const textarea = e.target
+  const cursorPos = textarea.selectionStart
+
+  // 检测 @ 符号并搜索用户
+  searchUsers(content.value)
+
+  // 如果找到 @ 符号，计算下拉菜单位置
+  if (mentionStartPos.value !== null && mentionStartPos.value !== -1) {
+    // 使用 setTimeout 确保 textarea 已更新
+    setTimeout(() => {
+      const textareaRect = textarea.getBoundingClientRect()
+      const container = document.querySelector('.comment-form-container')
+      const containerRect = container?.getBoundingClientRect() || { top: 0, left: 0 }
+
+      // 计算光标位置
+      const clone = textarea.cloneNode()
+      clone.style.visibility = 'hidden'
+      clone.style.position = 'absolute'
+      clone.style.height = 'auto'
+      clone.style.width = 'auto'
+      clone.style.whiteSpace = 'pre-wrap'
+      clone.textContent = content.value.substring(0, mentionStartPos.value)
+
+      // 获取行高和行宽的近似值
+      const lineHeight = parseInt(window.getComputedStyle(textarea).lineHeight)
+      const lines = content.value.substring(0, mentionStartPos.value).split('\n').length
+
+      mentionDropdownPosition.value = {
+        top: textareaRect.top - containerRect.top + (lines - 1) * lineHeight + lineHeight + 8,
+        left: textareaRect.left - containerRect.left + 16
+      }
+    }, 0)
+  }
+}
+
+// 处理 mention 用户选择
+const handleMentionSelect = (user) => {
+  const beforeMention = content.value.substring(0, mentionStartPos.value)
+  const afterMention = content.value.substring(mentionStartPos.value + mentionQuery.value.length + 1)
+
+  // 替换为 @username
+  content.value = beforeMention + '@' + user.username + ' ' + afterMention
+
+  // 隐藏下拉菜单
+  showMentionList.value = false
+
+  // 聚焦 textarea
+  const textarea = document.querySelector('.comment-form-container textarea')
+  if (textarea) {
+    const newCursorPos = beforeMention.length + user.username.length + 2
+    setTimeout(() => {
+      textarea.focus()
+      textarea.setSelectionRange(newCursorPos, newCursorPos)
+    }, 0)
+  }
 }
 
 const handleSubmit = async () => {
