@@ -720,6 +720,115 @@ class CommunityController {
           comments: []
         },
         {
+          id: 15,
+          title: '前端面试题解析：Vue 3 Composition API 最佳实践',
+          content: `# Vue 3 Composition API 最佳实践
+
+## 什么是 Composition API？
+
+Vue 3 引入的 Composition API 是一种新的方式来编织组件的逻辑。相比 Options API，它提供更好的代码复用性和更灵活的代码组织方式。
+
+## 核心概念
+
+### 1. ref 和 reactive
+
+\`\`\`javascript
+import { ref, reactive } from 'vue'
+
+// 基本值使用 ref
+const count = ref(0)
+
+// 对象使用 reactive
+const state = reactive({
+  name: 'John',
+  age: 30
+})
+\`\`\`
+
+### 2. computed 和 watch
+
+\`\`\`javascript
+import { computed, watch } from 'vue'
+
+// computed：依赖追踪的计算属性
+const fullName = computed(() => {
+  return state.firstName + ' ' + state.lastName
+})
+
+// watch：侦听响应式数据的变化
+watch(() => state.name, (newVal, oldVal) => {
+  console.log(\`Name changed from \${oldVal} to \${newVal}\`)
+})
+\`\`\`
+
+### 3. 生命周期钩子
+
+在 Composition API 中，所有生命周期钩子前缀都是 \`on\`：
+
+\`\`\`javascript
+import { onMounted, onUnmounted } from 'vue'
+
+onMounted(() => {
+  console.log('Component mounted')
+})
+
+onUnmounted(() => {
+  console.log('Component unmounted')
+})
+\`\`\`
+
+## 最佳实践
+
+### 1. 使用 composables 复用逻辑
+
+\`\`\`javascript
+// useCounter.js
+import { ref } from 'vue'
+
+export function useCounter() {
+  const count = ref(0)
+
+  const increment = () => count.value++
+  const decrement = () => count.value--
+
+  return { count, increment, decrement }
+}
+\`\`\`
+
+### 2. 合理组织代码
+
+- 相关的响应式数据和方法应该放在一起
+- 使用 composables 来提高代码复用性
+- 保持组件代码简洁易读
+
+### 3. 性能优化
+
+- 使用 \`computed\` 而不是在模板中进行复杂计算
+- 使用 \`reactive\` 代替多个 \`ref\` 来管理相关的状态
+- 使用 \`shallowRef\` 和 \`shallowReactive\` 来优化大型数据结构
+
+## 常见问题
+
+Q: 何时使用 ref vs reactive？
+A: 对于基本数据类型使用 ref，对于复杂对象使用 reactive。
+
+Q: 为什么我的 watch 没有触发？
+A: 确保依赖是响应式的，使用 getter 函数或 immediate 选项。
+
+## 总结
+
+Composition API 提供了更强大和灵活的方式来组织组件逻辑。掌握它的核心概念和最佳实践，将大大提高您的开发效率。`,
+          category: 'frontend',
+          tags: ['Vue', 'Composition API', '最佳实践', '面试题'],
+          authorId: 1,
+          authorName: 'user_1',
+          createdAt: '2025-11-12T10:00:00Z',
+          updatedAt: '2025-11-12T10:00:00Z',
+          views: 1200,
+          likes: 85,
+          comments: []
+        },
+        {
           id: 20,
           title: '【Linux】【操作】Linux操作集锦系列之十五——如何破解pdf、doc、zip、rar等密码',
           content: `# Linux 系统密码破解指南
