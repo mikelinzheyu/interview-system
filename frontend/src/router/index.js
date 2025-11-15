@@ -218,7 +218,7 @@ const routes = [
   {
     path: '/community/posts/:id',
     name: 'PostDetail',
-    component: () => import('@/views/community/PostDetail.vue'),
+    component: () => import('@/views/community/NewPostDetail.vue'),
     meta: { requiresAuth: true },
     props: true
   },

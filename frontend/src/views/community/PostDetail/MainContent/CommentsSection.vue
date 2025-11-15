@@ -9,6 +9,31 @@
       </el-select>
     </div>
 
+    <!-- 错误提示 -->
+    <div v-if="error" class="error-container">
+      <el-alert
+        :title="error"
+        type="error"
+        :closable="true"
+        show-icon
+        @close="error = null"
+      >
+        <template #default>
+          {{ error }}
+          <el-button
+            v-if="isOnline"
+            link
+            type="primary"
+            size="small"
+            @click="handleRetry"
+            style="margin-left: 12px;"
+          >
+            重试
+          </el-button>
+        </template>
+      </el-alert>
+    </div>
+
     <!-- 评论表单 -->
     <CommentForm :post-id="postId" @submit="handleCommentSubmit" />
 
@@ -35,6 +60,7 @@ import { ref, defineProps, computed, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import CommentForm from './CommentsSection/CommentForm.vue'
 import CommentList from './CommentsSection/CommentList.vue'
+import { useNetworkStatus } from '@/composables/useNetworkStatus'
 
 const props = defineProps({
   postId: {
@@ -47,6 +73,9 @@ const props = defineProps({
   },
 })
 
+// 网络状态监测
+const { isOnline } = useNetworkStatus()
+
 const loading = ref(false)
 const comments = ref([])
 const sortBy = ref('latest')
@@ -54,6 +83,8 @@ const totalComments = ref(0)
 const pageSize = 20
 const currentPage = ref(1)
 const hasMore = ref(false)
+const error = ref(null)
+const lastCommentData = ref(null) // 保存最后的评论数据，用于重试
 
 // 排序评论
 const sortedComments = computed(() => {
@@ -71,6 +102,16 @@ const sortedComments = computed(() => {
 })
 
 const handleCommentSubmit = async (commentData) => {
+  // 检查网络连接
+  if (!isOnline.value) {
+    error.value = '网络连接已断开，无法提交评论。请检查网络后重试。'
+    lastCommentData.value = commentData
+    return
+  }
+
+  error.value = null
+  lastCommentData.value = commentData
+
   try {
     // 添加到列表
     const newComment = {
@@ -84,9 +125,29 @@ const handleCommentSubmit = async (commentData) => {
     comments.value.unshift(newComment)
     totalComments.value++
     ElMessage.success('评论发表成功')
-  } catch (error) {
-    ElMessage.error('评论发表失败')
+    lastCommentData.value = null // 清空重试数据
+  } catch (err) {
+    error.value = '发表评论失败，请检查网络后重试'
+    console.error('Failed to submit comment:', err)
   }
+}
+
+/**
+ * 重试提交评论
+ */
+const handleRetry = () => {
+  if (!lastCommentData.value) {
+    ElMessage.warning('没有需要重试的评论数据')
+    return
+  }
+
+  if (!isOnline.value) {
+    error.value = '网络仍然未连接，请等待网络恢复'
+    return
+  }
+
+  error.value = null
+  handleCommentSubmit(lastCommentData.value)
 }
 
 const handleReply = async (data) => {
@@ -151,6 +212,20 @@ onMounted(() => {
 .comments-section {
   padding-top: 32px;
   border-top: 2px solid #f0f0f0;
+
+  // 错误提示
+  .error-container {
+    margin-bottom: 20px;
+
+    :deep(.el-alert) {
+      padding: 12px 16px;
+
+      .el-alert__content {
+        display: flex;
+        align-items: center;
+      }
+    }
+  }
 
   .section-header {
     display: flex;

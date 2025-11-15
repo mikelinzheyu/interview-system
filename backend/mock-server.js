@@ -1669,6 +1669,105 @@ const mockData = {
       aiReviewScore: 0.85,
       createdAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
       updatedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString()
+    },
+    {
+      id: 6,
+      slug: 'hot-1',
+      forumId: 1,
+      userId: 1,
+      username: 'vue_master',
+      userAvatar: 'https://cube.elemecdn.com/9/bc/1f819d1c9892da3de9a88e3c7a6fejpeg.jpeg',
+      title: 'Vue 3 性能优化的完整指南',
+      content: `# Vue 3 性能优化的完整指南
+
+## 为什么需要性能优化
+Vue 3 的组合式 API 让我们可以快速堆叠能力，但如果忽视性能，丰富的交互就会变成负担。
+
+### 关键指标
+- 首屏渲染 (FMP)
+- 交互延迟 (TTI)
+- 持续内存占用
+
+## 编译期优化策略
+### 善用 \`<script setup>\`
+组合式 API 可以让 Tree-Shaking 更有效，组件运行时代码体积也能保持更小。
+
+### 静态提升与内联事件
+确保静态内容在模板编译阶段被提升，只渲染一次即可。
+
+## 运行时优化技巧
+### 拆分响应式状态
+把大型对象拆成多个 ref，避免每次修改都触发整棵依赖树更新。
+
+### 合理使用 watchEffect
+在复杂副作用里，使用 \`watch\` 并设置 \`flush: 'post'\`，把计算放到 DOM 更新之后。
+
+## 监控与排查
+结合 Vue Devtools 性能面板与 Chrome Performance，配合 Web Vitals 追踪真实用户数据。
+
+## 总结
+性能优化没有银弹，建立持续的监控和回归基准，才能在版本迭代中保持敏捷表现。`,
+      contentType: 'markdown',
+      tags: ['Vue3', '性能优化', '前端架构'],
+      isPinned: true,
+      isLocked: false,
+      viewCount: 15200,
+      likeCount: 823,
+      commentCount: 42,
+      status: 'approved',
+      aiReviewScore: 0.97,
+      createdAt: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString(),
+      updatedAt: new Date(Date.now() - 12 * 24 * 60 * 60 * 1000).toISOString(),
+      author: {
+        id: 'author-vue-master',
+        name: '进击的前端人',
+        avatar: 'https://cube.elemecdn.com/0/88/ff94d3c6d86f60cbe2e86151d6a5cda1.png',
+        bio: 'Vue 性能优化布道师 · 前端架构师',
+        title: '高级前端工程师',
+        level: '专家作者',
+        followerCount: 9800,
+        articleCount: 68,
+        likeCount: 128000,
+        viewCount: 1200000
+      }
+    },
+    {
+      id: 20,
+      forumId: 3,
+      userId: 1,
+      username: 'testuser',
+      userAvatar: 'https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png',
+      title: '【Linux】【操作】Linux操作集锦系列之十五——如何安全管理加密文件',
+      content: `# Linux 加密文件管理指南
+
+本篇作为 Linux 操作集锦系列的一部分，重点介绍如何在日常工作中安全地管理和备份加密文件，而不是尝试绕过或破解他人设置的安全措施。
+
+## 适用场景
+
+- 自己创建的文档、压缩包等需要长期保存
+- 希望防止误删或遗忘密码导致的重要数据丢失
+
+## 安全建议
+
+1. 使用合规工具创建加密文件，并妥善保存密码或密钥
+2. 为重要资料做好多地备份，避免单点故障
+3. 定期检查备份是否可用，防止误操作或介质损坏
+4. 严格遵守公司和法律法规要求，不对非授权数据进行任何“破解”尝试
+
+## 总结
+
+合理使用加密与备份，可以在确保数据安全的前提下，降低遗忘密码、设备故障等带来的风险。请始终在合法、合规的前提下使用相关工具与技术。`,
+      contentType: 'markdown',
+      tags: ['linux', '加密', '备份', '安全'],
+      isPinned: false,
+      isLocked: false,
+      viewCount: 2400,
+      likeCount: 33,
+      commentCount: 0,
+      status: 'approved',
+      aiReviewScore: 0.9,
+      createdAt: '2025-11-09T10:00:00Z',
+      updatedAt: '2025-11-09T10:00:00Z'
     }
   ],
 
@@ -1744,7 +1843,7 @@ const mockData = {
   ],
 
   // 帖子ID计数器
-  postIdCounter: 6,
+  postIdCounter: 7,
   commentIdCounter: 4,
   reactionIdCounter: 4,
 
@@ -2428,6 +2527,32 @@ function mockAIReview(content) {
   if (content.includes('```')) score += 0.05 // 有代码块
 
   return Math.min(score, 1.0)
+}
+
+/**
+ * 根据帖子 ID 或 slug 定位真实数据
+ */
+function findPostByIdentifier(identifier) {
+  if (identifier === undefined || identifier === null) return null
+  const normalized = String(identifier).trim()
+  if (!normalized) return null
+
+  const numericId = Number(normalized)
+  if (!Number.isNaN(numericId)) {
+    const numericMatch = mockData.posts.find(
+      (post) => Number(post.id) === numericId
+    )
+    if (numericMatch) return numericMatch
+  }
+
+  return (
+    mockData.posts.find((post) => {
+      if (post.slug && post.slug.toLowerCase() === normalized.toLowerCase()) {
+        return true
+      }
+      return String(post.id) === normalized
+    }) || null
+  )
 }
 
 // ============ Dify API 调用函数 ============
@@ -7583,13 +7708,14 @@ const routes = {
   // 获取帖子详情
   'GET:/api/community/posts/:id': (req, res) => {
     const parsedUrl = url.parse(req.url, true)
-    const postId = parseInt(parsedUrl.pathname.split('/')[4])
-
-    const post = mockData.posts.find(p => p.id === postId)
+    const postParam = parsedUrl.pathname.split('/')[4]
+    const post = findPostByIdentifier(postParam)
     if (!post) {
       sendResponse(res, 404, null, '帖子不存在')
       return
     }
+
+    const postId = Number(post.id)
 
     // 增加浏览量
     post.viewCount++
@@ -7662,14 +7788,16 @@ const routes = {
   'POST:/api/community/posts/:id/comments': async (req, res) => {
     try {
       const parsedUrl = url.parse(req.url, true)
-      const postId = parseInt(parsedUrl.pathname.split('/')[4])
+      const postParam = parsedUrl.pathname.split('/')[4]
       const body = await parseJSONBody(req)
 
-      const post = mockData.posts.find(p => p.id === postId)
+      const post = findPostByIdentifier(postParam)
       if (!post) {
         sendResponse(res, 404, null, '帖子不存在')
         return
       }
+
+      const postId = Number(post.id)
 
       if (!body.content) {
         sendResponse(res, 400, null, '评论内容不能为空')
@@ -7706,13 +7834,15 @@ const routes = {
   // 点赞/取消点赞帖子
   'POST:/api/community/posts/:id/like': async (req, res) => {
     const parsedUrl = url.parse(req.url, true)
-    const postId = parseInt(parsedUrl.pathname.split('/')[4])
+    const postParam = parsedUrl.pathname.split('/')[4]
 
-    const post = mockData.posts.find(p => p.id === postId)
+    const post = findPostByIdentifier(postParam)
     if (!post) {
       sendResponse(res, 404, null, '帖子不存在')
       return
     }
+
+    const postId = Number(post.id)
 
     const userId = 1 // 当前用户
     const existingReaction = mockData.reactions.find(
@@ -7775,6 +7905,117 @@ const routes = {
       comment.likeCount++
       sendResponse(res, 200, { liked: true, likeCount: comment.likeCount }, '点赞成功')
     }
+  },
+
+  // 获取热门文章
+  'GET:/api/community/articles/hot': (req, res) => {
+    const parsedUrl = url.parse(req.url, true)
+    const limit = parseInt(parsedUrl.query.limit) || 5
+
+    // 返回热门文章模拟数据
+    const hotArticles = [
+      {
+        id: 1,
+        title: '如何优化代码性能',
+        content: '性能优化的10个技巧...',
+        category: 'performance',
+        views: 100,
+        likes: 15,
+        createdAt: '2025-11-05T10:00:00Z'
+      },
+      {
+        id: 2,
+        title: '现代 JavaScript 最佳实践',
+        content: '2025 年 JavaScript 开发指南...',
+        category: 'javascript',
+        views: 80,
+        likes: 12,
+        createdAt: '2025-11-08T10:00:00Z'
+      },
+      {
+        id: 3,
+        title: 'React 18 新特性深度解析',
+        content: 'React 18 带来的主要改进...',
+        category: 'react',
+        views: 75,
+        likes: 10,
+        createdAt: '2025-11-09T10:00:00Z'
+      },
+      {
+        id: 4,
+        title: 'Web 性能监控最佳实践',
+        content: '如何监控网站性能...',
+        category: 'performance',
+        views: 60,
+        likes: 8,
+        createdAt: '2025-11-10T10:00:00Z'
+      },
+      {
+        id: 5,
+        title: '前端安全知识总结',
+        content: 'XSS、CSRF 防护指南...',
+        category: 'security',
+        views: 55,
+        likes: 7,
+        createdAt: '2025-11-11T10:00:00Z'
+      }
+    ]
+
+    sendResponse(res, 200, hotArticles.slice(0, limit), '获取热门文章成功')
+  },
+
+  // 获取文章归档
+  'GET:/api/community/articles/archives': (req, res) => {
+    // 返回按月份分类的文章归档
+    const archives = [
+      {
+        month: '2025-11',
+        articles: [
+          { id: 1, title: '如何优化代码性能', date: '2025-11-05T10:00:00Z' },
+          { id: 2, title: '现代 JavaScript 最佳实践', date: '2025-11-08T10:00:00Z' },
+          { id: 3, title: 'React 18 新特性深度解析', date: '2025-11-09T10:00:00Z' },
+          { id: 4, title: 'Web 性能监控最佳实践', date: '2025-11-10T10:00:00Z' },
+          { id: 5, title: '前端安全知识总结', date: '2025-11-11T10:00:00Z' }
+        ],
+        count: 5
+      },
+      {
+        month: '2025-10',
+        articles: [
+          { id: 6, title: 'TypeScript 进阶指南', date: '2025-10-15T10:00:00Z' },
+          { id: 7, title: '微前端架构设计', date: '2025-10-20T10:00:00Z' }
+        ],
+        count: 2
+      }
+    ]
+
+    sendResponse(res, 200, archives, '获取文章归档成功')
+  },
+
+  // 获取帖子的相关内容/集合
+  'GET:/api/community/posts/:postId/collection': (req, res) => {
+    const postId = parseInt(req.params.postId)
+    const post = mockData.posts.find(p => p.id === postId)
+
+    if (!post) {
+      sendResponse(res, 404, null, '帖子不存在')
+      return
+    }
+
+    // 返回相关帖子和评论
+    const relatedPosts = mockData.posts
+      .filter(p => p.id !== postId && p.category === post.category)
+      .slice(0, 3)
+
+    const collection = {
+      postId,
+      post,
+      relatedPosts,
+      comments: post.comments || [],
+      total: (post.comments || []).length
+    }
+
+    sendResponse(res, 200, collection, '获取帖子集合成功')
   },
 
   // 获取热门标签

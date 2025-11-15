@@ -214,6 +214,36 @@ class CacheService {
   }
 
   /**
+   * 添加单条对话消息（增量式）
+   * @param {string} conversationId 对话 ID
+   * @param {Object} message 消息对象 {role, content, timestamp}
+   * @returns {Promise<boolean>} 是否成功
+   */
+  async appendChatMessage(conversationId, message) {
+    const key = this.prefixes.chat + conversationId;
+    if (!this.isConnected) {
+      return false;
+    }
+
+    try {
+      // 获取现有的对话历史
+      const messages = (await this.get(key)) || [];
+
+      // 添加新消息
+      messages.push(message);
+
+      // 保存更新后的历史
+      const expiresIn = 7 * 24 * 60 * 60; // 7 天
+      await this.client.setEx(key, expiresIn, JSON.stringify(messages));
+      logger.debug(`[Cache] Appended message to conversation ${conversationId}`);
+      return true;
+    } catch (error) {
+      logger.error(`[Cache] Append message error for ${conversationId}:`, error);
+      return false;
+    }
+  }
+
+  /**
    * 检查缓存是否存在
    * @param {string} key 缓存键
    * @returns {Promise<boolean>} 是否存在

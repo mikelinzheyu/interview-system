@@ -676,10 +676,474 @@ class CryptoController {
   }
 }
 
+/**
+ * 社区控制器 - 社区相关业务逻辑（帖子、文章、评论）
+ */
+class CommunityController {
+  constructor(mockData) {
+    this.mockData = mockData
+    this.initializeCommunityData()
+  }
+
+  /**
+   * 初始化社区数据
+   */
+  initializeCommunityData() {
+    if (!this.mockData.posts) {
+      this.mockData.posts = [
+        {
+          id: 1,
+          title: '欢迎来到社区',
+          content: '这是一个很好的开始！',
+          category: 'general',
+          tags: ['欢迎', '入门'],
+          authorId: 1,
+          authorName: 'user_1',
+          createdAt: '2025-11-10T10:00:00Z',
+          updatedAt: '2025-11-10T10:00:00Z',
+          views: 10,
+          likes: 2,
+          comments: []
+        },
+        {
+          id: 2,
+          title: '学习技术的最佳方式',
+          content: '通过实践和不断学习来提高技能',
+          category: 'tech',
+          tags: ['学习', '技术', '提升'],
+          authorId: 2,
+          authorName: 'user_2',
+          createdAt: '2025-11-11T10:00:00Z',
+          updatedAt: '2025-11-11T10:00:00Z',
+          views: 25,
+          likes: 5,
+          comments: []
+        },
+        {
+          id: 20,
+          title: '【Linux】【操作】Linux操作集锦系列之十五——如何破解pdf、doc、zip、rar等密码',
+          content: `# Linux 系统密码破解指南
+
+## 作者简介
+
+本文作者：**花神庙农**，拥有 20 年 Linux 系统运维经验。
+
+## 博文系列
+
+本文属于 **Linux技术系列**，该系列包含多篇深度技术文章。
+
+## 如何破解pdf、doc、zip、rar等密码
+
+如果您遗忘了这些加密文件的密码，可以使用专业工具进行破解。
+
+### john the ripper
+
+使用字典破解
+
+\`\`\`bash
+python office2john.py filename.docx > hash.txt
+john hash.txt
+\`\`\`
+
+### 破解word、excel
+
+\`\`\`bash
+python office2john.py filename.docx > hash.txt
+python office2john.py filename.xlsx > hash.txt
+\`\`\`
+
+### 破解pdf
+
+使用 john the ripper 破解 PDF 文件密码：
+
+\`\`\`bash
+pdf2john.pl encrypted.pdf > hash.txt
+john hash.txt
+\`\`\`
+
+## 总结
+
+本文介绍了在 Linux 系统中破解常见加密文件的方法。请注意，这些工具仅用于合法用途，如找回自己遗忘的密码。`,
+          category: 'linux',
+          tags: ['linux', 'pdf', '破解', 'zip', 'rar', 'doc', '密码'],
+          authorId: 1,
+          authorName: 'user_1',
+          createdAt: '2025-11-09T10:00:00Z',
+          updatedAt: '2025-11-09T10:00:00Z',
+          views: 2400,
+          likes: 33,
+          comments: []
+        }
+      ]
+      this.mockData.postIdCounter = 21
+    }
+
+    if (!this.mockData.articles) {
+      this.mockData.articles = [
+        {
+          id: 1,
+          title: 'Vue 3 性能优化的完整指南',
+          content: 'Vue 3 性能优化的10个技巧...',
+          category: 'performance',
+          views: 15200,
+          likes: 823,
+          createdAt: '2025-11-05T10:00:00Z'
+        },
+        {
+          id: 2,
+          title: 'React Hooks 最佳实践',
+          content: '2025 年 React Hooks 开发指南...',
+          category: 'javascript',
+          views: 12800,
+          likes: 756,
+          createdAt: '2025-11-08T10:00:00Z'
+        },
+        {
+          id: 3,
+          title: 'TypeScript 进阶技巧',
+          content: 'TypeScript 高级特性介绍...',
+          category: 'javascript',
+          views: 9800,
+          likes: 542,
+          createdAt: '2025-11-04T10:00:00Z'
+        },
+        {
+          id: 4,
+          title: 'Webpack 5 配置详解',
+          content: '现代化的模块打包器配置...',
+          category: 'performance',
+          views: 7600,
+          likes: 432,
+          createdAt: '2025-11-03T10:00:00Z'
+        },
+        {
+          id: 5,
+          title: 'Node.js 性能优化',
+          content: 'Node.js 应用优化最佳实践...',
+          category: 'nodejs',
+          views: 6500,
+          likes: 389,
+          createdAt: '2025-11-02T10:00:00Z'
+        }
+      ]
+      this.mockData.articleIdCounter = 6
+    }
+
+    if (!this.mockData.comments) {
+      this.mockData.comments = []
+      this.mockData.commentIdCounter = 1
+    }
+  }
+
+  /**
+   * 获取所有帖子
+   */
+  getPosts(skip = 0, limit = 20, category = null, search = null) {
+    let posts = this.mockData.posts || []
+
+    // 按分类筛选
+    if (category) {
+      posts = posts.filter(p => p.category === category)
+    }
+
+    // 按搜索关键词筛选
+    if (search) {
+      const searchLower = search.toLowerCase()
+      posts = posts.filter(p =>
+        p.title.toLowerCase().includes(searchLower) ||
+        p.content.toLowerCase().includes(searchLower)
+      )
+    }
+
+    // 分页
+    const total = posts.length
+    posts = posts.slice(skip, skip + limit)
+
+    return {
+      posts,
+      total,
+      skip,
+      limit
+    }
+  }
+
+  /**
+   * 创建帖子
+   */
+  createPost(data) {
+    const post = {
+      id: this.mockData.postIdCounter || 1,
+      ...data,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      views: 0,
+      likes: 0,
+      comments: []
+    }
+
+    if (!this.mockData.posts) {
+      this.mockData.posts = []
+    }
+
+    this.mockData.posts.push(post)
+    this.mockData.postIdCounter = (this.mockData.postIdCounter || 1) + 1
+
+    return post
+  }
+
+  /**
+   * 获取单个帖子
+   */
+  getPost(postId) {
+    if (!this.mockData.posts) {
+      return null
+    }
+
+    const post = this.mockData.posts.find(p => p.id === postId)
+    if (post) {
+      post.views = (post.views || 0) + 1
+    }
+    return post
+  }
+
+  /**
+   * 更新帖子
+   */
+  updatePost(postId, data) {
+    if (!this.mockData.posts) {
+      return null
+    }
+
+    const post = this.mockData.posts.find(p => p.id === postId)
+    if (!post) {
+      return null
+    }
+
+    Object.assign(post, data, {
+      updatedAt: new Date().toISOString()
+    })
+
+    return post
+  }
+
+  /**
+   * 删除帖子
+   */
+  deletePost(postId) {
+    if (!this.mockData.posts) {
+      return false
+    }
+
+    const index = this.mockData.posts.findIndex(p => p.id === postId)
+    if (index === -1) {
+      return false
+    }
+
+    this.mockData.posts.splice(index, 1)
+    return true
+  }
+
+  /**
+   * 获取帖子的相关内容/集合
+   */
+  getPostCollection(postId) {
+    const post = this.getPost(postId)
+    if (!post) {
+      return null
+    }
+
+    return {
+      postId,
+      post,
+      relatedPosts: this.mockData.posts?.filter(p =>
+        p.id !== postId && p.category === post.category
+      ).slice(0, 3) || [],
+      comments: post.comments || [],
+      total: (post.comments || []).length
+    }
+  }
+
+  /**
+   * 获取热门文章
+   */
+  getHotArticles(limit = 5) {
+    if (!this.mockData.articles) {
+      return []
+    }
+
+    return this.mockData.articles
+      .sort((a, b) => (b.likes || 0) - (a.likes || 0))
+      .slice(0, limit)
+  }
+
+  /**
+   * 获取文章归档
+   */
+  getArticleArchives() {
+    if (!this.mockData.articles) {
+      return []
+    }
+
+    const archives = {}
+    this.mockData.articles.forEach(article => {
+      const date = new Date(article.createdAt)
+      const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`
+
+      if (!archives[monthKey]) {
+        archives[monthKey] = []
+      }
+      archives[monthKey].push({
+        id: article.id,
+        title: article.title,
+        date: article.createdAt
+      })
+    })
+
+    return Object.entries(archives).map(([month, articles]) => ({
+      month,
+      articles,
+      count: articles.length
+    }))
+  }
+
+  /**
+   * 获取所有文章
+   */
+  getArticles(skip = 0, limit = 20, category = null, search = null) {
+    let articles = this.mockData.articles || []
+
+    if (category) {
+      articles = articles.filter(a => a.category === category)
+    }
+
+    if (search) {
+      const searchLower = search.toLowerCase()
+      articles = articles.filter(a =>
+        a.title.toLowerCase().includes(searchLower) ||
+        a.content.toLowerCase().includes(searchLower)
+      )
+    }
+
+    const total = articles.length
+    articles = articles.slice(skip, skip + limit)
+
+    return {
+      articles,
+      total,
+      skip,
+      limit
+    }
+  }
+
+  /**
+   * 获取帖子评论
+   */
+  getPostComments(postId, skip = 0, limit = 20) {
+    const post = this.mockData.posts?.find(p => p.id === postId)
+    if (!post) {
+      return { comments: [], total: 0 }
+    }
+
+    const comments = post.comments || []
+    const total = comments.length
+    const paginatedComments = comments.slice(skip, skip + limit)
+
+    return {
+      comments: paginatedComments,
+      total,
+      skip,
+      limit
+    }
+  }
+
+  /**
+   * 添加评论
+   */
+  addComment(data) {
+    if (!this.mockData.posts) {
+      return null
+    }
+
+    const post = this.mockData.posts.find(p => p.id === data.postId)
+    if (!post) {
+      return null
+    }
+
+    const comment = {
+      id: this.mockData.commentIdCounter || 1,
+      ...data,
+      createdAt: new Date().toISOString(),
+      likes: 0
+    }
+
+    if (!post.comments) {
+      post.comments = []
+    }
+
+    post.comments.push(comment)
+    this.mockData.commentIdCounter = (this.mockData.commentIdCounter || 1) + 1
+
+    return comment
+  }
+
+  /**
+   * 点赞帖子
+   */
+  likePost(postId, userId) {
+    const post = this.getPost(postId)
+    if (!post) {
+      return null
+    }
+
+    if (!post.likedBy) {
+      post.likedBy = []
+    }
+
+    if (!post.likedBy.includes(userId)) {
+      post.likedBy.push(userId)
+      post.likes = (post.likes || 0) + 1
+    }
+
+    return {
+      postId,
+      userId,
+      likes: post.likes,
+      liked: true
+    }
+  }
+
+  /**
+   * 取消点赞
+   */
+  unlikePost(postId, userId) {
+    const post = this.getPost(postId)
+    if (!post) {
+      return null
+    }
+
+    if (!post.likedBy) {
+      post.likedBy = []
+    }
+
+    const index = post.likedBy.indexOf(userId)
+    if (index !== -1) {
+      post.likedBy.splice(index, 1)
+      post.likes = Math.max(0, (post.likes || 1) - 1)
+    }
+
+    return {
+      postId,
+      userId,
+      likes: post.likes,
+      liked: false
+    }
+  }
+}
+
 module.exports = {
   ChannelController,
   MessageController,
   PermissionController,
   UserController,
-  CryptoController
-}
+  CryptoController,
+  CommunityController

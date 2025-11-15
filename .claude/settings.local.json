@@ -1,25 +1,7 @@
 {
   "permissions": {
     "allow": [
-      "Bash(where node)",
-      "Bash(netstat:*)",
-      "Bash(findstr:*)",
-      "Bash(curl:*)",
-      "Bash(taskkill:*)",
-      "Bash(powershell:*)",
-      "Bash(cat:*)",
-      "Bash(timeout 15 node:*)",
-      "Bash(timeout 20 node:*)",
-      "Bash(lsof:*)",
-      "Bash(xargs kill:*)",
-      "Bash(timeout 8 node:*)",
-      "Bash(timeout 10 head:*)",
-      "Bash(timeout 15 head:*)",
-      "Bash(timeout 20 head:*)",
-      "Bash(1 sleep 4 cd \"D:\\code7\\interview-system\\backend\")",
-      "Bash(timeout 5 curl:*)",
-      "Bash(git add:*)",
-      "Bash(git commit -m \"$(cat <<''EOF''\nfeat: Fix Dify Chat API event parser to handle ''message'' events\n\nThe Dify Chat API integration was returning real responses but the event parser\nwas not handling the ''message'' event type correctly. Updated the parser to:\n\n1. Handle ''message'' events from Dify Chat API (in addition to ''agent_message'')\n2. Properly extract conversation_id and message_id from event data\n3. Continue to support other event formats for backwards compatibility\n\nTesting Results:\n- API endpoint successfully returns streaming Dify Chat API responses\n- Real conversation IDs (UUIDs) are being generated and tracked\n- Content quality is high with comprehensive AI-generated explanations\n- Streaming works reliably without timeouts or content truncation\n- Backend logs confirm proper workflow routing and API integration\n\nFiles Modified:\n- backend/services/chatWorkflowService.js: Updated event parser\n\nThe Chat API integration is now fully functional and ready for production use.\nThe \"AI问答\" (AI Q&A) feature in the community forum posts now returns real,\ncomprehensive responses from Dify instead of mock data.\n\n🤖 Generated with Claude Code\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")"
+      "Bash(git add:*)"
     ],
     "deny": [],
     "ask": []

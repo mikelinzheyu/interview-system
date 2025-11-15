@@ -8,7 +8,8 @@ const {
   MessageController,
   PermissionController,
   UserController,
-  CryptoController
+  CryptoController,
+  CommunityController
 } = require('../controllers/index')
 
 // ============ 全局 MockData 对象 ============
@@ -39,7 +40,8 @@ function initializeControllers() {
     message: new MessageController(mockData),
     permission: new PermissionController(mockData),
     user: new UserController(mockData),
-    crypto: new CryptoController(mockData)
+    crypto: new CryptoController(mockData),
+    community: new CommunityController(mockData)
   }
 
   console.log('[DataService] 所有控制器已初始化')

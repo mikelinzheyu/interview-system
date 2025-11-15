@@ -9,6 +9,7 @@ const router = express.Router()
 const { getControllers } = require('../services/dataService')
 const { eventBridge } = require('../services/eventBridge')
 const aiRouter = require('./ai')
+const communityRouter = require('./community')
 
 // ==================== 工具函数 ====================
 
@@ -1359,6 +1360,12 @@ router.post('/dms/:dmId/messages', auth, (req, res) => {
 })
 
 // ==================== AI 工作流 API ====================
+
+/**
+ * 挂载社区路由
+ * 提供社区功能：帖子、文章、评论、点赞等
+ */
+router.use('/community', communityRouter)
 
 /**
  * 挂载 AI 路由

@@ -1,0 +1,194 @@
+/**
+ * 全局设计系统 - Design Tokens
+ * 参照CSDN博客风格设计
+ */
+
+:root {
+  /* ========== 颜色系统 ========== */
+
+  /* 主色 */
+  --color-primary: #fc5531;
+  --color-primary-light: #ff6b47;
+  --color-primary-dark: #e64a2e;
+
+  /* 文本颜色 */
+  --color-text-primary: #000000;
+  --color-text-secondary: #666666;
+  --color-text-tertiary: #999999;
+  --color-text-placeholder: #cccccc;
+
+  /* 背景颜色 */
+  --color-bg-page: #f5f6f7;
+  --color-bg-white: #ffffff;
+  --color-bg-gray: #f9fafb;
+  --color-bg-hover: #f0f0f0;
+
+  /* 边框颜色 */
+  --color-border-light: #f0f0f0;
+  --color-border-default: #e4e6eb;
+  --color-border-dark: #d0d0d0;
+
+  /* 链接颜色 */
+  --color-link: #c8473f;
+  --color-link-hover: #fc5531;
+
+  /* 标签颜色 */
+  --color-tag-bg: #f2f3f5;
+  --color-tag-text: #555666;
+  --color-tag-border: #e5e6eb;
+
+  /* 代码块颜色 */
+  --color-code-bg: #282c34;
+  --color-code-text: #abb2bf;
+  --color-code-header: #21252b;
+
+  /* 状态颜色 */
+  --color-success: #52c41a;
+  --color-warning: #faad14;
+  --color-error: #f5222d;
+  --color-info: #1890ff;
+
+  /* ========== 字体系统 ========== */
+  --font-family-base: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial,
+    'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
+  --font-family-code: 'Fira Code', 'Consolas', 'Monaco', 'Courier New', monospace;
+
+  /* 字体大小 */
+  --font-size-xs: 12px;
+  --font-size-sm: 13px;
+  --font-size-base: 14px;
+  --font-size-md: 16px;
+  --font-size-lg: 18px;
+  --font-size-xl: 20px;
+  --font-size-2xl: 24px;
+  --font-size-3xl: 32px;
+
+  /* 字重 */
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  /* 行高 */
+  --line-height-tight: 1.2;
+  --line-height-base: 1.5;
+  --line-height-relaxed: 1.75;
+  --line-height-loose: 2;
+
+  /* ========== 间距系统 ========== */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 12px;
+  --spacing-lg: 16px;
+  --spacing-xl: 20px;
+  --spacing-2xl: 24px;
+  --spacing-3xl: 32px;
+  --spacing-4xl: 40px;
+  --spacing-5xl: 48px;
+
+  /* ========== 圆角系统 ========== */
+  --radius-none: 0;
+  --radius-sm: 2px;
+  --radius-base: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-xl: 12px;
+  --radius-2xl: 16px;
+  --radius-full: 9999px;
+
+  /* ========== 阴影系统 ========== */
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+  --shadow-base: 0 2px 8px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+  --shadow-xl: 0 12px 32px rgba(0, 0, 0, 0.15);
+
+  /* ========== 过渡动画 ========== */
+  --transition-fast: 150ms ease-in-out;
+  --transition-base: 250ms ease-in-out;
+  --transition-slow: 350ms ease-in-out;
+
+  /* ========== 布局尺寸 ========== */
+  --layout-max-width: 1680px; /* 扩大整体页面可用宽度，避免压缩中间区域 */
+  --layout-content-width: 960px;
+  --layout-sidebar-width: 360px; /* 扩宽右侧栏，放大各卡片宽度 */
+  --layout-toc-width: 330px; /* 调整左侧小框宽度为 330px */
+  --layout-gap: 20px;
+
+  /* ========== Z-index 层级 ========== */
+  --z-index-dropdown: 1000;
+  --z-index-sticky: 1020;
+  --z-index-fixed: 1030;
+  --z-index-modal-backdrop: 1040;
+  --z-index-modal: 1050;
+  --z-index-popover: 1060;
+  --z-index-tooltip: 1070;
+}
+
+/* ========== 全局基础样式重置 ========== */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 14px;
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-base);
+  color: var(--color-text-primary);
+  background-color: var(--color-bg-page);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ========== 工具类 ========== */
+.text-primary {
+  color: var(--color-text-primary) !important;
+}
+
+.text-secondary {
+  color: var(--color-text-secondary) !important;
+}
+
+.text-tertiary {
+  color: var(--color-text-tertiary) !important;
+}
+
+.bg-white {
+  background-color: var(--color-bg-white) !important;
+}
+
+.bg-gray {
+  background-color: var(--color-bg-gray) !important;
+}
+
+.transition-all {
+  transition: all var(--transition-base);
+}
+
+/* ========== 滚动条样式 ========== */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-bg-gray);
+  border-radius: var(--radius-base);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-border-dark);
+  border-radius: var(--radius-base);
+
+  &:hover {
+    background: var(--color-text-tertiary);
+  }
+}

@@ -8,10 +8,29 @@ const https = require('https')
 
 class ChatWorkflowService {
   constructor() {
-    this.apiKey = process.env.DIFY_CHAT_API_KEY || 'app-LzqvkItq6QOd0PH2VwXL3P16'
+    this.apiKey = process.env.DIFY_CHAT_API_KEY || 'app-Bj1UccX9v9X1aw6st7OW5paG'
     this.appId = process.env.DIFY_CHAT_APP_ID || 'NF8mUftOYiGfQEzE'
     this.baseURL = process.env.DIFY_API_URL || 'https://api.dify.ai/v1'
     this.isConfigured = !!(this.apiKey && this.appId)
+
+    // 增强的配置日志
+    console.log('\n========== Dify Chat API 配置信息 ==========')
+    if (this.isConfigured) {
+      console.log('✅ 状态: Dify API 已配置')
+      console.log(`   API Key: ${this.apiKey.substring(0, 15)}...${this.apiKey.substring(this.apiKey.length - 5)}`)
+      console.log(`   App ID: ${this.appId}`)
+      console.log(`   Base URL: ${this.baseURL}`)
+      console.log('   ⚡ 将使用 Dify API 进行实时对话')
+    } else {
+      console.log('❌ 状态: Dify API 未配置')
+      console.log('   原因: API Key 或 App ID 缺失')
+      console.log('\n   ⚠️  将使用 Mock 模式代替')
+      console.log('\n   💡 要启用 Dify API，请设置以下环境变量:')
+      console.log('      DIFY_CHAT_API_KEY=app-Bj1UccX9v9X1aw6st7OW5paG')
+      console.log('      DIFY_CHAT_APP_ID=NF8mUftOYiGfQEzE')
+      console.log('      DIFY_API_URL=https://api.dify.ai/v1')
+    }
+    console.log('==========================================\n')
   }
 
   /**
@@ -259,7 +278,56 @@ class ChatWorkflowService {
    * @returns {Boolean}
    */
   checkConfiguration() {
-    return this.isConfigured
+    // 强制返回 true 以进行测试，因为我们已在 .env 中配置了 API Key
+    if (this.apiKey && this.appId && this.apiKey !== 'undefined' && this.appId !== 'undefined') {
+      return true
+    }
+    // 如果没有配置，返回 false
+    return false
+  }
+
+  /**
+   * 测试 Dify API 连接
+   * @returns {Promise<Object>} {success: boolean, message: string}
+   */
+  async testConnection() {
+    if (!this.isConfigured) {
+      return {
+        success: false,
+        message: 'API 未配置',
+      }
+    }
+
+    try {
+      console.log('[ChatWorkflow] 开始测试 Dify API 连接...')
+
+      const testPayload = {
+        inputs: { article_content: '测试连接' },
+        query: '你好',
+        response_mode: 'blocking',
+        user: 'test-user',
+      }
+
+      const response = await this._callDifyAPIBlocking(
+        `${this.baseURL}/chat-messages`,
+        testPayload,
+        'POST'
+      )
+
+      console.log('[ChatWorkflow] ✅ Dify API 连接成功!')
+      return {
+        success: true,
+        message: 'Dify API 连接正常',
+        data: response,
+      }
+    } catch (error) {
+      console.error('[ChatWorkflow] ❌ Dify API 连接失败:', error.message)
+      return {
+        success: false,
+        message: `Dify API 连接失败: ${error.message}`,
+        error: error,
+      }
+    }
   }
 
   /**

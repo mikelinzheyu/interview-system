@@ -82,11 +82,25 @@ export const buildApiUrl = (path = '') => {
 }
 
 export const getWebSocketBaseUrl = () => {
-  const envWsValue = import.meta?.env?.VITE_WS_BASE_URL?.trim()
-  if (envWsValue) {
+  const env = import.meta?.env
+
+  // 1) 如果显式配置了 WebSocket 地址且不为 auto，则优先使用
+  const rawWsEnv = env?.VITE_WS_BASE_URL
+  const envWsValue = rawWsEnv && rawWsEnv.trim()
+  if (envWsValue && envWsValue !== 'auto') {
     return stripTrailingSlash(envWsValue)
   }
 
+  // 2) 本地开发场景：优先使用当前前端页面所在的 host
+  //    这样 WebSocket 走 Vite 的 /socket.io 代理，避免直接连 3001 端口被防火墙/安全软件拦截
+  const mode = env?.MODE || env?.VITE_APP_ENV
+  if (typeof window !== 'undefined' && (mode === 'development' || mode === 'dev')) {
+    const isSecure = window.location.protocol === 'https:'
+    const protocol = isSecure ? 'wss:' : 'ws:'
+    return `${protocol}//${window.location.host}`
+  }
+
+  // 3) 其他环境：从 API_BASE_COMPONENTS 推导后端地址
   const { origin } = API_BASE_COMPONENTS
 
   if (origin) {
@@ -95,6 +109,6 @@ export const getWebSocketBaseUrl = () => {
     return `${protocol}//${url.host}`
   }
 
-  // Always use the backend URL from API_BASE_COMPONENTS or default
+  // 4) 最后兜底
   return 'ws://localhost:3001'
 }

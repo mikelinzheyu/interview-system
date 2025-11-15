@@ -68,64 +68,154 @@ export function useComments(postId) {
   }
 
   /**
-   * 发表评论
+   * 获取错误信息（分类处理）
+   * @param {Error} err - 错误对象
+   * @returns {string} 用户友好的错误信息
+   */
+  const getErrorMessage = (err) => {
+    const status = err.response?.status
+    const message = err.message || ''
+
+    // 网络相关错误
+    if (!navigator.onLine) {
+      return '网络连接已断开，请检查后重试'
+    }
+
+    if (message === 'Network Error' || err.code === 'ECONNABORTED') {
+      return '网络连接超时，系统已自动重试，请稍候'
+    }
+
+    // 请求超时
+    if (err.code === 'ECONNABORTED' || message.includes('timeout')) {
+      return '请求超时，请检查网络连接'
+    }
+
+    // HTTP 错误
+    if (status === 413) {
+      return '评论内容过长，请压缩后重试'
+    }
+
+    if (status === 429) {
+      return '您的操作过于频繁，请稍后再试'
+    }
+
+    if (status === 401 || status === 403) {
+      return '您的登录已过期，请重新登录'
+    }
+
+    if (status === 404) {
+      return '评论对象不存在'
+    }
+
+    if (status >= 500) {
+      return '服务器出错，请稍后重试'
+    }
+
+    // 默认错误
+    return err.message || '发表评论失败'
+  }
+
+  /**
+   * 检查错误是否可以重试
+   */
+  const isRetryableError = (err) => {
+    // 网络相关错误可以重试
+    if (!navigator.onLine) return true
+    if (err.message === 'Network Error') return true
+    if (err.code === 'ECONNABORTED') return true
+
+    // 服务器错误可以重试
+    const status = err.response?.status
+    if (status >= 500) return true
+    if (status === 408) return true // Request Timeout
+
+    return false
+  }
+
+  /**
+   * 发表评论（带自动重试）
    * @param {string} content - 评论内容
    * @param {string[]} mentions - @ 提及的用户 ID
+   * @param {number} maxRetries - 最多重试次数
    */
-  const submitComment = async (content, mentions = []) => {
+  const submitComment = async (content, mentions = [], maxRetries = 2) => {
     if (!content.trim()) {
       error.value = '评论内容不能为空'
       return false
     }
 
+    if (!navigator.onLine) {
+      error.value = '网络连接已断开，请检查后重试'
+      return false
+    }
+
     submitLoading.value = true
     error.value = null
+    let retryCount = 0
 
-    try {
-      const response = await communityAPI.createComment(postId, {
-        content: content.trim(),
-        mentions,
-        parentCommentId: replyingTo.value
-      })
+    const attemptSubmit = async () => {
+      try {
+        const response = await communityAPI.createComment(postId, {
+          content: content.trim(),
+          mentions,
+          parentCommentId: replyingTo.value
+        })
 
-      if (response.data) {
-        // 乐观更新：立即添加到列表
-        const newComment = {
-          ...response.data,
-          canEdit: true,
-          canDelete: true,
-          isLiked: false,
-          likeCount: 0,
-          replies: []
-        }
-
-        if (replyingTo.value) {
-          // 添加到父评论的回复列表
-          const parentComment = comments.value.find(c => c.id === replyingTo.value)
-          if (parentComment) {
-            if (!parentComment.replies) {
-              parentComment.replies = []
-            }
-            parentComment.replies.push(newComment)
+        if (response.data) {
+          // 乐观更新：立即添加到列表
+          const newComment = {
+            ...response.data,
+            canEdit: true,
+            canDelete: true,
+            isLiked: false,
+            likeCount: 0,
+            replies: []
           }
-        } else {
-          // 添加到顶级评论
-          comments.value.unshift(newComment)
-          totalComments.value++
+
+          if (replyingTo.value) {
+            // 添加到父评论的回复列表
+            const parentComment = comments.value.find(c => c.id === replyingTo.value)
+            if (parentComment) {
+              if (!parentComment.replies) {
+                parentComment.replies = []
+              }
+              parentComment.replies.push(newComment)
+            }
+          } else {
+            // 添加到顶级评论
+            comments.value.unshift(newComment)
+            totalComments.value++
+          }
+
+          // 重置表单
+          replyingTo.value = null
+
+          return true
+        }
+      } catch (err) {
+        // 检查是否可以重试
+        if (isRetryableError(err) && retryCount < maxRetries) {
+          retryCount++
+          // 指数退避：2s -> 4s
+          const delay = Math.pow(2, retryCount) * 1000
+          console.warn(
+            `[useComments] Retry attempt ${retryCount}/${maxRetries}, waiting ${delay}ms...`,
+            err
+          )
+          await new Promise(resolve => setTimeout(resolve, delay))
+          return attemptSubmit()
         }
 
-        // 重置表单
-        replyingTo.value = null
-
-        return true
+        // 不可重试或已达重试上限
+        error.value = getErrorMessage(err)
+        console.error('[useComments] Failed to submit comment:', err)
+        return false
       }
-    } catch (err) {
-      error.value = err.message || '发表评论失败'
-      console.error('Failed to submit comment:', err)
-      return false
-    } finally {
-      submitLoading.value = false
     }
+
+    const success = await attemptSubmit()
+    submitLoading.value = false
+    return success
   }
 
   /**
@@ -357,6 +447,7 @@ export function useComments(postId) {
     changePage,
     changePageSize,
     refresh,
+    getErrorMessage,
 
     // 工具
     canEdit,

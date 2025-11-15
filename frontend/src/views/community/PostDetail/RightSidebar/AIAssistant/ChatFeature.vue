@@ -47,6 +47,16 @@
         :disabled="isStreaming || isConnecting"
         @keydown.enter.prevent
       />
+      <el-button
+        class="floating-send"
+        circle
+        type="primary"
+        :disabled="!inputMessage.trim() || isStreaming || isConnecting"
+        @click="handleSendMessage"
+        aria-label="发送"
+      >
+        <el-icon><Promotion /></el-icon>
+      </el-button>
       <div class="input-actions">
         <span class="char-count">{{ inputMessage.length }}/500</span>
         <el-button
@@ -75,7 +85,7 @@
 <script setup>
 import { ref, defineProps, nextTick, computed, onUnmounted, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
-import { Loading } from '@element-plus/icons-vue'
+import { Loading, Promotion } from '@element-plus/icons-vue'
 
 const props = defineProps({
   articleContent: {
@@ -98,6 +108,68 @@ const error = ref(null)
 const messagesContainer = ref(null)
 let eventSource = null
 
+// 逐字输出相关变量
+const typeoutQueue = ref('') // 等待输出的文本队列
+const displaySpeed = ref(100) // 每个字符显示的延迟（毫秒），增大到100ms以看到更明显的效果
+let typeoutTimer = null
+let isProcessing = ref(false) // 标志是否正在处理
+
+/**
+ * 逐字输出效果处理函数
+ * 将文本逐个字符添加到显示内容中
+ */
+const processTypeout = () => {
+  isProcessing.value = true
+
+  if (typeoutQueue.value.length > 0) {
+    // 从队列中取出第一个字符
+    const char = typeoutQueue.value.charAt(0)
+    typeoutQueue.value = typeoutQueue.value.substring(1)
+
+    // 将字符添加到显示文本
+    streamingText.value += char
+
+    console.log(`[Typeout] 显示字符: "${char}" | 队列剩余: ${typeoutQueue.value.length} | 总输出: ${streamingText.value.length}`)
+
+    // 继续输出下一个字符
+    typeoutTimer = setTimeout(() => {
+      processTypeout()
+    }, displaySpeed.value)
+  } else {
+    // 队列为空，检查是否还在流式接收
+    isProcessing.value = false
+    if (!isStreaming.value && typeoutQueue.value.length === 0) {
+      // 流式接收已完成且队列为空
+      if (typeoutTimer) {
+        clearTimeout(typeoutTimer)
+        typeoutTimer = null
+      }
+      console.log('[Typeout] ✅ 逐字输出完成')
+    }
+  }
+
+  // 自动滚动
+  nextTick(() => {
+    scrollToBottom()
+  })
+}
+
+/**
+ * 将文本添加到逐字输出队列
+ */
+const addToTypeoutQueue = (text) => {
+  console.log(`[Typeout] 📝 添加到队列: "${text.substring(0, 50)}${text.length > 50 ? '...' : ''}" (长度: ${text.length})`)
+  typeoutQueue.value += text
+
+  // 如果没有正在进行的输出，启动输出过程
+  if (!typeoutTimer && !isProcessing.value) {
+    console.log('[Typeout] 🚀 启动逐字输出过程')
+    processTypeout()
+  } else {
+    console.log(`[Typeout] ⏳ 已在处理中，继续排队... (isProcessing: ${isProcessing.value}, hasTimer: ${!!typeoutTimer})`)
+  }
+}
+
 // 格式化时间
 const formatTime = () => {
   return new Date().toLocaleTimeString('zh-CN', {
@@ -114,7 +186,11 @@ const messageCharLimit = computed(() => inputMessage.value.length <= 500)
  * 加载对话历史（如果有之前的conversationId）
  */
 const loadConversationHistory = async () => {
-  if (!conversationId.value) return
+  // 如果没有 conversationId 或在初始化阶段，不加载
+  if (!conversationId.value || conversationId.value.startsWith('pending')) {
+    console.log('[ChatFeature] 跳过加载对话历史（无有效ID）')
+    return
+  }
 
   try {
     const baseURL = import.meta.env.VITE_API_BASE_URL || '/api'
@@ -123,15 +199,17 @@ const loadConversationHistory = async () => {
     const response = await fetch(url)
     if (response.ok) {
       const data = await response.json()
-      if (data.data && data.data.messages) {
+      if (data && data.length > 0) {
         // 加载历史消息
-        messages.value = data.data.messages.map(msg => ({
+        messages.value = data.map(msg => ({
           role: msg.role,
           text: msg.content,
           time: msg.timestamp ? new Date(msg.timestamp).toLocaleTimeString('zh-CN') : formatTime(),
         }))
         console.log(`[ChatFeature] 已加载 ${messages.value.length} 条历史消息`)
         nextTick(() => scrollToBottom())
+      } else {
+        console.log('[ChatFeature] 对话历史为空')
       }
     }
   } catch (err) {
@@ -180,6 +258,7 @@ const handleSendMessage = async () => {
   isStreaming.value = true
   isConnecting.value = true
   streamingText.value = ''
+  typeoutQueue.value = ''
   error.value = null
 
   await nextTick()
@@ -199,7 +278,7 @@ const handleSendMessage = async () => {
     const baseURL = import.meta.env.VITE_API_BASE_URL || '/api'
     const url = `${baseURL}/ai/chat/stream?${params.toString()}`
 
-    console.log('[ChatFeature] 发送消息 - URL:', url, 'postId:', props.postId)
+    console.log('[ChatFeature] 发送消息 - URL:', url, 'postId:', props.postId, '当前conversationId:', conversationId.value)
 
     // 创建 EventSource 连接
     eventSource = new EventSource(url)
@@ -207,6 +286,7 @@ const handleSendMessage = async () => {
     // 连接打开
     eventSource.onopen = () => {
       isConnecting.value = false
+      console.log('[ChatFeature] EventSource 连接已打开')
     }
 
     // 处理消息
@@ -219,25 +299,48 @@ const handleSendMessage = async () => {
           // 流式内容块 - Dify Chat API 格式
           const content = data.content || data.answer || ''
           if (content) {
-            streamingText.value += content
-            scrollToBottom()
+            console.log(`[ChatFeature] 接收到内容块，长度: ${content.length}`)
+            // 使用逐字输出而不是直接追加
+            addToTypeoutQueue(content)
           }
         } else if (data.type === 'end') {
           // 对话结束 - 保存对话 ID
+          console.log('[ChatFeature] 收到对话结束信号')
           if (data.conversationId) {
+            const oldConversationId = conversationId.value
             conversationId.value = data.conversationId
-            console.log('[ChatFeature] 对话 ID 已保存:', data.conversationId)
+            console.log('[ChatFeature] 对话 ID 已保存:', data.conversationId, '(旧ID:', oldConversationId, ')')
+
+            // 加载对话历史以确保显示完整的对话
+            if (oldConversationId !== data.conversationId) {
+              loadConversationHistory()
+            }
           }
-          // 将完整响应保存到历史
-          if (streamingText.value) {
-            messages.value.push({
-              role: 'assistant',
-              text: streamingText.value,
-              time: formatTime(),
-            })
+          // 标记流式接收已完成
+          isStreaming.value = false
+          console.log('[ChatFeature] 将完整响应保存到历史')
+
+          // 等待逐字输出完成后再保存消息
+          const checkCompletion = () => {
+            if (typeoutQueue.value.length === 0 && !typeoutTimer) {
+              // 逐字输出已完成，保存消息
+              if (streamingText.value) {
+                messages.value.push({
+                  role: 'assistant',
+                  text: streamingText.value,
+                  time: formatTime(),
+                })
+              }
+              streamingText.value = ''
+              typeoutQueue.value = ''
+              scrollToBottom()
+              console.log('[ChatFeature] 消息已保存到历史')
+            } else {
+              // 还在输出中，继续等待
+              setTimeout(checkCompletion, 100)
+            }
           }
-          streamingText.value = ''
-          scrollToBottom()
+          checkCompletion()
         } else if (data.type === 'error') {
           // 错误响应
           error.value = data.error || '发生错误，请重试'
@@ -254,6 +357,11 @@ const handleSendMessage = async () => {
       error.value = '连接错误，请重试'
       isStreaming.value = false
       isConnecting.value = false
+      // 清理逐字输出计时器
+      if (typeoutTimer) {
+        clearTimeout(typeoutTimer)
+        typeoutTimer = null
+      }
       if (eventSource) {
         eventSource.close()
         eventSource = null
@@ -265,6 +373,11 @@ const handleSendMessage = async () => {
       console.log('[ChatFeature] 对话完成')
       isStreaming.value = false
       isConnecting.value = false
+      // 清理逐字输出计时器
+      if (typeoutTimer) {
+        clearTimeout(typeoutTimer)
+        typeoutTimer = null
+      }
       if (eventSource) {
         eventSource.close()
         eventSource = null
@@ -283,6 +396,11 @@ const handleSendMessage = async () => {
       }
       isStreaming.value = false
       isConnecting.value = false
+      // 清理逐字输出计时器
+      if (typeoutTimer) {
+        clearTimeout(typeoutTimer)
+        typeoutTimer = null
+      }
       if (eventSource) {
         eventSource.close()
         eventSource = null
@@ -314,6 +432,11 @@ const cleanup = () => {
     eventSource.close()
     eventSource = null
   }
+  // 清理逐字输出计时器
+  if (typeoutTimer) {
+    clearTimeout(typeoutTimer)
+    typeoutTimer = null
+  }
 }
 
 onUnmounted(() => {
@@ -325,7 +448,7 @@ onUnmounted(() => {
 .chat-feature {
   display: flex;
   flex-direction: column;
-  height: 400px;
+  height: 700px;
   background: rgba(255, 255, 255, 0.8);
   border-radius: 6px;
   padding: 12px;
@@ -413,9 +536,15 @@ onUnmounted(() => {
           font-family: 'Monaco', 'Courier New', monospace;
           margin: 0;
           font-size: 13px;
+          line-height: 1.6;
+          letter-spacing: 0.5px;
 
           .cursor {
+            display: inline-block;
             animation: blink 0.8s infinite;
+            margin-left: 1px;
+            color: #409eff;
+            font-weight: bold;
           }
         }
       }
@@ -452,9 +581,22 @@ onUnmounted(() => {
     flex-direction: column;
     gap: 8px;
     flex-shrink: 0;
+    position: relative;
 
     :deep(.el-textarea) {
       flex: 1;
+    }
+
+    .floating-send {
+      position: absolute;
+      right: 10px;
+      bottom: 52px; /* 悬浮于输入框右下 */
+      width: 36px;
+      height: 36px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 10px rgba(64,158,255,0.35);
     }
 
     .input-actions {
