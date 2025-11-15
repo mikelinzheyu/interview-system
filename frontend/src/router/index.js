@@ -251,6 +251,14 @@ const routes = [
     meta: { requiresAuth: true }
   },
 
+  // Phase 6: 私信系统
+  {
+    path: '/messages',
+    name: 'MessageList',
+    component: () => import('@/views/messages/MessageList.vue'),
+    meta: { requiresAuth: true }
+  },
+
   // Phase 2.1: 错题集管理
   {
     path: '/wrong-answers',

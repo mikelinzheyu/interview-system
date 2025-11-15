@@ -31,7 +31,7 @@
       </div>
     </div>
 
-    <!-- 操作按钮 -->
+  <!-- 操作按钮 -->
     <div class="author-actions">
       <el-button
         :type="isFollowing ? 'default' : 'primary'"
@@ -46,6 +46,7 @@
         :icon="Message"
         @click="handleMessage"
         class="action-btn"
+        title="私信"
       />
     </div>
 
@@ -61,12 +62,21 @@
       </el-tag>
     </div>
   </div>
+
+  <!-- 私信对话窗口 -->
+  <ConversationDialog
+    v-model:visible="showMessageDialog"
+    :other-user-id="author.userId"
+    :other-user="author"
+    @close="showMessageDialog = false"
+  />
 </template>
 
 <script setup>
 import { ref, defineProps, computed } from 'vue'
 import { ElMessage } from 'element-plus'
 import { Message } from '@element-plus/icons-vue'
+import ConversationDialog from '@/components/messaging/ConversationDialog.vue'
 
 const props = defineProps({
   author: {
@@ -89,6 +99,7 @@ const emit = defineEmits(['follow', 'message'])
 
 const followLoading = ref(false)
 const isFollowing = ref(props.author.isFollowing || false)
+const showMessageDialog = ref(false)
 
 const handleFollowToggle = async () => {
   followLoading.value = true
@@ -105,8 +116,12 @@ const handleFollowToggle = async () => {
 }
 
 const handleMessage = () => {
+  if (!props.author.userId) {
+    ElMessage.warning('无法与该用户聊天')
+    return
+  }
+  showMessageDialog.value = true
   emit('message', { userId: props.author.userId })
-  ElMessage.info('功能开发中...')
 }
 </script>
 
