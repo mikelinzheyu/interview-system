@@ -317,8 +317,8 @@ defineExpose({
 .ai-assistant-panel {
   display: flex;
   flex-direction: column;
-  height: 680px;  // ✅ 固定高度（不随内容拉长）
-  max-height: 680px;  // ✅ 防止超出
+  height: 900px;  // ✅ 增加至 900px（增加 220px）
+  max-height: 900px;  // ✅ 防止超出
   background: #1f1f2f;
   border: 1px solid #3d3d4d;
   border-radius: 8px;
