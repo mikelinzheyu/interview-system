@@ -59,10 +59,48 @@
                   <span class="icon">{{ message.bookmarked ? '⭐' : '☆' }}</span>
                   <span class="text">收藏</span>
                 </button>
-                <button @click="shareMessage(message)" class="action-btn" title="分享">
-                  <span class="icon">🔗</span>
-                  <span class="text">分享</span>
-                </button>
+                <div class="share-container">
+                  <button
+                    @click.stop="showShareMenu($event, message)"
+                    class="action-btn"
+                    title="分享"
+                  >
+                    <span class="icon">🔗</span>
+                    <span class="text">分享</span>
+                  </button>
+
+                  <!-- 分享菜单弹窗 -->
+                  <div
+                    v-if="shareMenuVisible && shareMenuTarget === message.id"
+                    class="share-menu"
+                    :style="{ top: shareMenuPosition.top, left: shareMenuPosition.left }"
+                  >
+                    <button
+                      @click="shareToWeChat(message)"
+                      class="share-option"
+                      title="分享到微信"
+                    >
+                      <span class="share-icon">💬</span>
+                      <span class="share-text">微信</span>
+                    </button>
+                    <button
+                      @click="shareToQQ(message)"
+                      class="share-option"
+                      title="分享到QQ"
+                    >
+                      <span class="share-icon">🎯</span>
+                      <span class="share-text">QQ</span>
+                    </button>
+                    <button
+                      @click="copyShareLink(message)"
+                      class="share-option"
+                      title="复制分享链接"
+                    >
+                      <span class="share-icon">📋</span>
+                      <span class="share-text">复制链接</span>
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -84,7 +122,7 @@
 </template>
 
 <script setup>
-import { ref, watch, nextTick } from 'vue'
+import { ref, watch, nextTick, h } from 'vue'
 import { marked } from 'marked'
 import { ElMessage } from 'element-plus'
 
@@ -99,6 +137,11 @@ const props = defineProps({
 const emit = defineEmits(['scroll-to-bottom', 'scroll-top-reached', 'refresh-message'])
 
 const messageContainerRef = ref(null)
+
+// 分享菜单状态
+const shareMenuVisible = ref(false)
+const shareMenuTarget = ref(null)
+const shareMenuPosition = ref({ top: '0px', left: '0px' })
 
 // 配置 marked 选项
 marked.setOptions({
@@ -198,31 +241,76 @@ const toggleBookmark = (message) => {
   }
 }
 
-// Phase 4: 分享消息
-const shareMessage = async (message) => {
-  const shareText = message.content.replace(/<[^>]*>/g, '').substring(0, 100)
-  const shareData = {
-    title: 'AI Assistant',
-    text: shareText,
-    url: window.location.href,
+// Phase 4: 显示分享菜单
+const showShareMenu = (event, message) => {
+  shareMenuTarget.value = message.id
+  shareMenuVisible.value = true
+
+  // 计算菜单位置
+  const rect = event.target.getBoundingClientRect()
+  shareMenuPosition.value = {
+    top: `${rect.bottom + 5}px`,
+    left: `${rect.left - 50}px`,
   }
 
+  // 点击其他地方关闭菜单
+  const closeMenu = () => {
+    shareMenuVisible.value = false
+    document.removeEventListener('click', closeMenu)
+  }
+  setTimeout(() => {
+    document.addEventListener('click', closeMenu)
+  }, 0)
+}
+
+// Phase 4: 分享到微信
+const shareToWeChat = (message) => {
+  const shareText = message.content.replace(/<[^>]*>/g, '').substring(0, 100)
+  const shareUrl = window.location.href
+
+  // 微信分享生成二维码
+  const qrcodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(shareUrl)}`
+
+  // 弹出提示
+  ElMessage.info({
+    message: h('div', [
+      h('p', '微信分享需要在微信内打开，或扫描二维码：'),
+      h('img', { src: qrcodeUrl, style: 'max-width: 200px; margin-top: 10px;' }),
+    ]),
+    duration: 5000,
+    showClose: true,
+  })
+
+  shareMenuVisible.value = false
+}
+
+// Phase 4: 分享到QQ
+const shareToQQ = (message) => {
+  const shareText = message.content.replace(/<[^>]*>/g, '').substring(0, 100)
+  const shareUrl = window.location.href
+  const shareTitle = 'AI 助手回复'
+
+  // QQ分享链接
+  const qqShareUrl = `https://connect.qq.com/widget/shareqq/index.html?url=${encodeURIComponent(shareUrl)}&title=${encodeURIComponent(shareTitle)}&desc=${encodeURIComponent(shareText)}`
+
+  // 打开QQ分享
+  window.open(qqShareUrl, 'QQShare', 'width=800,height=600')
+
+  ElMessage.success('已打开QQ分享')
+  shareMenuVisible.value = false
+}
+
+// Phase 4: 复制分享链接
+const copyShareLink = async (message) => {
   try {
-    // 尝试使用 Web Share API
-    if (navigator.share) {
-      await navigator.share(shareData)
-      ElMessage.success('分享成功')
-    } else {
-      // 降级方案：复制分享链接
-      const shareUrl = `${window.location.href}?msg=${encodeURIComponent(shareText)}`
-      await navigator.clipboard.writeText(shareUrl)
-      ElMessage.success('分享链接已复制到剪贴板')
-    }
+    const shareText = message.content.replace(/<[^>]*>/g, '').substring(0, 100)
+    const shareUrl = `${window.location.href}?msg=${encodeURIComponent(shareText)}`
+    await navigator.clipboard.writeText(shareUrl)
+    ElMessage.success('分享链接已复制到剪贴板')
+    shareMenuVisible.value = false
   } catch (error) {
-    if (error.name !== 'AbortError') {
-      console.error('Share error:', error)
-      ElMessage.error('分享失败')
-    }
+    console.error('Copy link error:', error)
+    ElMessage.error('复制失败')
   }
 }
 
@@ -604,6 +692,77 @@ defineExpose({
   }
   50% {
     transform: scale(1.2);
+  }
+}
+
+// Phase 4: 分享容器和菜单样式
+.share-container {
+  position: relative;
+  display: inline-block;
+}
+
+.share-menu {
+  position: fixed;
+  background: #2d2d3d;
+  border: 1px solid #3d3d4d;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  z-index: 1000;
+  min-width: 120px;
+  overflow: hidden;
+  animation: slideUp 0.2s ease-out;
+
+  .share-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    padding: 10px 12px;
+    background: transparent;
+    border: none;
+    color: #d0d0d0;
+    cursor: pointer;
+    font-size: 13px;
+    transition: all 0.2s;
+    white-space: nowrap;
+
+    .share-icon {
+      font-size: 16px;
+    }
+
+    .share-text {
+      flex: 1;
+      text-align: left;
+      font-weight: 500;
+    }
+
+    &:hover {
+      background: rgba(102, 126, 234, 0.15);
+      color: #667eea;
+
+      .share-icon {
+        transform: scale(1.1);
+      }
+    }
+
+    &:active {
+      background: rgba(102, 126, 234, 0.25);
+    }
+
+    &:not(:last-child) {
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
