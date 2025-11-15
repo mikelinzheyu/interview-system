@@ -66,8 +66,11 @@ const selectedIndex = ref(0)
 // 监听suggestions变化，重置选中索引
 watch(
   () => props.suggestions,
-  () => {
-    selectedIndex.value = 0
+  (newSuggestions) => {
+    // 防御性编程：确保suggestions存在
+    if (newSuggestions && Array.isArray(newSuggestions)) {
+      selectedIndex.value = 0
+    }
   },
   { immediate: true }
 )
@@ -79,7 +82,10 @@ const selectUser = (user) => {
 
 // 处理键盘导航
 const handleKeyDown = (e) => {
-  if (!props.show || props.suggestions.length === 0) return
+  // 防御性编程：检查 props 和 suggestions 是否有效
+  if (!props?.show || !Array.isArray(props?.suggestions) || props.suggestions.length === 0) {
+    return
+  }
 
   switch (e.key) {
     case 'ArrowUp':
@@ -92,7 +98,10 @@ const handleKeyDown = (e) => {
       break
     case 'Enter':
       e.preventDefault()
-      selectUser(props.suggestions[selectedIndex.value])
+      const selectedUser = props.suggestions[selectedIndex.value]
+      if (selectedUser) {
+        selectUser(selectedUser)
+      }
       break
     case 'Escape':
       e.preventDefault()
