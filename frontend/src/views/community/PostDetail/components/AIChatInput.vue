@@ -107,24 +107,26 @@ defineExpose({
 </script>
 
 <style scoped lang="scss">
+// 方案 B: AI 聊天输入容器 - 完全全宽
 .ai-chat-input {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  padding: 16px;
+  gap: 0;  // ✅ 移除 gap，使用内部 padding 管理间距
+  padding: 0;  // ✅ 移除容器 padding，让子元素自己管理
   background: #2d2d3d;
   border-top: 1px solid #3d3d4d;
+  width: 100%;  // ✅ 确保容器 100% 宽度
 }
 
-// 输入框容器
+// 输入框容器 - 方案 B: 全宽块级
 .input-wrapper {
   display: flex;
   gap: 8px;
   align-items: flex-end;
-  background: #1f1f2f;
-  border: 1px solid #3d3d4d;
-  border-radius: 8px;
-  padding: 8px;
+  width: 100%;  // ✅ 填满宽度
+  background: #2d2d3d;
+  border-top: 1px solid #3d3d4d;
+  padding: 8px 16px;  // 水平 padding 统一
   transition: all 0.2s;
 
   &:focus-within {
@@ -133,9 +135,11 @@ defineExpose({
   }
 }
 
-// 文本区域
+// 文本区域 - 自适应全宽
 .chat-textarea {
-  flex: 1;
+  flex: 1;  // ✅ 占据所有可用空间
+  width: 100%;  // ✅ 确保 100% 宽度
+  max-width: none;  // ✅ 移除宽度限制
   padding: 8px;
   background: transparent;
   border: none;
@@ -204,11 +208,13 @@ defineExpose({
   }
 }
 
-// 建议问题
+// 建议问题 - 全宽分布
 .suggested-questions {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
+  width: 100%;  // ✅ 全宽
+  padding: 0 16px;  // 统一 padding
 }
 
 .suggestion-btn {
@@ -223,7 +229,7 @@ defineExpose({
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 150px;
+  max-width: none;  // ✅ 移除宽度限制
 
   &:hover:not(:disabled) {
     background: rgba(102, 126, 234, 0.2);
@@ -245,6 +251,7 @@ defineExpose({
   align-items: center;
   justify-content: flex-end;
   gap: 4px;
+  padding: 0 16px;  // 统一 padding
 
   .hint-loading {
     color: #667eea;

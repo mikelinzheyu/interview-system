@@ -102,24 +102,26 @@ defineExpose({
 </script>
 
 <style scoped lang="scss">
+// 方案 B: 消息面板 - 完全全宽块级
 .ai-message-panel {
   position: relative;
-  width: 100%;
+  width: 100%;  // ✅ 确保容器 100% 宽度
   height: 450px;
   display: flex;
   flex-direction: column;
   background: #1f1f2f;
   border-bottom: 1px solid #3d3d4d;
+  overflow: hidden;  // ✅ 防止内部溢出
 }
 
-// 消息容器
+// 消息容器 - 方案 B: 完全全宽块级设计
 .message-container {
   flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
   display: flex;
   flex-direction: column;
-  padding: 12px 0;
+  padding: 0;  // 移除容器 padding，让消息填满宽度
 
   /* 自定义滚动条样式 */
   &::-webkit-scrollbar {
@@ -141,18 +143,27 @@ defineExpose({
   }
 }
 
-// 消息包装器
+// 消息包装器 - 100% 宽度块级
 .message-wrapper {
   display: flex;
-  padding: 12px 16px;
+  width: 100%;  // ✅ 填满整个宽度
+  padding: 8px 16px;  // 水平 padding 用于边距
   animation: slideIn 0.3s ease-out;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);  // 分隔线
 
   &.message-user {
     justify-content: flex-end;
+    background: rgba(61, 61, 77, 0.3);  // 淡色背景区分用户消息
   }
 
   &.message-assistant {
     justify-content: flex-start;
+    background: transparent;  // AI消息无背景
+  }
+
+  // 移除最后一条消息的分隔线
+  &:last-child {
+    border-bottom: none;
   }
 }
 
@@ -167,34 +178,36 @@ defineExpose({
   }
 }
 
-// 消息气泡
+// 消息气泡 - 方案 B: 块级设计，移除 max-width
 .message-bubble {
-  max-width: 80%;
+  width: auto;  // ✅ 自适应内容宽度
+  max-width: none;  // ✅ 移除宽度限制
   padding: 10px 14px;
-  border-radius: 12px;
   word-wrap: break-word;
   white-space: pre-wrap;
   line-height: 1.6;
   font-size: 14px;
   animation: bubbleIn 0.3s ease-out;
 
-  // 用户消息
+  // 用户消息 - 简洁块级
   &.role-user {
-    background: #3d3d4d;
+    background: transparent;  // 无背景（wrapper已有背景）
     color: #e0e0e0;
+    text-align: right;  // 右对齐文本
   }
 
-  // AI 消息
+  // AI 消息 - 简洁块级
   &.role-assistant {
-    background: rgba(102, 126, 234, 0.15);
-    border-left: 3px solid #667eea;
+    background: transparent;  // 无背景（wrapper已有背景）
+    border-left: none;  // 移除左边框
     color: #c0c0c0;
+    text-align: left;  // 左对齐文本
   }
 
   // 加载消息
   &.role-loading {
-    background: rgba(102, 126, 234, 0.1);
-    padding: 12px 16px;
+    background: transparent;
+    padding: 12px 14px;
   }
 }
 
