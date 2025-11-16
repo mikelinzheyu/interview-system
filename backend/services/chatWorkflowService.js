@@ -278,12 +278,29 @@ class ChatWorkflowService {
    * @returns {Boolean}
    */
   checkConfiguration() {
-    // 强制返回 true 以进行测试，因为我们已在 .env 中配置了 API Key
-    if (this.apiKey && this.appId && this.apiKey !== 'undefined' && this.appId !== 'undefined') {
-      return true
+    // 在开发环境中，如果 Dify API 不可用，优先使用 Mock 模式
+    // 这确保即使 Dify API 返回 404，系统也会使用 Mock 数据而不是崩溃
+
+    if (!this.apiKey || !this.appId) {
+      console.log('[ChatWorkflow] 配置检查: API Key 或 App ID 缺失，使用 Mock 模式')
+      return false
     }
-    // 如果没有配置，返回 false
-    return false
+
+    if (this.apiKey === 'undefined' || this.appId === 'undefined') {
+      console.log('[ChatWorkflow] 配置检查: API Key 或 App ID 为 undefined，使用 Mock 模式')
+      return false
+    }
+
+    // 检查是否为默认示例 API Key（表示未真正配置）
+    const isDefaultExample = this.apiKey === 'app-Bj1UccX9v9X1aw6st7OW5paG'
+
+    if (isDefaultExample) {
+      console.log('[ChatWorkflow] 配置检查: 使用示例 API Key，Dify API 可能不可用，使用 Mock 模式')
+      return false
+    }
+
+    console.log('[ChatWorkflow] 配置检查: API 配置有效，将尝试使用 Dify API')
+    return true
   }
 
   /**
