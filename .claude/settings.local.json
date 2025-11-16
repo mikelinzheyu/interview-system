@@ -24,7 +24,8 @@
       "Bash(git -C \"D:\\code7\\interview-system\" add \"frontend/src/views/community/PostDetail/MainContent/CommentsSection/CommentForm.vue\")",
       "Bash(git -C \"D:\\code7\\interview-system\" commit -m \"refactor: Apply optimized comment form to production\n\n- Replace original CommentForm.vue with CommentFormOptimized.vue\n- Include all improvements: bug fixes, new features, better UX\n- Fix Markdown toolbar button insertion issues\n- Add advanced options menu (save draft, view draft, clear, help)\n- Improve toolbar organization with logical grouping\n- Add preview toggle and success feedback\n- Implement proper keyboard shortcut support\n- Better responsive design for all screen sizes\n- Ready for immediate production use\")",
       "Bash(git add:*)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(nul)"
     ],
     "deny": [],
     "ask": []

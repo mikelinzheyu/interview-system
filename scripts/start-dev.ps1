@@ -220,7 +220,7 @@ switch ($Action) {
 
   'stop' {
     Write-Host '==> Stopping dev processes ...' -ForegroundColor Cyan
-    $saved = LoadPids()
+    $saved = LoadPids
     $toKill = @()
     if ($saved -and $saved.backend) { $toKill += [int]$saved.backend }
     if ($saved -and $saved.frontend) { $toKill += [int]$saved.frontend }
@@ -233,7 +233,7 @@ switch ($Action) {
 
   'status' {
     Write-Host '==> Dev environment status' -ForegroundColor Cyan
-    $saved = LoadPids()
+    $saved = LoadPids
     if ($saved) { Write-Host ("Saved PIDs -> backend={0}, frontend={1}" -f $saved.backend, $saved.frontend) }
     try { $s1 = (Invoke-WebRequest -UseBasicParsing -Uri http://localhost:3001/api/health -TimeoutSec 2).StatusCode } catch { $s1 = 'ERR' }
     try { $s2 = (Invoke-WebRequest -UseBasicParsing -Uri http://127.0.0.1:5174 -TimeoutSec 2).StatusCode } catch { $s2 = 'ERR' }
