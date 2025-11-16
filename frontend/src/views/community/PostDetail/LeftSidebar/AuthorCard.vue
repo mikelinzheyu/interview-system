@@ -106,6 +106,11 @@ const handleFollowToggle = async () => {
 }
 
 const handleMessage = () => {
+  console.log('[AuthorCard] handleMessage called', {
+    authorUserId: props.author.userId,
+    author: props.author
+  })
+
   if (!props.author.userId) {
     ElMessage.warning('无法与该用户聊天')
     return

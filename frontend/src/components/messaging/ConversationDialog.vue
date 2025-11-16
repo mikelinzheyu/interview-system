@@ -108,6 +108,12 @@ const messages = computed(() => messagingStore.messages)
 watch(
   () => visible.value,
   async (newVal) => {
+    console.log('[ConversationDialog] visible changed', {
+      visible: newVal,
+      otherUserId: props.otherUserId,
+      otherUser: props.otherUser
+    })
+
     if (newVal && props.otherUserId) {
       await loadConversation()
     } else if (!newVal && conversationId) {

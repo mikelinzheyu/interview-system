@@ -93,10 +93,21 @@ const handleFollow = async (data) => {
 }
 
 const handleMessage = async (data) => {
+  console.log('[PostDetail] handleMessage called', {
+    data,
+    author: post.value?.author
+  })
+
   // 打开私信对话框
   messageTargetUserId.value = data.userId
   messageTargetUser.value = post.value?.author || {}
   showMessageDialog.value = true
+
+  console.log('[PostDetail] Dialog state updated', {
+    messageTargetUserId: messageTargetUserId.value,
+    messageTargetUser: messageTargetUser.value,
+    showMessageDialog: showMessageDialog.value
+  })
 }
 
 const fetchPostDetail = async () => {
