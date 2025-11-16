@@ -61,8 +61,9 @@
 </template>
 
 <script setup>
-import { ref, computed, nextTick, watch, onMounted } from 'vue'
+import { ref, computed, nextTick, watch, onMounted, onUnmounted } from 'vue'
 import { useMessagingStore } from '@/stores/messagingStore'
+import { useWebSocket } from '@/composables/useWebSocket'
 import ChatBubble from './ChatBubble.vue'
 import ChatInput from './ChatInput.vue'
 import MessageHeader from './MessageHeader.vue'
@@ -77,6 +78,7 @@ const props = defineProps({
 const emit = defineEmits(['close'])
 
 const messagingStore = useMessagingStore()
+const { joinConversation, leaveConversation } = useWebSocket()
 const messagesContainer = ref(null)
 const loadingMore = ref(false)
 const currentPage = ref(1)
@@ -100,6 +102,13 @@ watch(
 // 初始化加载对话
 onMounted(async () => {
   await loadConversation()
+  // 加入 WebSocket 对话房间
+  joinConversation(props.conversationId)
+})
+
+// 卸载时离开对话房间
+onUnmounted(() => {
+  leaveConversation(props.conversationId)
 })
 
 const loadConversation = async () => {

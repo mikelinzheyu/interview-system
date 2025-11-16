@@ -350,6 +350,93 @@ function initializeWebSocket(httpServer, mockData) {
       io.emit('comment-added', { postId, comment })
     })
 
+    // ==================== 私信功能 ====================
+
+    // 加入私信对话房间
+    socket.on('join-conversation', (data) => {
+      const { conversationId } = data
+      socket.join(`conversation-${conversationId}`)
+      console.log(`[WebSocket] 用户 ${socket.userId} 加入对话 ${conversationId}`)
+
+      // 发送在线状态给对话中的其他用户
+      socket.to(`conversation-${conversationId}`).emit('user-online-status', {
+        userId: socket.userId,
+        isOnline: true,
+        timestamp: new Date().toISOString()
+      })
+    })
+
+    // 离开私信对话房间
+    socket.on('leave-conversation', (data) => {
+      const { conversationId } = data
+      socket.leave(`conversation-${conversationId}`)
+      console.log(`[WebSocket] 用户 ${socket.userId} 离开对话 ${conversationId}`)
+
+      // 发送离线状态给对话中的其他用户
+      socket.to(`conversation-${conversationId}`).emit('user-online-status', {
+        userId: socket.userId,
+        isOnline: false,
+        timestamp: new Date().toISOString()
+      })
+    })
+
+    // 发送私信
+    socket.on('send-private-message', (data) => {
+      const { conversationId, content, messageId } = data
+      const message = {
+        id: messageId,
+        conversationId,
+        senderId: socket.userId,
+        content,
+        type: 'text',
+        status: 'delivered',
+        createdAt: new Date().toISOString()
+      }
+
+      // 广播给对话中的所有用户
+      io.to(`conversation-${conversationId}`).emit('private-message', message)
+      console.log(`[WebSocket] 用户 ${socket.userId} 在对话 ${conversationId} 发送私信`)
+    })
+
+    // 标记消息已读
+    socket.on('mark-message-read', (data) => {
+      const { conversationId, messageId } = data
+
+      // 广播已读状态给对话中的所有用户
+      io.to(`conversation-${conversationId}`).emit('message-read', {
+        messageId,
+        readBy: socket.userId,
+        readAt: new Date().toISOString()
+      })
+      console.log(`[WebSocket] 用户 ${socket.userId} 标记消息 ${messageId} 为已读`)
+    })
+
+    // 正在输入指示符
+    socket.on('typing-indicator', (data) => {
+      const { conversationId, isTyping } = data
+
+      // 发送给对话中的其他用户（不包括发送者）
+      socket.to(`conversation-${conversationId}`).emit('user-typing', {
+        userId: socket.userId,
+        isTyping,
+        timestamp: new Date().toISOString()
+      })
+      console.log(`[WebSocket] 用户 ${socket.userId} 在对话 ${conversationId} 输入状态: ${isTyping}`)
+    })
+
+    // 标记整个对话已读
+    socket.on('mark-conversation-read', (data) => {
+      const { conversationId } = data
+
+      // 广播给对话中的所有用户
+      io.to(`conversation-${conversationId}`).emit('conversation-read', {
+        conversationId,
+        readBy: socket.userId,
+        readAt: new Date().toISOString()
+      })
+      console.log(`[WebSocket] 用户 ${socket.userId} 标记对话 ${conversationId} 为已读`)
+    })
+
     // ==================== 断开连接 ====================
 
     socket.on('disconnect', () => {

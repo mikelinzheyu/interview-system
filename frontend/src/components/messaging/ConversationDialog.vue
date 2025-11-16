@@ -66,9 +66,10 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, nextTick } from 'vue'
+import { ref, computed, watch, nextTick, onBeforeUnmount } from 'vue'
 import { ElMessage } from 'element-plus'
 import { useMessagingStore } from '@/stores/messagingStore'
+import { useWebSocket } from '@/composables/useWebSocket'
 import ChatBubble from './ChatBubble.vue'
 
 const props = defineProps({
@@ -89,6 +90,7 @@ const props = defineProps({
 const emit = defineEmits(['update:visible', 'close'])
 
 const messagingStore = useMessagingStore()
+const { joinConversation, leaveConversation } = useWebSocket()
 const messagesContainer = ref(null)
 const messageText = ref('')
 const sending = ref(false)
@@ -108,6 +110,9 @@ watch(
   async (newVal) => {
     if (newVal && props.otherUserId) {
       await loadConversation()
+    } else if (!newVal && conversationId) {
+      // 关闭时离开对话房间
+      leaveConversation(conversationId)
     }
   }
 )
@@ -122,11 +127,23 @@ watch(
   { deep: true }
 )
 
+// 组件卸载时离开对话房间
+onBeforeUnmount(() => {
+  if (conversationId) {
+    leaveConversation(conversationId)
+  }
+})
+
 const loadConversation = async () => {
   try {
     const data = await messagingStore.openConversation(props.otherUserId)
     conversationId = data.conversation?.id
     messageText.value = ''
+
+    // 加入 WebSocket 对话房间
+    if (conversationId) {
+      joinConversation(conversationId)
+    }
   } catch (error) {
     console.error('[ConversationDialog] Load conversation error:', error)
     ElMessage.error('加载对话失败')
@@ -167,6 +184,9 @@ const handleSend = async () => {
 const handleDialogClose = () => {
   visible.value = false
   messageText.value = ''
+  if (conversationId) {
+    leaveConversation(conversationId)
+  }
   messagingStore.closeConversation()
   emit('close')
 }

@@ -241,6 +241,73 @@ class EventBridge {
     console.log(`[EventBridge] 广播: 公钥更新 - 用户 ${userId}`)
   }
 
+  // ==================== 私信事件 ====================
+
+  /**
+   * 广播私信消息
+   */
+  broadcastPrivateMessage(conversationId, message) {
+    if (!this.io) return
+    this.io.to(`conversation-${conversationId}`).emit('private-message', {
+      ...message,
+      timestamp: new Date().toISOString()
+    })
+    console.log(`[EventBridge] 广播: 私信发送 - 对话 ${conversationId}, 消息 ID ${message.id}`)
+  }
+
+  /**
+   * 广播消息已读状态
+   */
+  broadcastPrivateMessageRead(conversationId, messageId, userId) {
+    if (!this.io) return
+    this.io.to(`conversation-${conversationId}`).emit('message-read', {
+      messageId,
+      conversationId,
+      readBy: userId,
+      readAt: new Date().toISOString()
+    })
+    console.log(`[EventBridge] 广播: 私信已读 - 对话 ${conversationId}, 消息 ID ${messageId}`)
+  }
+
+  /**
+   * 广播对话已读状态
+   */
+  broadcastConversationRead(conversationId, userId) {
+    if (!this.io) return
+    this.io.to(`conversation-${conversationId}`).emit('conversation-read', {
+      conversationId,
+      readBy: userId,
+      readAt: new Date().toISOString()
+    })
+    console.log(`[EventBridge] 广播: 对话已读 - 对话 ${conversationId}, 用户 ${userId}`)
+  }
+
+  /**
+   * 广播用户输入状态
+   */
+  broadcastUserTyping(conversationId, userId, isTyping) {
+    if (!this.io) return
+    this.io.to(`conversation-${conversationId}`).emit('user-typing', {
+      userId,
+      isTyping,
+      timestamp: new Date().toISOString()
+    })
+    console.log(`[EventBridge] 广播: 用户输入 - 对话 ${conversationId}, 用户 ${userId}, 状态 ${isTyping}`)
+  }
+
+  /**
+   * 广播用户在线状态
+   */
+  broadcastUserOnlineStatus(conversationId, userId, isOnline) {
+    if (!this.io) return
+    this.io.to(`conversation-${conversationId}`).emit('user-online-status', {
+      userId,
+      isOnline,
+      timestamp: new Date().toISOString()
+    })
+    console.log(`[EventBridge] 广播: 用户在线状态 - 对话 ${conversationId}, 用户 ${userId}, 在线 ${isOnline}`)
+  }
+
   // ==================== 工具方法 ====================
 
   /**
