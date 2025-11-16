@@ -188,6 +188,16 @@ const handleSendMessage = async (messageText) => {
       params.conversationId = conversationId.value
     }
 
+    // 添加认证令牌 (EventSource 不支持自定义 header，所以必须用查询参数)
+    // 如果没有登录令牌，在开发环境中使用默认令牌
+    let token = localStorage.getItem('authToken')
+    if (!token) {
+      // 开发环境: 使用默认令牌，允许测试 AI 功能而无需登录
+      token = 'dev-token-for-testing'
+      console.warn('[AI Assistant] No authToken found, using development token')
+    }
+    params.token = token
+
     Object.keys(params).forEach(key =>
       url.searchParams.append(key, params[key])
     )
