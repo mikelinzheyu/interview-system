@@ -54,10 +54,25 @@ export const useMessagingStore = defineStore('messaging', () => {
   const openConversation = async (otherUserId) => {
     loading.value = true
     error.value = null
+
+    // 验证用户ID
+    if (!otherUserId || isNaN(parseInt(otherUserId))) {
+      error.value = '无效的用户ID'
+      loading.value = false
+      console.error('[MessagingStore] Invalid otherUserId:', otherUserId)
+      throw new Error('Invalid user ID: ' + otherUserId)
+    }
+
     try {
       // 首先创建或获取对话
       const convResponse = await messagingAPI.getOrCreateConversation(otherUserId)
       const conversation = convResponse.data.data
+
+      // 验证返回的对话ID
+      if (!conversation || !conversation.id || isNaN(parseInt(conversation.id))) {
+        error.value = '获取对话失败：无效的对话ID'
+        throw new Error('Invalid conversation ID returned: ' + conversation?.id)
+      }
 
       // 然后获取对话详情和消息
       const detailResponse = await messagingAPI.getConversation(conversation.id)

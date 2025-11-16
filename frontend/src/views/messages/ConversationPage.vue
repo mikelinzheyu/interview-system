@@ -150,6 +150,15 @@ onUnmounted(() => {
 
 const loadConversation = async () => {
   try {
+    // 验证路由参数中的 userId
+    if (!userId.value || isNaN(parseInt(userId.value))) {
+      ElMessage.error('无效的用户ID')
+      console.warn('[ConversationPage] Invalid userId from route:', userId.value)
+      // 返回上一页
+      router.back()
+      return
+    }
+
     const data = await messagingStore.openConversation(userId.value)
 
     // 设置其他用户信息
@@ -165,6 +174,10 @@ const loadConversation = async () => {
   } catch (error) {
     ElMessage.error('加载对话失败: ' + error.message)
     console.error('[ConversationPage] Load conversation error:', error)
+    // 延迟后返回上一页
+    setTimeout(() => {
+      router.back()
+    }, 2000)
   }
 }
 
