@@ -69,8 +69,11 @@
 
 <script setup>
 import { ref, computed } from 'vue'
+import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { Check, ChatDotRound } from '@element-plus/icons-vue'
+
+const router = useRouter()
 
 const props = defineProps({
   author: {
@@ -93,7 +96,7 @@ const props = defineProps({
   },
 })
 
-const emit = defineEmits(['follow', 'message'])
+const emit = defineEmits(['follow'])
 
 const defaultAvatar = 'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png'
 const followLoading = ref(false)
@@ -123,7 +126,16 @@ const handleFollow = async () => {
 }
 
 const handleMessage = () => {
-  emit('message', { userId: props.author.id })
+  if (!props.author.id && !props.author.userId) {
+    ElMessage.warning('无法与该用户聊天')
+    return
+  }
+
+  // 导航到私信页面
+  router.push({
+    name: 'Conversation',
+    params: { userId: props.author.id || props.author.userId }
+  })
 }
 </script>
 

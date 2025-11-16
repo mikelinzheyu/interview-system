@@ -1,7 +1,7 @@
 <template>
   <div class="left-sidebar">
     <!-- 作者卡片 -->
-    <AuthorCard :author="author" @follow="handleFollow" @message="handleMessage" />
+    <AuthorCard :author="author" @follow="handleFollow" />
 
     <!-- 文章目录 -->
     <TableOfContents :toc="toc" />
@@ -28,14 +28,10 @@ const props = defineProps({
   },
 })
 
-const emit = defineEmits(['follow', 'message'])
+const emit = defineEmits(['follow'])
 
 const handleFollow = (data) => {
   emit('follow', data)
-}
-
-const handleMessage = (data) => {
-  emit('message', data)
 }
 </script>
 
