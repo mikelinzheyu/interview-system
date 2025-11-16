@@ -15,7 +15,6 @@
           :author="post?.author || {}"
           :toc="tableOfContents"
           @follow="handleFollow"
-          @message="handleMessage"
         />
       </template>
 
@@ -34,14 +33,6 @@
         />
       </template>
     </ThreeColumnLayout>
-
-    <!-- 私信对话窗口（顶层，避免被父元素隐藏） -->
-    <ConversationDialog
-      v-model:visible="showMessageDialog"
-      :other-user-id="messageTargetUserId"
-      :other-user="messageTargetUser"
-      @close="showMessageDialog = false"
-    />
   </div>
 </template>
 
@@ -54,16 +45,12 @@ import ThreeColumnLayout from './PostDetail/layouts/ThreeColumnLayout.vue'
 import LeftSidebar from './PostDetail/LeftSidebar/LeftSidebar.vue'
 import MainContent from './PostDetail/MainContent/MainContent.vue'
 import RightSidebar from './PostDetail/RightSidebar/RightSidebar.vue'
-import ConversationDialog from '@/components/messaging/ConversationDialog.vue'
 
 const route = useRoute()
 
 const postId = computed(() => route.params.id)
 const post = ref(null)
 const loading = ref(false)
-const showMessageDialog = ref(false)
-const messageTargetUserId = ref(null)
-const messageTargetUser = ref(null)
 
 const tableOfContents = computed(() => {
   if (!post.value?.content) return []
@@ -90,24 +77,6 @@ const handleFollow = async (data) => {
   } catch (error) {
     ElMessage.error('操作失败')
   }
-}
-
-const handleMessage = async (data) => {
-  console.log('[PostDetail] handleMessage called', {
-    data,
-    author: post.value?.author
-  })
-
-  // 打开私信对话框
-  messageTargetUserId.value = data.userId
-  messageTargetUser.value = post.value?.author || {}
-  showMessageDialog.value = true
-
-  console.log('[PostDetail] Dialog state updated', {
-    messageTargetUserId: messageTargetUserId.value,
-    messageTargetUser: messageTargetUser.value,
-    showMessageDialog: showMessageDialog.value
-  })
 }
 
 const fetchPostDetail = async () => {

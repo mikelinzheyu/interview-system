@@ -4,7 +4,6 @@
     <AuthorBanner
       :author="post?.author || {}"
       @follow="handleFollow"
-      @message="handleMessage"
     />
 
     <!-- 两列布局 -->
@@ -117,11 +116,6 @@ const handleFollow = async (data) => {
   } catch (error) {
     ElMessage.error('操作失败')
   }
-}
-
-const handleMessage = async (data) => {
-  // 私信功能已在 LeftSidebar/AuthorCard 中实现
-  // 此方法保留以供未来扩展使用
 }
 </script>
 

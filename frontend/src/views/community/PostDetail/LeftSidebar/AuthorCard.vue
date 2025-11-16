@@ -66,8 +66,11 @@
 
 <script setup>
 import { ref, defineProps } from 'vue'
+import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { Message } from '@element-plus/icons-vue'
+
+const router = useRouter()
 
 const props = defineProps({
   author: {
@@ -86,7 +89,7 @@ const props = defineProps({
   },
 })
 
-const emit = defineEmits(['follow', 'message'])
+const emit = defineEmits(['follow'])
 
 const followLoading = ref(false)
 const isFollowing = ref(props.author.isFollowing || false)
@@ -115,8 +118,12 @@ const handleMessage = () => {
     ElMessage.warning('无法与该用户聊天')
     return
   }
-  // 触发 message 事件，由父组件处理
-  emit('message', { userId: props.author.userId })
+
+  // 导航到私信页面
+  router.push({
+    name: 'Conversation',
+    params: { userId: props.author.userId }
+  })
 }
 </script>
 

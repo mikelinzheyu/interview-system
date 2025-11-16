@@ -258,6 +258,13 @@ const routes = [
     component: () => import('@/views/messages/MessageList.vue'),
     meta: { requiresAuth: true }
   },
+  {
+    path: '/messages/:userId',
+    name: 'Conversation',
+    component: () => import('@/views/messages/ConversationPage.vue'),
+    meta: { requiresAuth: true },
+    props: true
+  },
 
   // Phase 2.1: 错题集管理
   {
