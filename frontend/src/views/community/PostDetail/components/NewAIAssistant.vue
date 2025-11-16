@@ -157,7 +157,7 @@ const handleAIChat = () => {
   ElMessage.success('AI 对话已开启')
 }
 
-// 发送消息
+// 发送消息 - 支持多轮对话
 const handleSendMessage = async (messageText) => {
   if (!messageText.trim() || !props.postContent) {
     return
@@ -173,6 +173,8 @@ const handleSendMessage = async (messageText) => {
   // 添加 AI 加载指示器
   const aiMessageId = addMessage('assistant', '', true)
 
+  let eventSource = null
+
   try {
     const backendUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001'
     const url = new URL('/api/ai/chat/stream', backendUrl)
@@ -184,8 +186,12 @@ const handleSendMessage = async (messageText) => {
       workflow: 'chat',
     }
 
+    // 🔴 关键：在第二次及以后的对话中，必须传递 conversationId 以继续对话
     if (conversationId.value) {
       params.conversationId = conversationId.value
+      console.log('[AI Assistant] 📌 继续多轮对话，conversationId:', conversationId.value)
+    } else {
+      console.log('[AI Assistant] 📌 开始新的对话')
     }
 
     // 添加认证令牌 (EventSource 不支持自定义 header，所以必须用查询参数)
@@ -204,11 +210,14 @@ const handleSendMessage = async (messageText) => {
 
     console.log('[AI Assistant] Connecting to stream:', url.toString())
 
-    const eventSource = new EventSource(url)
+    // 创建新的 EventSource 连接
+    eventSource = new EventSource(url)
+    let hasReceivedData = false
 
     eventSource.onmessage = (event) => {
       try {
         const data = JSON.parse(event.data)
+        hasReceivedData = true
 
         if (data.type === 'chunk') {
           const chunk = data.content || data.answer || ''
@@ -219,12 +228,18 @@ const handleSendMessage = async (messageText) => {
             loading: false,
           })
         } else if (data.type === 'end') {
-          // 流结束
-          conversationId.value = data.conversationId || data.conversation_id
+          // 流结束 - 保存 conversationId 用于多轮对话
+          const newConversationId = data.conversationId || data.conversation_id
+          if (newConversationId && newConversationId !== conversationId.value) {
+            conversationId.value = newConversationId
+            console.log('[AI Assistant] ✅ conversationId 已保存:', conversationId.value)
+          }
           updateMessage(aiMessageId, {
             loading: false,
           })
-          eventSource.close()
+          if (eventSource) {
+            eventSource.close()
+          }
           isLoading.value = false
           ElMessage.success('AI 回复完成')
         }
@@ -234,13 +249,33 @@ const handleSendMessage = async (messageText) => {
     }
 
     eventSource.onerror = (error) => {
-      console.error('[AI Assistant] Stream error:', error)
-      updateMessage(aiMessageId, {
-        content: messageBuffer || '对话出错，请重试',
-        loading: false,
+      console.error('[AI Assistant] ❌ Stream error:', {
+        error: error,
+        readyState: eventSource?.readyState,
+        hasReceivedData: hasReceivedData,
+        messageBuffer: messageBuffer.substring(0, 50) + '...',
+        conversationId: conversationId.value,
       })
-      errorMessage.value = '对话出错，请重试'
-      eventSource.close()
+
+      // 检查是否收到了数据但在流结束前发生错误
+      if (hasReceivedData && messageBuffer) {
+        console.log('[AI Assistant] ℹ️ 虽然有错误但已收到部分数据，保持消息')
+        updateMessage(aiMessageId, {
+          loading: false,
+        })
+        // 如果有消息内容，不显示错误
+      } else {
+        // 只有在没有收到任何数据时才显示错误
+        updateMessage(aiMessageId, {
+          content: messageBuffer || '对话出错，请重试',
+          loading: false,
+        })
+        errorMessage.value = '对话出错，请重试'
+      }
+
+      if (eventSource) {
+        eventSource.close()
+      }
       isLoading.value = false
     }
   } catch (error) {
@@ -251,6 +286,9 @@ const handleSendMessage = async (messageText) => {
     })
     errorMessage.value = '消息发送失败'
     isLoading.value = false
+    if (eventSource) {
+      eventSource.close()
+    }
   }
 }
 
