@@ -40,9 +40,11 @@ export const useWebSocket = () => {
       const token = localStorage.getItem('token') || userStore.user.id
       const userId = userStore.user.id
 
-      // 确定协议和主机
-      const protocol = window.location.protocol === 'https:' ? 'https:' : 'http:'
-      const host = window.location.host
+      // 使用环境变量中的 WebSocket 基础 URL（例如：http://localhost:3001）
+      // 转换为 WebSocket URL (http -> ws, https -> wss)
+      const baseUrl = import.meta.env.VITE_WS_BASE_URL || 'http://localhost:3001'
+      const protocol = baseUrl.startsWith('https') ? 'wss:' : 'ws:'
+      const host = baseUrl.replace(/^https?:\/\//, '').replace(/\/$/, '')
       const url = `${protocol}//${host}`
 
       console.log('[WebSocket] Connecting to:', url)
