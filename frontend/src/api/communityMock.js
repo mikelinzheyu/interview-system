@@ -3,6 +3,8 @@
  * 当后端 API 不可用时，使用此模拟数据
  */
 
+import webpackViteTurbopackContent from '@/content/community/webpack-vite-turbopack.md?raw'
+
 // 论坛板块定义
 export const mockForums = [
   {
@@ -562,6 +564,230 @@ export function generateMockHotTags() {
  * 获取帖子详情（包含完整内容和评论）
  */
 export function getPostDetailMock(postId) {
+  const detailedMap = {
+    '7': {
+      title: '微服务架构设计与实践',
+      forumSlug: 'backend',
+      tags: ['微服务', '架构设计', '分布式'],
+      content: `# 微服务架构设计与实践
+
+从单体系统演进到微服务，看似是技术栈升级，本质上是组织结构和业务边界一起重塑的过程。设计不好，容易从单体地狱走进分布式地狱。
+
+## 一、服务拆分的原则
+
+设计服务边界时，可以重点关注：
+
+- 是否围绕清晰的业务能力来拆分，而不是按技术层拆分  
+- 同一个服务内部的数据是否高度内聚  
+- 跨服务强一致场景是否可控  
+- 团队边界和服务边界是否大致匹配
+
+缺少这些考量，微服务很容易变成部署在不同机器上的一堆小单体。`
+    },
+    '8': {
+      title: 'Node.js 性能调优实战',
+      forumSlug: 'backend',
+      tags: ['Node.js', '性能优化', '后端开发'],
+      content: `# Node.js 性能调优实战
+
+Node.js 的优势在于处理大量并发 IO，但如果对事件循环和线程池缺乏认识，很容易写出看起来异步、实际上阻塞的代码。
+
+## 一、先弄清执行模型
+
+在调优之前，需要先理解：
+
+- 单线程主要负责执行 JavaScript 和调度回调  
+- IO 操作交给操作系统或线程池，完成后再把回调放回事件循环队列  
+- CPU 密集型代码会阻塞事件循环，导致所有请求排队
+
+## 二、常见优化思路
+
+- 避免在请求链路中使用同步文件操作  
+- 对计算密集任务使用子进程或工作线程  
+- 利用性能分析工具定位真正的热点函数  
+- 合理设置连接池与复用策略`
+    },
+    '9': {
+      title: '深入理解 JavaScript 事件循环机制',
+      forumSlug: 'frontend',
+      tags: ['JavaScript', '事件循环', '异步编程'],
+      content: `# 深入理解 JavaScript 事件循环机制
+
+事件循环是前端和 Node.js 中所有异步行为的基础。如果不了解它，就很难解释代码的真实执行顺序。
+
+## 一、同步任务、宏任务和微任务
+
+可以把一次完整的事件循环大致理解为：
+
+1. 执行当前宏任务中的所有同步代码  
+2. 清空本轮中产生的所有微任务队列  
+3. 必要时触发界面渲染  
+4. 进入下一轮循环`
+    },
+    '15': {
+      title: 'REST API 设计最佳实践',
+      forumSlug: 'backend',
+      tags: ['API设计', 'REST', '后端开发'],
+      content: `# REST API 设计最佳实践
+
+一个好的 REST API 能够做到看接口名字就大概知道是做什么的，并且在演进过程中尽量保持兼容。
+
+## 一、围绕资源建模
+
+设计接口时，不要一开始就纠结路径，而是先想清楚：
+
+- 系统中有哪些核心资源，例如用户、订单、文章等  
+- 资源之间的从属和关联关系  
+- 每个资源有哪些典型操作`
+    },
+    '16': {
+      title: 'Web 安全防护指南',
+      forumSlug: 'frontend',
+      tags: ['安全', 'Web安全', 'XSS防护'],
+      content: `# Web 安全防护指南
+
+Web 应用面临的安全风险非常多样，但大部分问题都可以归结为对输入不可信和边界缺乏控制。
+
+## 一、前端侧常见风险
+
+- 跨站脚本攻击，通过注入脚本窃取用户信息  
+- 跨站请求伪造，利用现有登录态发起恶意请求  
+- 不安全的本地存储和错误使用浏览器接口`
+    },
+    '17': {
+      title: '图论算法详解与应用',
+      forumSlug: 'frontend',
+      tags: ['算法', '图论', '高级技巧'],
+      content: `# 图论算法详解与应用
+
+图论看起来抽象，但在实际工程中处处可见：社交关系、推荐系统、路径规划和依赖分析都可以建模为图。
+
+## 一、常见的图算法家族
+
+- 深度优先遍历和广度优先遍历  
+- 单源最短路算法，例如 Dijkstra  
+- 最小生成树算法`
+    },
+    '18': {
+      title: 'Python 异步编程 asyncio 完全指南',
+      forumSlug: 'backend',
+      tags: ['Python', '异步编程', 'asyncio'],
+      content: `# Python 异步编程 asyncio 完全指南
+
+在需要处理大量网络请求或 IO 操作时，asyncio 提供了一种高效且可控的并发方式。它的核心是事件循环和协程。
+
+## 一、几个关键概念
+
+- 协程函数，通过 async 关键字定义  
+- await 表达式，用来挂起当前协程等待异步结果  
+- 事件循环，负责调度协程和回调执行`
+    },
+    '19': {
+      title: '分布式事务处理方案对比',
+      forumSlug: 'backend',
+      tags: ['分布式', '事务', '架构设计'],
+      content: `# 分布式事务处理方案对比
+
+当一次业务操作跨越多个服务或多个数据库时，仅依赖单机事务已经无法保证整体一致性。此时就需要分布式事务方案来兜底。
+
+## 一、常见的几种思路
+
+- 两阶段提交，追求强一致但对基础设施要求较高  
+- TCC，将预留和确认逻辑显式抽出来交给业务方实现  
+- 基于本地消息表或事务消息的最终一致性方案`
+    },
+    '24': {
+      title: '全栈开发必知的 SQL 优化技巧',
+      forumSlug: 'database',
+      tags: ['SQL', '数据库', '性能优化'],
+      content: `# 全栈开发必知的 SQL 优化技巧
+
+很多接口变慢的根本原因在数据库层。即使作为前端或全栈开发，也有必要掌握一套基础的 SQL 优化思路。
+
+## 一、合理使用索引
+
+- 为高频查询条件字段建立合适的索引  
+- 注意联合索引的顺序和最左前缀原则  
+- 避免在索引列上进行计算和函数调用`
+    }
+  }
+
+  const idStr = String(postId)
+
+  const overrideContentMap = {
+    '1': {
+      content: `详细解析 Promise.all 和 Promise.race 的实现思路、并发行为以及常见面试变体，附带伪代码和注意事项，帮助你真正吃透 Promise 的状态流转机制。`
+    },
+    '2': {
+      content: `从抽离业务逻辑、组织 composable，到结合 TypeScript 做类型推导，系统梳理 Vue3 Composition API 的最佳实践，并给出可复制的项目落地模板。`
+    },
+    '3': {
+      content: `围绕“度量 → 分析瓶颈 → 有针对性优化 → 持续监控”这一闭环，从网络、渲染和脚本三个层面构建前端性能优化清单，并结合真实指标给出优化前后的对比。`
+    },
+    '4': {
+      content: `通过可视化时间线和简化版源码，拆解 useState、useEffect、useMemo 等核心 Hook 的运行流程，并展示如何通过自定义 Hook 实现逻辑复用与工程化沉淀。`
+    },
+    '5': {
+      content: `以反转链表、环检测、合并有序链表等高频题为主线，总结链表解题的指针操作模板和边界处理套路，配合多张示意图帮助你建立指针直觉。`
+    },
+    '6': {
+      content: `结合实际业务场景，讲解泛型、条件类型、映射类型和工具类型的设计思路，展示如何用 TypeScript 在大型前端项目中构建可维护的“类型 API”。`
+    },
+    '10': {
+      content: `从错误处理、日志规范、健康检查到优雅关闭与限流熔断，总结生产环境下构建高可用 Node.js 服务器的实战经验，并附部署与监控建议。`
+    },
+    '11': {
+      content: `围绕 Express 中间件的执行链路，手把手实现日志、鉴权、错误捕获等常用中间件，讨论同步与异步中间件的写法差异以及常见踩坑点。`
+    },
+    '12': {
+      content: `从资源建模、错误语义、限流与幂等，到缓存策略与版本管理，系统梳理高可用 RESTful API 的设计要点，并给出接口文档与协作流程的建议。`
+    },
+    '13': {
+      content: `通过多个真实项目对比 Flask 与 Django 在开发体验、扩展性、性能和生态上的差异，给出不同体量与阶段下的框架选型建议。`
+    },
+    '14': {
+      content: `基于 Spring Boot �?Spring Cloud 的微服务实践总结，涵盖服务拆分、配置中心、注册发现、链路追踪以及在容器环境中的部署经验。`
+    },
+    '20': {
+      content: `从使用体验、生态成熟度、构建性能和迁移成本四个维度深入比较 Webpack、Vite 与 Turbopack，并结合不同团队和项目阶段给出选型建议。`
+    },
+    '21': {
+      content: `通过爬楼梯、背包和编辑距离三类经典问题，拆解动态规划的“状态设计 + 转移方程”套路，帮助你在短时间内建立 DP 题目的通用思维框架。`
+    },
+    '22': {
+      content: `以一个实际的组件库为例，从按模块规划组件、设计主题系统、搭建设计文档，到发布 npm 与版本管理，完整走一遍 Vue 组件库的落地流程。`
+    },
+    '23': {
+      content: `给出一份可直接落地的 Code Review 检查清单，涵盖正确性、可读性、可维护性、安全与性能等维度，并讨论如何在团队内建立健康的评审文化。`
+    }
+  }
+
+  if (detailedMap[idStr] && !mockPosts.find(p => String(p.id) === idStr)) {
+    const custom = detailedMap[idStr]
+    const author = custom.author || {
+      userId: 'user-default',
+      name: '社区作者',
+      avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=recommend'
+    }
+
+    return {
+      id: idStr,
+      title: custom.title,
+      content: custom.content,
+      tags: custom.tags || [],
+      likes: 0,
+      viewCount: 0,
+      commentCount: 0,
+      createdAt: new Date().toISOString(),
+      pinned: false,
+      isPinned: false,
+      author,
+      userAvatar: author.avatar,
+      username: author.name,
+      comments: []
+    }
+  }
+
   const post = mockPosts.find(p => String(p.id) === String(postId))
 
   if (!post) {
@@ -585,8 +811,35 @@ export function getPostDetailMock(postId) {
   }
 
   // 为帖子详情生成额外的数据
+  const isBuildToolsPost = String(post.id) === '20'
+
+  const content = isBuildToolsPost
+    ? webpackViteTurbopackContent
+    : post.content
+
+  const title = isBuildToolsPost
+    ? '前端构建工具对决：Webpack、Vite 与 Turbopack 全方位评测'
+    : post.title
+
+  const tags = isBuildToolsPost
+    ? ['Webpack', 'Vite', 'Turbopack', '构建工具']
+    : post.tags
+
+  const forumSlug = isBuildToolsPost ? 'frontend' : post.forumSlug
+
+  const author = isBuildToolsPost
+    ? { ...post.author, name: post.author?.name || '构建工具专家' }
+    : post.author
+
+  const override = overrideContentMap[idStr]
+
   return {
     ...post,
+    title,
+    content: override && override.content ? override.content : content,
+    tags,
+    forumSlug,
+    author,
     // 添加评论数据
     comments: [
       {

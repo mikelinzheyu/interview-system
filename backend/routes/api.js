@@ -11,6 +11,10 @@ const { eventBridge } = require('../services/eventBridge')
 const aiRouter = require('./ai')
 const communityRouter = require('./community')
 const messagesRouter = require('./messages')
+const contributionsRouter = require('./contributions')
+const wrongAnswersRouter = require('./wrongAnswers')
+const recommendationsRouter = require('./recommendations')
+const hierarchicalDomains = require('../data/mock-domains-hierarchical.json')
 
 // ==================== 工具函数 ====================
 
@@ -1363,6 +1367,24 @@ router.post('/dms/:dmId/messages', auth, (req, res) => {
 // ==================== AI 工作流 API ====================
 
 /**
+ * 挂载社区贡献路由
+ * 提供题库贡献、讨论、收藏等功能
+ */
+router.use('/contributions', contributionsRouter)
+
+/**
+ * 挂载推荐路由
+ * 提供首页和统计模块推荐数据
+ */
+router.use('/', recommendationsRouter)
+
+/**
+ * 挂载错题本路由
+ * 提供错题记录与复习功能
+ */
+router.use('/', wrongAnswersRouter)
+
+/**
  * 挂载社区路由
  * 提供社区功能：帖子、文章、评论、点赞等
  */
@@ -1379,6 +1401,30 @@ router.use('/messages', messagesRouter)
  * 提供 Dify 集成的 AI 功能：摘要、关键点、SEO关键词、流式对话
  */
 router.use('/ai', aiRouter)
+
+// ==================== 领域/分类 API ====================
+
+/**
+ * GET /domains/hierarchical - 获取分层领域树数据
+ */
+router.get('/domains/hierarchical', (req, res) => {
+  try {
+    const payload = Array.isArray(hierarchicalDomains) ? hierarchicalDomains : []
+
+    res.json({
+      code: 200,
+      message: 'Hierarchical domains retrieved successfully',
+      data: payload
+    })
+  } catch (error) {
+    console.error('[GET /domains/hierarchical] Error:', error)
+    res.status(500).json({
+      code: 500,
+      message: 'Failed to load hierarchical domains',
+      error: error.message
+    })
+  }
+})
 
 // ==================== 错误处理 ====================
 

@@ -190,23 +190,54 @@ router.get('/chat/stream', auth, rateLimit(30, 60), (req, res) => {
       if (!isChatConfigured) {
         logger.warn('[AI/Chat] Chat API not configured, using mock data');
 
-        // 生成基于消息内容的 mock 响应，实现多轮对话的错觉
-        const mockResponses = {
-          'java': '在 Vue3 中处理异步请求，你可以使用 async/await 结合 try/catch。这样可以让代码更简洁易读。如果需要错误处理，catch 块会捕获所有异常。',
-          'async': '你提到的异步问题确实常见。建议使用 Promise.all() 处理多个异步操作，或者使用 async/await 的并发模式来提高效率。',
-          'vue': 'Vue3 的 Composition API 在处理异步时很强大。你可以在 setup() 中使用 async 函数，然后返回响应式数据。',
-          'default': `关于你的问题"${message}"，这是一个很好的问题。根据文章内容和最佳实践，我的建议是：1. 深入学习相关概念 2. 通过项目实践来加深理解 3. 查阅官方文档获取最新信息。希望这能有所帮助！`
+        // 生成基于消息内容的 mock 响应，实现多轮对话
+        const lowerMessage = message.toLowerCase();
+
+        // 更丰富的 Mock 响应库，支持多轮对话上下文
+        const generateMockResponse = (msg, userMessage) => {
+          // 继续对话的响应（检测是否是第二轮及以后）
+          if (msg.includes('继续') || msg.includes('然后') || msg.includes('具体') || msg.includes('例子')) {
+            const continuationResponses = [
+              `很好的补充问题！基于前面的讨论，我可以进一步补充：实际上，在实际项目中，我们通常会结合使用多个技术来解决更复杂的问题。例如，可以结合使用第三方库如 axios、fetch API 等，配合适当的错误处理和重试机制。`,
+              `这是一个非常实际的考虑。在生产环境中，我们需要考虑性能优化、缓存策略、超时控制等多个方面。同时，还要考虑浏览器兼容性和网络稳定性的问题。`,
+              `好的，让我详细解释一下。这个技术不仅适用于当前场景，还可以扩展到更复杂的场景中。关键是要理解底层原理，然后根据具体需求进行适配和优化。`,
+              `完全同意你的想法。实际上，很多开发者在开始时都会遇到类似的问题。解决的关键在于不断学习和实践，并积极参考社区中的最佳实践和案例。`
+            ];
+            return continuationResponses[Math.floor(Math.random() * continuationResponses.length)];
+          }
+
+          // 关键词匹配的响应
+          const keywordResponses = {
+            '异步': '异步编程是现代 JavaScript 开发的核心。你可以通过回调函数、Promise、async/await 等多种方式实现异步操作。其中 async/await 是目前最推荐的方式，因为它让异步代码看起来更像同步代码，易于理解和维护。',
+            'vue': 'Vue3 相比 Vue2 有了很大的改进。Vue3 的 Composition API 提供了更灵活的逻辑组织方式，特别是在处理复杂组件时优势明显。同时，Vue3 在性能和 TypeScript 支持方面也有显著提升。',
+            'react': 'React 的函数式编程思想非常强大。使用 Hooks 可以让你以更函数式的方式组织组件逻辑。关键是要理解 Hooks 的规则，特别是依赖数组的概念，这对于避免性能问题和内存泄漏至关重要。',
+            '性能': '性能优化是一个持续的过程。通常我们会从代码层面、网络层面、缓存层面等多个角度来优化。使用浏览器开发者工具的 Performance 标签页可以帮助我们识别性能瓶颈。',
+            '安全': '安全是开发的重要考虑。常见的安全问题包括 XSS、CSRF、SQL 注入等。防御这些攻击需要在前后端都采取相应的措施，比如输入验证、HTML 转义、使用安全的 HTTP 头等。',
+            '测试': '编写测试是保证代码质量的重要手段。单元测试、集成测试、端到端测试各有其用处。在前端，我们常用 Jest、Vitest、Cypress 等测试框架。',
+            '代码': '代码质量直接影响项目的可维护性和扩展性。遵循 SOLID 原则、使用设计模式、编写清晰的代码注释都很重要。同时，使用 ESLint 等工具可以帮助我们自动检查代码质量。',
+            '数据': '数据管理是现代应用的核心。根据数据的复杂程度，可以选择不同的解决方案：简单情况下可以用 React Context/Vue 的 reactive，复杂情况下使用 Redux/Pinia 等状态管理库。',
+            'api': 'API 设计应该遵循 RESTful 原则。同时，良好的 API 设计需要考虑版本控制、错误处理、文档等多个方面。在前端，我们需要合理处理 API 调用的加载状态、错误情况等。',
+            'typescript': 'TypeScript 可以让 JavaScript 开发更加安全和高效。通过类型定义，你可以在开发阶段就发现很多潜在的错误。特别是在大型项目中，TypeScript 的价值更加显著。'
+          };
+
+          // 查找匹配的关键词
+          for (const [keyword, response] of Object.entries(keywordResponses)) {
+            if (msg.includes(keyword)) {
+              return response;
+            }
+          }
+
+          // 默认响应
+          const defaultResponses = [
+            `关于你的问题"${userMessage}"，这是一个很好的问题。在实际开发中，这个话题涉及多个方面。我的建议是：1. 首先深入理解核心概念 2. 通过实际项目来练习 3. 参考社区的最佳实践和经验分享。希望这能对你有所帮助！`,
+            `非常感谢你提出这个问题。这个话题在开发社区中经常被讨论。一个好的解决方案应该考虑到代码的可读性、可维护性和性能。我建议你可以查看一些开源项目的实现方式，从中学习经验。`,
+            `这是一个深度的问题。要完全掌握这个知识点，需要从理论到实践都有充分的理解。建议你：第一步了解基本原理，第二步看一些实际案例，第三步自己尝试实现。这样循序渐进会更有效果。`,
+            `很好的观察！这个问题触及了开发的很多核心要素。实际上，没有绝对的"最佳实践"，关键是要根据你的具体场景和需求来选择合适的方案。在决策时，可以综合考虑：项目规模、团队能力、维护成本等因素。`
+          ];
+          return defaultResponses[Math.floor(Math.random() * defaultResponses.length)];
         };
 
-        // 根据关键词选择响应
-        let response = mockResponses['default'];
-        const lowerMessage = message.toLowerCase();
-        for (const [key, value] of Object.entries(mockResponses)) {
-          if (key !== 'default' && lowerMessage.includes(key)) {
-            response = value;
-            break;
-          }
-        }
+        let response = generateMockResponse(lowerMessage, message);
 
         // 分块发送响应，实现打字机效果
         const chunkSize = 15;
@@ -329,23 +360,54 @@ router.post('/chat/stream', auth, rateLimit(30, 60), (req, res) => {
       if (!isChatConfigured) {
         logger.warn('[AI/Chat] Chat API not configured, using mock data');
 
-        // 生成基于消息内容的 mock 响应，实现多轮对话的错觉
-        const mockResponses = {
-          'java': '在 Vue3 中处理异步请求，你可以使用 async/await 结合 try/catch。这样可以让代码更简洁易读。如果需要错误处理，catch 块会捕获所有异常。',
-          'async': '你提到的异步问题确实常见。建议使用 Promise.all() 处理多个异步操作，或者使用 async/await 的并发模式来提高效率。',
-          'vue': 'Vue3 的 Composition API 在处理异步时很强大。你可以在 setup() 中使用 async 函数，然后返回响应式数据。',
-          'default': `关于你的问题"${message}"，这是一个很好的问题。根据文章内容和最佳实践，我的建议是：1. 深入学习相关概念 2. 通过项目实践来加深理解 3. 查阅官方文档获取最新信息。希望这能有所帮助！`
+        // 生成基于消息内容的 mock 响应，实现多轮对话
+        const lowerMessage = message.toLowerCase();
+
+        // 更丰富的 Mock 响应库，支持多轮对话上下文
+        const generateMockResponse = (msg, userMessage) => {
+          // 继续对话的响应（检测是否是第二轮及以后）
+          if (msg.includes('继续') || msg.includes('然后') || msg.includes('具体') || msg.includes('例子')) {
+            const continuationResponses = [
+              `很好的补充问题！基于前面的讨论，我可以进一步补充：实际上，在实际项目中，我们通常会结合使用多个技术来解决更复杂的问题。例如，可以结合使用第三方库如 axios、fetch API 等，配合适当的错误处理和重试机制。`,
+              `这是一个非常实际的考虑。在生产环境中，我们需要考虑性能优化、缓存策略、超时控制等多个方面。同时，还要考虑浏览器兼容性和网络稳定性的问题。`,
+              `好的，让我详细解释一下。这个技术不仅适用于当前场景，还可以扩展到更复杂的场景中。关键是要理解底层原理，然后根据具体需求进行适配和优化。`,
+              `完全同意你的想法。实际上，很多开发者在开始时都会遇到类似的问题。解决的关键在于不断学习和实践，并积极参考社区中的最佳实践和案例。`
+            ];
+            return continuationResponses[Math.floor(Math.random() * continuationResponses.length)];
+          }
+
+          // 关键词匹配的响应
+          const keywordResponses = {
+            '异步': '异步编程是现代 JavaScript 开发的核心。你可以通过回调函数、Promise、async/await 等多种方式实现异步操作。其中 async/await 是目前最推荐的方式，因为它让异步代码看起来更像同步代码，易于理解和维护。',
+            'vue': 'Vue3 相比 Vue2 有了很大的改进。Vue3 的 Composition API 提供了更灵活的逻辑组织方式，特别是在处理复杂组件时优势明显。同时，Vue3 在性能和 TypeScript 支持方面也有显著提升。',
+            'react': 'React 的函数式编程思想非常强大。使用 Hooks 可以让你以更函数式的方式组织组件逻辑。关键是要理解 Hooks 的规则，特别是依赖数组的概念，这对于避免性能问题和内存泄漏至关重要。',
+            '性能': '性能优化是一个持续的过程。通常我们会从代码层面、网络层面、缓存层面等多个角度来优化。使用浏览器开发者工具的 Performance 标签页可以帮助我们识别性能瓶颈。',
+            '安全': '安全是开发的重要考虑。常见的安全问题包括 XSS、CSRF、SQL 注入等。防御这些攻击需要在前后端都采取相应的措施，比如输入验证、HTML 转义、使用安全的 HTTP 头等。',
+            '测试': '编写测试是保证代码质量的重要手段。单元测试、集成测试、端到端测试各有其用处。在前端，我们常用 Jest、Vitest、Cypress 等测试框架。',
+            '代码': '代码质量直接影响项目的可维护性和扩展性。遵循 SOLID 原则、使用设计模式、编写清晰的代码注释都很重要。同时，使用 ESLint 等工具可以帮助我们自动检查代码质量。',
+            '数据': '数据管理是现代应用的核心。根据数据的复杂程度，可以选择不同的解决方案：简单情况下可以用 React Context/Vue 的 reactive，复杂情况下使用 Redux/Pinia 等状态管理库。',
+            'api': 'API 设计应该遵循 RESTful 原则。同时，良好的 API 设计需要考虑版本控制、错误处理、文档等多个方面。在前端，我们需要合理处理 API 调用的加载状态、错误情况等。',
+            'typescript': 'TypeScript 可以让 JavaScript 开发更加安全和高效。通过类型定义，你可以在开发阶段就发现很多潜在的错误。特别是在大型项目中，TypeScript 的价值更加显著。'
+          };
+
+          // 查找匹配的关键词
+          for (const [keyword, response] of Object.entries(keywordResponses)) {
+            if (msg.includes(keyword)) {
+              return response;
+            }
+          }
+
+          // 默认响应
+          const defaultResponses = [
+            `关于你的问题"${userMessage}"，这是一个很好的问题。在实际开发中，这个话题涉及多个方面。我的建议是：1. 首先深入理解核心概念 2. 通过实际项目来练习 3. 参考社区的最佳实践和经验分享。希望这能对你有所帮助！`,
+            `非常感谢你提出这个问题。这个话题在开发社区中经常被讨论。一个好的解决方案应该考虑到代码的可读性、可维护性和性能。我建议你可以查看一些开源项目的实现方式，从中学习经验。`,
+            `这是一个深度的问题。要完全掌握这个知识点，需要从理论到实践都有充分的理解。建议你：第一步了解基本原理，第二步看一些实际案例，第三步自己尝试实现。这样循序渐进会更有效果。`,
+            `很好的观察！这个问题触及了开发的很多核心要素。实际上，没有绝对的"最佳实践"，关键是要根据你的具体场景和需求来选择合适的方案。在决策时，可以综合考虑：项目规模、团队能力、维护成本等因素。`
+          ];
+          return defaultResponses[Math.floor(Math.random() * defaultResponses.length)];
         };
 
-        // 根据关键词选择响应
-        let response = mockResponses['default'];
-        const lowerMessage = message.toLowerCase();
-        for (const [key, value] of Object.entries(mockResponses)) {
-          if (key !== 'default' && lowerMessage.includes(key)) {
-            response = value;
-            break;
-          }
-        }
+        let response = generateMockResponse(lowerMessage, message);
 
         // 分块发送响应，实现打字机效果
         const chunkSize = 15;

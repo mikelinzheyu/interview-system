@@ -72,9 +72,9 @@
                 <el-dropdown-item command="edit">编辑</el-dropdown-item>
                 <el-dropdown-item command="view">查看详情</el-dropdown-item>
                 <el-dropdown-item command="export">导出</el-dropdown-item>
-                <el-dropdown-item command="share">分享</el-dropdown-item>
-                <el-dropdown-divider />
-                <el-dropdown-item command="delete">删除</el-dropdown-item>
+              <el-dropdown-item command="share">分享</el-dropdown-item>
+              <el-dropdown-item divided disabled>----------------</el-dropdown-item>
+              <el-dropdown-item command="delete">删除</el-dropdown-item>
               </el-dropdown-menu>
             </template>
           </el-dropdown>

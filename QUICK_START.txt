@@ -1,0 +1,46 @@
+# 快速启动指南
+
+## 一键启动（Windows）
+
+在项目根目录打开命令行，按顺序执行：
+
+### 终端 1: 启动后端
+```
+START_BACKEND.cmd
+```
+
+### 终端 2: 启动前端
+```
+START_FRONTEND.cmd
+```
+
+### 打开浏览器
+访问 http://localhost:5174
+
+---
+
+## 验证
+
+后端启动成功时会看到：
+```
+🚀 Backend Server 已启动
+HTTP API  : http://localhost:3001/api
+```
+
+前端启动成功时会看到：
+```
+VITE v5.x.x  ready in XXX ms
+Local:   http://localhost:5174/
+```
+
+---
+
+## 快速故障排除
+
+| 问题 | 解决方案 |
+|------|--------|
+| API 返回 500 | 确保后端已启动 |
+| WebSocket 连接失败 | 检查后端是否运行 |
+| 无法启动 | 运行 `npm install --legacy-peer-deps` |
+
+更多帮助见 `ERROR_RESOLUTION_GUIDE.md`

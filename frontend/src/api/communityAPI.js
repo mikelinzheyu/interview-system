@@ -4,11 +4,15 @@
  */
 
 import { ElMessage } from 'element-plus'
+import { getPostDetailMock } from './communityMock'
 
 // 基础配置
 const API_BASE = '/api'
 const COMMUNITY_API = `${API_BASE}/community`
-// 与 communityWithCache 保持一致：默认使用 Mock 数据，除非显式关闭
+
+// 与 communityWithCache 保持一致：
+// 默认使用 Mock 数据（确保本地和无后端环境下也能看到完整内容）
+// 如需强制使用真实 API，可在 .env 中设置：VITE_USE_MOCK_DATA=false
 const USE_MOCK_DATA = import.meta.env.VITE_USE_MOCK_DATA !== 'false'
 
 /**
@@ -78,8 +82,13 @@ const request = async (url, options = {}) => {
 const communityAPI = {
   /**
    * 获取文章详情
+   * 优先调用后端 API，失败或显式启用 mock 时回退到本地 mock
    */
   async getPostDetail(postId) {
+    if (USE_MOCK_DATA) {
+      return this._getMockPostDetail(postId)
+    }
+
     try {
       const { response, result } = await doFetch(`${COMMUNITY_API}/posts/${postId}`)
       const payload = result || {}
@@ -204,75 +213,12 @@ const communityAPI = {
 
   // ========== Mock 数据方法 ==========
 
+  /**
+   * 本地 mock：按 postId 返回对应帖子详情
+   * 使用 api/communityMock.js 中的 getPostDetailMock，保证每篇帖子内容独立
+   */
   _getMockPostDetail(postId) {
-    return {
-      id: postId,
-      title: '【Linux】【操作】Linux操作集锦系列之十五——如何破解pdf、doc、zip、rar等密码',
-      content: `# Linux 系统密码破解指南
-
-## 作者简介
-
-本文作者：**花神庙农**，拥有 20 年 Linux 系统运维经验。
-
-## 博文系列
-
-本文属于 **Linux技术系列**，该系列包含多篇深度技术文章。
-
-## 如何破解pdf、doc、zip、rar等密码
-
-如果您遗忘了这些加密文件的密码，可以使用专业工具进行破解。
-
-### john the ripper
-
-使用字典破解
-
-\`\`\`bash
-python office2john.py filename.docx > hash.txt
-john hash.txt
-\`\`\`
-
-### 破解word、excel
-
-\`\`\`bash
-python office2john.py filename.docx > hash.txt
-python office2john.py filename.xlsx > hash.txt
-\`\`\`
-
-### 破解pdf
-
-使用 john the ripper 破解 PDF 文件密码：
-
-\`\`\`bash
-pdf2john.pl encrypted.pdf > hash.txt
-john hash.txt
-\`\`\`
-
-## 总结
-
-本文介绍了在 Linux 系统中破解常见加密文件的方法。请注意，这些工具仅用于合法用途，如找回自己遗忘的密码。
-`,
-      tags: ['linux', 'pdf', '破解', 'zip', 'rar', 'doc', '密码'],
-      createdAt: new Date(Date.now() - 2 * 24 * 3600000),
-      viewCount: 2400,
-      likeCount: 33,
-      commentCount: 20,
-      liked: false,
-      collected: false,
-      author: {
-        id: 'author-1',
-        name: '花神庙农',
-        avatar: 'https://cube.elemecdn.com/0/88/ff94d3c6d86f60cbe2e86151d6a5cda1.png',
-        bio: '博客专家 · 操作系统领域新星博主',
-        title: '高级系统工程师',
-        level: '博客专家',
-        verified: true,
-        followerCount: 250,
-        articleCount: 4054,
-        likeCount: 82000,
-        viewCount: 450000
-      },
-      comments: []
-    }
+    return getPostDetailMock(postId)
   },
 
   _getMockCollection() {
@@ -313,3 +259,4 @@ john hash.txt
 }
 
 export default communityAPI
+

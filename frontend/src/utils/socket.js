@@ -4,30 +4,33 @@
  */
 import { io } from 'socket.io-client'
 import { ElNotification } from 'element-plus'
+import { getWebSocketBaseUrl } from '@/utils/networkConfig'
 
-// 统一解析 WebSocket 基础地址：优先使用环境变量，其次使用当前页面 host
+// 统一解析 WebSocket 基础地址：优先使用配置和后端 API 地址
 const DEFAULT_WS_URL = (() => {
-  // 优先使用环境变量配置
-  const envUrl = import.meta.env.VITE_WS_BASE_URL
-  if (envUrl && envUrl !== 'auto' && typeof envUrl === 'string') {
-    const trimmed = envUrl.trim()
-    if (trimmed) {
-      console.log('[Socket] 使用环境变量 WebSocket URL:', trimmed)
-      return trimmed
+  try {
+    // 通过统一的网络配置模块解析基础地址
+    const base = getWebSocketBaseUrl()
+
+    if (base && typeof base === 'string') {
+      let url = base.trim()
+
+      // 如有必要，将 HTTP/HTTPS 协议转换为 WS/WSS
+      url = url.replace(/^https?:\/\//, (match) => {
+        return match.startsWith('https') ? 'wss://' : 'ws://'
+      })
+
+      console.log('[Socket] 使用解析后的 WebSocket URL:', url)
+      return url
     }
+  } catch (error) {
+    console.error('[Socket] 解析 WebSocket 基础地址失败，将使用兜底地址 ws://localhost:3001', error)
   }
 
-  // 否则使用当前页面 host
-  if (typeof window !== 'undefined') {
-    const isSecure = window.location.protocol === 'https:'
-    const protocol = isSecure ? 'wss:' : 'ws:'
-    const url = `${protocol}//${window.location.host}`
-    console.log('[Socket] 使用当前页面 WebSocket URL:', url)
-    return url
-  }
-
-  // Node/SSR 环境兜底
-  return 'ws://localhost:3001'
+  // 兜底：直连本地后端 WebSocket 服�?
+  const fallback = 'ws://localhost:3001'
+  console.log('[Socket] 使用兜底 WebSocket URL:', fallback)
+  return fallback
 })()
 
 const normalizeSocketUrl = (value) => {

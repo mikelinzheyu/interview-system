@@ -1,10 +1,10 @@
 <template>
-  <div class="achievements-container">
+  <div class="achievements-page">
     <!-- 顶部导航 -->
     <el-header class="header">
       <div class="header-content">
         <div class="nav-section">
-          <el-button type="text" class="back-btn" @click="$router.back()">
+          <el-button type="text" class="back-btn" @click="router.back()">
             <el-icon><ArrowLeft /></el-icon>
             返回
           </el-button>
@@ -28,7 +28,7 @@
       </div>
     </el-header>
 
-    <!-- 主要内容区域 -->
+    <!-- 主体内容 -->
     <el-main class="main-content">
       <div class="content-wrapper">
         <!-- 成就总览 -->
@@ -46,7 +46,7 @@
           @category-change="handleCategoryChange"
         />
 
-        <!-- 筛选和排序 -->
+        <!-- 过滤和排序 -->
         <div class="filter-section">
           <div class="filter-controls">
             <el-select
@@ -63,7 +63,7 @@
 
             <el-select
               v-model="rarityFilter"
-              placeholder="稀有度筛选"
+              placeholder="稀有度"
               class="rarity-filter"
               @change="applyFilters"
             >
@@ -81,7 +81,7 @@
               @change="applySorting"
             >
               <el-option label="解锁时间" value="unlockedAt" />
-              <el-option label="进度" value="progress" />
+              <el-option label="完成度" value="progress" />
               <el-option label="稀有度" value="rarity" />
               <el-option label="名称" value="title" />
             </el-select>
@@ -102,7 +102,7 @@
           @achievement-share="handleAchievementShare"
         />
 
-        <!-- 分页控制 -->
+        <!-- 分页 -->
         <div v-if="totalPages > 1" class="pagination-section">
           <el-pagination
             v-model:current-page="currentPage"
@@ -137,19 +137,19 @@
 import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useStatisticsStore } from '@/stores/statistics'
-import { ElMessage, ElNotification } from 'element-plus'
-import {
-  ArrowLeft, Search, Refresh, Share
-} from '@element-plus/icons-vue'
+import { ElMessage } from 'element-plus'
+import { ArrowLeft, Search, Refresh } from '@element-plus/icons-vue'
 import AchievementOverview from '@/components/achievements/AchievementOverview.vue'
 import AchievementCategories from '@/components/achievements/AchievementCategories.vue'
 import AchievementGrid from '@/components/achievements/AchievementGrid.vue'
 import AchievementCard from '@/components/achievements/AchievementCard.vue'
+import { useShare } from '@/composables/useShare'
 
 const router = useRouter()
 const statisticsStore = useStatisticsStore()
+const { triggerShare } = useShare()
 
-// 响应式数据
+// 响应式状态
 const searchQuery = ref('')
 const activeCategory = ref('all')
 const statusFilter = ref('all')
@@ -159,7 +159,7 @@ const refreshing = ref(false)
 const currentPage = ref(1)
 const pageSize = ref(24)
 
-// 从 store 获取数据
+// 从 store 中获取数据
 const {
   achievementMetadata,
   achievementCategories,
@@ -216,17 +216,20 @@ const filteredAchievements = computed(() => {
     const progressB = userAchievementProgress[b.id]
 
     switch (sortBy.value) {
-      case 'unlockedAt':
+      case 'unlockedAt': {
         const timeA = progressA?.unlockedAt ? new Date(progressA.unlockedAt) : new Date(0)
         const timeB = progressB?.unlockedAt ? new Date(progressB.unlockedAt) : new Date(0)
         return timeB - timeA
-      case 'progress':
-        const progressPercentA = (progressA?.progress || 0) / a.requirement
-        const progressPercentB = (progressB?.progress || 0) / b.requirement
-        return progressPercentB - progressPercentA
-      case 'rarity':
-        const rarityOrder = { common: 1, rare: 2, epic: 3, legendary: 4 }
-        return (rarityOrder[b.rarity] || 0) - (rarityOrder[a.rarity] || 0)
+      }
+      case 'progress': {
+        const percentA = (progressA?.progress || 0) / a.requirement
+        const percentB = (progressB?.progress || 0) / b.requirement
+        return percentB - percentA
+      }
+      case 'rarity': {
+        const order = { common: 1, rare: 2, epic: 3, legendary: 4 }
+        return (order[b.rarity] || 0) - (order[a.rarity] || 0)
+      }
       case 'title':
         return a.title.localeCompare(b.title)
       default:
@@ -244,7 +247,9 @@ const filteredAchievements = computed(() => {
   }))
 })
 
-const totalPages = computed(() => Math.ceil(filteredAchievements.value.length / pageSize.value))
+const totalPages = computed(() =>
+  Math.ceil(filteredAchievements.value.length / pageSize.value || 1)
+)
 
 const paginatedAchievements = computed(() => {
   const start = (currentPage.value - 1) * pageSize.value
@@ -272,8 +277,10 @@ const applySorting = () => {
 
 const handlePageChange = (page) => {
   currentPage.value = page
-  // 滚动到顶部
-  document.querySelector('.main-content').scrollTo({ top: 0, behavior: 'smooth' })
+  const main = document.querySelector('.main-content')
+  if (main) {
+    main.scrollTo({ top: 0, behavior: 'smooth' })
+  }
 }
 
 const handlePageSizeChange = (size) => {
@@ -288,12 +295,10 @@ const handleAchievementClick = (achievement) => {
   })
 }
 
-import { useShare } from ''@/composables/useShare''
-const { triggerShare } = useShare()
-
 const handleAchievementShare = (achievement) => {
-    const title = 我解锁了成就：`r
-  const text = achievement.description
+  if (!achievement) return
+  const title = '我解锁了一个成就'
+  const text = achievement.description || ''
   const url = window.location.href
   triggerShare({ title, text, url })
 }
@@ -318,206 +323,155 @@ const refreshData = async () => {
   }
 }
 
-// 监听路由参数变化
-watch(() => router.currentRoute.value.query, (newQuery) => {
-  if (newQuery.category) {
-    activeCategory.value = newQuery.category
-  }
-}, { immediate: true })
+// 监听路由参数变化（支持从其它页面带 category 过滤）
+watch(
+  () => router.currentRoute.value.query,
+  (query) => {
+    if (query.category) {
+      activeCategory.value = query.category
+    }
+  },
+  { immediate: true }
+)
 
-// 初始化数据
 onMounted(async () => {
   await refreshData()
 })
 </script>
 
 <style scoped>
-.achievements-container {
+.achievements-page {
   min-height: 100vh;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 }
 
 .header {
-  background: white;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  padding: 0;
-  height: 70px;
+  background-color: #ffffff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
 .header-content {
-  max-width: 1400px;
+  max-width: 1200px;
   margin: 0 auto;
-  padding: 0 24px;
-  height: 100%;
+  padding: 12px 24px;
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
 }
 
 .nav-section {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 12px;
 }
 
 .back-btn {
-  font-size: 16px;
-  padding: 8px 16px;
+  padding-left: 0;
 }
 
 .page-title {
-  font-size: 24px;
+  font-size: 20px;
   font-weight: 600;
-  color: #303133;
   margin: 0;
 }
 
 .header-actions {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 12px;
 }
 
 .search-input {
-  width: 300px;
+  width: 260px;
 }
 
 .main-content {
-  padding: 0;
-  overflow-x: hidden;
+  padding: 24px 0 40px;
+  background: transparent;
 }
 
 .content-wrapper {
-  max-width: 1400px;
+  max-width: 1200px;
   margin: 0 auto;
-  padding: 32px 24px;
 }
 
 .filter-section {
+  margin: 24px 0 12px;
+  padding: 12px 16px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.9);
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  margin: 32px 0;
-  padding: 20px;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
-  border-radius: 16px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
 }
 
 .filter-controls {
   display: flex;
-  gap: 16px;
   align-items: center;
+  gap: 12px;
 }
 
 .status-filter,
 .rarity-filter,
 .sort-select {
-  width: 140px;
+  width: 150px;
 }
 
 .filter-stats {
-  color: #666;
-  font-size: 14px;
-}
-
-.results-count {
-  font-weight: 500;
+  font-size: 13px;
+  color: #606266;
 }
 
 .pagination-section {
+  margin-top: 20px;
+  padding: 16px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.9);
   display: flex;
   justify-content: center;
-  margin: 48px 0;
-  padding: 24px;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
-  border-radius: 16px;
 }
 
 .recent-section {
-  margin-top: 48px;
+  margin-top: 24px;
+  padding: 16px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.9);
 }
 
 .section-title {
-  font-size: 24px;
+  margin: 0 0 12px;
+  font-size: 16px;
   font-weight: 600;
-  color: #ffffff;
-  margin-bottom: 24px;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .recent-achievements {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 16px;
-}
-
-/* 响应式设计 */
-@media (max-width: 1200px) {
-  .content-wrapper {
-    padding: 24px 16px;
-  }
-
-  .filter-section {
-    flex-direction: column;
-    gap: 16px;
-    align-items: stretch;
-  }
-
-  .filter-controls {
-    flex-wrap: wrap;
-  }
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 12px;
 }
 
 @media (max-width: 768px) {
   .header-content {
-    padding: 0 16px;
     flex-direction: column;
-    height: auto;
-    padding: 12px 16px;
+    align-items: flex-start;
+    gap: 8px;
   }
 
   .header-actions {
     width: 100%;
-    margin-top: 12px;
+    justify-content: space-between;
   }
 
   .search-input {
     flex: 1;
-    width: auto;
   }
 
-  .page-title {
-    font-size: 20px;
-  }
-
-  .filter-controls {
-    width: 100%;
-  }
-
-  .status-filter,
-  .rarity-filter,
-  .sort-select {
-    flex: 1;
-  }
-
-  .recent-achievements {
-    grid-template-columns: 1fr;
-  }
-}
-
-/* 深色模式支持 */
-@media (prefers-color-scheme: dark) {
-  .filter-section,
-  .pagination-section {
-    background: linear-gradient(135deg, #2a2a2a 0%, #1e1e2e 100%);
-    color: #fff;
-  }
-
-  .results-count {
-    color: #ccc;
+  .filter-section {
+    flex-direction: column;
+    align-items: flex-start;
   }
 }
 </style>
+

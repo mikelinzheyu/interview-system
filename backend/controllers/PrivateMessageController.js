@@ -13,10 +13,10 @@ class PrivateMessageController {
     if (!mockData.privateMessages) {
       mockData.privateMessages = []
     }
-    if (!mockData.conversationIdCounter === undefined) {
+    if (typeof mockData.conversationIdCounter === 'undefined') {
       mockData.conversationIdCounter = 1
     }
-    if (!mockData.privateMessageIdCounter === undefined) {
+    if (typeof mockData.privateMessageIdCounter === 'undefined') {
       mockData.privateMessageIdCounter = 1
     }
   }

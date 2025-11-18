@@ -4,7 +4,7 @@
 
 const express = require('express')
 const router = express.Router()
-const { getControllers } = require('../services/dataService')
+const { getControllers, getMockData } = require('../services/dataService')
 
 /**
  * 获取用户的对话列表
@@ -70,7 +70,7 @@ router.get('/conversations/:conversationId', (req, res) => {
     const userId = parseInt(req.headers['x-user-id'] || '1')
 
     const controller = getControllers().privateMessage
-    const conversation = getControllers().getMockData().conversations.find(c => c.id === conversationId)
+    const conversation = getMockData().conversations.find(c => c.id === conversationId)
 
     if (!conversation) {
       return res.status(404).json({
@@ -93,7 +93,7 @@ router.get('/conversations/:conversationId', (req, res) => {
 
     // 获取其他参与者的信息
     const otherUserId = conversation.participantIds.find(id => id !== userId)
-    const otherUser = getControllers().getMockData().users?.find(u => u.id === otherUserId)
+    const otherUser = getMockData().users?.find(u => u.id === otherUserId)
 
     res.json({
       code: 200,
@@ -137,7 +137,7 @@ router.get('/conversations/:conversationId/messages', (req, res) => {
     const userId = parseInt(req.headers['x-user-id'] || '1')
 
     const controller = getControllers().privateMessage
-    const conversation = getControllers().getMockData().conversations.find(c => c.id === conversationId)
+    const conversation = getMockData().conversations.find(c => c.id === conversationId)
 
     if (!conversation) {
       return res.status(404).json({

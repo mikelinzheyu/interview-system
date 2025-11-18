@@ -175,7 +175,9 @@
                 <el-dropdown-item command="clear-all">
                   🗑️ 清空全部
                 </el-dropdown-item>
-                <el-dropdown-divider />
+                <el-dropdown-item divided disabled>
+                  ----------------
+                </el-dropdown-item>
                 <el-dropdown-item command="markdown-help">
                   📖 Markdown 帮助
                 </el-dropdown-item>

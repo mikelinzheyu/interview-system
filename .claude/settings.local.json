@@ -1,31 +1,14 @@
 {
   "permissions": {
     "allow": [
-      "Bash(git -C \"D:\\code7\\interview-system\" add \"frontend/src/components/MentionDropdown.vue\")",
-      "Bash(git -C \"D:\\code7\\interview-system\" commit -m \"fix: Fix MentionDropdown.vue watch and props reference errors\")",
-      "Bash(git -C \"D:\\code7\\interview-system\" add \"backend/controllers/index.js\")",
-      "Bash(git -C \"D:\\code7\\interview-system\" commit -m \"feat: Add post ID 15 test data for frontend testing\n\n- Added Vue 3 Composition API interview question post with ID 15\n- Includes comprehensive markdown content with code examples\n- Resolves 404 error when frontend tries to load post 15\")",
-      "Bash(git -C \"D:\\code7\\interview-system\" commit -m \"refactor: Add defensive programming to MentionDropdown\n\n- Add null-safety checks using optional chaining operator (?.)\n- Validate suggestions array type in watch callback\n- Verify selectedUser exists before calling selectUser\n- Prevents undefined reference errors from invalid props\n- Improves robustness and error handling\")",
-      "Bash(git -C \"D:\\code7\\interview-system\" log --oneline -5)",
-      "Bash(git -C \"D:\\code7\\interview-system\" add \"frontend/src/views/community/PostDetail/RightSidebar/AIAssistant/ChatFeature.vue\")",
-      "Bash(git -C \"D:\\code7\\interview-system\" commit -m \"refactor: Improve typeout streaming effect with async/await\n\n- Replace setTimeout recursion with async/await for better control flow\n- Add streamComplete flag to properly signal stream end\n- Improve queue processing with while loop instead of recursion\n- Fix state management conflicts between isProcessing and typeoutTimer\n- Reduce display speed from 100ms to 50ms for smoother animation\n- Better error handling and logging for debugging\n- Ensure all characters are displayed even when stream ends abruptly\")",
-      "Bash(git -C \"D:\\code7\\interview-system\" add \"TYPEOUT_STREAMING_FIX.md\")",
-      "Bash(git -C \"D:\\code7\\interview-system\" commit -m \"docs: Add comprehensive typeout streaming fix documentation\n\n- Detailed analysis of original problems\n- Root cause explanation with code examples\n- Complete solution walkthrough\n- Performance improvements summary\n- Testing procedures and parameter tuning guide\n- Future optimization suggestions\")",
-      "Bash(git -C \"D:\\code7\\interview-system\" commit -m \"refactor: Simplify typeout streaming with reliable setTimeout recursion\n\n- Revert to simple setTimeout recursion for better reliability\n- Reduce displaySpeed from 50ms to 30ms for faster output\n- Replace async/await with setInterval polling for completion detection\n- Add detailed logging for debugging stream processing\n- Use interval-based completion checking instead of Promise chains\n- Handle timeout case by forcing message save after 50 seconds\")",
-      "Bash(git -C \"D:\\code7\\interview-system\" add \"TYPEOUT_DEBUG_GUIDE.md\")",
-      "Bash(git -C \"D:\\code7\\interview-system\" commit -m \"docs: Add typeout debugging guide for troubleshooting\n\n- Step-by-step console debugging procedures\n- Expected log sequences for normal operation\n- Diagnostic flowchart for common issues\n- Parameter adjustment guide\n- Network debugging tips\n- Quick test script for validation\")",
-      "Bash(git -C \"D:\\code7\\interview-system\" add \"frontend/src/views/community/PostDetail/MainContent/CommentsSection/CommentFormOptimized.vue\" \"COMMENT_FORM_OPTIMIZATION.md\")",
-      "Bash(git -C \"D:\\code7\\interview-system\" commit -m \"feat: Create optimized comment form with comprehensive improvements\n\n- Fix Markdown toolbar button bug (insertMarkdown function)\n- Add insertBlock function for proper block element handling\n- Redesign button layout with more options menu\n- Add preview toggle control\n- Improve toolbar organization with logical grouping\n- Add keyboard shortcut hints (Ctrl+Enter)\n- Implement success feedback animation\n- Add draft save/view/clear options\n- Improve responsive design (desktop/tablet/mobile)\n- Better visual hierarchy and spacing\n- Add character count warning at 1800 chars\n- Add confirmation dialog for clear action\n- Show last save time in header\n- Complete documentation with before/after comparison\")",
-      "Bash(git -C \"D:\\code7\\interview-system\" add \"COMMENT_FORM_DEMO.md\")",
-      "Bash(git -C \"D:\\code7\\interview-system\" commit -m \"docs: Add comment form optimization demo and comparison\n\n- Visual before/after UI comparison\n- Feature comparison table\n- Bug fix demonstration\n- Usage scenario examples\n- Performance metrics\n- Integration instructions\n- Post-optimization recommendations\")",
+      "Bash(timeout 5 bash -c 'while ! curl -s http://localhost:3001/health > /dev/null 2>&1; do echo \"\"等待后端启动...\"\"; sleep 1; done; echo \"\"后端已启动\"\"')",
+      "Bash(node:*)",
+      "Bash(curl:*)",
+      "Bash(timeout 10 bash:*)",
+      "Bash(timeout 8 bash:*)",
       "Bash(cat:*)",
-      "Bash(\"D:\\code7\\interview-system\\frontend\\src\\views\\community\\PostDetail\\MainContent\\CommentsSection\\CommentForm.vue\")",
-      "Bash(git -C \"D:\\code7\\interview-system\" diff --stat frontend/src/views/community/PostDetail/MainContent/CommentsSection/CommentForm.vue)",
-      "Bash(git -C \"D:\\code7\\interview-system\" add \"frontend/src/views/community/PostDetail/MainContent/CommentsSection/CommentForm.vue\")",
-      "Bash(git -C \"D:\\code7\\interview-system\" commit -m \"refactor: Apply optimized comment form to production\n\n- Replace original CommentForm.vue with CommentFormOptimized.vue\n- Include all improvements: bug fixes, new features, better UX\n- Fix Markdown toolbar button insertion issues\n- Add advanced options menu (save draft, view draft, clear, help)\n- Improve toolbar organization with logical grouping\n- Add preview toggle and success feedback\n- Implement proper keyboard shortcut support\n- Better responsive design for all screen sizes\n- Ready for immediate production use\")",
       "Bash(git add:*)",
-      "Bash(git commit:*)",
-      "Bash(nul)"
+      "Bash(git commit:*)"
     ],
     "deny": [],
     "ask": []

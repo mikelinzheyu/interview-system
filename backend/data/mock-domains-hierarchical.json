@@ -1,0 +1,254 @@
+[
+  {
+    "id": 100,
+    "name": "工学",
+    "slug": "engineering",
+    "level": "discipline",
+    "icon": "🏗️",
+    "parentId": null,
+    "description": "工程应用与技术创新方向",
+    "children": [
+      {
+        "id": 101,
+        "name": "计算机类",
+        "slug": "computer",
+        "level": "field",
+        "icon": "💻",
+        "parentId": 100,
+        "description": "计算机科学与技术核心模块",
+        "children": [
+          {
+            "id": 102,
+            "name": "前端工程",
+            "slug": "frontend-engineering",
+            "level": "domain",
+            "icon": "🌐",
+            "parentId": 101,
+            "description": "现代 Web 前端开发与工程化实践",
+            "questionCount": 116,
+            "children": [
+              {
+                "id": 103,
+                "name": "React 进阶",
+                "slug": "react-advanced",
+                "level": "track",
+                "parentId": 102,
+                "description": "构建高可维护性的组件化前端应用",
+                "questionCount": 48
+              },
+              {
+                "id": 104,
+                "name": "性能优化专题",
+                "slug": "frontend-performance",
+                "level": "track",
+                "parentId": 102,
+                "description": "涵盖性能瓶颈定位与优化方案",
+                "questionCount": 38
+              }
+            ]
+          },
+          {
+            "id": 105,
+            "name": "后端工程",
+            "slug": "backend-engineering",
+            "level": "domain",
+            "icon": "🛠️",
+            "parentId": 101,
+            "description": "高并发、可扩展的服务端架构设计",
+            "questionCount": 108,
+            "children": [
+              {
+                "id": 106,
+                "name": "微服务实践",
+                "slug": "microservices",
+                "level": "track",
+                "parentId": 105,
+                "description": "服务拆分、治理与容错策略",
+                "questionCount": 42
+              },
+              {
+                "id": 107,
+                "name": "数据库设计与调优",
+                "slug": "database-design",
+                "level": "track",
+                "parentId": 105,
+                "description": "高性能数据库建模与索引优化",
+                "questionCount": 36
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": 108,
+        "name": "软件工程",
+        "slug": "software-engineering",
+        "level": "field",
+        "icon": "🧩",
+        "parentId": 100,
+        "description": "工程管理、测试与质量保障体系",
+        "children": [
+          {
+            "id": 109,
+            "name": "工程项目管理",
+            "slug": "project-management",
+            "level": "domain",
+            "icon": "📋",
+            "parentId": 108,
+            "description": "覆盖需求分析、进度与风险管理",
+            "questionCount": 72,
+            "children": [
+              {
+                "id": 110,
+                "name": "敏捷实践",
+                "slug": "agile-practices",
+                "level": "track",
+                "parentId": 109,
+                "description": "Scrum 与看板最佳实践",
+                "questionCount": 28
+              }
+            ]
+          },
+          {
+            "id": 111,
+            "name": "软件测试",
+            "slug": "software-testing",
+            "level": "domain",
+            "icon": "🧪",
+            "parentId": 108,
+            "description": "测试策略、自动化与质量度量体系",
+            "questionCount": 68,
+            "children": [
+              {
+                "id": 112,
+                "name": "自动化测试",
+                "slug": "test-automation",
+                "level": "track",
+                "parentId": 111,
+                "description": "构建持续集成下的测试流水线",
+                "questionCount": 30
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": 200,
+    "name": "理学",
+    "slug": "science",
+    "level": "discipline",
+    "icon": "📚",
+    "parentId": null,
+    "description": "数据科学与人工智能方向",
+    "children": [
+      {
+        "id": 201,
+        "name": "数据科学",
+        "slug": "data-science",
+        "level": "field",
+        "icon": "📊",
+        "parentId": 200,
+        "description": "数据分析、统计建模与可视化",
+        "children": [
+          {
+            "id": 202,
+            "name": "商业分析",
+            "slug": "business-analytics",
+            "level": "domain",
+            "icon": "💡",
+            "parentId": 201,
+            "description": "支持战略决策的数据分析流程",
+            "questionCount": 96,
+            "children": [
+              {
+                "id": 203,
+                "name": "实验设计与 A/B 测试",
+                "slug": "ab-testing",
+                "level": "track",
+                "parentId": 202,
+                "description": "设计实验、评估指标与结果解读",
+                "questionCount": 34
+              }
+            ]
+          },
+          {
+            "id": 204,
+            "name": "数据工程",
+            "slug": "data-engineering",
+            "level": "domain",
+            "icon": "🗄️",
+            "parentId": 201,
+            "description": "数据采集、处理与管道构建",
+            "questionCount": 88,
+            "children": [
+              {
+                "id": 205,
+                "name": "数据管道实践",
+                "slug": "data-pipeline",
+                "level": "track",
+                "parentId": 204,
+                "description": "构建可靠的数据同步与调度体系",
+                "questionCount": 36
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": 206,
+        "name": "人工智能",
+        "slug": "artificial-intelligence",
+        "level": "field",
+        "icon": "🤖",
+        "parentId": 200,
+        "description": "机器学习与深度学习的核心能力",
+        "children": [
+          {
+            "id": 207,
+            "name": "机器学习",
+            "slug": "machine-learning",
+            "level": "domain",
+            "icon": "📈",
+            "parentId": 206,
+            "description": "从数学基础到模型训练与评估",
+            "questionCount": 110,
+            "children": [
+              {
+                "id": 208,
+                "name": "模型调参与部署",
+                "slug": "model-deployment",
+                "level": "track",
+                "parentId": 207,
+                "description": "提升模型性能并落地到生产环境",
+                "questionCount": 40
+              }
+            ]
+          },
+          {
+            "id": 209,
+            "name": "深度学习",
+            "slug": "deep-learning",
+            "level": "domain",
+            "icon": "🧠",
+            "parentId": 206,
+            "description": "神经网络、CV 与 NLP 的实战能力",
+            "questionCount": 112,
+            "children": [
+              {
+                "id": 210,
+                "name": "计算机视觉专题",
+                "slug": "computer-vision",
+                "level": "track",
+                "parentId": 209,
+                "description": "图像识别、检测与生成模型实践",
+                "questionCount": 38
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+]

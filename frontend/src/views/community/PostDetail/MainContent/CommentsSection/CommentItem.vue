@@ -3,9 +3,9 @@
     <!-- 评论头部 -->
     <div class="comment-header">
       <div class="author-info">
-        <el-avatar :src="comment.avatar" :size="40" />
+        <el-avatar :src="commentAvatar" :size="40" />
         <div class="author-details">
-          <span class="author-name">{{ comment.author }}</span>
+          <span class="author-name">{{ commentAuthorName }}</span>
           <span class="comment-time">{{ formatTime(comment.createdAt) }}</span>
         </div>
       </div>
@@ -45,7 +45,7 @@
     <ReplyForm
       v-if="showReplyForm"
       :comment-id="comment.id"
-      :placeholder="`回复 ${comment.author}...`"
+      :placeholder="`回复 ${commentAuthorName}...`"
       @submit="handleReplySubmit"
       @cancel="showReplyForm = false"
     />
@@ -55,9 +55,9 @@
       <div v-for="reply in comment.replies" :key="reply.id" class="reply-item">
         <div class="reply-header">
           <div class="author-info">
-            <el-avatar :src="reply.avatar" :size="32" />
+            <el-avatar :src="getReplyAvatar(reply)" :size="32" />
             <div class="author-details">
-              <span class="author-name">{{ reply.author }}</span>
+              <span class="author-name">{{ getReplyAuthorName(reply) }}</span>
               <span class="reply-time">{{ formatTime(reply.createdAt) }}</span>
             </div>
           </div>
@@ -134,6 +134,33 @@ const liked = computed(() => isLiked(props.comment.id))
 
 // 计算当前评论的点赞数
 const likeCount = computed(() => getLikeCount(props.comment.id))
+
+// 规范化作者展示信息（兼容字符串和对象）
+const commentAuthorName = computed(() => {
+  const author = props.comment.author
+  if (!author) return '匿名用户'
+  if (typeof author === 'string') return author
+  return author.name || author.username || author.nickname || `用户 ${author.userId || ''}`.trim()
+})
+
+const commentAvatar = computed(() => {
+  const author = props.comment.author
+  if (author && typeof author === 'object' && author.avatar) return author.avatar
+  return props.comment.avatar || ''
+})
+
+const getReplyAuthorName = (reply) => {
+  const author = reply.author
+  if (!author) return '匿名用户'
+  if (typeof author === 'string') return author
+  return author.name || author.username || author.nickname || `用户 ${author.userId || ''}`.trim()
+}
+
+const getReplyAvatar = (reply) => {
+  const author = reply.author
+  if (author && typeof author === 'object' && author.avatar) return author.avatar
+  return reply.avatar || ''
+}
 
 // 权限检查
 const canDelete = computed(() => {

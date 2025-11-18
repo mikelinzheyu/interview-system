@@ -1,0 +1,251 @@
+{
+  "questions": [
+    {
+      "id": 1,
+      "title": "打造稳定的 WebSocket 聊天室：如何处理断线重连与历史消息同步？",
+      "difficulty": "中等",
+      "category": "实时通信",
+      "tags": ["Node.js", "WebSocket", "Redis"],
+      "author": "Nova",
+      "authorId": 9,
+      "publishedAt": "2025-11-05 14:20",
+      "views": 1854,
+      "content": "## 背景\\n在高并发聊天室中，断线重连与历史消息同步是影响体验的关键因素。\\n\\n## 方案对比\\n1. **定期心跳**：保持连接可用性。\\n2. **消息游标**：通过 messageId 请求缺失消息。\\n3. **多副本缓存**：本地 + Redis 双写。\\n\\n```js\\nconst message = await redis.lrange(`room:${roomId}`, -100, -1)\\n```\\n\\n## 实践经验\\n- 结合 `socket.io` 的 `ack` 机制防止重复消费。\\n- 使用 `roomVersion` 判断是否需要全量同步。",
+      "isFavorited": false,
+      "favorites": 32,
+      "bounty": null,
+      "discussions": [
+        {
+          "id": "d-101",
+          "author": "Ken",
+          "authorId": 7,
+          "createdAt": "2025-11-12 09:10",
+          "likes": 6,
+          "isLiked": false,
+          "content": "<p>我们在金融场景里引入了 <code>delivery receipt</code>，断线后会把未确认的消息重放，效果不错。</p>",
+          "replies": [
+            {
+              "id": "r-201",
+              "author": "Nova",
+              "authorId": 9,
+              "createdAt": "2025-11-12 11:02",
+              "content": "<p>感谢分享！receipt 结合批量确认确实能降低漏消息。</p>"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "面向增长团队的 A/B 测试埋点题库",
+      "difficulty": "简单",
+      "category": "数据分析",
+      "tags": ["A/B 测试", "埋点", "数据治理"],
+      "author": "Mia",
+      "authorId": 5,
+      "publishedAt": "2025-10-29 10:05",
+      "views": 964,
+      "content": "### 题目亮点\\n- 评估埋点设计的完整性\\n- 识别指标造假的常见方式\\n- 通过算例验证实验结论\\n\\n### 核心结构\\n1. 指标口径表\\n2. 埋点事件列表\\n3. QA 检查单",
+      "isFavorited": true,
+      "favorites": 58,
+      "bounty": {
+        "points": 80,
+        "deadline": "2025-12-15"
+      },
+      "discussions": [
+        {
+          "id": "d-205",
+          "author": "DataGeek",
+          "authorId": 15,
+          "createdAt": "2025-11-01 15:40",
+          "likes": 3,
+          "isLiked": false,
+          "content": "<p>是否可以补充一个埋点质量得分的示例？</p>",
+          "replies": []
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "构建可维护的 Vue3 题库系统：从路由到权限的全链路设计",
+      "difficulty": "困难",
+      "category": "前端工程",
+      "tags": ["Vue3", "Pinia", "Vite"],
+      "author": "Lina",
+      "authorId": 3,
+      "publishedAt": "2025-11-10 09:00",
+      "views": 2189,
+      "content": "## 设计重点\\n- 拆分模组：领域、题目、贡献、成就\\n- 统一 API 层与错误边界\\n- 权限维度：角色 + 频道 + 资源\\n\\n```ts\\nconst router = createRouter({ history: createWebHistory(), routes })\\n```\\n\\n## 讨论点\\n1. 如何在 Pinia 中管理大型实体？\\n2. 离线缓存的策略？",
+      "isFavorited": false,
+      "favorites": 41,
+      "bounty": null,
+      "discussions": [
+        {
+          "id": "d-309",
+          "author": "Alex",
+          "authorId": 8,
+          "createdAt": "2025-11-13 18:22",
+          "likes": 12,
+          "isLiked": false,
+          "content": "<p>推荐把领域/题目拆分成两个 store：一个负责 structure，一个负责状态。</p>",
+          "replies": [
+            {
+              "id": "r-401",
+              "author": "Lina",
+              "authorId": 3,
+              "createdAt": "2025-11-13 20:10",
+              "content": "<p>是的，目前准备引入 Entity Adapter 思想。</p>"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "submissions": [
+    {
+      "id": 501,
+      "title": "多模态答疑系统题库",
+      "status": "pending",
+      "authorId": 1,
+      "domain": "人工智能",
+      "difficulty": "中等",
+      "createdAt": "2025-11-11T02:15:00Z",
+      "updatedAt": "2025-11-11T02:15:00Z",
+      "reviewComments": []
+    },
+    {
+      "id": 502,
+      "title": "分布式事务设计题目",
+      "status": "approved",
+      "authorId": 2,
+      "domain": "后端",
+      "difficulty": "困难",
+      "createdAt": "2025-11-09T09:20:00Z",
+      "updatedAt": "2025-11-10T12:10:00Z",
+      "reviewComments": [
+        {
+          "reviewer": "Eason",
+          "comment": "补充了 Saga 的异常场景",
+          "createdAt": "2025-11-10T12:10:00Z"
+        }
+      ]
+    }
+  ],
+  "reviewQueue": [
+    {
+      "submissionId": 503,
+      "title": "数据建模与指标治理",
+      "status": "available",
+      "difficulty": "中等",
+      "author": "Aria",
+      "authorId": 6,
+      "submittedAt": "2025-11-12T07:40:00Z"
+    }
+  ],
+  "profiles": [
+    {
+      "userId": 1,
+      "stats": {
+        "totalSubmissions": 18,
+        "approvedCount": 14,
+        "approvalRate": 0.78,
+        "totalPoints": 920
+      },
+      "badges": [
+        {
+          "id": "badge-mentor",
+          "name": "题库导师",
+          "description": "累计 10 道题通过审核",
+          "icon": "🎓",
+          "earnedAt": "2025-10-30T09:00:00Z"
+        }
+      ],
+      "expertise": [
+        {
+          "domainId": "frontend",
+          "domainName": "前端工程",
+          "level": "advanced",
+          "submissionCount": 8
+        },
+        {
+          "domainId": "ai-safety",
+          "domainName": "AI 安全",
+          "level": "intermediate",
+          "submissionCount": 5
+        }
+      ],
+      "activityLog": [
+        {
+          "action": "submitted",
+          "description": "提交了《构建 prompt 评测体系》",
+          "timestamp": "2025-11-12T09:10:00Z"
+        },
+        {
+          "action": "approved",
+          "description": "《可视化埋点排查》通过审核",
+          "timestamp": "2025-11-10T08:30:00Z"
+        }
+      ]
+    }
+  ],
+  "leaderboard": [
+    {
+      "userId": 1,
+      "name": "Nova",
+      "avatar": "",
+      "score": 2560,
+      "rank": 1,
+      "recentSubmissions": 5
+    },
+    {
+      "userId": 3,
+      "name": "Lina",
+      "avatar": "",
+      "score": 2310,
+      "rank": 2,
+      "recentSubmissions": 4
+    },
+    {
+      "userId": 5,
+      "name": "Mia",
+      "avatar": "",
+      "score": 2105,
+      "rank": 3,
+      "recentSubmissions": 6
+    }
+  ],
+  "badges": [
+    {
+      "id": "badge-mentor",
+      "name": "题库导师",
+      "description": "累计 10 道题通过审核",
+      "icon": "🎓"
+    },
+    {
+      "id": "badge-reviewer",
+      "name": "金牌审核官",
+      "description": "完成 20 次审核",
+      "icon": "🛡️"
+    },
+    {
+      "id": "badge-researcher",
+      "name": "领域研究者",
+      "description": "覆盖 5 个不同领域的高质量题目",
+      "icon": "📚"
+    }
+  ],
+  "recommendations": [
+    {
+      "id": 9901,
+      "title": "Serverless 题库：函数冷启动调优",
+      "tags": ["Serverless", "性能优化"],
+      "difficulty": "中等"
+    },
+    {
+      "id": 9902,
+      "title": "知识图谱问答系统题库",
+      "tags": ["图数据库", "NLP"],
+      "difficulty": "困难"
+    }
+  ]
+}

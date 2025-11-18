@@ -250,7 +250,7 @@ const getTypeTagType = (type) => {
     question: 'warning',
     user: 'info'
   }
-  return map[type] || ''
+  return map[type] || 'info'
 }
 
 // 获取操作按钮文本

@@ -1,6 +1,6 @@
 <template>
-  <div class="category-page-container">
-    <!-- 导航栏 -->
+  <div class="category-page">
+    <!-- 顶部导航 -->
     <el-header class="category-header">
       <div class="header-content">
         <div class="nav-section">
@@ -10,16 +10,16 @@
           </el-button>
           <el-breadcrumb separator="/">
             <el-breadcrumb-item to="/achievements">成就中心</el-breadcrumb-item>
-            <el-breadcrumb-item>{{ categoryInfo?.name }}</el-breadcrumb-item>
+            <el-breadcrumb-item>{{ categoryInfo?.name || '分类详情' }}</el-breadcrumb-item>
           </el-breadcrumb>
         </div>
       </div>
     </el-header>
 
-    <!-- 主内容 -->
+    <!-- 主体内容 -->
     <el-main v-loading="loading" class="category-content">
       <div v-if="categoryInfo" class="content-wrapper">
-        <!-- 分类信息头部 -->
+        <!-- 分类信息 -->
         <div class="category-hero">
           <div class="category-icon-large" :style="{ backgroundColor: categoryInfo.color + '20' }">
             <el-icon :size="64" :color="categoryInfo.color">
@@ -34,7 +34,7 @@
             <div class="category-stats">
               <div class="stat-item">
                 <span class="stat-value">{{ categoryAchievements.length }}</span>
-                <span class="stat-label">总成就数</span>
+                <span class="stat-label">成就总数</span>
               </div>
               <div class="stat-item">
                 <span class="stat-value">{{ unlockedCount }}</span>
@@ -63,7 +63,7 @@
         <el-result
           icon="error"
           title="分类不存在"
-          sub-title="抱歉，找不到这个成就分类"
+          sub-title="抱歉，没有找到这个成就分类"
         >
           <template #extra>
             <el-button type="primary" @click="goToAchievements">
@@ -83,48 +83,30 @@ import { useStatisticsStore } from '@/stores/statistics'
 import { ElMessage } from 'element-plus'
 import { ArrowLeft } from '@element-plus/icons-vue'
 import AchievementGrid from '@/components/achievements/AchievementGrid.vue'
+import { useShare } from '@/composables/useShare'
 
 const route = useRoute()
 const router = useRouter()
 const statisticsStore = useStatisticsStore()
+const { triggerShare } = useShare()
 
-// 响应式数据
-const loading = ref(true)
-
-// 计算属性
-const categoryInfo = computed(() => {
-  return statisticsStore.achievementCategories.find(
-    cat => cat.id === route.params.categoryId
-  )
-})
-
-const categoryAchievements = computed(() => {
-  const categoryId = route.params.categoryId
-  const achievements = statisticsStore.achievementMetadata.filter(
-    achievement => achievement.category === categoryId
-  )
-
-  // 添加进度信息
-  return achievements.map(achievement => ({
-    ...achievement,
-    progress: statisticsStore.userAchievementProgress[achievement.id] || {
-      unlocked: false,
-      progress: 0,
-      unlockedAt: null
-    }
-  }))
-})
+const loading = ref(false)
+const categoryInfo = ref(null)
+const categoryAchievements = ref([])
 
 const unlockedCount = computed(() => {
-  return categoryAchievements.value.filter(a => a.progress.unlocked).length
+  const progressMap = statisticsStore.userAchievementProgress || {}
+  return categoryAchievements.value.filter(a => progressMap[a.id]?.unlocked).length
 })
 
 const completionRate = computed(() => {
-  if (categoryAchievements.value.length === 0) return 0
-  return Math.round((unlockedCount.value / categoryAchievements.value.length) * 100)
+  if (!categoryAchievements.value.length) return 0
+  const progressMap = statisticsStore.userAchievementProgress || {}
+  const total = categoryAchievements.value.length
+  const unlocked = categoryAchievements.value.filter(a => progressMap[a.id]?.unlocked).length
+  return Math.round((unlocked / total) * 100)
 })
 
-// 方法
 const handleGoBack = () => {
   router.back()
 }
@@ -136,35 +118,40 @@ const handleAchievementClick = (achievement) => {
   })
 }
 
-import { useShare } from ''@/composables/useShare''
-const { triggerShare } = useShare()
-
 const handleAchievementShare = (achievement) => {
-    const title = 我解锁了成就：`r
-  const text = achievement.description
+  if (!achievement) return
+  const title = '我解锁了一个成就'
+  const text = achievement.description || ''
   const url = window.location.href
   triggerShare({ title, text, url })
 }
 
 const handleViewDetail = (achievement) => {
-  router.push({
-    name: 'AchievementDetail',
-    params: { achievementId: achievement.id }
-  })
+  handleAchievementClick(achievement)
 }
 
 const goToAchievements = () => {
   router.push('/achievements')
 }
 
-// 生命周期
 onMounted(async () => {
   loading.value = true
   try {
-    // 确保数据已加载
+    // 确保基础数据已加载
     await statisticsStore.fetchAchievementMetadata()
     await statisticsStore.fetchUserAchievementProgress()
     await statisticsStore.fetchAchievementCategories()
+
+    const categoryId = route.params.categoryId
+    const categories = statisticsStore.achievementCategories || []
+    categoryInfo.value = categories.find(c => String(c.id) === String(categoryId))
+
+    const allAchievements = statisticsStore.achievementMetadata || []
+    categoryAchievements.value = allAchievements.filter(a => String(a.categoryId) === String(categoryId))
+
+    if (!categoryInfo.value) {
+      ElMessage.error('未找到对应的成就分类')
+    }
   } catch (error) {
     console.error('加载分类数据失败:', error)
     ElMessage.error('加载分类数据失败')
@@ -175,68 +162,59 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-.category-page-container {
+.category-page {
   min-height: 100vh;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 }
 
 .category-header {
-  background: white;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  padding: 0;
-  height: 70px;
+  background-color: #ffffff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
 .header-content {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 0 24px;
-  height: 100%;
-  display: flex;
-  align-items: center;
+  padding: 12px 24px;
 }
 
 .nav-section {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 12px;
 }
 
 .back-btn {
-  font-size: 16px;
-  padding: 8px 16px;
+  padding-left: 0;
 }
 
 .category-content {
-  padding: 0;
+  padding: 24px 0 40px;
+  background: transparent;
 }
 
 .content-wrapper {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 32px 24px;
 }
 
 .category-hero {
   display: flex;
   align-items: center;
-  gap: 32px;
-  padding: 48px;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
-  border-radius: 24px;
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
-  margin-bottom: 32px;
+  gap: 24px;
+  padding: 20px 24px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.92);
+  margin-bottom: 24px;
 }
 
 .category-icon-large {
-  width: 120px;
-  height: 120px;
-  border-radius: 30px;
+  width: 96px;
+  height: 96px;
+  border-radius: 24px;
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-shrink: 0;
 }
 
 .category-info {
@@ -244,80 +222,47 @@ onMounted(async () => {
 }
 
 .category-title {
-  font-size: 32px;
-  font-weight: 700;
-  color: #303133;
-  margin: 0 0 16px 0;
+  margin: 0 0 8px;
+  font-size: 22px;
+  font-weight: 600;
 }
 
 .category-description {
-  font-size: 16px;
+  margin: 0 0 16px;
   color: #606266;
-  margin: 0 0 24px 0;
-  line-height: 1.6;
 }
 
 .category-stats {
   display: flex;
-  gap: 32px;
+  gap: 24px;
+  flex-wrap: wrap;
 }
 
 .stat-item {
-  text-align: center;
+  min-width: 90px;
 }
 
 .stat-value {
   display: block;
-  font-size: 28px;
-  font-weight: 700;
-  color: #409eff;
-  line-height: 1;
-  margin-bottom: 8px;
+  font-size: 20px;
+  font-weight: 600;
 }
 
 .stat-label {
-  font-size: 14px;
+  font-size: 12px;
   color: #909399;
-  font-weight: 500;
 }
 
 .error-state {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 400px;
+  max-width: 600px;
+  margin: 60px auto;
 }
 
-/* 响应式设计 */
 @media (max-width: 768px) {
-  .content-wrapper {
-    padding: 24px 16px;
-  }
-
   .category-hero {
     flex-direction: column;
-    text-align: center;
-    padding: 32px 24px;
-    gap: 24px;
-  }
-
-  .category-icon-large {
-    width: 80px;
-    height: 80px;
-    border-radius: 20px;
-  }
-
-  .category-title {
-    font-size: 24px;
-  }
-
-  .category-stats {
-    justify-content: center;
-    gap: 24px;
-  }
-
-  .stat-value {
-    font-size: 24px;
+    align-items: flex-start;
   }
 }
 </style>
+

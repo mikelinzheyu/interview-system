@@ -2,8 +2,8 @@
   <div class="chat-input-wrapper">
     <!-- 工具栏 -->
     <div class="input-toolbar">
-      <el-button text circle :icon="Smile" title="表情" />
-      <el-button text circle :icon="Paperclip" title="上传文件" />
+      <el-button text circle title="表情">😀</el-button>
+      <el-button text circle title="上传文件">📎</el-button>
     </div>
 
     <!-- 输入框 -->
@@ -13,7 +13,7 @@
         type="textarea"
         :rows="3"
         :maxlength="500"
-        placeholder="写下你的消息... (Ctrl+Enter 或 Cmd+Enter 发送)"
+        placeholder="写下你的消息... (Ctrl+Enter / Cmd+Enter 发送)"
         @keydown.ctrl.enter="handleSend"
         @keydown.meta.enter="handleSend"
         show-word-limit
@@ -38,14 +38,6 @@
 <script setup>
 import { ref } from 'vue'
 import { ElMessage } from 'element-plus'
-import { Smile, Paperclip } from '@element-plus/icons-vue'
-
-const props = defineProps({
-  loading: {
-    type: Boolean,
-    default: false
-  }
-})
 
 const emit = defineEmits(['send'])
 
@@ -122,3 +114,4 @@ const handleSend = async () => {
   }
 }
 </style>
+*** End Patch>>();
