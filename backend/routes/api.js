@@ -1440,3 +1440,15 @@ router.use((req, res) => {
 })
 
 module.exports = router
+
+// ==================== 会话管理端点 ====================
+
+// GET /api/sessions - 获取所有会话
+router.get('/sessions', (req, res) => {
+  res.json({
+    code: 200,
+    message: 'OK',
+    data: []
+  })
+})
+

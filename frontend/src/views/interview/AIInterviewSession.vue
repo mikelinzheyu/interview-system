@@ -414,7 +414,8 @@ export default {
     VideoCamera,
     ChatDotRound,
     LoadingSpinner,
-    ErrorBoundary
+    ErrorBoundary,
+    WrongAnswerStatisticsCard
   },
   setup() {
     // 基础状态

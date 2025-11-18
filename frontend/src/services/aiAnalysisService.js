@@ -129,6 +129,37 @@ class AIAnalysisService {
   }
 
   /**
+   * Generate smart interview question based on user profile
+   * Uses AI to generate contextual questions based on job, level, and skills
+   *
+   * @param {Object} params - Question generation parameters
+   * @returns {Promise<Object>} Generated question data
+   */
+  static async generateQuestionSmart(params) {
+    try {
+      // Import InterviewAPIService dynamically to avoid circular dependencies
+      const InterviewAPIService = await import('./InterviewAPIService').then(m => m.default)
+      const interviewService = new InterviewAPIService()
+
+      const response = await interviewService.generateQuestionSmart(params)
+
+      return {
+        success: true,
+        data: response.data || response,
+        message: 'Question generated successfully'
+      }
+    } catch (error) {
+      console.error('Error generating smart question:', error)
+      // Return error object that AIInterviewSession can handle
+      return {
+        success: false,
+        data: null,
+        error: error.message
+      }
+    }
+  }
+
+  /**
    * Get empty insights object
    */
   static getEmptyInsights() {
