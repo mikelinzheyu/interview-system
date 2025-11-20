@@ -74,17 +74,39 @@
 
       <!-- 历史按钮栏 -->
       <div class="history-button-bar">
-        <el-button
-          @click="showHistory = !showHistory"
-          :type="showHistory ? 'primary' : 'default'"
-          size="small"
-          plain
-        >
-          {{ showHistory ? '👈 隐藏历史' : `📋 历史 (${conversations.length})` }}
-        </el-button>
-        <span v-if="conversationId" class="conversation-badge">
-          ✓ 对话 ID: {{ conversationId.substring(0, 8) }}...
-        </span>
+        <div class="history-btn-container">
+          <button
+            @click="showHistory = !showHistory"
+            class="modern-history-btn"
+            :class="{ 'is-active': showHistory }"
+          >
+            <span class="btn-inner">
+              <i class="btn-icon">
+                <svg v-if="!showHistory" viewBox="0 0 24 24" width="20" height="20">
+                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm3.5-9c.83 0 1.5-.67 1.5-1.5S16.33 8 15.5 8 14 8.67 14 9.5s.67 1.5 1.5 1.5zm-7 0c.83 0 1.5-.67 1.5-1.5S9.33 8 8.5 8 7 8.67 7 9.5 7.67 11 8.5 11zm3.5 6.5c2.33 0 4.31-1.46 5.11-3.5H6.89c.8 2.04 2.78 3.5 5.11 3.5z"/>
+                </svg>
+                <svg v-else viewBox="0 0 24 24" width="20" height="20">
+                  <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14zm-5.04-6.71l-2.75 3.54-2.12-2.12-1.41 1.41L11.21 17l4.16-5.25z"/>
+                </svg>
+              </i>
+              <span class="btn-label">
+                {{ showHistory ? '隐藏' : '历史' }}
+              </span>
+              <span class="btn-count" v-if="conversations.length > 0 && !showHistory">
+                {{ conversations.length }}
+              </span>
+            </span>
+            <span class="btn-highlight"></span>
+          </button>
+        </div>
+
+        <div v-if="conversationId" class="active-conv-badge">
+          <span class="badge-pulse"></span>
+          <span class="badge-content">
+            <span class="badge-label">当前对话</span>
+            <span class="badge-id">{{ conversationId.substring(0, 6) }}</span>
+          </span>
+        </div>
       </div>
 
       <AIMessagePanel
@@ -155,6 +177,7 @@ const conversations = ref([])          // 历史对话列表
 const showHistory = ref(false)          // 是否显示历史面板
 const isLoadingHistory = ref(false)     // 是否正在加载历史
 const selectedHistoryId = ref(null)     // 当前选中的历史对话 ID
+const historyLoaded = ref(false)        // 标记历史是否已加载过（用于懒加载）
 
 const getCurrentUserId = () => {
   try {
@@ -414,14 +437,22 @@ const handleRefreshMessage = async (message) => {
   }
 
   try {
-    const userMessages = messages.value.filter(m => m.role === 'user')
-    const lastUserMessage = userMessages[userMessages.length - 1]
+    // 🔧 修复：找到这条AI消息对应的用户消息
+    // 向前查找，找到最近的一条用户消息
+    let correspondingUserMessage = null
 
-    if (!lastUserMessage) {
-      throw new Error('找不到用户消息')
+    for (let i = msgIndex - 1; i >= 0; i--) {
+      if (messages.value[i].role === 'user') {
+        correspondingUserMessage = messages.value[i]
+        break
+      }
     }
 
-    await handleSendMessage(lastUserMessage.content)
+    if (!correspondingUserMessage) {
+      throw new Error('找不到对应的用户消息')
+    }
+
+    await handleSendMessage(correspondingUserMessage.content)
   } catch (error) {
     console.error('Refresh message error:', error)
     errorMessage.value = '重新生成失败，请重试'
@@ -602,11 +633,21 @@ const handleClearAllConversations = async () => {
 }
 
 /**
- * 组件挂载时加载历史
+ * 组件挂载时 - 不再急加载历史，改为懒加载
  */
 onMounted(() => {
-  loadConversationHistory()
-  console.log('[AI Assistant] 组件已挂载，加载对话历史')
+  console.log('[AI Assistant] 组件已挂载，历史对话将在首次打开时加载')
+})
+
+/**
+ * 监听 showHistory 变化，实现懒加载历史对话
+ */
+watch(showHistory, async (newVal) => {
+  if (newVal && !historyLoaded.value) {
+    console.log('[AI Assistant] 首次打开历史面板，开始加载...')
+    await loadConversationHistory()
+    historyLoaded.value = true
+  }
 })
 
 defineExpose({
@@ -618,8 +659,8 @@ defineExpose({
 <style scoped lang="scss">
 .ai-assistant-panel {
   display: flex;
-  height: 900px;
-  max-height: 900px;
+  height: 1000px;
+  max-height: 1000px;
   background: #1f1f2f;
   border: 1px solid #3d3d4d;
   border-radius: 8px;
@@ -769,19 +810,251 @@ defineExpose({
 .history-button-bar {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 8px 12px;
-  background: rgba(0, 0, 0, 0.2);
-  border-bottom: 1px solid #3d3d4d;
+  gap: 16px;
+  padding: 12px 16px;
+  background: linear-gradient(to right,
+    rgba(31, 31, 47, 0.8),
+    rgba(31, 31, 47, 0.6));
+  border-bottom: 1px solid rgba(61, 61, 77, 0.6);
   flex-shrink: 0;
+  backdrop-filter: blur(8px);
 
-  .conversation-badge {
-    font-size: 12px;
-    color: #4a90e2;
-    padding: 4px 8px;
-    background: rgba(74, 144, 226, 0.1);
-    border-radius: 4px;
-    border: 1px solid rgba(74, 144, 226, 0.3);
+  .history-btn-container {
+    flex: 0 0 auto;
+  }
+
+  .modern-history-btn {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 0;
+    padding: 0;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 0;
+    outline: none;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+
+    .btn-inner {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      background: linear-gradient(135deg,
+        rgba(74, 144, 226, 0.1) 0%,
+        rgba(74, 144, 226, 0.05) 100%);
+      border: 1.5px solid rgba(74, 144, 226, 0.3);
+      border-radius: 8px;
+      transition: all 0.3s ease;
+      position: relative;
+      z-index: 2;
+
+      .btn-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 24px;
+        height: 24px;
+        color: #4a90e2;
+        transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+
+        svg {
+          width: 100%;
+          height: 100%;
+          fill: currentColor;
+        }
+      }
+
+      .btn-label {
+        font-size: 13px;
+        font-weight: 600;
+        color: #b0c4ff;
+        letter-spacing: 0.5px;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+      }
+
+      .btn-count {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 24px;
+        height: 24px;
+        padding: 0 6px;
+        background: rgba(74, 144, 226, 0.25);
+        border-radius: 12px;
+        font-size: 11px;
+        font-weight: 700;
+        color: #e8f0ff;
+        animation: float-pulse 2.5s ease-in-out infinite;
+      }
+    }
+
+    .btn-highlight {
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 2px;
+      background: linear-gradient(90deg,
+        transparent 0%,
+        #4a90e2 50%,
+        transparent 100%);
+      transition: width 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+      z-index: 1;
+    }
+
+    &:hover {
+      .btn-inner {
+        background: linear-gradient(135deg,
+          rgba(74, 144, 226, 0.2) 0%,
+          rgba(74, 144, 226, 0.12) 100%);
+        border-color: rgba(74, 144, 226, 0.5);
+        box-shadow: 0 4px 16px rgba(74, 144, 226, 0.2),
+                    inset 0 1px 2px rgba(255, 255, 255, 0.1);
+        transform: translateY(-1px);
+      }
+
+      .btn-icon {
+        transform: scale(1.1) rotate(8deg);
+        color: #5a9ff0;
+      }
+
+      .btn-label {
+        color: #d4e4ff;
+      }
+    }
+
+    &:active {
+      .btn-inner {
+        transform: translateY(0);
+        box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+      }
+    }
+
+    &.is-active {
+      .btn-inner {
+        background: linear-gradient(135deg,
+          rgba(45, 156, 219, 0.25) 0%,
+          rgba(45, 156, 219, 0.15) 100%);
+        border-color: rgba(74, 144, 226, 0.6);
+        box-shadow: 0 6px 20px rgba(74, 144, 226, 0.25),
+                    inset 0 1px 3px rgba(255, 255, 255, 0.15);
+      }
+
+      .btn-icon {
+        color: #6ba4ff;
+        animation: icon-spin 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+      }
+
+      .btn-label {
+        color: #e8f0ff;
+      }
+
+      .btn-highlight {
+        width: 32px;
+        opacity: 1;
+      }
+    }
+  }
+
+  .active-conv-badge {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    background: linear-gradient(135deg,
+      rgba(39, 174, 96, 0.12) 0%,
+      rgba(39, 174, 96, 0.05) 100%);
+    border: 1.5px solid rgba(39, 174, 96, 0.4);
+    border-radius: 8px;
+    animation: fade-in 0.4s ease;
+
+    .badge-pulse {
+      position: relative;
+      width: 8px;
+      height: 8px;
+      background: #27ae60;
+      border-radius: 50%;
+      box-shadow: 0 0 8px rgba(39, 174, 96, 0.6);
+      animation: pulse-glow 2s ease-in-out infinite;
+    }
+
+    .badge-content {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+
+      .badge-label {
+        font-size: 11px;
+        font-weight: 600;
+        color: #7bd3a0;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+      }
+
+      .badge-id {
+        font-size: 12px;
+        font-weight: 700;
+        color: #a0ddb8;
+        font-family: 'Courier New', monospace;
+        letter-spacing: 1px;
+      }
+    }
+
+    &:hover {
+      background: linear-gradient(135deg,
+        rgba(39, 174, 96, 0.18) 0%,
+        rgba(39, 174, 96, 0.1) 100%);
+      border-color: rgba(39, 174, 96, 0.6);
+      box-shadow: 0 4px 12px rgba(39, 174, 96, 0.2);
+    }
+  }
+}
+
+@keyframes float-pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(0.9);
+  }
+}
+
+@keyframes icon-spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(180deg);
+  }
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 8px rgba(39, 174, 96, 0.6),
+                0 0 16px rgba(39, 174, 96, 0.3);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 0 12px rgba(39, 174, 96, 0.8),
+                0 0 24px rgba(39, 174, 96, 0.5);
+    transform: scale(1.2);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
   }
 }
 

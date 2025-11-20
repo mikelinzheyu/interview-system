@@ -16,8 +16,6 @@
       <el-skeleton :rows="3" animated />
     </div>
 
-    <!-- 热门文章已移动到左侧区域，这里隐藏 -->
-
     <!-- 文章归档 -->
     <MonthlyArchive v-if="!archivesLoading" :archives="archives" />
     <div v-else class="sidebar-skeleton">
@@ -32,7 +30,6 @@ import { ElMessage } from 'element-plus'
 import communityAPI from '@/api/communityAPI'
 import NewAIAssistant from './NewAIAssistant.vue'
 import ArticleCollection from './ArticleCollection.vue'
-import HotArticles from './HotArticles.vue'
 import MonthlyArchive from './MonthlyArchive.vue'
 
 const props = defineProps({
@@ -48,64 +45,56 @@ const props = defineProps({
 
 // 加载状态
 const collectionLoading = ref(false)
-const hotArticlesLoading = ref(false)
 const archivesLoading = ref(false)
+const collectionLoaded = ref(false)  // 标记collection是否已加载
+const archivesLoaded = ref(false)    // 标记archives是否已加载
 
 // 数据
 const collection = ref(null)
-const hotArticles = ref([])
 const archives = ref([])
 
 // 加载专栏数据
 const loadCollection = async () => {
+  if (!props.currentArticleId || collectionLoaded.value) return
   collectionLoading.value = true
   try {
     const data = await communityAPI.getArticleCollection(props.currentArticleId)
     collection.value = data
+    collectionLoaded.value = true
   } catch (error) {
     console.error('Failed to load collection:', error)
     ElMessage.warning('专栏目录加载失败，显示默认数据')
     collection.value = communityAPI._getMockCollection()
+    collectionLoaded.value = true
   } finally {
     collectionLoading.value = false
   }
 }
 
-// 加载热门文章
-const loadHotArticles = async () => {
-  hotArticlesLoading.value = true
-  try {
-    const data = await communityAPI.getHotArticles(5)
-    hotArticles.value = Array.isArray(data) ? data : data.articles || []
-  } catch (error) {
-    console.error('Failed to load hot articles:', error)
-    ElMessage.warning('热门文章加载失败，显示默认数据')
-    hotArticles.value = communityAPI._getMockHotArticles()
-  } finally {
-    hotArticlesLoading.value = false
-  }
-}
-
-// 加载归档数据
+// 加载归档数据（延迟加载以提高初始页面加载速度）
 const loadArchives = async () => {
+  if (archivesLoaded.value) return
   archivesLoading.value = true
   try {
     const data = await communityAPI.getArticleArchives()
     archives.value = Array.isArray(data) ? data : data.archives || []
+    archivesLoaded.value = true
   } catch (error) {
     console.error('Failed to load archives:', error)
     ElMessage.warning('归档数据加载失败，显示默认数据')
     archives.value = communityAPI._getMockArchives()
+    archivesLoaded.value = true
   } finally {
     archivesLoading.value = false
   }
 }
 
-// 初始化加载
 onMounted(() => {
-  loadCollection()
-  loadHotArticles()
-  loadArchives()
+  // ⏱️ 延迟500ms加载数据，让主内容先渲染
+  setTimeout(() => {
+    loadCollection()
+    loadArchives()
+  }, 500)
 })
 </script>
 
@@ -113,5 +102,9 @@ onMounted(() => {
 .new-right-sidebar {
   display: flex;
   flex-direction: column;
+}
+
+.sidebar-skeleton {
+  padding: 12px;
 }
 </style>

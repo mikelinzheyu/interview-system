@@ -1,18 +1,13 @@
 <template>
   <div class="post-detail-new-page">
-    <!-- 顶部作者横幅 -->
     <AuthorBanner
       :author="post?.author || {}"
       @follow="handleFollow"
     />
 
-    <!-- 两列布局 -->
     <NewTwoColumnLayout>
-      <!-- 主内容区 -->
       <template #main>
-        <!-- 文章内容（带左侧目录） -->
         <ArticleWithTOC>
-          <!-- 左侧悬浮目录 -->
           <template #toc>
             <FloatingTOC :toc="tableOfContents" />
             <div style="margin-top: var(--spacing-2xl)">
@@ -23,14 +18,12 @@
             </div>
           </template>
 
-          <!-- 右侧文章内容 -->
           <template #content>
             <NewArticleContent :post-id="postId" @post-loaded="handlePostLoaded" />
           </template>
         </ArticleWithTOC>
       </template>
 
-      <!-- 右侧边栏 -->
       <template #sidebar>
         <NewRightSidebar
           :current-article-id="postId"
@@ -64,7 +57,6 @@ const tableOfContents = ref([])
 const hotArticlesLoading = ref(false)
 const hotArticles = ref([])
 
-// 从文章内容中提取目录
 const generateTableOfContents = (content) => {
   if (!content) return []
 
@@ -78,7 +70,7 @@ const generateTableOfContents = (content) => {
     const id = `heading-${text
       .toLowerCase()
       .replace(/\s+/g, '-')
-      .replace(/[^\w\-]/g, '')}`
+      .replace(/[^\w-]/g, '')}`
 
     matches.push({ level, text, id })
   }
@@ -91,7 +83,6 @@ const handlePostLoaded = (postData) => {
   tableOfContents.value = generateTableOfContents(postData?.content)
 }
 
-// 加载热门文章至左侧区域
 const loadHotArticles = async () => {
   hotArticlesLoading.value = true
   try {
@@ -106,15 +97,18 @@ const loadHotArticles = async () => {
 }
 
 onMounted(() => {
-  loadHotArticles()
+  // ⏱️ 延迟加载热门文章（500ms），避免与主内容加载竞争）
+  setTimeout(() => {
+    loadHotArticles()
+  }, 500)
 })
 
 const handleFollow = async (data) => {
   try {
-    // TODO: 调用 API 关注用户
-    ElMessage.success(data.isFollowing ? '关注成功' : '已取消关注')
+    // TODO: wire follow/unfollow API
+    ElMessage.success(data.isFollowing ? 'Followed' : 'Unfollowed')
   } catch (error) {
-    ElMessage.error('操作失败')
+    ElMessage.error('Operation failed')
   }
 }
 </script>
