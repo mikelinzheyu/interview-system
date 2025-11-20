@@ -122,7 +122,7 @@
 </template>
 
 <script setup>
-import { ref, watch, nextTick, h } from 'vue'
+import { ref, watch, nextTick, h, onMounted, onBeforeUnmount, defineProps, defineEmits } from 'vue'
 import { marked } from 'marked'
 import { ElMessage } from 'element-plus'
 
@@ -130,25 +130,56 @@ const props = defineProps({
   messages: {
     type: Array,
     default: () => [],
-    // 消息格式: { id, role: 'user' | 'assistant', content, timestamp, loading }
   },
 })
 
-const emit = defineEmits(['scroll-to-bottom', 'scroll-top-reached', 'refresh-message'])
+const emit = defineEmits(['scroll-to-bottom', 'refresh-message'])
 
+// ==================== 状态变量 ====================
 const messageContainerRef = ref(null)
-
-// 分享菜单状态
 const shareMenuVisible = ref(false)
 const shareMenuTarget = ref(null)
-const shareMenuPosition = ref({ top: '0px', left: '0px' })
+const shareMenuPosition = ref({ top: '0', left: '0' })
+
+// ==================== 自定义 marked 渲染器 ====================
+
+// 创建自定义renderer
+const renderer = new marked.Renderer()
+
+// 自定义代码块处理 - 添加框和复制按钮
+renderer.code = (code, language, isEscaped) => {
+  const lang = language || 'plaintext'
+  const escapedCode = marked.Lexer.escape(code)
+
+  // 生成唯一ID用于复制功能
+  const codeId = `code-${Date.now()}-${Math.random()}`
+
+  return `
+    <div class="code-block-wrapper" data-language="${lang}">
+      <div class="code-block-header">
+        <span class="code-language">${lang}</span>
+        <button class="copy-code-btn" data-code-id="${codeId}" title="复制代码">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
+            <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
+          </svg>
+          <span class="copy-text">复制</span>
+        </button>
+      </div>
+      <pre class="code-block-content" data-code-id="${codeId}"><code class="language-${lang}">${escapedCode}</code></pre>
+    </div>
+  `
+}
 
 // 配置 marked 选项
 marked.setOptions({
   breaks: true,
   gfm: true,
   headerIds: false,
+  renderer: renderer
 })
+
+// ==================== 渲染函数 ====================
 
 // 渲染Markdown为HTML
 const renderMarkdown = (content) => {
@@ -213,7 +244,51 @@ const copyMessage = async (content) => {
   }
 }
 
-// 刷新消息
+// ==================== 代码块复制功能 ====================
+
+// 处理代码块复制事件
+const handleCodeBlockCopy = async (event) => {
+  const copyBtn = event.target.closest('.copy-code-btn')
+  if (!copyBtn) return
+
+  event.preventDefault()
+  event.stopPropagation()
+
+  try {
+    const codeId = copyBtn.getAttribute('data-code-id')
+    const codeElement = document.querySelector(`[data-code-id="${codeId}"]`)
+
+    if (!codeElement) {
+      throw new Error('找不到代码块')
+    }
+
+    // 获取纯文本（去除HTML标签）
+    const codeText = codeElement.innerText
+
+    // 使用Clipboard API复制
+    await navigator.clipboard.writeText(codeText)
+
+    // 显示复制成功反馈
+    const copyText = copyBtn.querySelector('.copy-text')
+    const originalText = copyText.textContent
+
+    copyBtn.classList.add('copied')
+    copyText.textContent = '✓ 已复制'
+
+    ElMessage.success('代码已复制到剪贴板')
+
+    // 2秒后恢复按钮状态
+    setTimeout(() => {
+      copyBtn.classList.remove('copied')
+      copyText.textContent = originalText
+    }, 2000)
+  } catch (error) {
+    console.error('复制代码失败:', error)
+    ElMessage.error('复制失败，请重试')
+  }
+}
+
+// ==================== 生命周期和事件监听 ====================
 const refreshMessage = (message) => {
   emit('refresh-message', message)
 }
@@ -348,6 +423,19 @@ watch(
   { immediate: true }
 )
 
+// ==================== 生命周期：事件监听 ====================
+
+// 组件挂载时添加事件监听
+onMounted(() => {
+  // 为所有复制代码块按钮添加事件监听
+  document.addEventListener('click', handleCodeBlockCopy)
+})
+
+// 组件卸载前移除事件监听
+onBeforeUnmount(() => {
+  document.removeEventListener('click', handleCodeBlockCopy)
+})
+
 // 暴露方法给父组件
 defineExpose({
   scrollToBottom,
@@ -359,7 +447,7 @@ defineExpose({
 .ai-message-panel {
   position: relative;
   width: 100%;
-  height: 450px;
+  height: 600px;
   display: flex;
   flex-direction: column;
   background: #1f1f2f;
@@ -613,7 +701,7 @@ defineExpose({
   gap: 10px;
   margin-top: 12px;
   padding-top: 12px;
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
 
   .action-group {
     display: flex;
@@ -632,16 +720,36 @@ defineExpose({
   .action-btn {
     display: flex;
     align-items: center;
-    gap: 4px;
-    padding: 6px 12px;
-    background: rgba(102, 126, 234, 0.1);
-    border: 1px solid rgba(102, 126, 234, 0.3);
-    color: #a0a0a0;
-    border-radius: 4px;
+    gap: 6px;
+    padding: 7px 12px;
+    background: linear-gradient(135deg,
+      rgba(74, 144, 226, 0.1) 0%,
+      rgba(74, 144, 226, 0.05) 100%);
+    border: 1.5px solid rgba(74, 144, 226, 0.25);
+    color: #a8d8ff;
+    border-radius: 6px;
     cursor: pointer;
     font-size: 12px;
-    transition: all 0.2s;
+    font-weight: 500;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
     user-select: none;
+    position: relative;
+    overflow: hidden;
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg,
+        transparent,
+        rgba(255, 255, 255, 0.1),
+        transparent);
+      transition: left 0.4s ease;
+      z-index: 0;
+    }
 
     .icon {
       font-size: 14px;
@@ -649,38 +757,61 @@ defineExpose({
       align-items: center;
       justify-content: center;
       min-width: 14px;
+      position: relative;
+      z-index: 1;
+      transition: transform 0.3s ease;
     }
 
     .text {
       font-weight: 500;
       white-space: nowrap;
+      position: relative;
+      z-index: 1;
     }
 
     &:hover {
-      background: rgba(102, 126, 234, 0.2);
-      border-color: #667eea;
-      color: #667eea;
-      transform: translateY(-1px);
+      background: linear-gradient(135deg,
+        rgba(74, 144, 226, 0.2) 0%,
+        rgba(74, 144, 226, 0.12) 100%);
+      border-color: rgba(74, 144, 226, 0.45);
+      color: #e8f0ff;
+      box-shadow: 0 3px 12px rgba(74, 144, 226, 0.2);
+      transform: translateY(-2px);
+
+      &::before {
+        left: 100%;
+      }
+
+      .icon {
+        transform: scale(1.15);
+      }
     }
 
     &:active {
-      transform: scale(0.96);
+      transform: translateY(0);
+      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
     }
 
     // Phase 4: 点赞/收藏活跃状态
     &.active {
-      background: rgba(255, 107, 107, 0.15);
-      border-color: rgba(255, 107, 107, 0.4);
-      color: #ff6b6b;
+      background: linear-gradient(135deg,
+        rgba(255, 107, 107, 0.15) 0%,
+        rgba(255, 107, 107, 0.08) 100%);
+      border-color: rgba(255, 107, 107, 0.35);
+      color: #ff8a8a;
+      box-shadow: 0 2px 8px rgba(255, 107, 107, 0.15);
 
       &:hover {
-        background: rgba(255, 107, 107, 0.25);
-        border-color: #ff6b6b;
-        color: #ff6b6b;
+        background: linear-gradient(135deg,
+          rgba(255, 107, 107, 0.25) 0%,
+          rgba(255, 107, 107, 0.15) 100%);
+        border-color: rgba(255, 107, 107, 0.5);
+        color: #ffb0b0;
+        box-shadow: 0 4px 12px rgba(255, 107, 107, 0.25);
       }
 
       .icon {
-        animation: heartBeat 0.3s ease-in-out;
+        animation: heartBeat 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
       }
     }
   }
@@ -690,8 +821,14 @@ defineExpose({
   0%, 100% {
     transform: scale(1);
   }
+  25% {
+    transform: scale(0.9);
+  }
   50% {
     transform: scale(1.2);
+  }
+  75% {
+    transform: scale(1.05);
   }
 }
 
@@ -703,50 +840,78 @@ defineExpose({
 
 .share-menu {
   position: fixed;
-  background: #2d2d3d;
-  border: 1px solid #3d3d4d;
-  border-radius: 6px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  background: linear-gradient(135deg,
+    #2d2d3d 0%,
+    #262636 100%);
+  border: 1.5px solid rgba(74, 144, 226, 0.3);
+  border-radius: 8px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4),
+              0 0 20px rgba(74, 144, 226, 0.1);
   z-index: 1000;
-  min-width: 120px;
+  min-width: 140px;
   overflow: hidden;
-  animation: slideUp 0.2s ease-out;
+  animation: slideUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  backdrop-filter: blur(10px);
 
   .share-option {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
     width: 100%;
-    padding: 10px 12px;
+    padding: 11px 14px;
     background: transparent;
     border: none;
-    color: #d0d0d0;
+    color: #d0e4ff;
     cursor: pointer;
     font-size: 13px;
-    transition: all 0.2s;
+    font-weight: 500;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
     white-space: nowrap;
+    position: relative;
+
+    &::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      height: 100%;
+      width: 0;
+      background: linear-gradient(90deg,
+        rgba(74, 144, 226, 0.1),
+        transparent);
+      transition: width 0.3s ease;
+      z-index: 0;
+    }
 
     .share-icon {
       font-size: 16px;
+      position: relative;
+      z-index: 1;
+      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
 
     .share-text {
       flex: 1;
       text-align: left;
-      font-weight: 500;
+      position: relative;
+      z-index: 1;
     }
 
     &:hover {
-      background: rgba(102, 126, 234, 0.15);
-      color: #667eea;
+      background: rgba(74, 144, 226, 0.15);
+      color: #a8d8ff;
+
+      &::before {
+        width: 100%;
+      }
 
       .share-icon {
-        transform: scale(1.1);
+        transform: scale(1.2) rotate(5deg);
       }
     }
 
     &:active {
-      background: rgba(102, 126, 234, 0.25);
+      background: rgba(74, 144, 226, 0.25);
     }
 
     &:not(:last-child) {
@@ -827,6 +992,148 @@ defineExpose({
     margin: 0;
     font-size: 14px;
     color: #888;
+  }
+}
+
+// ==================== 代码块样式 ====================
+
+.code-block-wrapper {
+  margin: 12px 0;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #1e1e2e;
+  border: 1px solid rgba(74, 144, 226, 0.2);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
+
+  &:hover {
+    border-color: rgba(74, 144, 226, 0.4);
+    box-shadow: 0 6px 16px rgba(74, 144, 226, 0.1);
+  }
+
+  // 代码块头部
+  .code-block-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px;
+    background: linear-gradient(135deg,
+      rgba(45, 45, 61, 0.8) 0%,
+      rgba(38, 38, 51, 0.6) 100%);
+    border-bottom: 1px solid rgba(74, 144, 226, 0.15);
+
+    .code-language {
+      font-size: 12px;
+      font-weight: 600;
+      color: #4a90e2;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    // 复制代码块按钮
+    .copy-code-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 10px;
+      background: rgba(74, 144, 226, 0.1);
+      border: 1px solid rgba(74, 144, 226, 0.3);
+      border-radius: 6px;
+      color: #a8d8ff;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      position: relative;
+      overflow: hidden;
+
+      svg {
+        width: 14px;
+        height: 14px;
+        flex-shrink: 0;
+      }
+
+      .copy-text {
+        white-space: nowrap;
+      }
+
+      &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg,
+          transparent,
+          rgba(255, 255, 255, 0.15),
+          transparent);
+        transition: left 0.4s ease;
+        z-index: 0;
+      }
+
+      &:hover {
+        background: rgba(74, 144, 226, 0.2);
+        border-color: rgba(74, 144, 226, 0.5);
+        box-shadow: 0 2px 8px rgba(74, 144, 226, 0.2);
+        transform: translateY(-1px);
+
+        &::before {
+          left: 100%;
+        }
+      }
+
+      &:active {
+        transform: translateY(0);
+        box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
+      }
+
+      // 复制成功状态
+      &.copied {
+        background: rgba(74, 220, 110, 0.2);
+        border-color: rgba(74, 220, 110, 0.4);
+        color: #4adc6e;
+
+        svg {
+          display: none;
+        }
+      }
+    }
+  }
+
+  // 代码内容
+  .code-block-content {
+    margin: 0;
+    padding: 14px;
+    overflow-x: auto;
+    background: #1e1e2e;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #e0e0e0;
+
+    code {
+      font-family: 'Courier New', 'Source Code Pro', 'Monaco', monospace;
+      color: inherit;
+      background: transparent;
+    }
+
+    // 自定义滚动条
+    &::-webkit-scrollbar {
+      height: 6px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: rgba(74, 144, 226, 0.3);
+      border-radius: 3px;
+
+      &:hover {
+        background: rgba(74, 144, 226, 0.5);
+      }
+    }
   }
 }
 </style>
