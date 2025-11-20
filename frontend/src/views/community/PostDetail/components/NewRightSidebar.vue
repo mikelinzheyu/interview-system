@@ -48,6 +48,7 @@ const collectionLoading = ref(false)
 const archivesLoading = ref(false)
 const collectionLoaded = ref(false)  // 标记collection是否已加载
 const archivesLoaded = ref(false)    // 标记archives是否已加载
+const lastLoadedCollectionArticleId = ref(null)  // 追踪已加载的 articleId
 
 // 数据
 const collection = ref(null)
@@ -55,17 +56,21 @@ const archives = ref([])
 
 // 加载专栏数据
 const loadCollection = async () => {
-  if (!props.currentArticleId || collectionLoaded.value) return
+  // ⏱️ 防止重复加载：如果已经加载过同一个文章的专栏，不重新加载
+  if (!props.currentArticleId || (collectionLoaded.value && lastLoadedCollectionArticleId.value === props.currentArticleId)) return
+
   collectionLoading.value = true
   try {
     const data = await communityAPI.getArticleCollection(props.currentArticleId)
     collection.value = data
     collectionLoaded.value = true
+    lastLoadedCollectionArticleId.value = props.currentArticleId
   } catch (error) {
     console.error('Failed to load collection:', error)
     ElMessage.warning('专栏目录加载失败，显示默认数据')
     collection.value = communityAPI._getMockCollection()
     collectionLoaded.value = true
+    lastLoadedCollectionArticleId.value = props.currentArticleId
   } finally {
     collectionLoading.value = false
   }

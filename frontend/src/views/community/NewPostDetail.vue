@@ -35,7 +35,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import AuthorBanner from './PostDetail/components/AuthorBanner.vue'
@@ -56,6 +56,7 @@ const postContent = computed(() => post.value?.content || '')
 const tableOfContents = ref([])
 const hotArticlesLoading = ref(false)
 const hotArticles = ref([])
+const lastLoadedHotArticlesPostId = ref(null)  // 追踪热门文章是否已加载过
 
 const generateTableOfContents = (content) => {
   if (!content) return []
@@ -84,10 +85,16 @@ const handlePostLoaded = (postData) => {
 }
 
 const loadHotArticles = async () => {
+  // ⏱️ 防止重复加载：每个帖子页面只加载一次热门文章
+  if (lastLoadedHotArticlesPostId.value === postId.value) {
+    return
+  }
+
   hotArticlesLoading.value = true
   try {
     const data = await communityAPI.getHotArticles(5)
     hotArticles.value = Array.isArray(data) ? data : data.articles || []
+    lastLoadedHotArticlesPostId.value = postId.value
   } catch (error) {
     console.error('Failed to load hot articles:', error)
     hotArticles.value = communityAPI._getMockHotArticles()
@@ -97,7 +104,15 @@ const loadHotArticles = async () => {
 }
 
 onMounted(() => {
-  // ⏱️ 延迟加载热门文章（500ms），避免与主内容加载竞争）
+  // ⏱️ 延迟加载热门文章（500ms），避免与主内容加载竞争
+  setTimeout(() => {
+    loadHotArticles()
+  }, 500)
+})
+
+// 监听 postId 变化，当用户导航到不同帖子时重新加载热门文章
+watch(() => postId.value, () => {
+  lastLoadedHotArticlesPostId.value = null  // 重置标志，允许加载新的
   setTimeout(() => {
     loadHotArticles()
   }, 500)

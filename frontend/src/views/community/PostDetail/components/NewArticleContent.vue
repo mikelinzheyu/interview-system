@@ -104,7 +104,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, defineProps } from 'vue'
+import { ref, onMounted, defineProps, watch } from 'vue'
 import { ElMessage } from 'element-plus'
 import {
   Star,
@@ -131,6 +131,7 @@ const loading = ref(true)
 const post = ref(null)
 const articleBodyRef = ref(null)
 const commentsRef = ref(null)
+const lastFetchedPostId = ref(null)  // 追踪已加载过的 postId，防止重复加载
 
 const formatTime = (timeStr) => {
   if (!timeStr) return '未知'
@@ -181,11 +182,17 @@ const scrollToComments = () => {
 }
 
 const fetchPostDetail = async () => {
+  // ⏱️ 防止重复加载：如果已经加载过同一个 postId，则不重新加载
+  if (lastFetchedPostId.value === props.postId) {
+    return
+  }
+
   loading.value = true
   try {
     // 调用 API 获取文章详情
     const data = await communityAPI.getPostDetail(props.postId)
     post.value = data
+    lastFetchedPostId.value = props.postId
 
     // 触发post-loaded事件，传递文章数据给父组件
     emit('post-loaded', post.value)
@@ -198,6 +205,11 @@ const fetchPostDetail = async () => {
 }
 
 onMounted(() => {
+  fetchPostDetail()
+})
+
+// 监听 postId 变化，当用户导航到不同的帖子时重新加载
+watch(() => props.postId, () => {
   fetchPostDetail()
 })
 </script>
