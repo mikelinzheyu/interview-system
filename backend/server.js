@@ -12,6 +12,10 @@ const apiRouter = require('./routes/api')
 const { initializeControllers } = require('./services/dataService')
 const { eventBridge } = require('./services/eventBridge')
 
+// 导入数据库和模型，用于自动同步
+const sequelize = require('./config/database')
+const { AIConversation, AIMessage } = require('./models')
+
 /**
  * 创建和配置后端服务器
  * 支持 Express API 和 WebSocket
@@ -83,8 +87,14 @@ function createBackendServer(PORT = 3001) {
   console.log('[Init] 正在初始化事件桥接...')
   eventBridge.initialize(io)
 
-  // 启动服务器
-  server.listen(PORT, () => {
+  // 同步数据库表
+  console.log('[Init] 正在同步数据库表...')
+  sequelize.sync({ alter: true })
+    .then(() => {
+      console.log('✅ 数据库表同步成功')
+
+      // 启动服务器
+      server.listen(PORT, () => {
     console.log(`
 ╔════════════════════════════════════════════════════════════╗
 ║          🚀 Backend Server 已启动                          ║
@@ -106,8 +116,14 @@ function createBackendServer(PORT = 3001) {
 ║  ✓ WebSocket 实时同步 (20+ 个事件)                         ║
 ║  ✓ REST ↔ WebSocket 事件桥接 ✅                           ║
 ╚════════════════════════════════════════════════════════════╝
-    `)
-  })
+      `)
+      })
+    })
+    .catch((err) => {
+      console.error('❌ 数据库同步失败:', err.message)
+      console.error(err)
+      process.exit(1)
+    })
 
   return { server, io, eventBridge }
 }
