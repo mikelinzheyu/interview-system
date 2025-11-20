@@ -4,9 +4,13 @@
  * CRITICAL FIX: 绕过 database.js 查询包装层,直接使用 Sequelize
  */
 
+console.log('[AI-History Module] Loading ai-history.js router module...')
+
 const express = require('express')
 const router = express.Router()
 const { AIConversation, AIMessage } = require('../models')
+
+console.log('[AI-History Module] ✅ Module loaded, router created')
 
 // 认证中间件
 const auth = (req, res, next) => {
@@ -158,15 +162,18 @@ router.get('/conversations/:conversationId/messages', auth, async (req, res) => 
 })
 
 // 保存对话消息 (在每次 AI 回复后调用)
+console.log('[AI-History] 📍 Registering POST /conversations/:conversationId/messages route')
 router.post('/conversations/:conversationId/messages', auth, async (req, res) => {
   try {
     const { conversationId } = req.params
     const { role, content, postId } = req.body
     const userId = req.user?.id
 
-    console.log(`[AI-History] POST message: convId=${conversationId}, userId=${userId}, role=${role}`)
+    console.log(`\n[AI-History] ========== POST message START ==========`)
+    console.log(`[AI-History] convId=${conversationId}, userId=${userId}, role=${role}, postId=${postId}`)
 
     if (!conversationId || !role || !content || !userId) {
+      console.error(`[AI-History] ❌ 验证失败: convId=${conversationId}, role=${role}, userId=${userId}, hasContent=${!!content}`)
       return res.status(400).json({
         code: 400,
         message: 'conversationId、role、content 是必需的，userId 从认证令牌获取'
@@ -174,6 +181,7 @@ router.post('/conversations/:conversationId/messages', auth, async (req, res) =>
     }
 
     if (!postId) {
+      console.error(`[AI-History] ❌ 验证失败: postId 是必需的`)
       return res.status(400).json({
         code: 400,
         message: 'postId 是必需的'
@@ -181,6 +189,7 @@ router.post('/conversations/:conversationId/messages', auth, async (req, res) =>
     }
 
     if (!['user', 'assistant'].includes(role)) {
+      console.error(`[AI-History] ❌ 验证失败: role=${role} 不是有效值`)
       return res.status(400).json({
         code: 400,
         message: 'role 必须是 user 或 assistant'
@@ -190,7 +199,7 @@ router.post('/conversations/:conversationId/messages', auth, async (req, res) =>
     const titlePreview = content.substring(0, 100)
 
     // 确保对话记录存在
-    console.log(`[AI-History] 创建或更新对话: ${conversationId}`)
+    console.log(`[AI-History] 📝 Step1: 创建或更新对话 ${conversationId}...`)
     const [conversation, created] = await AIConversation.findOrCreate({
       where: { id: conversationId },
       defaults: {
@@ -201,38 +210,59 @@ router.post('/conversations/:conversationId/messages', auth, async (req, res) =>
         isActive: true
       }
     })
+    console.log(`[AI-History] ✅ Step1 完成: 对话 ${created ? '已创建' : '已存在'}, ID=${conversation.id}`)
+    console.log(`[AI-History]    对话数据: postId=${conversation.postId}, userId=${conversation.userId}, title=${conversation.title}, isActive=${conversation.isActive}`)
 
     if (!created && conversation.title === 'Untitled') {
+      console.log(`[AI-History] 📝 Step1.5: 更新对话标题...`)
       await conversation.update({ title: titlePreview })
+      console.log(`[AI-History] ✅ Step1.5 完成: 标题已更新`)
     }
 
     // 保存消息
-    console.log(`[AI-History] 保存消息: role=${role}`)
+    console.log(`[AI-History] 📝 Step2: 保存消息 (role=${role})...`)
     const message = await AIMessage.create({
       conversationId,
       role,
       content
     })
-
-    console.log(`[AI-History] 消息已创建: ID=${message.id}`)
+    console.log(`[AI-History] ✅ Step2 完成: 消息已创建, ID=${message.id}`)
 
     // 更新消息计数
+    console.log(`[AI-History] 📝 Step3: 计算消息总数...`)
     const count = await AIMessage.count({ where: { conversationId } })
-    await conversation.update({ messageCount: count })
+    console.log(`[AI-History] ✅ Step3 完成: 共有 ${count} 条消息`)
 
-    console.log(`[AI-History] 消息计数已更新: ${count}`)
+    console.log(`[AI-History] 📝 Step4: 更新对话的消息计数...`)
+    await conversation.update({ messageCount: count })
+    console.log(`[AI-History] ✅ Step4 完成: messageCount 已更新为 ${count}`)
+
+    // 验证数据确实被保存了
+    console.log(`[AI-History] 📝 Step5: 验证数据已保存到数据库...`)
+    const savedConv = await AIConversation.findByPk(conversationId)
+    const savedMessages = await AIMessage.findAll({ where: { conversationId } })
+    console.log(`[AI-History] ✅ Step5 完成: 验证成功`)
+    console.log(`[AI-History]    数据库中对话: ${savedConv ? '存在✅' : '不存在❌'}, ID=${savedConv?.id}`)
+    console.log(`[AI-History]    数据库中消息: ${savedMessages.length} 条`)
+
+    console.log(`[AI-History] ========== POST message SUCCESS ==========\n`)
 
     res.json({
       code: 200,
       message: '消息已保存',
       data: {
         conversationId,
-        messageCount: count
+        messageCount: count,
+        _source: 'ai-history-route-verified'
       }
     })
   } catch (error) {
-    console.error('[AI-History] 保存消息失败:', error.message)
+    console.error(`\n[AI-History] ========== POST message ERROR ==========`)
+    console.error(`[AI-History] ❌ 保存消息失败: ${error.message}`)
+    console.error(`[AI-History] 详细错误:`)
     console.error(error.stack)
+    console.error(`[AI-History] ========== ERROR END ==========\n`)
+
     res.status(500).json({
       code: 500,
       message: '保存消息失败',
