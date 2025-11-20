@@ -138,7 +138,7 @@
 </template>
 
 <script setup>
-import { ref, defineProps, nextTick, onMounted } from 'vue'
+import { ref, defineProps, nextTick, onMounted, watch } from 'vue'
 import { ElMessage } from 'element-plus'
 import AssistantHeader from './AssistantHeader.vue'
 import QuickActions from './QuickActions.vue'

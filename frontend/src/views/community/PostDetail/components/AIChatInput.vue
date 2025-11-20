@@ -73,7 +73,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, defineProps, defineEmits } from 'vue'
 import { Message, Loading } from '@element-plus/icons-vue'
 
 const props = defineProps({
@@ -192,33 +192,63 @@ defineExpose({
 // 发送按钮
 .send-btn {
   flex-shrink: 0;
-  width: 36px;
-  height: 36px;
+  width: 40px;
+  height: 40px;
   padding: 0;
-  background: #667eea;
-  border: none;
-  border-radius: 6px;
-  color: white;
+  background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%);
+  border: 1.5px solid rgba(255, 255, 255, 0.15);
+  border-radius: 8px;
+  color: #fff;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.2s;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
   font-size: 18px;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+    z-index: 0;
+  }
 
   &:hover:not(:disabled) {
-    background: #764ba2;
-    transform: scale(1.05);
-    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    background: linear-gradient(135deg, #5a9ff0 0%, #3d6fb0 100%);
+    box-shadow: 0 6px 20px rgba(74, 144, 226, 0.4);
+    border-color: rgba(255, 255, 255, 0.25);
+    transform: translateY(-2px);
+
+    &::before {
+      width: 80px;
+      height: 80px;
+    }
   }
 
   &:active:not(:disabled) {
-    transform: scale(0.95);
+    transform: translateY(0);
+    box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.3);
   }
 
   &:disabled {
     opacity: 0.5;
     cursor: not-allowed;
+    box-shadow: none;
+  }
+
+  .send-icon,
+  .loading-icon {
+    position: relative;
+    z-index: 1;
   }
 
   .loading-icon {
@@ -226,40 +256,48 @@ defineExpose({
   }
 }
 
-@keyframes spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
 // Phase 3: 输入区底部控件区域
 .input-footer {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  padding: 8px 16px;
-  background: #2d2d3d;
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  gap: 10px;
+  padding: 12px 16px;
+  background: linear-gradient(180deg,
+    rgba(30, 30, 40, 0.5) 0%,
+    rgba(25, 25, 35, 0.3) 100%);
+  border-top: 1px solid rgba(74, 144, 226, 0.15);
+  backdrop-filter: blur(8px);
 }
 
 // Phase 3: 上下文切换区域
 .context-toggle {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   font-size: 13px;
+  padding: 8px 12px;
+  background: linear-gradient(135deg,
+    rgba(74, 144, 226, 0.08) 0%,
+    rgba(74, 144, 226, 0.03) 100%);
+  border-radius: 6px;
+  border: 1px solid rgba(74, 144, 226, 0.2);
+  transition: all 0.3s ease;
+
+  &:hover {
+    background: linear-gradient(135deg,
+      rgba(74, 144, 226, 0.12) 0%,
+      rgba(74, 144, 226, 0.06) 100%);
+    border-color: rgba(74, 144, 226, 0.3);
+  }
 
   .context-switch {
     :deep(.el-switch__core) {
-      background-color: #3d3d4d;
-      border-color: #4d4d5d;
+      background-color: rgba(61, 61, 77, 0.8);
+      border-color: rgba(61, 61, 77, 0.8);
 
       &.is-checked {
-        background-color: #667eea;
-        border-color: #667eea;
+        background-color: #4a90e2;
+        border-color: #4a90e2;
       }
     }
 
@@ -270,18 +308,28 @@ defineExpose({
   }
 
   .toggle-label {
-    color: #d0d0d0;
-    font-weight: 500;
+    color: #d4e4ff;
+    font-weight: 600;
     user-select: none;
+    letter-spacing: 0.5px;
   }
 
   .toggle-hint {
     color: #888;
     font-size: 12px;
-    transition: color 0.2s;
+    font-weight: 500;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    padding: 3px 8px;
+    background: transparent;
+    border-radius: 4px;
+    letter-spacing: 0.3px;
 
     &.active {
-      color: #667eea;
+      color: #4adc6e;
+      background: rgba(74, 220, 110, 0.15);
+      border: 1px solid rgba(74, 220, 110, 0.3);
+      font-weight: 600;
+      box-shadow: 0 0 8px rgba(74, 220, 110, 0.2);
     }
   }
 }
@@ -290,27 +338,61 @@ defineExpose({
 .suggested-questions {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
+  gap: 8px;
   width: 100%;
 }
 
+// 建议问题按钮
 .suggestion-btn {
   padding: 6px 12px;
-  background: rgba(102, 126, 234, 0.1);
-  border: 1px solid rgba(102, 126, 234, 0.3);
+  background: linear-gradient(135deg,
+    rgba(74, 144, 226, 0.12) 0%,
+    rgba(74, 144, 226, 0.06) 100%);
+  border: 1.5px solid rgba(74, 144, 226, 0.3);
   border-radius: 6px;
-  color: #667eea;
+  color: #a8d8ff;
   font-size: 12px;
+  font-weight: 500;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   max-width: none;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg,
+      transparent,
+      rgba(255, 255, 255, 0.15),
+      transparent);
+    transition: left 0.4s ease;
+  }
 
   &:hover:not(:disabled) {
-    background: rgba(102, 126, 234, 0.2);
-    border-color: #667eea;
+    background: linear-gradient(135deg,
+      rgba(74, 144, 226, 0.2) 0%,
+      rgba(74, 144, 226, 0.12) 100%);
+    border-color: rgba(74, 144, 226, 0.5);
+    color: #e8f0ff;
+    box-shadow: 0 2px 8px rgba(74, 144, 226, 0.2);
+    transform: translateY(-1px);
+
+    &::before {
+      left: 100%;
+    }
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(0);
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
   }
 
   &:disabled {
