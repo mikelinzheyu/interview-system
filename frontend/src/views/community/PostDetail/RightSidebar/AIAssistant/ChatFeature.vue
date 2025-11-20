@@ -120,8 +120,8 @@ let eventSource = null
 const typeoutQueue = ref('') // 等待输出的文本队列
 const displaySpeed = ref(30) // 改到30ms，显示更快
 let typeoutTimer = null
-let isProcessing = ref(false) // 标志是否正在处理
-let streamComplete = ref(false) // 流式接收是否已完成
+const isProcessing = ref(false) // 标志是否正在处理
+const streamComplete = ref(false) // 流式接收是否已完成
 
 /**
  * DOMPurify 配置 - 用于安全渲染Markdown
