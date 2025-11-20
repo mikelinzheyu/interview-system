@@ -1,55 +1,129 @@
 <template>
   <div class="ai-assistant-panel">
-    <!-- Phase 1: 头部区域 (新增) -->
-    <AssistantHeader />
+    <!-- 历史对话侧边栏 -->
+    <div v-if="showHistory" class="history-sidebar">
+      <div class="history-header">
+        <h3>💬 对话历史 ({{ conversations.length }})</h3>
+        <div class="header-actions">
+          <el-button
+            v-if="conversations.length > 0"
+            type="danger"
+            size="small"
+            @click="handleClearAllConversations"
+            plain
+          >
+            清空全部
+          </el-button>
+          <el-button
+            type="primary"
+            size="small"
+            @click="showHistory = false"
+            plain
+          >
+            关闭
+          </el-button>
+        </div>
+      </div>
 
-    <!-- Phase 1: 快捷功能区域 (新增) -->
-    <QuickActions
-      @action="handleQuickAction"
-      :disabled="isLoading"
-    />
+      <div v-if="isLoadingHistory" class="history-loading">
+        <span>加载中...</span>
+      </div>
 
-    <!-- 消息展示面板 -->
-    <AIMessagePanel
-      ref="messagePanelRef"
-      :messages="messages"
-      @scroll-to-bottom="onScrollToBottom"
-      @refresh-message="handleRefreshMessage"
-    />
+      <div v-else-if="conversations.length === 0" class="history-empty">
+        📭 暂无对话历史<br>
+        <small>开始新对话后，历史会自动保存</small>
+      </div>
 
-    <!-- 聊天输入区 -->
-    <AIChatInput
-      ref="chatInputRef"
-      :is-loading="isLoading"
-      :suggested-questions="suggestedQuestions"
-      @send-message="handleSendMessage"
-      @select-question="selectQuestion"
-      @context-toggle="handleContextToggle"
-    />
+      <div v-else class="history-list">
+        <div
+          v-for="conv in conversations"
+          :key="conv.id"
+          class="history-item"
+          :class="{ active: selectedHistoryId === conv.id }"
+        >
+          <div class="history-item-content" @click="loadHistoryMessages(conv.id)">
+            <div class="history-title">{{ conv.title || '新对话' }}</div>
+            <div class="history-meta">
+              💬 {{ conv.message_count || 0 }} 条消息
+            </div>
+            <div class="history-time">
+              {{ new Date(conv.updated_at).toLocaleString('zh-CN') }}
+            </div>
+          </div>
+          <el-button
+            type="danger"
+            size="small"
+            @click.stop="handleDeleteConversation(conv.id)"
+            plain
+            class="delete-btn"
+          >
+            删除
+          </el-button>
+        </div>
+      </div>
+    </div>
 
-    <!-- 错误提示 -->
-    <el-alert
-      v-if="errorMessage"
-      :title="errorMessage"
-      type="error"
-      :closable="true"
-      @close="errorMessage = null"
-      class="error-alert"
-    />
+    <!-- 主面板 -->
+    <div class="main-panel">
+      <AssistantHeader />
+
+      <QuickActions
+        @action="handleQuickAction"
+        :disabled="isLoading"
+      />
+
+      <!-- 历史按钮栏 -->
+      <div class="history-button-bar">
+        <el-button
+          @click="showHistory = !showHistory"
+          :type="showHistory ? 'primary' : 'default'"
+          size="small"
+          plain
+        >
+          {{ showHistory ? '👈 隐藏历史' : `📋 历史 (${conversations.length})` }}
+        </el-button>
+        <span v-if="conversationId" class="conversation-badge">
+          ✓ 对话 ID: {{ conversationId.substring(0, 8) }}...
+        </span>
+      </div>
+
+      <AIMessagePanel
+        ref="messagePanelRef"
+        :messages="messages"
+        @scroll-to-bottom="onScrollToBottom"
+        @refresh-message="handleRefreshMessage"
+      />
+
+      <AIChatInput
+        ref="chatInputRef"
+        :is-loading="isLoading"
+        :suggested-questions="suggestedQuestions"
+        @send-message="handleSendMessage"
+        @select-question="selectQuestion"
+        @context-toggle="handleContextToggle"
+      />
+
+      <el-alert
+        v-if="errorMessage"
+        :title="errorMessage"
+        type="error"
+        :closable="true"
+        @close="errorMessage = null"
+        class="error-alert"
+      />
+    </div>
   </div>
 </template>
 
 <script setup>
-import { ref, defineProps, computed, watch, nextTick } from 'vue'
+import { ref, defineProps, nextTick, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import AssistantHeader from './AssistantHeader.vue'
 import QuickActions from './QuickActions.vue'
-import SidebarCard from './SidebarCard.vue'
 import AIMessagePanel from './AIMessagePanel.vue'
 import AIChatInput from './AIChatInput.vue'
-import * as aiApi from '@/api/ai'
+import * as aiHistoryApi from '@/api/ai-history'
 
-// Props
 const props = defineProps({
   postId: {
     type: String,
@@ -61,11 +135,9 @@ const props = defineProps({
   },
 })
 
-// Refs
 const messagePanelRef = ref(null)
 const chatInputRef = ref(null)
 
-// State
 const messages = ref([])
 const isLoading = ref(false)
 const errorMessage = ref(null)
@@ -75,11 +147,28 @@ const suggestedQuestions = ref([
   '能否举个例子说明？',
   '如何在实践中应用？',
 ])
-// Phase 3: 上下文模式状态
 const useArticleContext = ref(true)
-let messageBuffer = '' // 用于流式拼接消息
+let messageBuffer = ''
 
-// 添加消息到列表
+// ================ 历史对话相关状态 ================
+const conversations = ref([])          // 历史对话列表
+const showHistory = ref(false)          // 是否显示历史面板
+const isLoadingHistory = ref(false)     // 是否正在加载历史
+const selectedHistoryId = ref(null)     // 当前选中的历史对话 ID
+
+const getCurrentUserId = () => {
+  try {
+    const userStr = localStorage.getItem('user')
+    if (userStr) {
+      const user = JSON.parse(userStr)
+      return user.id || user.userId || 'anonymous'
+    }
+  } catch (e) {
+    console.error('[AI Assistant] Failed to parse user from localStorage:', e)
+  }
+  return 'anonymous'
+}
+
 const addMessage = (role, content, loading = false) => {
   const id = `msg-${Date.now()}-${Math.random()}`
   messages.value.push({
@@ -89,10 +178,12 @@ const addMessage = (role, content, loading = false) => {
     timestamp: new Date().toISOString(),
     loading,
   })
+  nextTick(() => {
+    messagePanelRef.value?.scrollToBottom()
+  })
   return id
 }
 
-// 更新消息
 const updateMessage = (id, updates) => {
   const msg = messages.value.find(m => m.id === id)
   if (msg) {
@@ -100,7 +191,6 @@ const updateMessage = (id, updates) => {
   }
 }
 
-// Phase 1: 快捷操作处理 (新增)
 const handleQuickAction = (actionId) => {
   if (actionId === 'analyze') {
     handleAIAnalysis()
@@ -109,7 +199,6 @@ const handleQuickAction = (actionId) => {
   }
 }
 
-// AI 解读
 const handleAIAnalysis = async () => {
   if (!props.postContent) {
     errorMessage.value = '文章内容为空'
@@ -120,27 +209,31 @@ const handleAIAnalysis = async () => {
   errorMessage.value = null
 
   try {
-    const response = await aiApi.generateArticleSummary({
-      content: props.postContent,
-      postId: props.postId,
+    const backendUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001'
+    const res = await fetch(`${backendUrl}/api/ai/summary`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        content: props.postContent,
+        postId: String(props.postId),
+      }),
     })
 
-    if (response.code === 200 && response.data?.summary) {
-      addMessage('assistant', response.data.summary)
-      ElMessage.success('AI 解读完成')
+    const data = await res.json()
+    if (res.ok && data?.data?.summary) {
+      addMessage('assistant', data.data.summary)
     } else {
-      throw new Error(response.message || '获取摘要失败')
+      throw new Error(data?.error || 'AI 解读失败')
     }
   } catch (error) {
+    console.error('[AI Assistant] Summary error:', error)
     errorMessage.value = 'AI 解读失败，请重试'
-    console.error('AI analysis error:', error)
     ElMessage.error('AI 解读失败')
   } finally {
     isLoading.value = false
   }
 }
 
-// 启动 AI 对话
 const handleAIChat = () => {
   isLoading.value = false
   errorMessage.value = null
@@ -148,29 +241,42 @@ const handleAIChat = () => {
   messages.value = []
   messageBuffer = ''
 
-  const welcomeMsg = `欢迎使用 AI 对话功能！\n\n我可以帮助你：\n1. 回答关于本文的问题\n2. 提供代码示例和最佳实践\n3. 讨论相关的安全知识\n\n请在下方输入你的问题开始对话。`
+  const welcomeMsg = `欢迎使用 AI 对话功能！
+
+我可以帮助你：
+1. 回答关于本文的问题
+2. 提供代码示例和最佳实践
+3. 讨论相关的安全知识
+
+请在下方输入你的问题开始对话。`
   addMessage('assistant', welcomeMsg)
-
-  // 聚焦输入框
   chatInputRef.value?.focus()
-
   ElMessage.success('AI 对话已开启')
 }
 
-// 发送消息 - 支持多轮对话
 const handleSendMessage = async (messageText) => {
-  if (!messageText.trim() || !props.postContent) {
+  if (!messageText.trim()) {
+    errorMessage.value = '请输入问题'
     return
   }
 
-  // 添加用户消息
+  if (!props.postContent) {
+    errorMessage.value = '文章内容为空，无法启动对话'
+    return
+  }
+
+  if (!props.postId) {
+    errorMessage.value = '文章 ID 丢失'
+    console.error('[AI Assistant] Missing postId:', props.postId)
+    return
+  }
+
   addMessage('user', messageText)
 
   isLoading.value = true
   errorMessage.value = null
   messageBuffer = ''
 
-  // 添加 AI 加载指示器
   const aiMessageId = addMessage('assistant', '', true)
 
   let eventSource = null
@@ -182,35 +288,29 @@ const handleSendMessage = async (messageText) => {
     const params = {
       message: messageText,
       articleContent: props.postContent,
-      postId: props.postId,
+      postId: String(props.postId),
       workflow: 'chat',
     }
 
-    // 🔴 关键：在第二次及以后的对话中，必须传递 conversationId 以继续对话
     if (conversationId.value) {
       params.conversationId = conversationId.value
-      console.log('[AI Assistant] 📌 继续多轮对话，conversationId:', conversationId.value)
-    } else {
-      console.log('[AI Assistant] 📌 开始新的对话')
     }
 
-    // 添加认证令牌 (EventSource 不支持自定义 header，所以必须用查询参数)
-    // 如果没有登录令牌，在开发环境中使用默认令牌
     let token = localStorage.getItem('authToken')
     if (!token) {
-      // 开发环境: 使用默认令牌，允许测试 AI 功能而无需登录
       token = 'dev-token-for-testing'
       console.warn('[AI Assistant] No authToken found, using development token')
     }
     params.token = token
+    params.userId = getCurrentUserId()
 
-    Object.keys(params).forEach(key =>
-      url.searchParams.append(key, params[key])
-    )
+    Object.keys(params).forEach((key) => {
+      const value = params[key]
+      if (value != null && value !== '') {
+        url.searchParams.append(key, String(value))
+      }
+    })
 
-    console.log('[AI Assistant] Connecting to stream:', url.toString())
-
-    // 创建新的 EventSource 连接
     eventSource = new EventSource(url)
     let hasReceivedData = false
 
@@ -222,26 +322,26 @@ const handleSendMessage = async (messageText) => {
         if (data.type === 'chunk') {
           const chunk = data.content || data.answer || ''
           messageBuffer += chunk
-          // 实时更新消息（去掉加载状态）
           updateMessage(aiMessageId, {
             content: messageBuffer,
             loading: false,
           })
         } else if (data.type === 'end') {
-          // 流结束 - 保存 conversationId 用于多轮对话
           const newConversationId = data.conversationId || data.conversation_id
           if (newConversationId && newConversationId !== conversationId.value) {
             conversationId.value = newConversationId
-            console.log('[AI Assistant] ✅ conversationId 已保存:', conversationId.value)
           }
-          updateMessage(aiMessageId, {
-            loading: false,
-          })
+          updateMessage(aiMessageId, { loading: false })
           if (eventSource) {
             eventSource.close()
           }
           isLoading.value = false
           ElMessage.success('AI 回复完成')
+
+          // ✅ 保存消息到历史
+          if (conversationId.value && messageBuffer) {
+            saveMessageToHistory(messageText, messageBuffer)
+          }
         }
       } catch (e) {
         console.error('[AI Assistant] Error parsing stream data:', e)
@@ -249,28 +349,30 @@ const handleSendMessage = async (messageText) => {
     }
 
     eventSource.onerror = (error) => {
-      console.error('[AI Assistant] ❌ Stream error:', {
-        error: error,
+      console.error('[AI Assistant] Stream error:', {
+        error,
         readyState: eventSource?.readyState,
-        hasReceivedData: hasReceivedData,
-        messageBuffer: messageBuffer.substring(0, 50) + '...',
+        hasReceivedData,
+        messageBufferSample: messageBuffer.substring(0, 50),
         conversationId: conversationId.value,
+        url: url.toString(),
       })
 
-      // 检查是否收到了数据但在流结束前发生错误
+      let errorMsg = '对话出错'
+      if (eventSource?.readyState === EventSource.CLOSED) {
+        errorMsg = '连接被关闭'
+      } else if (!hasReceivedData) {
+        errorMsg = '无法连接到服务器'
+      }
+
       if (hasReceivedData && messageBuffer) {
-        console.log('[AI Assistant] ℹ️ 虽然有错误但已收到部分数据，保持消息')
-        updateMessage(aiMessageId, {
-          loading: false,
-        })
-        // 如果有消息内容，不显示错误
+        updateMessage(aiMessageId, { loading: false })
       } else {
-        // 只有在没有收到任何数据时才显示错误
         updateMessage(aiMessageId, {
-          content: messageBuffer || '对话出错，请重试',
+          content: messageBuffer || errorMsg,
           loading: false,
         })
-        errorMessage.value = '对话出错，请重试'
+        errorMessage.value = `${errorMsg}，请重试`
       }
 
       if (eventSource) {
@@ -279,12 +381,12 @@ const handleSendMessage = async (messageText) => {
       isLoading.value = false
     }
   } catch (error) {
-    console.error('Send message error:', error)
+    console.error('[AI Assistant] Send message error:', error)
     updateMessage(aiMessageId, {
       content: '消息发送失败，请重试',
       loading: false,
     })
-    errorMessage.value = '消息发送失败'
+    errorMessage.value = `消息发送失败: ${error.message || '未知错误'}`
     isLoading.value = false
     if (eventSource) {
       eventSource.close()
@@ -292,21 +394,16 @@ const handleSendMessage = async (messageText) => {
   }
 }
 
-// 选择建议问题
 const selectQuestion = (question) => {
   chatInputRef.value?.focus()
   handleSendMessage(question)
 }
 
-// 刷新消息 - 重新生成AI回复
 const handleRefreshMessage = async (message) => {
-  if (message.role !== 'assistant') {
-    return
-  }
+  if (message.role !== 'assistant') return
 
   errorMessage.value = null
 
-  // 标记消息为加载中
   const msgIndex = messages.value.findIndex(m => m.id === message.id)
   if (msgIndex >= 0) {
     messages.value[msgIndex] = {
@@ -317,7 +414,6 @@ const handleRefreshMessage = async (message) => {
   }
 
   try {
-    // 获取用户的最后一条消息作为重新生成的参考
     const userMessages = messages.value.filter(m => m.role === 'user')
     const lastUserMessage = userMessages[userMessages.length - 1]
 
@@ -325,14 +421,12 @@ const handleRefreshMessage = async (message) => {
       throw new Error('找不到用户消息')
     }
 
-    // 重新发送请求
     await handleSendMessage(lastUserMessage.content)
   } catch (error) {
     console.error('Refresh message error:', error)
     errorMessage.value = '重新生成失败，请重试'
     ElMessage.error('重新生成失败')
 
-    // 恢复原消息
     if (msgIndex >= 0) {
       messages.value[msgIndex] = {
         ...message,
@@ -342,18 +436,179 @@ const handleRefreshMessage = async (message) => {
   }
 }
 
-// 滚动到底部
 const onScrollToBottom = () => {
   messagePanelRef.value?.scrollToBottom()
 }
 
-// Phase 3: 处理上下文切换
 const handleContextToggle = (value) => {
   useArticleContext.value = value
   console.log(`[AI Assistant] Context mode: ${value ? '结合博文' : '自由对话'}`)
 }
 
-// 暴露给父组件
+// ================ 历史对话管理函数 ================
+
+/**
+ * 加载对话历史列表
+ */
+const loadConversationHistory = async () => {
+  try {
+    isLoadingHistory.value = true
+    const response = await aiHistoryApi.getConversations({
+      postId: props.postId
+    })
+
+    if (response.code === 200) {
+      conversations.value = response.data || []
+      console.log(`[AI Assistant] 加载了 ${conversations.value.length} 个历史对话`)
+    }
+  } catch (error) {
+    console.error('[AI Assistant] 加载历史失败:', error)
+    ElMessage.error('加载对话历史失败')
+  } finally {
+    isLoadingHistory.value = false
+  }
+}
+
+/**
+ * 加载历史对话的所有消息
+ */
+const loadHistoryMessages = async (convId) => {
+  try {
+    const response = await aiHistoryApi.getConversationMessages(convId)
+
+    if (response.code === 200) {
+      // 清空当前消息，加载历史消息
+      messages.value = []
+      conversationId.value = convId
+      selectedHistoryId.value = convId
+
+      // 显示历史消息
+      const msgs = response.data || []
+      msgs.forEach(msg => {
+        addMessage(msg.role, msg.content)
+      })
+
+      // 隐藏历史面板
+      showHistory.value = false
+      ElMessage.success(`已加载对话（${msgs.length} 条消息）`)
+      console.log(`[AI Assistant] 加载历史对话: ${convId}, 消息数: ${msgs.length}`)
+    }
+  } catch (error) {
+    console.error('[AI Assistant] 加载对话失败:', error)
+    ElMessage.error('加载对话失败')
+  }
+}
+
+/**
+ * 保存消息到历史
+ */
+const saveMessageToHistory = async (userMessage, assistantMessage) => {
+  try {
+    if (!conversationId.value) {
+      console.warn('[AI Assistant] conversationId 为空，无法保存消息')
+      return
+    }
+
+    console.log('[AI Assistant] 开始保存消息到历史', {
+      conversationId: conversationId.value,
+      userMessageLength: userMessage.length,
+      assistantMessageLength: assistantMessage.length,
+    })
+
+    // 保存用户消息
+    try {
+      await aiHistoryApi.saveMessage(
+        conversationId.value,
+        'user',
+        userMessage,
+        props.postId
+      )
+      console.log('[AI Assistant] 用户消息已保存')
+    } catch (userError) {
+      console.error('[AI Assistant] 保存用户消息失败:', userError)
+      throw userError
+    }
+
+    // 保存 AI 回复
+    try {
+      await aiHistoryApi.saveMessage(
+        conversationId.value,
+        'assistant',
+        assistantMessage,
+        props.postId
+      )
+      console.log('[AI Assistant] AI 回复已保存')
+    } catch (assistantError) {
+      console.error('[AI Assistant] 保存 AI 回复失败:', assistantError)
+      throw assistantError
+    }
+
+    console.log('[AI Assistant] 消息已保存到历史')
+
+    // 刷新历史列表
+    await loadConversationHistory()
+  } catch (error) {
+    console.error('[AI Assistant] 保存消息失败:', error)
+    ElMessage.error(`保存对话失败: ${error.message || '未知错误'}`)
+  }
+}
+
+/**
+ * 删除单个对话
+ */
+const handleDeleteConversation = async (convId) => {
+  try {
+    if (!confirm('确定要删除这个对话吗？')) return
+
+    await aiHistoryApi.deleteConversation(convId)
+    conversations.value = conversations.value.filter(c => c.id !== convId)
+    ElMessage.success('对话已删除')
+
+    // 如果删除的是当前对话，清空
+    if (selectedHistoryId.value === convId) {
+      conversationId.value = ''
+      messages.value = []
+      selectedHistoryId.value = null
+    }
+
+    console.log('[AI Assistant] 对话已删除:', convId)
+  } catch (error) {
+    console.error('[AI Assistant] 删除对话失败:', error)
+    ElMessage.error('删除对话失败')
+  }
+}
+
+/**
+ * 清空所有对话
+ */
+const handleClearAllConversations = async () => {
+  try {
+    if (!confirm('确定要清空所有对话历史吗？此操作不可恢复！')) return
+
+    for (const conv of conversations.value) {
+      await aiHistoryApi.deleteConversation(conv.id)
+    }
+
+    conversations.value = []
+    messages.value = []
+    conversationId.value = ''
+    selectedHistoryId.value = null
+    ElMessage.success('已清空所有对话历史')
+    console.log('[AI Assistant] 所有对话已清空')
+  } catch (error) {
+    console.error('[AI Assistant] 清空对话失败:', error)
+    ElMessage.error('清空对话失败')
+  }
+}
+
+/**
+ * 组件挂载时加载历史
+ */
+onMounted(() => {
+  loadConversationHistory()
+  console.log('[AI Assistant] 组件已挂载，加载对话历史')
+})
+
 defineExpose({
   addMessage,
   updateMessage,
@@ -361,52 +616,179 @@ defineExpose({
 </script>
 
 <style scoped lang="scss">
-// 主容器 - Phase 1: 新架构 - 固定高度
 .ai-assistant-panel {
   display: flex;
-  flex-direction: column;
-  height: 900px;  // ✅ 增加至 900px（增加 220px）
-  max-height: 900px;  // ✅ 防止超出
+  height: 900px;
+  max-height: 900px;
   background: #1f1f2f;
   border: 1px solid #3d3d4d;
   border-radius: 8px;
-  overflow: hidden;  // ✅ 确保内容不溢出
+  overflow: hidden;
+  position: relative;
+}
 
-  // 子组件自动填充可用空间的合理分配
-  > :nth-child(1) {
-    // AssistantHeader - 固定高度
-    flex-shrink: 0;
+// 历史对话侧边栏
+.history-sidebar {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 300px;
+  height: 100%;
+  background: linear-gradient(135deg, #2d2d3d 0%, #25252f 100%);
+  border-right: 2px solid #3d3d4d;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 4px 0 12px rgba(0, 0, 0, 0.3);
+
+  .history-header {
+    padding: 16px;
+    border-bottom: 2px solid #3d3d4d;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.2);
+
+    h3 {
+      margin: 0;
+      font-size: 14px;
+      font-weight: 600;
+      color: #fff;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 8px;
+    }
   }
 
-  > :nth-child(2) {
-    // QuickActions - 固定高度
-    flex-shrink: 0;
-  }
-
-  > :nth-child(3) {
-    // AIMessagePanel - 可伸缩主体区域
+  .history-list {
     flex: 1;
-    overflow: hidden;  // ✅ 确保不溢出
+    overflow-y: auto;
+    padding: 8px;
+
+    &::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: #555;
+      border-radius: 3px;
+
+      &:hover {
+        background: #777;
+      }
+    }
   }
 
-  > :nth-child(4) {
-    // AIChatInput - 固定高度输入区
-    flex-shrink: 0;
+  .history-item {
+    display: flex;
+    gap: 8px;
+    padding: 12px;
+    margin-bottom: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid transparent;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: #4a90e2;
+    }
+
+    &.active {
+      background: rgba(74, 144, 226, 0.2);
+      border-color: #4a90e2;
+    }
+
+    .history-item-content {
+      flex: 1;
+      min-width: 0;
+      cursor: pointer;
+    }
+
+    .history-title {
+      font-size: 13px;
+      font-weight: 500;
+      color: #fff;
+      margin-bottom: 4px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .history-meta {
+      font-size: 12px;
+      color: #aaa;
+      margin-bottom: 4px;
+    }
+
+    .history-time {
+      font-size: 11px;
+      color: #888;
+    }
+
+    .delete-btn {
+      flex-shrink: 0;
+    }
   }
 
-  > :nth-child(5) {
-    // 错误提示 - 固定高度
-    flex-shrink: 0;
+  .history-loading,
+  .history-empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: #888;
+    font-size: 13px;
+    text-align: center;
+    padding: 20px;
+  }
+
+  .history-empty {
+    flex-direction: column;
+    line-height: 1.6;
   }
 }
 
-// 错误提示样式
-.error-alert {
-  margin: 12px;
+// 主面板
+.main-panel {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  width: 100%;
+  overflow: hidden;
+}
+
+// 历史按钮栏
+.history-button-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 12px;
+  background: rgba(0, 0, 0, 0.2);
+  border-bottom: 1px solid #3d3d4d;
   flex-shrink: 0;
 
-  :deep(.el-alert__title) {
-    font-size: 13px;
+  .conversation-badge {
+    font-size: 12px;
+    color: #4a90e2;
+    padding: 4px 8px;
+    background: rgba(74, 144, 226, 0.1);
+    border-radius: 4px;
+    border: 1px solid rgba(74, 144, 226, 0.3);
   }
 }
+
+// 错误提示
+.error-alert {
+  margin-top: auto;
+  flex-shrink: 0;
+}
 </style>
+
