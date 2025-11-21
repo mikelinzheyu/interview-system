@@ -181,7 +181,7 @@ router.get('/chat/stream', auth, rateLimit(30, 60), (req, res) => {
   // 异步处理流式响应
   (async () => {
     try {
-      let finalConversationId = conversationId || `conv_${randomUUID().substring(0, 8)}`;
+      let finalConversationId = conversationId || randomUUID();
       let hasStarted = false;
 
       // 调试：记录配置状态
@@ -438,7 +438,7 @@ router.post('/chat/stream', auth, rateLimit(30, 60), (req, res) => {
   // 异步处理流式响应
   (async () => {
     try {
-      let finalConversationId = conversationId || `conv_${randomUUID().substring(0, 8)}`;
+      let finalConversationId = conversationId || randomUUID();
       let hasStarted = false;
 
       // 调试：记录配置状态
