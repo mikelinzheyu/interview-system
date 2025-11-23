@@ -1,101 +1,87 @@
-# Dependencies
+# 开发调试文件
+test-*.js
+debug-*.js
+DIAGNOSTIC_SCRIPT.js
+FULL_DIAGNOSTIC.js
+*_REPORT.md
+*_FIX.md
+*_ANALYSIS.md
+*_PLAN.md
+*_SUMMARY.md
+*_GUIDE.md
+*_COMPLETION.md
+*_UPGRADE.md
+backend_logs.txt
+backend/clear-data.js
+backend/simple-server.js
+backend/data/abilityProfiles.js
+backend/routes/auth.js
+backend/services/userDbService.js
+backend/scripts/
+clear-data.js
+console-debug.js
+verify-*.js
+temp_*.txt
+nul
+*.nul
+D:\code7*
+.idea
+.mvn
+.vscode
+*.log
+
+# 前端临时文件
+frontend/nul
+frontend/src/views/home/
+frontend/src/views/HomeV2/
+frontend/src/views/pricing/
+frontend/src/components/AvatarUploader.vue
+frontend/src/components/SliderImageVerify.vue
+frontend/src/components/charts/
+frontend/src/components/home/Activity*
+frontend/src/components/home/Dashboard*
+frontend/src/components/home/Hero*
+frontend/src/components/home/Interview*
+frontend/src/components/home/Login*
+frontend/src/components/home/Main*
+frontend/src/components/home/Sidebar.vue
+frontend/src/components/home/Signup*
+frontend/src/components/home/StatCard*
+frontend/src/components/home/Statistics*
+frontend/src/components/home/TopHeader.vue
+frontend/src/components/pricing/
+frontend/src/components/layout/
+frontend/src/data/mock-*.js
+frontend/src/services/dashboard.ts
+frontend/src/stores/dashboard.ts
+frontend/src/stores/homepage.ts
+
+# 构建输出
+dist/
 node_modules/
+*.so
+*.dylib
+
+# 依赖锁文件
 package-lock.json
-pnpm-lock.yaml
 yarn.lock
 
-# Production build
-dist/
-build/
-.next/
-out/
-
-# Environment variables
-.env
+# 环境变量
 .env.local
 .env.*.local
-.env.production
-.env.prod
-production/.env
-production/.env.production
-storage-service/.env
-storage-service/.env.prod
-storage-service/.env.local
-
-# Logs
-logs/
-*.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
-lerna-debug.log*
 
 # IDE
-.vscode/
 .idea/
+.vscode/
 *.swp
 *.swo
 *~
-.DS_Store
-
-# Docker
-docker-compose.override.yml
-
-# Production data
-production/data/
-production/logs/
-production/mysql/
-production/redis/
-storage-service/target/
-
-# Secrets and certificates
-*.pem
-*.key
-*.crt
-*.cert
-production/nginx/ssl/*.pem
-production/nginx/ssl/*.key
-production/nginx/ssl/*.crt
-
-# Test coverage
-coverage/
-.nyc_output/
-
-# Temporary files
-*.tmp
-temp/
-tmp/
 
 # OS
+.DS_Store
 Thumbs.db
-.AppleDouble
-.LSOverride
 
-# Java/Maven
-target/
-*.class
-*.jar
-*.war
-*.ear
-.m2/
-
-# Spring Boot
-application-local.properties
-application-dev.properties
-HELP.md
-
-# Vue/Vite
-.vite/
-*.local
-
-# Backup files
-*.bak
-*.backup
-*~
-
-# Database
-*.sql
-*.db
-*.sqlite
-*.sqlite3
+# 数据文件
+data/redis/
+logs/
+uploads/

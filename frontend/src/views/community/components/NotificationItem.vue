@@ -78,8 +78,8 @@
 import {
   ChatDotRound,
   Message,
-  Heart,
-  UserAdd,
+  StarFilled,
+  User,
   Warning,
   Bell,
   MoreFilled,
@@ -105,9 +105,9 @@ const getTypeIcon = () => {
   const iconMap = {
     comment: ChatDotRound,
     reply: Message,
-    like: Heart,
+    like: StarFilled,
     mention: ChatDotRound,
-    follow: UserAdd,
+    follow: User,
     system: Bell,
     warning: Warning
   }

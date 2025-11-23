@@ -19,6 +19,12 @@ COPY package.json ./
 COPY mock-server.js ./
 COPY websocket-server.js ./
 COPY redis-client.js ./
+COPY app.js ./
+COPY services/ ./services/
+COPY routes/ ./routes/
+COPY models/ ./models/
+COPY middleware/ ./middleware/
+COPY config/ ./config/
 
 # 安装依赖
 RUN npm config set registry https://registry.npmmirror.com && \
