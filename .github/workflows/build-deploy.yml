@@ -105,7 +105,27 @@ jobs:
 
       - name: Deploy to Production Server
         run: |
-          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -p ${{ secrets.DEPLOY_PORT }} ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} << 'EOF'
+          # 检查所有必需的 Secrets
+          if [ -z "${{ secrets.DEPLOY_HOST }}" ]; then
+            echo "❌ 错误：DEPLOY_HOST Secret 未配置"
+            exit 1
+          fi
+          if [ -z "${{ secrets.DEPLOY_USER }}" ]; then
+            echo "❌ 错误：DEPLOY_USER Secret 未配置"
+            exit 1
+          fi
+          if [ -z "${{ secrets.DEPLOY_PRIVATE_KEY }}" ]; then
+            echo "❌ 错误：DEPLOY_PRIVATE_KEY Secret 未配置"
+            exit 1
+          fi
+
+          # 设置 SSH 端口，如果未指定则使用默认值 22
+          PORT=${{ secrets.DEPLOY_PORT }}
+          PORT=${PORT:-22}
+
+          echo "正在连接到: ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}:$PORT"
+
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -p $PORT ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} << 'EOF'
           set -e
 
           echo "========== 开始部署 =========="
