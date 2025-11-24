@@ -113,7 +113,7 @@ jobs:
 
           echo "正在连接到: ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}:$PORT"
 
-          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -p $PORT ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} << 'EOF'
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -p $PORT ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} << EOF
           set -e
 
           echo "========== 开始部署 =========="
