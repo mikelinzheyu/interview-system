@@ -13,7 +13,8 @@
       "Bash(timeout 8 node:*)",
       "Bash(start http://localhost:5175)",
       "Bash(start http://localhost:5177)",
-      "Bash(curl:*)"
+      "Bash(curl:*)",
+      "Bash(start http://localhost:5174)"
     ],
     "deny": [],
     "ask": []
