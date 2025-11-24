@@ -82,7 +82,7 @@ const primaryLabel = computed(() => {
 })
 
 const primaryTarget = computed(() => {
-  return isAuthenticated.value ? '/home' : content.value.primaryCta.to
+  return isAuthenticated.value ? '/dashboard' : content.value.primaryCta.to
 })
 
 const handlePrimary = () => {

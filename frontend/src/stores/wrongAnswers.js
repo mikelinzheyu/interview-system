@@ -2,6 +2,9 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { ElMessage } from 'element-plus'
 import { api } from '@/api'
+import { mockWrongAnswers, mockWrongAnswerSessions, buildWrongAnswerStats, mockReviewLogs } from '@/data/mock-wrong-answers'
+
+const USE_MOCK = import.meta.env.VITE_USE_MOCK_DATA !== 'false'
 
 /**
  * Wrong Answers Store
@@ -54,6 +57,20 @@ export const useWrongAnswersStore = defineStore('wrongAnswers', () => {
   const totalWrongCount = computed(() => statistics.value?.totalWrongCount || 0)
   const masteredPercentage = computed(() => statistics.value?.masteredPercentage || 0)
 
+  const refreshStatistics = () => {
+    statistics.value = buildWrongAnswerStats(wrongAnswers.value.length ? wrongAnswers.value : mockWrongAnswers)
+    return statistics.value
+  }
+
+  const ensureMockData = () => {
+    if (!wrongAnswers.value.length) {
+      wrongAnswers.value = mockWrongAnswers.map(normalizeRecord)
+    }
+    if (!statistics.value) {
+      refreshStatistics()
+    }
+  }
+
   // Actions
   /**
    * Record a wrong answer
@@ -71,6 +88,23 @@ export const useWrongAnswersStore = defineStore('wrongAnswers', () => {
         errorType: inferredErrorType,
         ...metadata,
         metadata: { ...(metadata.metadata || {}), errorType: inferredErrorType }
+      }
+
+      if (USE_MOCK) {
+        const normalized = normalizeRecord({
+          id: `mock-${Date.now()}`,
+          reviewStatus: isCorrect ? 'mastered' : 'reviewing',
+          wrongCount: isCorrect ? 0 : 1,
+          correctCount: isCorrect ? 1 : 0,
+          mastery: isCorrect ? 80 : 40,
+          nextReviewTime: new Date(Date.now() + 1000 * 60 * 60).toISOString(),
+          updatedAt: new Date().toISOString(),
+          ...request
+        })
+        wrongAnswers.value.unshift(normalized)
+        refreshStatistics()
+        ElMessage.success('Wrong answer recorded successfully')
+        return normalized
       }
 
       const response = await api.post('/wrong-answers', request)
@@ -105,6 +139,12 @@ export const useWrongAnswersStore = defineStore('wrongAnswers', () => {
       loading.value = true
       error.value = null
 
+      if (USE_MOCK) {
+        ensureMockData()
+        refreshStatistics()
+        return wrongAnswers.value
+      }
+
       const response = await api.get('/wrong-answers')
 
       if (response && response.data !== undefined) {
@@ -135,6 +175,14 @@ export const useWrongAnswersStore = defineStore('wrongAnswers', () => {
       loading.value = true
       error.value = null
 
+      if (USE_MOCK) {
+        ensureMockData()
+        const items = wrongAnswers.value.filter(item => item.reviewStatus === status)
+        wrongAnswers.value = items
+        refreshStatistics()
+        return items
+      }
+
       const response = await api.get(`/wrong-answers/status/${status}`)
 
       if (response && response.data !== undefined) {
@@ -164,6 +212,14 @@ export const useWrongAnswersStore = defineStore('wrongAnswers', () => {
       loading.value = true
       error.value = null
 
+      if (USE_MOCK) {
+        ensureMockData()
+        const items = wrongAnswers.value.filter(item => item.source === source)
+        wrongAnswers.value = items
+        refreshStatistics()
+        return items
+      }
+
       const response = await api.get(`/wrong-answers/source/${source}`)
 
       if (response && response.data !== undefined) {
@@ -192,6 +248,18 @@ export const useWrongAnswersStore = defineStore('wrongAnswers', () => {
     try {
       loading.value = true
       error.value = null
+
+      if (USE_MOCK) {
+        ensureMockData()
+        const nowTs = Date.now()
+        const items = wrongAnswers.value.filter(item => {
+          if (!item.nextReviewTime) return true
+          return new Date(item.nextReviewTime).getTime() <= nowTs
+        })
+        wrongAnswers.value = items
+        refreshStatistics()
+        return items
+      }
 
       const response = await api.get('/wrong-answers/due-for-review')
 
@@ -223,6 +291,11 @@ export const useWrongAnswersStore = defineStore('wrongAnswers', () => {
       loading.value = true
       error.value = null
 
+      if (USE_MOCK) {
+        ensureMockData()
+        return refreshStatistics()
+      }
+
       const response = await api.get('/wrong-answers/statistics')
 
       if (response.data) {
@@ -245,6 +318,25 @@ export const useWrongAnswersStore = defineStore('wrongAnswers', () => {
     try {
       loading.value = true
       error.value = null
+
+      if (USE_MOCK) {
+        const index = wrongAnswers.value.findIndex(item => item.id === recordId)
+        if (index >= 0) {
+          wrongAnswers.value[index] = normalizeRecord({
+            ...wrongAnswers.value[index],
+            result,
+            timeSpentSec,
+            notes,
+            errorType,
+            updatedAt: new Date().toISOString(),
+            reviewStatus: result === 'pass' ? 'mastered' : 'reviewing'
+          })
+          refreshStatistics()
+          ElMessage.success('Review plan updated')
+          return wrongAnswers.value[index]
+        }
+        return null
+      }
 
       const response = await api.post(`/wrong-answers/${recordId}/review`, { result, timeSpentSec, notes, errorType })
 
@@ -269,6 +361,10 @@ export const useWrongAnswersStore = defineStore('wrongAnswers', () => {
    */
   const fetchReviewLogs = async (recordId) => {
     try {
+      if (USE_MOCK) {
+        return mockReviewLogs.filter(log => log.recordId === recordId)
+      }
+
       const response = await api.get('/wrong-answers/review/logs', { params: { recordId } })
       if (response.data) {
         const items = Array.isArray(response.data.items) ? response.data.items : []
@@ -288,6 +384,22 @@ export const useWrongAnswersStore = defineStore('wrongAnswers', () => {
     try {
       loading.value = true
       error.value = null
+
+      if (USE_MOCK) {
+        const index = wrongAnswers.value.findIndex(item => item.id === recordId)
+        if (index >= 0) {
+          wrongAnswers.value[index] = normalizeRecord({
+            ...wrongAnswers.value[index],
+            reviewStatus: 'mastered',
+            mastery: 100,
+            updatedAt: new Date().toISOString()
+          })
+          refreshStatistics()
+        }
+
+        ElMessage.success('Marked as mastered')
+        return wrongAnswers.value[index] || null
+      }
 
       const response = await api.put(`/wrong-answers/${recordId}/mark-mastered`)
 
@@ -317,6 +429,21 @@ export const useWrongAnswersStore = defineStore('wrongAnswers', () => {
       loading.value = true
       error.value = null
 
+      if (USE_MOCK) {
+        const index = wrongAnswers.value.findIndex(item => item.id === recordId)
+        if (index >= 0) {
+          wrongAnswers.value[index] = normalizeRecord({
+            ...wrongAnswers.value[index],
+            reviewStatus: 'reviewing',
+            updatedAt: new Date().toISOString()
+          })
+          refreshStatistics()
+        }
+
+        ElMessage.success('Marked as reviewing')
+        return wrongAnswers.value[index] || null
+      }
+
       const response = await api.put(`/wrong-answers/${recordId}/mark-reviewing`)
 
       if (response.data) {
@@ -344,6 +471,21 @@ export const useWrongAnswersStore = defineStore('wrongAnswers', () => {
     try {
       loading.value = true
       error.value = null
+
+      if (USE_MOCK) {
+        const index = wrongAnswers.value.findIndex(item => item.id === recordId)
+        if (index >= 0) {
+          wrongAnswers.value[index] = normalizeRecord({
+            ...wrongAnswers.value[index],
+            notes,
+            updatedAt: new Date().toISOString()
+          })
+          refreshStatistics()
+        }
+
+        ElMessage.success('Notes updated successfully')
+        return wrongAnswers.value[index] || null
+      }
 
       const response = await api.put(`/wrong-answers/${recordId}/notes`, { notes })
 
@@ -373,6 +515,21 @@ export const useWrongAnswersStore = defineStore('wrongAnswers', () => {
       loading.value = true
       error.value = null
 
+      if (USE_MOCK) {
+        const index = wrongAnswers.value.findIndex(item => item.id === recordId)
+        if (index >= 0) {
+          wrongAnswers.value[index] = normalizeRecord({
+            ...wrongAnswers.value[index],
+            userTags: tags,
+            updatedAt: new Date().toISOString()
+          })
+          refreshStatistics()
+        }
+
+        ElMessage.success('Tags updated successfully')
+        return wrongAnswers.value[index] || null
+      }
+
       const response = await api.put(`/wrong-answers/${recordId}/tags`, { tags })
 
       if (response.data) {
@@ -401,6 +558,13 @@ export const useWrongAnswersStore = defineStore('wrongAnswers', () => {
       loading.value = true
       error.value = null
 
+      if (USE_MOCK) {
+        wrongAnswers.value = wrongAnswers.value.filter(item => item.id !== recordId)
+        refreshStatistics()
+        ElMessage.success('Wrong answer deleted successfully')
+        return true
+      }
+
       await api.delete(`/wrong-answers/${recordId}`)
 
       wrongAnswers.value = wrongAnswers.value.filter(item => item.id !== recordId)
@@ -421,6 +585,13 @@ export const useWrongAnswersStore = defineStore('wrongAnswers', () => {
     try {
       loading.value = true
       error.value = null
+
+      if (USE_MOCK) {
+        ensureMockData()
+        refreshStatistics()
+        ElMessage.success('Review plan generated successfully')
+        return { ok: true, generatedAt: new Date().toISOString() }
+      }
 
       await api.post('/wrong-answers/generate-review-plan')
 

@@ -158,6 +158,9 @@
 import { ref, computed, onMounted } from 'vue'
 import { Search, Clock, Close, Delete, ArrowRight } from '@element-plus/icons-vue'
 import { fetchTrendingQuestions, fetchQuestionList } from '@/api/questions'
+import { buildMockQuestionList, mockQuestionTags, mockQuestions } from '@/data/mock-questions'
+
+const USE_MOCK = import.meta.env.VITE_USE_MOCK_DATA !== 'false'
 
 const props = defineProps({
   domains: {
@@ -208,7 +211,9 @@ const trendingLoaded = ref(false)
 const hotQuestions = computed(() => {
   const base = trendingLoaded.value && Array.isArray(trending.value) && trending.value.length
     ? trending.value
-    : props.questions.slice(0, 10)
+    : (props.questions && props.questions.length
+      ? props.questions.slice(0, 10)
+      : (USE_MOCK ? mockQuestions : []))
 
   return base.slice(0, 10).map((q, index) => ({
     id: q.id,
@@ -235,16 +240,23 @@ const hotDomains = computed(() => {
 // 热门标签（从分类中提取）
 const hotTags = computed(() => {
   const tags = []
-  props.categories.forEach(cat => {
-    const children = cat.items || cat.children || []
-    children.slice(0, 3).forEach(item => {
-      tags.push({
-        id: item.id,
-        name: item.name,
-        payload: item
+  if (props.categories && props.categories.length) {
+    props.categories.forEach(cat => {
+      const children = cat.items || cat.children || []
+      children.slice(0, 3).forEach(item => {
+        tags.push({
+          id: item.id,
+          name: item.name,
+          payload: item
+        })
       })
     })
-  })
+  }
+
+  if (!tags.length && USE_MOCK) {
+    return mockQuestionTags.slice(0, 12).map(tag => ({ ...tag, payload: tag }))
+  }
+
   return tags.slice(0, 12)
 })
 
@@ -389,6 +401,16 @@ async function loadTrendingQuestions() {
       }
     }
   } catch {}
+
+  if (USE_MOCK) {
+    const mockList = buildMockQuestionList({ page: 1, size: 10, sort: 'popular' }).items || mockQuestions
+    trending.value = mockList
+    trendingLoaded.value = true
+    try {
+      localStorage.setItem('trending-questions-cache', JSON.stringify({ ts: Date.now(), items: mockList }))
+    } catch {}
+    return
+  }
 
   // 请求后端标准趋势接口
   try {

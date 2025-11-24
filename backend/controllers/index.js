@@ -574,17 +574,25 @@ class UserController {
    * 获取用户信息
    */
   getUser(userId) {
-    const user = this.mockData.users?.find(u => u.id === parseInt(userId))
+    const id = parseInt(userId)
+
+    if (!this.mockData.users) {
+      this.mockData.users = []
+    }
+
+    let user = this.mockData.users.find(u => u.id === id)
 
     if (!user) {
-      return {
-        id: parseInt(userId),
-        username: `user_${userId}`,
-        realName: `User ${userId}`,
+      user = {
+        id,
+        username: `user_${id}`,
+        realName: `User ${id}`,
         avatar: 'https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png',
         status: 'online',
         bio: ''
       }
+
+      this.mockData.users.push(user)
     }
 
     return user

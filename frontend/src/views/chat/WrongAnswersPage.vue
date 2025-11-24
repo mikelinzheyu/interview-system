@@ -338,6 +338,9 @@ import { ElMessage } from 'element-plus'
 import { Search, Grid, List, ChatDotRound, Notebook, Timer, Tickets } from '@element-plus/icons-vue'
 import SpacedRepetitionService from '@/services/spacedRepetitionService'
 import { useWrongAnswersStore } from '@/stores/wrongAnswers'
+import { mockWrongAnswerSessions } from '@/data/mock-wrong-answers'
+
+const USE_MOCK = import.meta.env.VITE_USE_MOCK_DATA !== 'false'
 
 const router = useRouter()
 const store = useWrongAnswersStore()
@@ -434,13 +437,21 @@ async function fetchWrongAnswers() {
 onMounted(async () => {
   await fetchWrongAnswers()
   try {
+    if (USE_MOCK) {
+      sessions.value = mockWrongAnswerSessions
+      return
+    }
     const resp = await fetch('/api/sessions')
     if (resp.ok) {
       const payload = await resp.json()
       const list = Array.isArray(payload) ? payload : payload?.data
       if (Array.isArray(list)) sessions.value = list
     }
-  } catch {}
+  } catch {
+    if (USE_MOCK) {
+      sessions.value = mockWrongAnswerSessions
+    }
+  }
 })
 
 // save on change

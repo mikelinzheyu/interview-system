@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.interview.mapper.CategoryMapper">
+
+  <resultMap id="CategoryResultMap" type="com.interview.entity.Category">
+    <id column="id" property="id" />
+    <result column="name" property="name" />
+    <result column="description" property="descText" />
+    <result column="parent_id" property="parentId" />
+    <result column="sort_order" property="sortOrder" />
+    <result column="created_at" property="createdAt" />
+    <result column="updated_at" property="updatedAt" />
+    <!-- type/icon not present in DB; left null -->
+  </resultMap>
+
+  <select id="selectAll" resultMap="CategoryResultMap">
+    SELECT id, name, description, parent_id, sort_order, status, created_at, updated_at
+    FROM categories
+    <where>
+      <if test="parentId != null">AND parent_id = #{parentId}</if>
+      <if test="type != null and type != ''">
+        <!-- no type column in schema; ignore -->
+      </if>
+      AND status = 1
+    </where>
+    ORDER BY sort_order ASC, id ASC
+  </select>
+
+  <select id="selectById" resultMap="CategoryResultMap">
+    SELECT id, name, description, parent_id, sort_order, status, created_at, updated_at
+    FROM categories WHERE id = #{id}
+  </select>
+
+  <insert id="insert" parameterType="com.interview.entity.Category" useGeneratedKeys="true" keyProperty="id">
+    INSERT INTO categories (name, description, parent_id, sort_order, status, created_at, updated_at)
+    VALUES (#{name}, #{descText}, #{parentId}, #{sortOrder}, 1, #{createdAt}, #{updatedAt})
+  </insert>
+
+  <update id="updateById" parameterType="com.interview.entity.Category">
+    UPDATE categories
+    <set>
+      <if test="name != null">name = #{name},</if>
+      <if test="descText != null">description = #{descText},</if>
+      <if test="parentId != null">parent_id = #{parentId},</if>
+      <if test="sortOrder != null">sort_order = #{sortOrder},</if>
+      updated_at = #{updatedAt}
+    </set>
+    WHERE id = #{id}
+  </update>
+
+  <delete id="deleteById">
+    DELETE FROM categories WHERE id = #{id}
+  </delete>
+
+  <update id="updateQuestionCount">
+    <!-- No direct question_count column in schema; this is a placeholder to fit interface -->
+    UPDATE categories SET updated_at = NOW() WHERE id = #{id}
+  </update>
+
+</mapper>
+

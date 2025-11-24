@@ -1,26 +1,28 @@
 <template>
   <div class="wechat-login-container">
-    <div class="wechat-description">
-      <el-icon :size="48" color="#09BB07">
-        <svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
-          <path fill="currentColor" d="M666.67 512c0 155.7-126.3 282-282 282s-282-126.3-282-282 126.3-282 282-282 282 126.3 282 282z" />
-          <path fill="currentColor" d="M877.33 657.33c0 124.56-101.1 225.67-225.66 225.67-124.57 0-225.67-101.1-225.67-225.67 0-124.56 101.1-225.66 225.67-225.66 124.56 0 225.66 101.1 225.66 225.66z" />
-        </svg>
-      </el-icon>
-      <p class="tip-text">使用微信扫码登录</p>
-      <p class="sub-tip">快速、安全、便捷</p>
-    </div>
+    <template v-if="!compact">
+      <div class="wechat-description">
+        <el-icon :size="48" color="#09BB07">
+          <svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+            <path fill="currentColor" d="M666.67 512c0 155.7-126.3 282-282 282s-282-126.3-282-282 126.3-282 282-282 282 126.3 282 282z" />
+            <path fill="currentColor" d="M877.33 657.33c0 124.56-101.1 225.67-225.66 225.67-124.57 0-225.67-101.1-225.67-225.67 0-124.56 101.1-225.66 225.67-225.66 124.56 0 225.66 101.1 225.66 225.66z" />
+          </svg>
+        </el-icon>
+        <p class="tip-text">使用微信扫码登录</p>
+        <p class="sub-tip">快速、安全、便捷</p>
+      </div>
 
-    <el-button
-      type="success"
-      size="large"
-      class="wechat-button"
-      :loading="loading"
-      @click="handleWeChatLogin"
-    >
-      <el-icon class="button-icon"><ChatLineSquare /></el-icon>
-      微信扫码登录
-    </el-button>
+      <el-button
+        type="success"
+        size="large"
+        class="wechat-button"
+        :loading="loading"
+        @click="handleWeChatLogin"
+      >
+        <el-icon class="button-icon"><ChatLineSquare /></el-icon>
+        微信扫码登录
+      </el-button>
+    </template>
 
     <!-- 二维码弹窗 -->
     <el-dialog
@@ -65,6 +67,13 @@ import { ElMessage } from 'element-plus'
 import { ChatLineSquare, DataAnalysis, Loading, InfoFilled } from '@element-plus/icons-vue'
 import { oauthAPI } from '@/api/oauth'
 import { buildApiUrl } from '@/utils/networkConfig'
+
+const props = defineProps({
+  compact: {
+    type: Boolean,
+    default: false
+  }
+})
 
 const emit = defineEmits(['login-success'])
 
@@ -113,9 +122,10 @@ const closeDialog = () => {
   currentState.value = ''
 }
 
-// 暴露关闭方法给父组件
+// 暴露方法给父组件
 defineExpose({
-  closeDialog
+  closeDialog,
+  startLogin: handleWeChatLogin
 })
 </script>
 

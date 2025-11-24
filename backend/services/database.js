@@ -59,7 +59,7 @@ async function saveConversation(conversationId, postId, userId, title) {
 /**
  * 保存消息
  */
-async function saveMessage(conversationId, role, content, metadata = null) {
+async function saveMessage(conversationId, role, content) {
   try {
     console.log(`[DB] 📝 保存消息:`)
     console.log(`     - conversationId: ${conversationId}`)
@@ -78,8 +78,7 @@ async function saveMessage(conversationId, role, content, metadata = null) {
     const message = await AIMessage.create({
       conversationId,
       role,
-      content,
-      metadata
+      content
     })
 
     console.log(`[DB] ✅ 消息已创建 (ID: ${message.id})`)

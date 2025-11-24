@@ -51,6 +51,7 @@ class ChatWorkflowService {
       throw new Error('Chat API 未配置')
     }
 
+    // 始终使用同一个端点,conversationId 在 request body 中
     const url = `${this.baseURL}/chat-messages`
 
     const payload = {
@@ -59,11 +60,14 @@ class ChatWorkflowService {
       },
       query: message,
       response_mode: 'streaming',
-      conversation_id: conversationId || '',
+      conversation_id: conversationId || '',  // 在 body 中发送 conversationId
       user: userId,
     }
 
-    console.log(`[ChatWorkflow] 发送消息 - 用户: ${userId}, 对话ID: ${conversationId}`)
+    console.log(`[ChatWorkflow] 发送消息 - 用户: ${userId}, 对话ID: "${conversationId}"`)
+    console.log(`[ChatWorkflow] 消息内容: "${message.substring(0, 50)}${message.length > 50 ? '...' : ''}"`)
+    console.log(`[ChatWorkflow] API Key: ${this.apiKey.substring(0, 15)}...${this.apiKey.substring(this.apiKey.length - 5)}`)
+    console.log(`[ChatWorkflow] App ID: ${this.appId}`)
 
     try {
       const chunks = await this._callDifyAPI(url, payload)
@@ -185,10 +189,13 @@ class ChatWorkflowService {
         },
       }
 
-      console.log('[ChatWorkflow] 发送请求:')
+      console.log('\n[ChatWorkflow] ======== Dify API 请求详情 ========')
       console.log('  URL:', url)
-      console.log('  API Key:', this.apiKey.substring(0, 15) + '...')
-      console.log('  Payload:', JSON.stringify(payload))
+      console.log('  Auth Bearer:', this.apiKey.substring(0, 20) + '...' + this.apiKey.substring(this.apiKey.length - 10))
+      console.log('  Conversation ID:', payload.conversation_id || '(empty - 新会话)')
+      console.log('  User ID:', payload.user)
+      console.log('  Message:', JSON.stringify(payload.query).substring(0, 80))
+      console.log('  Payload:', JSON.stringify(payload, null, 2).substring(0, 200))
 
       const req = https.request(url, options, (res) => {
         let data = ''
@@ -199,14 +206,19 @@ class ChatWorkflowService {
 
         res.on('end', () => {
           if (res.statusCode >= 400) {
-            console.error('[ChatWorkflow] Dify API 返回错误:')
+            console.error('\n[ChatWorkflow] ❌ Dify API 错误响应')
             console.error('  状态码:', res.statusCode)
-            console.error('  响应:', data)
+            console.error('  状态消息:', res.statusMessage)
+            console.error('  响应数据:', data.substring(0, 500))
+            console.error('  响应头:', JSON.stringify(res.headers, null, 2))
             const error = new Error(`API 错误: ${res.statusCode}`)
             error.statusCode = res.statusCode
             error.response = data
             reject(error)
           } else {
+            console.log('[ChatWorkflow] ✅ Dify API 响应成功')
+            console.log('  状态码:', res.statusCode)
+            console.log('  响应数据块数:', data.split('\n\n').length)
             // 将数据分块
             const chunks = data.split('\n\n').filter(chunk => chunk.trim())
             resolve(chunks)
@@ -291,12 +303,18 @@ class ChatWorkflowService {
       return false
     }
 
-    // 检查是否为默认示例 API Key（表示未真正配置）
+    // ✅ 只在非开发环境中检查默认示例 Key
+    // 在开发环境中允许使用示例 Key 进行测试
     const isDefaultExample = this.apiKey === 'app-Bj1UccX9v9X1aw6st7OW5paG'
 
-    if (isDefaultExample) {
-      console.log('[ChatWorkflow] 配置检查: 使用示例 API Key，Dify API 可能不可用，使用 Mock 模式')
+    if (isDefaultExample && process.env.NODE_ENV === 'production') {
+      console.log('[ChatWorkflow] 配置检查: 生产环境不允许使用示例 API Key，使用 Mock 模式')
       return false
+    }
+
+    if (isDefaultExample && process.env.NODE_ENV !== 'production') {
+      console.log('[ChatWorkflow] ⚠️  配置检查: 开发环境使用示例 API Key，注意 Dify API 可能不可用')
+      console.log('[ChatWorkflow] 提示: 要使用真实的 Dify API，请在 .env 中设置真实的 Key')
     }
 
     console.log('[ChatWorkflow] 配置检查: API 配置有效，将尝试使用 Dify API')

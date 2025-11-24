@@ -46,8 +46,8 @@ const props = defineProps({
 // 加载状态
 const collectionLoading = ref(false)
 const archivesLoading = ref(false)
-const collectionLoaded = ref(false)  // 标记collection是否已加载
-const archivesLoaded = ref(false)    // 标记archives是否已加载
+const collectionLoaded = ref(false)  // 标记 collection 是否已加载
+const archivesLoaded = ref(false)    // 标记 archives 是否已加载
 const lastLoadedCollectionArticleId = ref(null)  // 追踪已加载的 articleId
 
 // 数据
@@ -56,7 +56,7 @@ const archives = ref([])
 
 // 加载专栏数据
 const loadCollection = async () => {
-  // ⏱️ 防止重复加载：如果已经加载过同一个文章的专栏，不重新加载
+  // 防止重复加载：如果已经加载过同一个文章的专栏，不重新加载
   if (!props.currentArticleId || (collectionLoaded.value && lastLoadedCollectionArticleId.value === props.currentArticleId)) return
 
   collectionLoading.value = true
@@ -95,7 +95,7 @@ const loadArchives = async () => {
 }
 
 onMounted(() => {
-  // ⏱️ 延迟500ms加载数据，让主内容先渲染
+  // 延迟 500ms 加载数据，让主内容先渲染
   setTimeout(() => {
     loadCollection()
     loadArchives()

@@ -41,9 +41,10 @@ api.interceptors.response.use(
     const status = error?.response?.status
     const backendMessage = error?.response?.data?.message
     const message = backendMessage || error?.message || '网络错误'
+    const url = error?.response?.config?.url || error?.config?.url
 
-    // 避免出现类似 "API Error: Lt" 这种难以理解的错误信息
-    console.error('API Error:', { status, message })
+    // 避免出现难以理解的错误信息，同时带上 URL 方便排查
+    console.error('API Error:', { status, message, url })
 
     if (error.response) {
       const { data } = error.response
@@ -63,8 +64,14 @@ api.interceptors.response.use(
         case 500:
           ElMessage.error('服务器内部错误')
           break
-        default:
-          ElMessage.error(data?.message || message || '网络错误')
+        default: {
+          // 特例：/users/me 返回 400（例如 "Invalid user ID"）时，只记录日志，不打断用户体验
+          if (status === 400 && typeof url === 'string' && url.includes('/users/me')) {
+            console.warn('[API] Suppressing toast for /users/me 400 error:', message)
+          } else {
+            ElMessage.error(data?.message || message || '网络错误')
+          }
+        }
       }
     } else if (error.request) {
       ElMessage.error('网络连接失败')

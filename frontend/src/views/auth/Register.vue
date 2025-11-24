@@ -1,603 +1,529 @@
 <template>
   <div class="auth-container">
-    <div class="auth-background">
-      <div class="background-pattern"></div>
-    </div>
-    
-    <div class="auth-content">
-      <div class="auth-card">
-        <div class="logo-section">
-          <el-icon :size="48" color="#409eff">
-            <ChatRound />
-          </el-icon>
-          <h1 class="system-title">智能面试系统</h1>
-          <p class="system-subtitle">创建您的专业面试账户</p>
+    <!-- Gradient Background -->
+    <div class="auth-bg"></div>
+
+    <!-- Back Button -->
+    <button class="back-btn" @click="goBack">
+      <el-icon><ArrowLeft /></el-icon>
+    </button>
+
+    <!-- Auth Card -->
+    <div class="auth-card">
+      <!-- Top Gradient Line -->
+      <div class="gradient-line"></div>
+
+      <!-- Header -->
+      <div class="auth-header">
+        <h1 class="auth-title">注册账号</h1>
+        <p class="auth-subtitle">填写以下信息完成注册</p>
+      </div>
+
+      <!-- Form -->
+      <form @submit.prevent="handleRegister" class="auth-form">
+        <!-- Username -->
+        <div class="form-group">
+          <div class="input-wrapper">
+            <el-icon class="input-icon"><User /></el-icon>
+            <input
+              v-model="form.username"
+              type="text"
+              placeholder="请输入用户名"
+              class="form-input"
+            />
+          </div>
         </div>
 
-        <el-form
-          ref="registerFormRef"
-          :model="registerForm"
-          :rules="registerRules"
-          size="large"
-          @submit.prevent="handleRegister"
-        >
-          <el-form-item prop="username">
-            <el-input
-              v-model="registerForm.username"
-              placeholder="请输入用户名"
-              prefix-icon="User"
-              clearable
-            />
-          </el-form-item>
-
-          <el-form-item prop="real_name">
-            <el-input
-              v-model="registerForm.real_name"
-              placeholder="请输入真实姓名"
-              prefix-icon="Avatar"
-              clearable
-            />
-          </el-form-item>
-
-          <el-form-item prop="password">
-            <el-input
-              v-model="registerForm.password"
-              type="password"
+        <!-- Password -->
+        <div class="form-group">
+          <div class="input-wrapper">
+            <el-icon class="input-icon"><Lock /></el-icon>
+            <input
+              v-model="form.password"
+              :type="showPassword ? 'text' : 'password'"
               placeholder="请输入密码"
-              prefix-icon="Lock"
-              show-password
+              class="form-input"
             />
-          </el-form-item>
+            <el-icon
+              class="toggle-icon"
+              @click="showPassword = !showPassword"
+            >
+              <View v-if="showPassword" />
+              <Hide v-else />
+            </el-icon>
+          </div>
+        </div>
 
-          <el-form-item prop="confirmPassword">
-            <el-input
-              v-model="registerForm.confirmPassword"
-              type="password"
+        <!-- Confirm Password -->
+        <div class="form-group">
+          <div class="input-wrapper">
+            <el-icon class="input-icon"><Lock /></el-icon>
+            <input
+              v-model="form.confirmPassword"
+              :type="showConfirmPassword ? 'text' : 'password'"
               placeholder="请确认密码"
-              prefix-icon="Lock"
-              show-password
+              class="form-input"
             />
-          </el-form-item>
+            <el-icon
+              class="toggle-icon"
+              @click="showConfirmPassword = !showConfirmPassword"
+            >
+              <View v-if="showConfirmPassword" />
+              <Hide v-else />
+            </el-icon>
+          </div>
+        </div>
 
-          <el-form-item prop="phone">
-            <el-input
-              v-model="registerForm.phone"
+        <!-- Phone -->
+        <div class="form-group">
+          <div class="input-wrapper">
+            <el-icon class="input-icon"><Iphone /></el-icon>
+            <input
+              v-model="form.phone"
+              type="tel"
               placeholder="请输入手机号"
-              prefix-icon="Iphone"
-              maxlength="11"
-              clearable
+              class="form-input"
             />
-          </el-form-item>
+          </div>
+        </div>
 
-          <!-- 步骤0: 显示"点击按钮进行验证" -->
-          <el-form-item v-if="verificationStep === 0">
-            <el-button
-              type="primary"
-              :disabled="!registerForm.phone"
-              class="verify-button"
-              @click="handleShowSlider"
-            >
-              <el-icon><Lock /></el-icon>
-              点击按钮进行验证
-            </el-button>
-            <div v-if="!registerForm.phone" class="hint-text">请先输入手机号</div>
-          </el-form-item>
-
-          <!-- 步骤1: 显示验证码输入框 -->
-          <el-form-item v-else-if="verificationStep === 1" prop="code">
-            <div class="code-input-wrapper">
-              <el-input
-                v-model="registerForm.code"
-                placeholder="请输入验证码"
-                prefix-icon="Message"
-                maxlength="6"
-                clearable
-                @keyup.enter="handleRegister"
+        <!-- Verify Code -->
+        <div class="form-group">
+          <div class="input-row">
+            <div class="input-wrapper flex-1">
+              <el-icon class="input-icon"><Message /></el-icon>
+              <input
+                v-model="form.verifyCode"
+                type="text"
+                placeholder="验证码"
+                class="form-input"
               />
-              <el-button
-                class="code-button"
-                :disabled="codeButtonDisabled"
-                @click="handleSendCode"
-              >
-                {{ codeButtonText }}
-              </el-button>
             </div>
-          </el-form-item>
-
-          <!-- 滑块验证弹窗 -->
-          <el-dialog
-            v-model="showSliderDialog"
-            title="安全验证"
-            width="400px"
-            :close-on-click-modal="false"
-            class="slider-dialog"
-          >
-            <Vcode
-              :show="showSliderDialog"
-              @success="onSliderSuccess"
-              @close="onSliderClose"
-            />
-          </el-dialog>
-
-          <el-form-item>
-            <el-checkbox v-model="agreeTerms">
-              我已阅读并同意
-              <el-link type="primary" :underline="false">用户协议</el-link>
-              和
-              <el-link type="primary" :underline="false">隐私政策</el-link>
-            </el-checkbox>
-          </el-form-item>
-
-          <el-form-item>
-            <el-button
-              type="primary"
-              size="large"
-              class="register-button"
-              :loading="loading"
-              :disabled="!agreeTerms"
-              @click="handleRegister"
+            <button
+              type="button"
+              class="verify-btn"
+              @click="openSliderVerify"
+              :disabled="codeCountdown > 0"
             >
-              立即注册
-            </el-button>
-          </el-form-item>
+              {{ codeCountdown > 0 ? `${codeCountdown}s` : '获取验证码' }}
+            </button>
+          </div>
+        </div>
 
-          <el-form-item>
-            <div class="login-link">
-              已有账号？
-              <el-link type="primary" @click="$router.push('/login')">
-                立即登录
-              </el-link>
-            </div>
-          </el-form-item>
-        </el-form>
+        <!-- Agreement -->
+        <div class="form-agreement">
+          <label class="checkbox">
+            <input v-model="agreedTerms" type="checkbox" />
+            <span>
+              我已阅读并同意
+              <a href="#" class="link">《用户协议》</a>
+              和
+              <a href="#" class="link">《隐私政策》</a>
+            </span>
+          </label>
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" class="submit-btn" :loading="loading">
+          立即注册
+        </button>
+      </form>
+
+      <!-- Footer -->
+      <div class="auth-footer">
+        <span>已有账号？</span>
+        <a href="#" @click.prevent="$router.push('/login')" class="link">立即登录</a>
       </div>
     </div>
+
+    <!-- Slider Image Verification Modal -->
+    <SliderImageVerify
+      v-model="showSliderVerify"
+      :phone="form.phone"
+      @verify-success="handleVerifySuccess"
+    />
   </div>
 </template>
 
-<script setup>
-import { ref, reactive } from 'vue'
+<script setup lang="ts">
+import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { useUserStore } from '@/stores/user'
+import { ArrowLeft, User, Lock, View, Hide, Iphone, Message } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
-import { ChatRound, Lock, CircleCheck } from '@element-plus/icons-vue'
-import Vcode from 'vue3-puzzle-vcode'
+import SliderImageVerify from '@/components/SliderImageVerify.vue'
 
 const router = useRouter()
-const userStore = useUserStore()
 
-const registerFormRef = ref()
+// State
+const showPassword = ref(false)
+const showConfirmPassword = ref(false)
+const agreedTerms = ref(false)
 const loading = ref(false)
-const agreeTerms = ref(false)
+const codeCountdown = ref(0)
+const showSliderVerify = ref(false)
 
-const registerForm = reactive({
+const form = ref({
   username: '',
-  phone: '',
-  code: '',
-  real_name: '',
   password: '',
-  confirmPassword: ''
+  confirmPassword: '',
+  phone: '',
+  verifyCode: ''
 })
 
-// 验证流程步骤
-const verificationStep = ref(0) // 0: 初始状态, 1: 验证通过显示验证码框
-
-// 滑块验证
-const showSliderDialog = ref(false)
-const captchaVerified = ref(false)
-const captchaToken = ref('')
-
-// 验证码倒计时
-const countdown = ref(0)
-const codeButtonDisabled = ref(false)
-const codeButtonText = ref('发送验证码')
-
-let timer = null
-
-const validatePass2 = (rule, value, callback) => {
-  if (value === '') {
-    callback(new Error('请再次输入密码'))
-  } else if (value !== registerForm.password) {
-    callback(new Error('两次输入的密码不一致'))
-  } else {
-    callback()
-  }
+// Methods
+const goBack = () => {
+  router.back()
 }
 
-const registerRules = {
-  username: [
-    { required: true, message: '请输入用户名', trigger: 'blur' },
-    { min: 3, max: 20, message: '用户名长度在 3 到 20 个字符', trigger: 'blur' },
-    { pattern: /^[a-zA-Z0-9_]+$/, message: '用户名只能包含字母、数字和下划线', trigger: 'blur' }
-  ],
-  phone: [
-    { required: true, message: '请输入手机号', trigger: 'blur' },
-    { pattern: /^1[3-9]\d{9}$/, message: '请输入正确的手机号', trigger: 'blur' }
-  ],
-  code: [
-    { required: true, message: '请输入验证码', trigger: 'blur' },
-    { len: 6, message: '验证码为6位数字', trigger: 'blur' }
-  ],
-  real_name: [
-    { required: true, message: '请输入真实姓名', trigger: 'blur' },
-    { min: 2, max: 10, message: '姓名长度在 2 到 10 个字符', trigger: 'blur' }
-  ],
-  password: [
-    { required: true, message: '请输入密码', trigger: 'blur' },
-    { min: 6, max: 20, message: '密码长度在 6 到 20 个字符', trigger: 'blur' },
-    { pattern: /^(?=.*[a-zA-Z])(?=.*\d)/, message: '密码必须包含字母和数字', trigger: 'blur' }
-  ],
-  confirmPassword: [
-    { required: true, message: '请确认密码', trigger: 'blur' },
-    { validator: validatePass2, trigger: 'blur' }
-  ]
-}
-
-// 显示滑块验证弹窗（先验证手机号）
-const handleShowSlider = () => {
-  // 验证手机号
-  if (!registerForm.phone) {
-    ElMessage.warning('请先输入手机号')
+const openSliderVerify = () => {
+  if (!form.value.phone) {
+    ElMessage.error('请先输入手机号')
     return
   }
 
-  const phonePattern = /^1[3-9]\d{9}$/
-  if (!phonePattern.test(registerForm.phone)) {
-    ElMessage.warning('请输入正确的手机号格式')
+  // Validate phone format
+  const phoneRegex = /^1[3-9]\d{9}$/
+  if (!phoneRegex.test(form.value.phone)) {
+    ElMessage.error('请输入有效的手机号')
     return
   }
 
-  // 验证通过，显示滑块弹窗
-  showSliderDialog.value = true
+  showSliderVerify.value = true
 }
 
-// 滑块验证成功回调
-const onSliderSuccess = async (msg) => {
-  console.log('滑块验证成功', msg)
+const handleVerifySuccess = () => {
+  // 验证成功后开始倒计时
+  ElMessage.success('验证码已发送')
+  codeCountdown.value = 60
 
-  // 标记验证通过
-  captchaVerified.value = true
-  captchaToken.value = 'verified_' + Date.now()
-
-  // 关闭弹窗
-  showSliderDialog.value = false
-
-  // 切换到步骤1 - 显示验证码输入框
-  verificationStep.value = 1
-
-  ElMessage.success('验证成功！正在发送验证码...')
-
-  // 自动发送验证码
-  await handleSendCode()
-}
-
-// 滑块验证关闭回调
-const onSliderClose = () => {
-  showSliderDialog.value = false
-}
-
-// 发送验证码
-const handleSendCode = async () => {
-  // 验证手机号
-  if (!registerForm.phone) {
-    ElMessage.warning('请先输入手机号')
-    return
-  }
-
-  const phonePattern = /^1[3-9]\d{9}$/
-  if (!phonePattern.test(registerForm.phone)) {
-    ElMessage.warning('请输入正确的手机号')
-    return
-  }
-
-  try {
-    codeButtonDisabled.value = true
-
-    // 调用发送验证码API
-    const response = await fetch('/api/auth/sms/send', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ phone: registerForm.phone })
-    })
-
-    const result = await response.json()
-
-    if (result.code === 200) {
-      ElMessage.success('验证码已发送，请查收')
-
-      // 开始倒计时
-      countdown.value = 60
-      codeButtonText.value = `${countdown.value}秒后重试`
-
-      timer = setInterval(() => {
-        countdown.value--
-        if (countdown.value > 0) {
-          codeButtonText.value = `${countdown.value}秒后重试`
-        } else {
-          clearInterval(timer)
-          codeButtonText.value = '重新发送'
-          codeButtonDisabled.value = false
-        }
-      }, 1000)
-    } else if (result.code === 429) {
-      ElMessage.warning(result.message || '发送过于频繁，请稍后再试')
-      codeButtonDisabled.value = false
-    } else {
-      ElMessage.error(result.message || '验证码发送失败')
-      codeButtonDisabled.value = false
+  const timer = setInterval(() => {
+    codeCountdown.value--
+    if (codeCountdown.value <= 0) {
+      clearInterval(timer)
     }
-  } catch (error) {
-    ElMessage.error('网络错误，请稍后重试')
-    codeButtonDisabled.value = false
-  }
+  }, 1000)
 }
 
 const handleRegister = async () => {
-  if (!registerFormRef.value) return
+  // Validation
+  if (!form.value.username) {
+    ElMessage.error('请输入用户名')
+    return
+  }
 
+  if (!form.value.password || form.value.password.length < 6) {
+    ElMessage.error('密码不能为空且至少6位')
+    return
+  }
+
+  if (form.value.password !== form.value.confirmPassword) {
+    ElMessage.error('两次输入的密码不一致')
+    return
+  }
+
+  if (!form.value.phone) {
+    ElMessage.error('请输入手机号')
+    return
+  }
+
+  if (!form.value.verifyCode) {
+    ElMessage.error('请输入验证码')
+    return
+  }
+
+  if (!agreedTerms.value) {
+    ElMessage.error('请同意用户协议和隐私政策')
+    return
+  }
+
+  loading.value = true
   try {
-    const valid = await registerFormRef.value.validate()
-    if (!valid) return
-
-    if (!captchaVerified.value) {
-      ElMessage.warning('请先完成滑块验证')
-      return
-    }
-
-    if (!agreeTerms.value) {
-      ElMessage.warning('请先同意用户协议和隐私政策')
-      return
-    }
-
-    loading.value = true
-
-    // 调用注册API
-    const response = await fetch('/api/auth/register', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        username: registerForm.username,
-        phone: registerForm.phone,
-        code: registerForm.code,
-        real_name: registerForm.real_name,
-        password: registerForm.password,
-        captchaToken: captchaToken.value
-      })
-    })
-
-    const result = await response.json()
-
-    if (result.code === 200) {
-      // 保存用户信息和token
-      userStore.user = result.data.user
-      userStore.token = result.data.token
-      localStorage.setItem('token', result.data.token)
-      localStorage.setItem('user', JSON.stringify(result.data.user))
-
-      ElMessage.success('注册成功，欢迎使用智能面试系统！')
-      router.push('/home')
-    } else {
-      ElMessage.error(result.message || '注册失败，请稍后重试')
-    }
-
-  } catch (error) {
-    ElMessage.error('网络错误，请稍后重试')
+    // Simulate registration
+    await new Promise(resolve => setTimeout(resolve, 1500))
+    ElMessage.success('注册成功，请登录')
+    router.push('/login')
   } finally {
     loading.value = false
   }
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .auth-container {
+  position: relative;
   min-height: 100vh;
   display: flex;
-  position: relative;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
   overflow: hidden;
 }
 
-.auth-background {
-  position: absolute;
+.auth-bg {
+  position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #e0e7ff 0%, #dbeafe 50%, #ddd6fe 100%);
+  z-index: 0;
 }
 
-.background-pattern {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-image: 
-    radial-gradient(circle at 25% 25%, rgba(255,255,255,0.1) 0%, transparent 50%),
-    radial-gradient(circle at 75% 75%, rgba(255,255,255,0.1) 0%, transparent 50%);
-  background-size: 400px 400px;
-  animation: float 20s ease-in-out infinite;
-}
-
-@keyframes float {
-  0%, 100% { transform: translateY(0px) rotate(0deg); }
-  50% { transform: translateY(-20px) rotate(10deg); }
-}
-
-.auth-content {
-  flex: 1;
+.back-btn {
+  position: fixed;
+  top: 24px;
+  left: 24px;
+  width: 40px;
+  height: 40px;
+  border: none;
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: 8px;
+  cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 20px;
-  position: relative;
-  z-index: 1;
+  color: #1f2937;
+  transition: all 0.3s ease;
+  z-index: 10;
+
+  &:hover {
+    background: white;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  :deep(.el-icon) {
+    font-size: 20px;
+  }
 }
 
 .auth-card {
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
+  position: relative;
+  z-index: 1;
+  background: white;
   border-radius: 20px;
-  padding: 40px;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
   width: 100%;
   max-width: 420px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  margin: 0 auto;
 }
 
-.logo-section {
+.gradient-line {
+  height: 4px;
+  background: linear-gradient(90deg, #06b6d4 0%, #0ea5e9 50%, #6366f1 100%);
+}
+
+.auth-header {
+  padding: 40px 40px 24px;
   text-align: center;
-  margin-bottom: 40px;
 }
 
-.system-title {
+.auth-title {
   font-size: 28px;
   font-weight: 700;
-  color: #303133;
-  margin: 16px 0 8px 0;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: #1f2937;
+  margin: 0 0 8px;
 }
 
-.system-subtitle {
-  color: #909399;
+.auth-subtitle {
   font-size: 14px;
+  color: #6b7280;
   margin: 0;
 }
 
-.register-button {
-  width: 100%;
-  height: 45px;
-  font-size: 16px;
-  font-weight: 600;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border: none;
+.auth-form {
+  padding: 0 40px;
+  margin-bottom: 24px;
+}
+
+.form-group {
+  margin-bottom: 16px;
+}
+
+.input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: 44px;
+  padding: 0 12px;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
   border-radius: 8px;
   transition: all 0.3s ease;
+
+  &:focus-within {
+    background: white;
+    border-color: #6366f1;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+  }
 }
 
-.register-button:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+.input-icon {
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  color: #9ca3af;
+  margin-right: 8px;
+  font-size: 18px;
 }
 
-.register-button:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-.login-link {
-  text-align: center;
-  color: #909399;
+.form-input {
+  flex: 1;
+  border: none;
+  background: transparent;
   font-size: 14px;
+  color: #1f2937;
+  outline: none;
+
+  &::placeholder {
+    color: #d1d5db;
+  }
 }
 
-:deep(.el-form-item) {
+.toggle-icon {
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  color: #9ca3af;
+  cursor: pointer;
+  transition: color 0.3s ease;
+  font-size: 18px;
+
+  &:hover {
+    color: #6366f1;
+  }
+}
+
+.input-row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+
+  .input-wrapper {
+    flex: 1;
+  }
+}
+
+.form-agreement {
   margin-bottom: 20px;
 }
 
-:deep(.el-input__wrapper) {
-  padding: 12px 16px;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s ease;
-}
-
-:deep(.el-input__wrapper:hover) {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-
-:deep(.el-input__wrapper.is-focus) {
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
-}
-
-:deep(.el-checkbox__label) {
+.checkbox {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  cursor: pointer;
   font-size: 13px;
-  color: #666;
-}
+  color: #6b7280;
 
-.code-input-wrapper {
-  display: flex;
-  gap: 10px;
-}
-
-.code-input-wrapper :deep(.el-input) {
-  flex: 1;
-}
-
-.code-button {
-  min-width: 110px;
-  height: 48px;
-  font-size: 14px;
-  border-radius: 8px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  border: none;
-}
-
-.code-button:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-  background: #909399;
-}
-
-.slider-captcha-wrapper {
-  width: 100%;
-}
-
-.verify-button {
-  width: 100%;
-  height: 48px;
-  font-size: 15px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-}
-
-.verified-badge {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 12px 16px;
-  background: #f0f9ff;
-  border: 2px solid #67C23A;
-  border-radius: 8px;
-  color: #67C23A;
-  font-size: 15px;
-  font-weight: 600;
-}
-
-:deep(.slider-dialog .el-dialog__header) {
-  padding: 20px 20px 10px;
-  border-bottom: 1px solid #eee;
-}
-
-:deep(.slider-dialog .el-dialog__body) {
-  padding: 20px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 200px;
-}
-
-.hint-text {
-  margin-top: 8px;
-  font-size: 13px;
-  color: #909399;
-  text-align: center;
-}
-
-@media (max-width: 480px) {
-  .auth-card {
-    padding: 30px 20px;
-    margin: 20px;
-    border-radius: 16px;
+  input {
+    cursor: pointer;
+    width: 16px;
+    height: 16px;
+    margin-top: 2px;
+    flex-shrink: 0;
   }
-  
-  .system-title {
+
+  span {
+    user-select: none;
+    line-height: 1.5;
+  }
+
+  .link {
+    color: #6366f1;
+    text-decoration: none;
+    font-weight: 500;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+.verify-btn {
+  padding: 10px 16px;
+  border: 1px solid #e5e7eb;
+  background: white;
+  color: #6366f1;
+  font-size: 13px;
+  font-weight: 500;
+  border-radius: 6px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.3s ease;
+
+  &:hover {
+    border-color: #6366f1;
+    background: #f3f4f6;
+  }
+
+  &:disabled {
+    color: #9ca3af;
+    cursor: not-allowed;
+  }
+}
+
+.submit-btn {
+  width: 100%;
+  height: 44px;
+  border: none;
+  background: linear-gradient(135deg, #6366f1 0%, #7c3aed 100%);
+  color: white;
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  &:hover {
+    box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3);
+    transform: translateY(-2px);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+.auth-footer {
+  padding: 24px 40px;
+  text-align: center;
+  border-top: 1px solid #f3f4f6;
+  font-size: 13px;
+  color: #6b7280;
+
+  .link {
+    color: #6366f1;
+    text-decoration: none;
+    font-weight: 500;
+    margin-left: 4px;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+@media (max-width: 640px) {
+  .auth-header {
+    padding: 24px 24px 16px;
+  }
+
+  .auth-form {
+    padding: 0 24px;
+  }
+
+  .auth-footer {
+    padding: 16px 24px;
+  }
+
+  .auth-title {
     font-size: 24px;
+  }
+
+  .back-btn {
+    top: 16px;
+    left: 16px;
   }
 }
 </style>

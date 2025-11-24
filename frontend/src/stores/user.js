@@ -10,10 +10,32 @@ export const useUserStore = defineStore('user', () => {
 
   const isAuthenticated = computed(() => !!token.value)
 
+  // 计算用户是否为管理员
+  const isAdmin = computed(() => {
+    return user.value?.role === 'admin' || user.value?.isAdmin === true
+  })
+
   // 登录
   const login = async (credentials) => {
     try {
       const response = await authAPI.login(credentials)
+      if (response.code === 200) {
+        token.value = response.data.token
+        user.value = response.data.user
+        localStorage.setItem('token', response.data.token)
+        ElMessage.success('登录成功')
+        return true
+      }
+    } catch (error) {
+      ElMessage.error(error.message || '登录失败')
+      return false
+    }
+  }
+
+  // 短信验证码登录
+  const loginBySms = async (data) => {
+    try {
+      const response = await authAPI.loginBySms(data)
       if (response.code === 200) {
         token.value = response.data.token
         user.value = response.data.user
@@ -61,15 +83,34 @@ export const useUserStore = defineStore('user', () => {
   // 获取用户信息
   const fetchUserInfo = async () => {
     try {
-      if (!token.value) return
+      if (!token.value) {
+        console.warn('[User] No token available, skipping user info fetch')
+        return false
+      }
+
       const response = await userAPI.getUserInfo()
+
       if (response.code === 200) {
         user.value = response.data
+        console.log('[User] User info fetched successfully:', user.value)
+        return true
+      } else if (response.code === 401 || response.code === 403) {
+        // 只在 token 真正失效时登出
+        console.warn('[User] Token expired or unauthorized (401/403), logging out')
+        await logout()
+        return false
+      } else {
+        // 其他错误（5xx, 4xx 等）：记录但保留认证状态
+        console.warn('[User] Failed to fetch user info (code:', response.code, '), keeping auth intact')
+        // ✓ 重要：不调用 logout()，保留已认证状态
+        return true
       }
     } catch (error) {
-      console.error('Failed to fetch user info:', error)
-      // 如果获取用户信息失败，可能是token过期
-      logout()
+      // 网络错误、超时等：记录但保留认证状态
+      console.error('[User] Network error fetching user info:', error.message)
+      // ✓ 重要：不调用 logout()，保留已认证状态
+      // 用户仍然可以访问受保护资源，只是缺少用户详细信息
+      return true
     }
   }
 
@@ -91,7 +132,9 @@ export const useUserStore = defineStore('user', () => {
     user,
     token,
     isAuthenticated,
+    isAdmin,
     login,
+    loginBySms,
     register,
     logout,
     fetchUserInfo,

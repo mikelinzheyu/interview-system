@@ -1,0 +1,170 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.interview.mapper.WrongAnswerMapper">
+
+    <!-- Result map for WrongAnswerRecord entity -->
+    <resultMap id="WrongAnswerRecordMap" type="com.interview.entity.WrongAnswerRecord">
+        <id column="id" property="id"/>
+        <result column="user_id" property="userId"/>
+        <result column="question_id" property="questionId"/>
+        <result column="source" property="source"/>
+        <result column="source_instance_id" property="sourceInstanceId"/>
+        <result column="wrong_count" property="wrongCount"/>
+        <result column="correct_count" property="correctCount"/>
+        <result column="last_wrong_time" property="lastWrongTime"/>
+        <result column="last_correct_time" property="lastCorrectTime"/>
+        <result column="review_status" property="reviewStatus"/>
+        <result column="next_review_time" property="nextReviewTime"/>
+        <result column="review_priority" property="reviewPriority"/>
+        <result column="repetitions" property="repetitions"/>
+        <result column="ease_factor" property="easeFactor"/>
+        <result column="interval_days" property="intervalDays"/>
+        <result column="last_quality" property="lastQuality"/>
+        <result column="user_notes" property="userNotes"/>
+        <result column="user_tags" property="userTags" typeHandler="com.interview.mapper.handler.JsonStringListTypeHandler"/>
+        <result column="question_title" property="questionTitle"/>
+        <result column="question_content" property="questionContent"/>
+        <result column="difficulty" property="difficulty"/>
+        <result column="knowledge_points" property="knowledgePoints" typeHandler="com.interview.mapper.handler.JsonStringListTypeHandler"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="updated_at" property="updatedAt"/>
+    </resultMap>
+
+    <!-- Insert statement -->
+    <insert id="insert" parameterType="com.interview.entity.WrongAnswerRecord" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO wrong_answer_records (
+            user_id, question_id, source, source_instance_id,
+            wrong_count, correct_count, last_wrong_time, last_correct_time,
+            review_status, next_review_time, review_priority,
+            repetitions, ease_factor, interval_days, last_quality,
+            user_notes, user_tags, question_title, question_content,
+            difficulty, knowledge_points, created_at, updated_at
+        ) VALUES (
+            #{userId}, #{questionId}, #{source}, #{sourceInstanceId},
+            #{wrongCount}, #{correctCount}, #{lastWrongTime}, #{lastCorrectTime},
+            #{reviewStatus}, #{nextReviewTime}, #{reviewPriority},
+            #{repetitions}, #{easeFactor}, #{intervalDays}, #{lastQuality},
+            #{userNotes}, #{userTags, typeHandler=com.interview.mapper.handler.JsonStringListTypeHandler}, #{questionTitle}, #{questionContent},
+            #{difficulty}, #{knowledgePoints, typeHandler=com.interview.mapper.handler.JsonStringListTypeHandler}, #{createdAt}, #{updatedAt}
+        )
+    </insert>
+
+    <!-- Update statement -->
+    <update id="updateById" parameterType="com.interview.entity.WrongAnswerRecord">
+        UPDATE wrong_answer_records SET
+            wrong_count = #{wrongCount},
+            correct_count = #{correctCount},
+            last_wrong_time = #{lastWrongTime},
+            last_correct_time = #{lastCorrectTime},
+            review_status = #{reviewStatus},
+            next_review_time = #{nextReviewTime},
+            review_priority = #{reviewPriority},
+            repetitions = #{repetitions},
+            ease_factor = #{easeFactor},
+            interval_days = #{intervalDays},
+            last_quality = #{lastQuality},
+            user_notes = #{userNotes},
+            user_tags = #{userTags, typeHandler=com.interview.mapper.handler.JsonStringListTypeHandler},
+            question_title = #{questionTitle},
+            question_content = #{questionContent},
+            difficulty = #{difficulty},
+            knowledge_points = #{knowledgePoints, typeHandler=com.interview.mapper.handler.JsonStringListTypeHandler},
+            updated_at = #{updatedAt}
+        WHERE id = #{id}
+    </update>
+
+    <!-- Select by id -->
+    <select id="selectById" parameterType="Long" resultMap="WrongAnswerRecordMap">
+        SELECT * FROM wrong_answer_records WHERE id = #{id}
+    </select>
+
+    <!-- Select by user and question -->
+    <select id="selectByUserAndQuestion" resultMap="WrongAnswerRecordMap">
+        SELECT * FROM wrong_answer_records
+        WHERE user_id = #{userId} AND question_id = #{questionId}
+        LIMIT 1
+    </select>
+
+    <!-- Select all by user id -->
+    <select id="selectByUserId" parameterType="Long" resultMap="WrongAnswerRecordMap">
+        SELECT * FROM wrong_answer_records
+        WHERE user_id = #{userId}
+        ORDER BY last_wrong_time DESC
+    </select>
+
+    <!-- Select by user id and review status -->
+    <select id="selectByUserIdAndStatus" resultMap="WrongAnswerRecordMap">
+        SELECT * FROM wrong_answer_records
+        WHERE user_id = #{userId} AND review_status = #{reviewStatus}
+        ORDER BY review_priority DESC, last_wrong_time DESC
+    </select>
+
+    <!-- Select by user id and source -->
+    <select id="selectByUserIdAndSource" resultMap="WrongAnswerRecordMap">
+        SELECT * FROM wrong_answer_records
+        WHERE user_id = #{userId} AND source = #{source}
+        ORDER BY last_wrong_time DESC
+    </select>
+
+    <!-- Select due for review -->
+    <select id="selectDueForReview" resultMap="WrongAnswerRecordMap">
+        SELECT * FROM wrong_answer_records
+        WHERE user_id = #{userId}
+          AND review_status != 'mastered'
+          AND (next_review_time IS NULL OR next_review_time &lt;= #{now})
+        ORDER BY review_priority DESC, next_review_time ASC
+    </select>
+
+    <!-- Select by user id and knowledge point -->
+    <select id="selectByUserIdAndKnowledgePoint" resultMap="WrongAnswerRecordMap">
+        SELECT * FROM wrong_answer_records
+        WHERE user_id = #{userId}
+          AND JSON_CONTAINS(knowledge_points, JSON_QUOTE(#{knowledgePoint}))
+        ORDER BY wrong_count DESC, last_wrong_time DESC
+    </select>
+
+    <!-- Count by user id -->
+    <select id="countByUserId" parameterType="Long" resultType="int">
+        SELECT COUNT(*) FROM wrong_answer_records WHERE user_id = #{userId}
+    </select>
+
+    <!-- Count by user id and status -->
+    <select id="countByUserIdAndStatus" resultType="int">
+        SELECT COUNT(*) FROM wrong_answer_records
+        WHERE user_id = #{userId} AND review_status = #{reviewStatus}
+    </select>
+
+    <!-- Count by user id and source -->
+    <select id="countByUserIdAndSource" resultType="int">
+        SELECT COUNT(*) FROM wrong_answer_records
+        WHERE user_id = #{userId} AND source = #{source}
+    </select>
+
+    <!-- Count by user id and difficulty -->
+    <select id="countByUserIdAndDifficulty" resultType="int">
+        SELECT COUNT(*) FROM wrong_answer_records
+        WHERE user_id = #{userId} AND difficulty = #{difficulty}
+    </select>
+
+    <!-- Count today's wrong answers -->
+    <select id="countTodayByUserId" resultType="int">
+        SELECT COUNT(*) FROM wrong_answer_records
+        WHERE user_id = #{userId}
+          AND created_at BETWEEN #{startDate} AND #{endDate}
+    </select>
+
+    <!-- Delete by id -->
+    <delete id="deleteById" parameterType="Long">
+        DELETE FROM wrong_answer_records WHERE id = #{id}
+    </delete>
+
+    <!-- Delete archived records -->
+    <delete id="deleteByUserIdAndMasteredBefore">
+        DELETE FROM wrong_answer_records
+        WHERE user_id = #{userId}
+          AND review_status = 'mastered'
+          AND updated_at &lt; #{date}
+    </delete>
+
+</mapper>

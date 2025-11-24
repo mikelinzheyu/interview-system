@@ -72,8 +72,19 @@ export function useNotifications() {
         currentPage.value = page
       }
     } catch (err) {
-      error.value = err.message || '获取通知失败'
-      console.error('Failed to fetch notifications:', err)
+      // 降级处理：如果API不可用，使用本地存储的通知
+      console.warn('[Notifications] API 不可用，使用本地降级:', err.message)
+      const localNotifications = localStorage.getItem('__notifications__')
+      if (localNotifications) {
+        try {
+          notifications.value = JSON.parse(localNotifications)
+        } catch (e) {
+          notifications.value = []
+        }
+      } else {
+        notifications.value = []
+      }
+      // 不设置error，让UI显示空状态而不是错误
     } finally {
       loading.value = false
     }
@@ -89,7 +100,9 @@ export function useNotifications() {
         unreadCount.value = response.data.count || 0
       }
     } catch (err) {
-      console.error('Failed to fetch unread count:', err)
+      // 降级处理：API不可用时保持当前未读计数
+      console.warn('[Notifications] 获取未读计数失败，使用本地值:', err.message)
+      unreadCount.value = 0
     }
   }
 
@@ -166,6 +179,14 @@ export function useNotifications() {
    * 初始化 WebSocket 连接
    */
   const initializeWebSocket = () => {
+    // 检查环境变量是否启用了 WebSocket
+    const wsEnabled = import.meta.env.VITE_NOTIFICATIONS_WS_ENABLED !== 'false'
+
+    if (!wsEnabled) {
+      console.log('[Notifications] WebSocket 已禁用（设置 VITE_NOTIFICATIONS_WS_ENABLED=true 启用）')
+      return
+    }
+
     const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
     const wsUrl = `${wsProtocol}//localhost:3001/notifications`
 
@@ -188,7 +209,7 @@ export function useNotifications() {
       }
 
       webSocket.onerror = (error) => {
-        console.error('[Notifications] WebSocket error:', error)
+        console.warn('[Notifications] WebSocket error (已禁用):', error.type)
         isConnected.value = false
       }
 
@@ -198,7 +219,7 @@ export function useNotifications() {
         attemptReconnect()
       }
     } catch (err) {
-      console.error('Failed to initialize WebSocket:', err)
+      console.warn('[Notifications] WebSocket initialization failed:', err.message)
       attemptReconnect()
     }
   }

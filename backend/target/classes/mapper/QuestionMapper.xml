@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.interview.mapper.QuestionMapper">
+
+  <sql id="Base_Column_List">
+    id, category_id, title, content, difficulty, type, answer, tags, created_by, status, created_at, updated_at,
+    view_count, like_count
+  </sql>
+
+  <resultMap id="QuestionResultMap" type="com.interview.entity.Question">
+    <id column="id" property="id" />
+    <result column="title" property="title" />
+    <result column="content" property="content" />
+    <result column="difficulty" property="difficulty" />
+    <result column="type" property="type" />
+    <result column="category_id" property="categoryId" />
+    <result column="answer" property="answer" />
+    <result column="view_count" property="viewCount" />
+    <result column="like_count" property="likeCount" />
+    <result column="created_by" property="createdBy" />
+    <result column="created_at" property="createdAt" />
+    <result column="updated_at" property="updatedAt" />
+  </resultMap>
+
+  <select id="selectPage" resultMap="QuestionResultMap">
+    SELECT
+      <include refid="Base_Column_List"/>
+    FROM questions
+    <where>
+      <if test="categoryId != null">AND category_id = #{categoryId}</if>
+      <if test="difficulty != null and difficulty != ''">AND difficulty = #{difficulty}</if>
+      <if test="type != null and type != ''">AND type = #{type}</if>
+      <if test="keyword != null and keyword != ''">
+        AND (
+          MATCH(title, content) AGAINST (#{keyword} IN NATURAL LANGUAGE MODE)
+          OR title LIKE CONCAT('%', #{keyword}, '%') OR content LIKE CONCAT('%', #{keyword}, '%')
+        )
+      </if>
+      <if test="tags != null and tags != ''">
+        AND (tags LIKE CONCAT('%', #{tags}, '%'))
+      </if>
+      <if test="tagList != null and tagList.size() > 0">
+        AND EXISTS (
+          SELECT 1 FROM question_tags qt
+          JOIN tags t ON t.id = qt.tag_id
+          WHERE qt.question_id = questions.id
+          AND t.name IN
+          <foreach collection="tagList" item="tname" open="(" separator="," close=")">#{tname}</foreach>
+        )
+      </if>
+      AND status = 1
+    </where>
+    <choose>
+      <when test="sort == 'hot'">ORDER BY like_count DESC, updated_at DESC</when>
+      <when test="sort == 'views'">ORDER BY view_count DESC, updated_at DESC</when>
+      <when test="sort == 'oldest'">ORDER BY updated_at ASC</when>
+      <otherwise>ORDER BY updated_at DESC</otherwise>
+    </choose>
+    LIMIT #{size} OFFSET #{offset}
+  </select>
+
+  <select id="countByCondition" resultType="long">
+    SELECT COUNT(1)
+    FROM questions
+    <where>
+      <if test="categoryId != null">AND category_id = #{categoryId}</if>
+      <if test="difficulty != null and difficulty != ''">AND difficulty = #{difficulty}</if>
+      <if test="type != null and type != ''">AND type = #{type}</if>
+      <if test="keyword != null and keyword != ''">
+        AND (
+          MATCH(title, content) AGAINST (#{keyword} IN NATURAL LANGUAGE MODE)
+          OR title LIKE CONCAT('%', #{keyword}, '%') OR content LIKE CONCAT('%', #{keyword}, '%')
+        )
+      </if>
+      <if test="tags != null and tags != ''">
+        AND (tags LIKE CONCAT('%', #{tags}, '%'))
+      </if>
+      <if test="tagList != null and tagList.size() > 0">
+        AND EXISTS (
+          SELECT 1 FROM question_tags qt
+          JOIN tags t ON t.id = qt.tag_id
+          WHERE qt.question_id = questions.id
+          AND t.name IN
+          <foreach collection="tagList" item="tname" open="(" separator="," close=")">#{tname}</foreach>
+        )
+      </if>
+      AND status = 1
+    </where>
+  </select>
+
+  <select id="selectById" resultMap="QuestionResultMap">
+    SELECT <include refid="Base_Column_List"/> FROM questions WHERE id = #{id}
+  </select>
+
+  <update id="incrementViewCount">
+    UPDATE questions SET view_count = IFNULL(view_count,0) + 1 WHERE id = #{id}
+  </update>
+
+  <update id="incrementLikeCount">
+    UPDATE questions SET like_count = IFNULL(like_count,0) + 1 WHERE id = #{id}
+  </update>
+
+  <insert id="insert" parameterType="com.interview.entity.Question" useGeneratedKeys="true" keyProperty="id">
+    INSERT INTO questions (category_id, title, content, difficulty, type, answer, tags, created_by, status, created_at, updated_at, view_count, like_count)
+    VALUES (#{categoryId}, #{title}, #{content}, #{difficulty}, #{type}, #{answer},
+            #{tags,jdbcType=VARCHAR}, #{createdBy}, 1, #{createdAt}, #{updatedAt},
+            #{viewCount}, #{likeCount})
+  </insert>
+
+  <update id="updateById" parameterType="com.interview.entity.Question">
+    UPDATE questions
+    <set>
+      <if test="categoryId != null">category_id = #{categoryId},</if>
+      <if test="title != null">title = #{title},</if>
+      <if test="content != null">content = #{content},</if>
+      <if test="difficulty != null">difficulty = #{difficulty},</if>
+      <if test="type != null">type = #{type},</if>
+      <if test="answer != null">answer = #{answer},</if>
+      <if test="tags != null">tags = #{tags,jdbcType=VARCHAR},</if>
+      updated_at = #{updatedAt}
+    </set>
+    WHERE id = #{id}
+  </update>
+
+  <delete id="deleteById">
+    DELETE FROM questions WHERE id = #{id}
+  </delete>
+
+  <update id="publish">
+    UPDATE questions SET status = 1, updated_at = NOW() WHERE id = #{id}
+  </update>
+
+  <update id="archive">
+    UPDATE questions SET status = 0, updated_at = NOW() WHERE id = #{id}
+  </update>
+
+  <select id="countByDifficulty" resultType="com.interview.dto.FacetBucket">
+    SELECT difficulty AS `key`, COUNT(1) AS `count`
+    FROM questions
+    <where>
+      <if test="categoryId != null">AND category_id = #{categoryId}</if>
+      <if test="keyword != null and keyword != ''">
+        AND (title LIKE CONCAT('%', #{keyword}, '%') OR content LIKE CONCAT('%', #{keyword}, '%'))
+      </if>
+      <if test="tags != null and tags != ''">
+        AND (tags LIKE CONCAT('%', #{tags}, '%'))
+      </if>
+      AND status = 1
+    </where>
+    GROUP BY difficulty
+  </select>
+
+  <select id="countByCategory" resultType="com.interview.dto.FacetBucket">
+    SELECT CAST(category_id AS CHAR) AS `key`, COUNT(1) AS `count`
+    FROM questions
+    <where>
+      <if test="keyword != null and keyword != ''">
+        AND (title LIKE CONCAT('%', #{keyword}, '%') OR content LIKE CONCAT('%', #{keyword}, '%'))
+      </if>
+      <if test="tags != null and tags != ''">
+        AND (tags LIKE CONCAT('%', #{tags}, '%'))
+      </if>
+      AND status = 1
+    </where>
+    GROUP BY category_id
+  </select>
+
+</mapper>

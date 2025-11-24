@@ -1,0 +1,52 @@
+[2025-11-19T03:51:06.149Z] [INFO] [Dify] Service initialized {"baseURL":"https://api.dify.ai/v1","workflowId":"D6kweN4qjR1FWd3g"}
+
+========== Dify Chat API 配置信息 ==========
+✅ 状态: Dify API 已配置
+   API Key: app-Bj1UccX9v9X...W5paG
+   App ID: NF8mUftOYiGfQEzE
+   Base URL: https://api.dify.ai/v1
+   ⚡ 将使用 Dify API 进行实时对话
+==========================================
+
+🚀 正在启动后端服务器...
+[Init] 正在初始化数据层...
+[DataService] 所有控制器已初始化
+[Init] 正在初始化 WebSocket...
+✅ WebSocket 服务器已初始化（Phase 4 增强）
+✅ 已启用以下功能:
+   - 消息实时同步
+   - 用户状态管理
+   - 频道订阅
+   - 用户订阅
+   - 线程回复
+   - 表情反应
+   - 输入状态
+   - 系统消息
+[Init] 正在初始化事件桥接...
+[EventBridge] 初始化完成，准备转发 REST API 事件到 WebSocket
+node:events:497
+      throw er; // Unhandled 'error' event
+      ^
+
+Error: listen EADDRINUSE: address already in use :::3001
+    at Server.setupListenHandle [as _listen2] (node:net:1940:16)
+    at listenInCluster (node:net:1997:12)
+    at Server.listen (node:net:2102:7)
+    at createBackendServer (D:\code7\interview-system\backend\server.js:87:10)
+    at Object.<anonymous> (D:\code7\interview-system\backend\start-server.js:13:39)
+    at Module._compile (node:internal/modules/cjs/loader:1706:14)
+    at Object..js (node:internal/modules/cjs/loader:1839:10)
+    at Module.load (node:internal/modules/cjs/loader:1441:32)
+    at Function._load (node:internal/modules/cjs/loader:1263:12)
+    at TracingChannel.traceSync (node:diagnostics_channel:322:14)
+Emitted 'error' event on Server instance at:
+    at emitErrorNT (node:net:1976:8)
+    at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+  code: 'EADDRINUSE',
+  errno: -4091,
+  syscall: 'listen',
+  address: '::',
+  port: 3001
+}
+
+Node.js v22.19.0

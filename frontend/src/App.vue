@@ -10,36 +10,57 @@ import { useUserStore } from '@/stores/user'
 import socketService from '@/utils/socket'
 
 const userStore = useUserStore()
+const isMockMode = import.meta.env.VITE_USE_MOCK_DATA !== 'false'
+const WS_ENABLED = !isMockMode && import.meta.env.VITE_WS_ENABLED !== 'false'
 
-// 监听用户登录状态，自动连接/断开 Socket
 watch(
   () => userStore.token,
   (newToken) => {
+    if (!WS_ENABLED) {
+      console.log('[App] WebSocket 已禁用（mock 模式或 VITE_WS_ENABLED=false）')
+      socketService.disconnect()
+      return
+    }
+
     if (newToken) {
-      // 用户已登录，初始化 Socket 连接
       console.log('[App] 用户已登录，初始化 WebSocket 连接')
       socketService.connect(newToken)
     } else {
-      // 用户已登出，断开 Socket 连接
-      console.log('[App] 用户已登出，断开 WebSocket 连接')
+      console.log('[App] 用户未登录或已退出，断开 WebSocket 连接')
       socketService.disconnect()
     }
   },
   { immediate: true }
 )
 
-onMounted(() => {
-  // 如果用户已经登录（刷新页面后），立即连接
+onMounted(async () => {
+  // 如果有token，立即初始化用户信息
   if (userStore.token) {
-    console.log('[App] 应用启动，用户已登录，初始化 WebSocket 连接')
+    try {
+      console.log('[App] 应用启动，用户已登录，开始初始化用户信息')
+      const success = await userStore.fetchUserInfo()
+
+      if (!success) {
+        console.warn('[App] 获取用户信息失败，但保留登录状态（可能是 token 已过期）')
+      } else {
+        console.log('[App] 用户信息获取完成')
+      }
+    } catch (error) {
+      console.error('[App] 初始化用户信息异常:', error)
+      // 不要中断，用户仍可以访问受保护资源
+    }
+  } else {
+    console.log('[App] 应用启动，用户未登录')
+  }
+
+  // 初始化 WebSocket 连接（独立于用户信息获取）
+  if (userStore.token && WS_ENABLED) {
+    console.log('[App] 用户已登录，初始化 WebSocket 连接')
     socketService.connect(userStore.token)
   }
 })
 
-// 已移除重复初始化逻辑，依赖上方 watch({ immediate: true }) 进行首次连接
-
 onUnmounted(() => {
-  // 应用卸载时断开连接
   socketService.disconnect()
 })
 </script>

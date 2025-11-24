@@ -12,6 +12,19 @@ import {
   fetchQuestionFacets,
   fetchCategories
 } from '@/api/questions'
+import {
+  mockQuestionCategories,
+  mockQuestionTags,
+  mockQuestions,
+  mockQuestionSummary,
+  mockQuestionFacets,
+  buildMockQuestionList,
+  getMockPracticeRecords,
+  getMockQuestionById,
+  getMockRecommendations
+} from '@/data/mock-questions'
+
+const USE_MOCK = import.meta.env.VITE_USE_MOCK_DATA !== 'false'
 
 export const useQuestionBankStore = defineStore('questionBank', () => {
   const loading = ref(false)
@@ -132,6 +145,30 @@ export const useQuestionBankStore = defineStore('questionBank', () => {
         pagination.size = overrides.size
       }
 
+      if (USE_MOCK) {
+        const result = buildMockQuestionList(params)
+        list.value = result.items || []
+        const summaryData = result.summary || mockQuestionSummary
+
+        summary.value = summaryData || null
+
+        pagination.page = summaryData?.page || params.page || 1
+        pagination.size = summaryData?.size || params.size || pagination.size
+        pagination.total = summaryData?.total || result.total || list.value.length || 0
+        pagination.totalPages = summaryData?.totalPages || result.totalPages || Math.max(1, Math.ceil((pagination.total || 0) / pagination.size))
+
+        const facets = result.facets || mockQuestionFacets
+        availableFilters.value = {
+          difficulties: facets?.difficulties || [],
+          categories: facets?.categories || [],
+          types: facets?.types || [],
+          tags: facets?.tags || mockQuestionTags
+        }
+
+        lastFetchedAt.value = Date.now()
+        return
+      }
+
       const response = await fetchQuestionList(params)
       const data = response.data || {}
 
@@ -170,6 +207,12 @@ export const useQuestionBankStore = defineStore('questionBank', () => {
   }
 
   async function loadCategories(domainId = null) {
+    if (USE_MOCK) {
+      categoriesTree.value = mockQuestionCategories.tree
+      categoriesFlat.value = mockQuestionCategories.flat
+      return
+    }
+
     try {
       const params = {}
       if (domainId) {
@@ -199,6 +242,11 @@ export const useQuestionBankStore = defineStore('questionBank', () => {
   }
 
   async function loadTags() {
+    if (USE_MOCK) {
+      tags.value = mockQuestionTags
+      return
+    }
+
     try {
       const response = await fetchQuestionTags()
       const data = response.data || {}
@@ -303,6 +351,18 @@ export const useQuestionBankStore = defineStore('questionBank', () => {
 
     currentQuestionLoading.value = true
     try {
+      if (USE_MOCK) {
+        const data = getMockQuestionById(numericId)
+        if (!data) {
+          throw new Error('QUESTION_NOT_FOUND')
+        }
+        questionCache.value.set(numericId, data)
+        currentQuestion.value = data
+        recommendations.value = getMockRecommendations(numericId)
+        practiceRecords.value = getMockPracticeRecords(numericId)
+        return data
+      }
+
       const response = await fetchQuestionDetail(numericId)
       const data = response.data || {}
       questionCache.value.set(numericId, data)
@@ -320,6 +380,12 @@ export const useQuestionBankStore = defineStore('questionBank', () => {
   }
 
   async function loadPracticeRecords(questionId) {
+    if (USE_MOCK) {
+      const records = getMockPracticeRecords(questionId)
+      practiceRecords.value = records
+      return records
+    }
+
     try {
       const response = await fetchQuestionPracticeRecords(questionId)
       practiceRecords.value = response.data?.items || []
@@ -331,6 +397,11 @@ export const useQuestionBankStore = defineStore('questionBank', () => {
   }
 
   async function loadRecommendations(questionId) {
+    if (USE_MOCK) {
+      recommendations.value = getMockRecommendations(questionId, 5)
+      return
+    }
+
     try {
       const response = await fetchQuestionRecommendations({ base_id: questionId })
       recommendations.value = response.data?.items || []
@@ -344,6 +415,26 @@ export const useQuestionBankStore = defineStore('questionBank', () => {
 
     submitting.value = true
     try {
+      if (USE_MOCK) {
+        const record = {
+          questionId,
+          submittedAt: Date.now(),
+          payload
+        }
+        const existing = getMockQuestionById(questionId)
+        if (existing) {
+          questionCache.value.set(Number(questionId), existing)
+          currentQuestion.value = existing
+        }
+        practiceRecords.value = [
+          { id: `mock-${Date.now()}`, questionId, result: 'submitted', timeSpent: payload?.timeSpent || 0, createdAt: new Date().toISOString() },
+          ...practiceRecords.value
+        ]
+        recommendations.value = getMockRecommendations(questionId, 5)
+        ElMessage.success('作答提交成功')
+        return record
+      }
+
       const response = await submitQuestionAnswer(questionId, payload)
       const data = response.data || {}
       ElMessage.success('作答提交成功')

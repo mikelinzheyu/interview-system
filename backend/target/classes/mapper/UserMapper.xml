@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.interview.mapper.UserMapper">
+
+    <resultMap id="UserResultMap" type="com.interview.entity.User">
+        <id column="id" property="id"/>
+        <result column="username" property="username"/>
+        <result column="email" property="email"/>
+        <result column="password" property="password"/>
+        <result column="real_name" property="realName"/>
+        <result column="avatar" property="avatar"/>
+        <result column="bio" property="bio"/>
+        <result column="phone" property="phone"/>
+        <result column="status" property="status"/>
+        <result column="total_answered" property="totalAnswered"/>
+        <result column="correct_answered" property="correctAnswered"/>
+        <result column="accuracy_rate" property="accuracyRate"/>
+        <result column="study_time" property="studyTime"/>
+        <result column="interview_count" property="interviewCount"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="updated_at" property="updatedAt"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, username, email, password, real_name, avatar, bio, phone, status,
+        total_answered, correct_answered, accuracy_rate, study_time, interview_count,
+        created_at, updated_at
+    </sql>
+
+    <select id="selectById" resultMap="UserResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM users
+        WHERE id = #{id}
+    </select>
+
+    <select id="selectByUsername" resultMap="UserResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM users
+        WHERE username = #{username}
+    </select>
+
+    <select id="selectByEmail" resultMap="UserResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM users
+        WHERE email = #{email}
+    </select>
+
+    <select id="selectByUsernameOrEmail" resultMap="UserResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM users
+        WHERE username = #{usernameOrEmail} OR email = #{usernameOrEmail}
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO users (
+            username, email, password, real_name, phone, status,
+            total_answered, correct_answered, accuracy_rate, study_time, interview_count,
+            created_at, updated_at
+        ) VALUES (
+            #{username}, #{email}, #{password}, #{realName}, #{phone}, #{status},
+            #{totalAnswered}, #{correctAnswered}, #{accuracyRate}, #{studyTime}, #{interviewCount},
+            #{createdAt}, #{updatedAt}
+        )
+    </insert>
+
+    <update id="updateById">
+        UPDATE users
+        SET
+            real_name = #{realName},
+            avatar = #{avatar},
+            bio = #{bio},
+            phone = #{phone},
+            updated_at = NOW()
+        WHERE id = #{id}
+    </update>
+
+    <update id="updatePasswordById">
+        UPDATE users
+        SET password = #{password}, updated_at = NOW()
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteById">
+        DELETE FROM users WHERE id = #{id}
+    </delete>
+
+    <select id="existsByUsername" resultType="int">
+        SELECT COUNT(1) FROM users WHERE username = #{username}
+    </select>
+
+    <select id="existsByEmail" resultType="int">
+        SELECT COUNT(1) FROM users WHERE email = #{email}
+    </select>
+
+</mapper>

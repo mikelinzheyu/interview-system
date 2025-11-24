@@ -1,136 +1,118 @@
 <template>
   <section class="hero-section">
-    <!-- 背景装饰 -->
-    <div class="hero-decoration">
-      <div class="decoration-circle decoration-circle-1"></div>
-      <div class="decoration-circle decoration-circle-2"></div>
-    </div>
+    <div class="hero-bg-blob hero-blob-1"></div>
+    <div class="hero-bg-blob hero-blob-2"></div>
 
-    <!-- 内容 -->
     <div class="hero-content">
       <h1 class="hero-title">欢迎回来{{ userName }}！</h1>
-      <p class="hero-subtitle">准备好开始您的下一次面试了吗？</p>
+      <p class="hero-subtitle">准备好拿下下一次面试了吗？你的 AI 教练正在等你。</p>
+
       <div class="hero-actions">
-        <el-button
-          type="primary"
-          size="large"
-          @click="handleAction('interview')"
-        >
-          开始面试
-        </el-button>
-        <el-button
-          size="large"
-          @click="handleAction('questions')"
-        >
+        <button class="hero-btn primary-btn" @click="$emit('start-interview')">
+          <el-icon><VideoPlay /></el-icon>
+          开始 AI 模拟面试
+        </button>
+        <button class="hero-btn secondary-btn">
+          <el-icon><DocumentCopy /></el-icon>
           浏览题库
-        </el-button>
-        <el-button
-          size="large"
-          @click="handleAction('achievements')"
-        >
-          查看排名
-        </el-button>
+        </button>
       </div>
     </div>
   </section>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { computed } from 'vue'
-import { useRouter } from 'vue-router'
+import { VideoPlay, DocumentCopy } from '@element-plus/icons-vue'
 import { useUserStore } from '@/stores/user'
 
-const router = useRouter()
+defineEmits(['start-interview'])
+
 const userStore = useUserStore()
 
 const userName = computed(() => {
-  return userStore.user?.real_name || userStore.user?.username || '用户'
+  const user = userStore.user
+  if (!user) return '用户'
+  return user.username || user.real_name || '用户'
 })
-
-const handleAction = (action) => {
-  const routes = {
-    interview: '/interview/new',
-    questions: '/questions',
-    achievements: '/achievements'
-  }
-
-  if (routes[action]) {
-    router.push(routes[action])
-  }
-}
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .hero-section {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  padding: 60px 40px;
-  border-radius: 20px;
-  overflow: hidden;
   position: relative;
+  padding: 80px 24px;
   text-align: center;
-  min-height: 280px;
+  overflow: hidden;
+  background: linear-gradient(135deg, #0071e3 0%, #4facfe 100%);
+  color: white;
+  border-radius: 20px;
+  margin-bottom: 24px;
+  min-height: 300px;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-/* 装饰背景 */
-.hero-decoration {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-}
-
-.decoration-circle {
+.hero-bg-blob {
   position: absolute;
   border-radius: 50%;
-  background: white;
-  opacity: 0.1;
+  mix-blend-mode: multiply;
+  filter: blur(64px);
+  opacity: 0.3;
+  animation: blob 7s infinite;
+
+  &.hero-blob-1 {
+    width: 400px;
+    height: 400px;
+    top: -100px;
+    left: -100px;
+    background: rgba(255, 255, 255, 0.2);
+    animation-delay: 0s;
+  }
+
+  &.hero-blob-2 {
+    width: 500px;
+    height: 500px;
+    bottom: -200px;
+    right: -100px;
+    background: rgba(0, 0, 0, 0.1);
+    animation-delay: 2s;
+  }
 }
 
-.decoration-circle-1 {
-  width: 300px;
-  height: 300px;
-  top: -100px;
-  right: -100px;
+@keyframes blob {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+  }
+  33% {
+    transform: translate(30px, -50px) scale(1.1);
+  }
+  66% {
+    transform: translate(-20px, 20px) scale(0.9);
+  }
 }
 
-.decoration-circle-2 {
-  width: 250px;
-  height: 250px;
-  bottom: -80px;
-  left: -80px;
-}
-
-/* 内容区 */
 .hero-content {
   position: relative;
-  z-index: 2;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 20px;
-  max-width: 700px;
-  animation: slideUp 0.6s ease-out;
+  z-index: 10;
+  max-width: 600px;
+  margin: 0 auto;
 }
 
 .hero-title {
-  font-size: 42px;
-  font-weight: 700;
-  color: white;
-  line-height: 1.3;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  margin: 0;
-  word-break: break-word;
-  max-width: 100%;
+  font-size: 48px;
+  font-weight: 800;
+  margin-bottom: 16px;
+  line-height: 1.2;
+  text-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .hero-subtitle {
-  font-size: 16px;
-  color: rgba(255, 255, 255, 0.9);
+  font-size: 18px;
+  margin-bottom: 32px;
+  font-weight: 300;
+  opacity: 0.95;
   line-height: 1.6;
-  margin: 0;
 }
 
 .hero-actions {
@@ -138,88 +120,125 @@ const handleAction = (action) => {
   gap: 16px;
   justify-content: center;
   flex-wrap: wrap;
-  margin-top: 8px;
 }
 
-.hero-actions :deep(.el-button) {
-  border-radius: 8px;
+.hero-btn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 32px;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
   font-weight: 600;
-  min-width: 120px;
-  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  &.primary-btn {
+    background: white;
+    color: #0071e3;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+
+    &:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.2);
+    }
+  }
+
+  &.secondary-btn {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    border: 2px solid rgba(255, 255, 255, 0.5);
+    backdrop-filter: blur(8px);
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.3);
+      border-color: white;
+    }
+  }
+
+  :deep(.el-icon) {
+    font-size: 18px;
+  }
 }
 
-/* 动画 */
-@keyframes slideUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* 响应式 */
-@media (max-width: 1200px) {
+// Responsive
+@media (max-width: 1024px) {
   .hero-section {
-    padding: 50px 30px;
-    min-height: 260px;
+    padding: 60px 20px;
+    min-height: 250px;
   }
 
   .hero-title {
     font-size: 36px;
   }
 
-  .decoration-circle-1 {
-    width: 250px;
-    height: 250px;
-  }
-
-  .decoration-circle-2 {
-    width: 200px;
-    height: 200px;
+  .hero-subtitle {
+    font-size: 16px;
   }
 }
 
 @media (max-width: 768px) {
   .hero-section {
-    padding: 40px 20px;
-    border-radius: 16px;
-    min-height: 240px;
+    padding: 40px 16px;
+    min-height: 220px;
   }
 
   .hero-title {
     font-size: 28px;
-    line-height: 1.4;
   }
 
   .hero-subtitle {
     font-size: 14px;
+    margin-bottom: 24px;
+  }
+
+  .hero-btn {
+    padding: 12px 24px;
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 640px) {
+  .hero-section {
+    padding: 30px 12px;
+    min-height: 200px;
+  }
+
+  .hero-title {
+    font-size: 24px;
+    margin-bottom: 12px;
+  }
+
+  .hero-subtitle {
+    font-size: 13px;
+    margin-bottom: 16px;
   }
 
   .hero-actions {
     flex-direction: column;
-    width: 100%;
     gap: 12px;
   }
 
-  .hero-actions :deep(.el-button) {
+  .hero-btn {
     width: 100%;
+    justify-content: center;
+    padding: 12px 16px;
   }
 
-  .decoration-circle-1 {
-    width: 180px;
-    height: 180px;
-    top: -80px;
-    right: -80px;
-  }
+  .hero-bg-blob {
+    filter: blur(40px);
+    opacity: 0.2;
 
-  .decoration-circle-2 {
-    width: 140px;
-    height: 140px;
-    bottom: -50px;
-    left: -50px;
+    &.hero-blob-1 {
+      width: 250px;
+      height: 250px;
+    }
+
+    &.hero-blob-2 {
+      width: 300px;
+      height: 300px;
+    }
   }
 }
 </style>

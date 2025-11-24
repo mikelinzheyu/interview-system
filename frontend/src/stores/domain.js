@@ -6,6 +6,7 @@ import mockDomains from '@/data/mock-domains.json'
 import mockDomainsHierarchical from '@/data/mock-domains-hierarchical.json'
 import recommendationService from '@/services/recommendationService'
 
+const USE_MOCK = import.meta.env.VITE_USE_MOCK_DATA !== 'false'
 const FALLBACK_RECOMMENDED_COUNT = 6
 const FALLBACK_PROGRESS = Object.freeze({ completion: 0, easy: 0, medium: 0, hard: 0, total: 0 })
 
@@ -290,6 +291,15 @@ export const useDomainStore = defineStore('domain', () => {
     error.value = null
 
     try {
+      if (USE_MOCK) {
+        const fallback = fallbackDomainsFromMock()
+        domains.value = fallback
+        if (options.selectFirst !== false && !currentDomain.value && fallback.length) {
+          currentDomain.value = fallback[0]
+        }
+        return domains.value
+      }
+
       const response = await api.get('/domains')
       const payload = response.data || {}
       const list = ensureDomainCollection(normalizeDomainList(payload))
@@ -327,6 +337,14 @@ export const useDomainStore = defineStore('domain', () => {
     error.value = null
 
     try {
+      if (USE_MOCK) {
+        const fallback = fallbackDomainsFromMock().find(domain => domain.slug === idOrSlug || domain.id === idOrSlug)
+        if (fallback) {
+          currentDomain.value = fallback
+          return fallback
+        }
+      }
+
       const response = await api.get(`/domains/${idOrSlug}`)
       const payload = response.data || {}
       const normalized = ensureDomainModel(payload) || fallbackDomainsFromMock().find(domain => domain.slug === idOrSlug || domain.id === idOrSlug)
@@ -348,6 +366,11 @@ export const useDomainStore = defineStore('domain', () => {
   }
 
   async function loadFieldConfig(domainId) {
+    if (USE_MOCK) {
+      fieldConfigs.value[domainId] = fieldConfigs.value[domainId] || { fields: [] }
+      return fieldConfigs.value[domainId]
+    }
+
     if (fieldConfigs.value[domainId]) {
       return fieldConfigs.value[domainId]
     }
@@ -365,6 +388,13 @@ export const useDomainStore = defineStore('domain', () => {
 
   async function loadRecommendedDomains(options = {}) {
     if (recommendedSource.value.length && !options.force) {
+      return recommendedSource.value
+    }
+
+    if (USE_MOCK) {
+      const base = domains.value.length ? domains.value : fallbackDomainsFromMock()
+      recommendedSource.value = deriveRecommended(base)
+      recommendedError.value = null
       return recommendedSource.value
     }
 
@@ -408,6 +438,25 @@ export const useDomainStore = defineStore('domain', () => {
     progressError.value = null
 
     try {
+      if (USE_MOCK) {
+        const fallbackDomain =
+          typeof domain === 'object' && domain
+            ? domain
+            : currentDomain.value
+
+        const fallbackProgress = fallbackProgressFromDomain(fallbackDomain) || { ...FALLBACK_PROGRESS }
+
+        if (cacheKey) {
+          progressCache.value = {
+            ...progressCache.value,
+            [cacheKey]: fallbackProgress
+          }
+        }
+
+        userProgress.value = fallbackProgress
+        return fallbackProgress
+      }
+
       const params = { ...(options.params || {}) }
       if (cacheKey) {
         params.domain = cacheKey
@@ -545,6 +594,10 @@ export const useDomainStore = defineStore('domain', () => {
    * 加载层级数据
    */
   async function loadHierarchicalDomains(options = {}) {
+    if (USE_MOCK) {
+      hierarchicalDomains.value = mockDomainsHierarchical
+      return mockDomainsHierarchical
+    }
     try {
       // 优先使用后端API，否则使用mock数据
       try {

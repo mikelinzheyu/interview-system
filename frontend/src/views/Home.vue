@@ -14,7 +14,7 @@
         </div>
         
         <div class="header-actions">
-          <el-button type="text" @click="$router.push('/interview/new')">
+          <el-button type="text" @click="$router.push('/interview/ai')">
             <el-icon><Plus /></el-icon>
             开始面试
           </el-button>
@@ -216,7 +216,7 @@ const features = ref([
     buttonText: '开始面试',
     icon: markRaw(VideoCamera),
     color: '#409eff',
-    route: '/interview/new'
+    route: '/interview/ai'
   },
   {
     key: 'questions',

@@ -45,6 +45,63 @@ const auth = (req, res, next) => {
   }
 }
 
+// 创建新的对话
+router.post('/conversations', auth, async (req, res) => {
+  try {
+    const { conversationId, postId } = req.body
+    const userId = req.user?.id
+
+    console.log(`[AI-History] POST create conversation: conversationId=${conversationId}, postId=${postId}, userId=${userId}`)
+
+    if (!conversationId || !postId) {
+      return res.status(400).json({
+        code: 400,
+        message: 'conversationId 和 postId 是必需的'
+      })
+    }
+
+    if (!userId) {
+      return res.status(401).json({
+        code: 401,
+        message: '需要认证'
+      })
+    }
+
+    // 创建对话
+    const [conversation, created] = await AIConversation.findOrCreate({
+      where: { id: conversationId },
+      defaults: {
+        postId: String(postId),
+        userId: String(userId),
+        title: '新对话',
+        messageCount: 0,
+        isActive: true
+      }
+    })
+
+    console.log(`[AI-History] 对话${created ? '已创建' : '已存在'}: ${conversationId}`)
+
+    res.json({
+      code: 200,
+      message: '对话已创建或获取成功',
+      data: {
+        conversationId: conversation.id,
+        postId: conversation.postId,
+        userId: conversation.userId,
+        title: conversation.title,
+        messageCount: conversation.messageCount
+      }
+    })
+  } catch (error) {
+    console.error('[AI-History] 创建对话失败:', error.message)
+    res.status(500).json({
+      code: 500,
+      message: '创建对话失败',
+      error: error.message
+    })
+  }
+})
+
 // 获取用户在某篇文章的所有对话历史
 router.get('/conversations', auth, async (req, res) => {
   try {

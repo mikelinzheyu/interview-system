@@ -1,683 +1,613 @@
 <template>
   <div class="auth-container">
-    <div class="auth-background">
-      <div class="background-pattern"></div>
-    </div>
-    
-    <div class="auth-content">
-      <div class="auth-card">
-        <div class="logo-section">
-          <el-icon :size="48" color="#409eff">
-            <ChatRound />
-          </el-icon>
-          <h1 class="system-title">智能面试系统</h1>
-          <p class="system-subtitle">AI驱动的专业面试平台</p>
-        </div>
+    <div class="auth-bg"></div>
 
-        <el-tabs v-model="activeTab" class="login-tabs">
-          <el-tab-pane label="密码登录" name="password">
-            <el-form
-              ref="loginFormRef"
-              :model="loginForm"
-              :rules="loginRules"
-              size="large"
-              @submit.prevent="handleLogin"
-            >
-              <el-form-item prop="username">
-                <el-input
-                  v-model="loginForm.username"
-                  placeholder="请输入用户名或邮箱"
-                  prefix-icon="User"
-                  clearable
+    <button class="back-btn" @click="goBack">
+      <el-icon><ArrowLeft /></el-icon>
+    </button>
+
+    <div class="auth-card">
+      <div class="auth-header">
+        <h1 class="auth-title">欢迎回来</h1>
+        <p class="auth-subtitle">登录以继续你的练习</p>
+      </div>
+
+      <div class="auth-tabs">
+        <button
+          :class="['tab-btn', { active: loginMode === 'password' }]"
+          @click="loginMode = 'password'"
+        >
+          密码登录
+        </button>
+        <button
+          :class="['tab-btn', { active: loginMode === 'code' }]"
+          @click="loginMode = 'code'"
+        >
+          验证码登录
+        </button>
+      </div>
+
+      <form @submit.prevent="handleLogin" class="auth-form">
+        <template v-if="loginMode === 'password'">
+          <div class="form-group">
+            <div class="input-wrapper">
+              <el-icon class="input-icon"><User /></el-icon>
+              <input
+                v-model="form.username"
+                type="text"
+                placeholder="用户名 / 手机号 / 邮箱"
+                class="form-input"
+              />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <div class="input-wrapper">
+              <el-icon class="input-icon"><Lock /></el-icon>
+              <input
+                v-model="form.password"
+                :type="showPassword ? 'text' : 'password'"
+                placeholder="请输入密码"
+                class="form-input"
+              />
+              <el-icon class="toggle-icon" @click="showPassword = !showPassword">
+                <View v-if="showPassword" />
+                <Hide v-else />
+              </el-icon>
+            </div>
+          </div>
+        </template>
+
+        <template v-else>
+          <div class="form-group">
+            <div class="input-wrapper">
+              <el-icon class="input-icon"><Iphone /></el-icon>
+              <input
+                v-model="form.phone"
+                type="tel"
+                placeholder="请输入手机号"
+                class="form-input"
+              />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <div class="input-row">
+              <div class="input-wrapper flex-1">
+                <el-icon class="input-icon"><Message /></el-icon>
+                <input
+                  v-model="form.verifyCode"
+                  type="text"
+                  placeholder="请输入验证码"
+                  class="form-input"
                 />
-              </el-form-item>
+              </div>
+              <button
+                type="button"
+                class="verify-btn"
+                :disabled="codeCountdown > 0"
+                @click="sendCode"
+              >
+                {{ codeCountdown > 0 ? `${codeCountdown}s` : '获取验证码' }}
+              </button>
+            </div>
+          </div>
+        </template>
 
-              <el-form-item prop="password">
-                <el-input
-                  v-model="loginForm.password"
-                  type="password"
-                  placeholder="请输入密码"
-                  prefix-icon="Lock"
-                  show-password
-                  @keyup.enter="handleLogin"
+        <div class="form-options">
+          <label class="checkbox">
+            <input v-model="rememberMe" type="checkbox" />
+            <span>记住登录状态</span>
+          </label>
+          <a href="#" class="forgot-link">忘记密码？</a>
+        </div>
+
+        <button type="submit" class="submit-btn" :disabled="loading">
+          {{ loading ? '登录中...' : '登录' }}
+        </button>
+      </form>
+
+      <div class="social-login">
+        <div class="divider">
+          <span>其它登录方式</span>
+        </div>
+        <div class="social-icons">
+          <button type="button" class="social-icon wechat" title="微信登录" @click="openWeChatQr">
+            <el-icon :size="24" color="#09BB07">
+              <svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+                <path
+                  fill="currentColor"
+                  d="M666.67 512c0 155.7-126.3 282-282 282s-282-126.3-282-282 126.3-282 282-282 282 126.3 282 282z"
                 />
-              </el-form-item>
-
-              <el-form-item>
-                <div class="login-options">
-                  <el-checkbox v-model="rememberMe">记住我</el-checkbox>
-                  <el-link type="primary" :underline="false" @click="showForgotPasswordDialog">忘记密码？</el-link>
-                </div>
-              </el-form-item>
-
-              <el-form-item>
-                <el-button
-                  type="primary"
-                  size="large"
-                  class="login-button"
-                  :loading="loading"
-                  @click="handleLogin"
-                >
-                  登 录
-                </el-button>
-              </el-form-item>
-
-              <el-form-item>
-                <div class="register-link">
-                  还没有账号？
-                  <el-link type="primary" @click="$router.push('/register')">
-                    立即注册
-                  </el-link>
-                </div>
-              </el-form-item>
-
-              <el-form-item>
-                <div class="social-login">
-                  <div class="social-login-divider">
-                    <span>其他登录方式</span>
-                  </div>
-                  <div class="social-login-icons">
-                    <div class="social-icon wechat-icon" title="微信登录" @click="handleWeChatLogin">
-                      <img src="@/assets/wechat-icon.png" alt="微信登录" class="social-icon-img" />
-                    </div>
-                    <div class="social-icon qq-icon" title="QQ登录" @click="handleQQLogin">
-                      <el-icon :size="28">
-                        <svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
-                          <path fill="currentColor" d="M824.8 613.2c-16-51.4-34.4-94.6-62.7-165.3C766.5 262.2 689.3 112 511.5 112 331.7 112 256.2 265.2 261 447.9c-28.4 70.8-46.7 113.7-62.7 165.3-34 109.5-23 154.8-14.6 155.8 18 2.2 70.1-82.4 70.1-82.4 0 49 25.2 112.9 79.8 159-26.4 8.1-85.7 29.9-71.6 53.8 11.4 19.3 196.2 12.3 249.5 6.3 53.3 6 238.1 13 249.5-6.3 14.1-23.8-45.3-45.7-71.6-53.8 54.6-46.2 79.8-110.1 79.8-159 0 0 52.1 84.6 70.1 82.4 8.5-1.1 19.5-46.4-14.5-155.8z" />
-                        </svg>
-                      </el-icon>
-                    </div>
-                  </div>
-                </div>
-              </el-form-item>
-            </el-form>
-          </el-tab-pane>
-
-          <el-tab-pane label="短信登录" name="sms">
-            <SmsLogin @login-success="handleSmsLoginSuccess" />
-          </el-tab-pane>
-        </el-tabs>
+                <path
+                  fill="currentColor"
+                  d="M877.33 657.33c0 124.56-101.1 225.67-225.66 225.67-124.57 0-225.67-101.1-225.67-225.67 0-124.56 101.1-225.66 225.67-225.66 124.56 0 225.66 101.1 225.66 225.66z"
+                />
+              </svg>
+            </el-icon>
+          </button>
+          <button type="button" class="social-icon qq" title="QQ登录" @click="openQQQr">
+            <el-icon :size="24" color="#12B7F5">
+              <svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+                <path
+                  fill="currentColor"
+                  d="M824.8 613.2c-16-51.4-34.4-94.6-62.7-165.3C766.5 262.2 689.3 112 511.5 112 331.7 112 256.2 265.2 261 447.9c-28.4 70.8-46.7 113.7-62.7 165.3-34 109.5-23 154.8-14.6 155.8 18 2.2 70.1-82.4 70.1-82.4 0 49 25.2 112.9 79.8 159-26.4 8.1-85.7 29.9-71.6 53.8 11.4 19.3 196.2 12.3 249.5 6.3 53.3 6 238.1 13 249.5-6.3 14.1-23.8-45.3-45.7-71.6-53.8 54.6-46.2 79.8-110.1 79.8-159 0 0 52.1 84.6 70.1 82.4 8.5-1.1 19.5-46.4-14.5-155.8z"
+                />
+              </svg>
+            </el-icon>
+          </button>
+        </div>
       </div>
+
+      <div class="auth-footer">
+        <span>还没有账号？</span>
+        <a href="#" @click.prevent="$router.push('/register')" class="link">立即注册</a>
+      </div>
+
+      <WeChatLogin ref="wechatLoginRef" :compact="true" />
+      <QQLogin ref="qqLoginRef" :compact="true" />
     </div>
-
-    <!-- 微信二维码弹窗 -->
-    <el-dialog
-      v-model="wechatQrDialogVisible"
-      title="微信扫码登录"
-      width="400px"
-      :close-on-click-modal="false"
-    >
-      <div class="qr-container">
-        <div v-if="wechatQrCodeImage" class="qr-code">
-          <!-- 显示真实的二维码图片 -->
-          <div class="qrcode-image-wrapper">
-            <img :src="wechatQrCodeImage" alt="微信登录二维码" class="qrcode-image" />
-          </div>
-          <div class="qr-hint">
-            <el-tag type="success" effect="plain">开发环境</el-tag>
-            <p class="hint-text">请使用微信扫描二维码</p>
-          </div>
-        </div>
-        <div v-else class="loading-qr">
-          <el-icon :size="48" class="is-loading"><Loading /></el-icon>
-          <p>正在生成二维码...</p>
-        </div>
-        <div class="qr-footer">
-          <el-icon :size="16"><InfoFilled /></el-icon>
-          <span>{{ wechatQrTip || '请使用微信扫描二维码登录' }}</span>
-        </div>
-      </div>
-    </el-dialog>
-
-    <!-- QQ二维码弹窗 -->
-    <el-dialog
-      v-model="qqQrDialogVisible"
-      title="QQ扫码登录"
-      width="400px"
-      :close-on-click-modal="false"
-    >
-      <div class="qr-container">
-        <div v-if="qqQrCodeImage" class="qr-code">
-          <!-- 显示真实的二维码图片 -->
-          <div class="qrcode-image-wrapper qq-theme">
-            <img :src="qqQrCodeImage" alt="QQ登录二维码" class="qrcode-image" />
-          </div>
-          <div class="qr-hint">
-            <el-tag type="primary" effect="plain">开发环境</el-tag>
-            <p class="hint-text">请使用手机QQ扫描二维码</p>
-          </div>
-        </div>
-        <div v-else class="loading-qr">
-          <el-icon :size="48" class="is-loading"><Loading /></el-icon>
-          <p>正在生成二维码...</p>
-        </div>
-        <div class="qr-footer">
-          <el-icon :size="16"><InfoFilled /></el-icon>
-          <span>{{ qqQrTip || '请使用手机QQ扫描二维码登录' }}</span>
-        </div>
-      </div>
-    </el-dialog>
-
-    <!-- 忘记密码对话框 -->
-    <ForgotPasswordDialog
-      v-model:visible="forgotPasswordDialogVisible"
-      @success="handleForgotPasswordSuccess"
-    />
   </div>
 </template>
 
-<script setup>
-import { ref, reactive } from 'vue'
+<script setup lang="ts">
+import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { useUserStore } from '@/stores/user'
+import { ArrowLeft, User, Lock, View, Hide, Iphone, Message } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
-import { ChatRound, ChatLineSquare, Grid, Loading, InfoFilled } from '@element-plus/icons-vue'
-import SmsLogin from './components/SmsLogin.vue'
-import ForgotPasswordDialog from './components/ForgotPasswordDialog.vue'
-import { oauthAPI } from '@/api/oauth'
+import { useUserStore } from '@/stores/user'
+import { authAPI } from '@/api/auth'
+import WeChatLogin from './components/WeChatLogin.vue'
+import QQLogin from './components/QQLogin.vue'
 
 const router = useRouter()
 const userStore = useUserStore()
 
-const activeTab = ref('password')
-const loginFormRef = ref()
-const loading = ref(false)
+const loginMode = ref<'password' | 'code'>('password')
+const showPassword = ref(false)
 const rememberMe = ref(false)
-const wechatQrDialogVisible = ref(false)
-const qqQrDialogVisible = ref(false)
-const wechatQrCodeImage = ref('') // Base64二维码图片
-const qqQrCodeImage = ref('') // Base64二维码图片
-const wechatQrCodeUrl = ref('') // 二维码内容URL
-const qqQrCodeUrl = ref('') // 二维码内容URL
-const wechatQrTip = ref('') // 提示文本
-const qqQrTip = ref('') // 提示文本
-const forgotPasswordDialogVisible = ref(false)
+const loading = ref(false)
+const codeCountdown = ref(0)
 
-const loginForm = reactive({
+const form = ref({
   username: '',
-  password: ''
+  password: '',
+  phone: '',
+  verifyCode: ''
 })
 
-const loginRules = {
-  username: [
-    { required: true, message: '请输入用户名或邮箱', trigger: 'blur' },
-    {
-      validator: (rule, value, callback) => {
-        if (!value) {
-          callback()
-          return
-        }
-        // 检查是邮箱格式还是用户名格式
-        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-        const usernamePattern = /^[a-zA-Z0-9_]{3,20}$/
+const wechatLoginRef = ref<InstanceType<typeof WeChatLogin> | null>(null)
+const qqLoginRef = ref<InstanceType<typeof QQLogin> | null>(null)
 
-        if (!emailPattern.test(value) && !usernamePattern.test(value)) {
-          callback(new Error('请输入有效的用户名或邮箱地址'))
-        } else {
-          callback()
-        }
-      },
-      trigger: ['blur', 'change']
-    }
-  ],
-  password: [
-    { required: true, message: '请输入密码', trigger: 'blur' },
-    { min: 6, max: 20, message: '密码长度在 6 到 20 个字符', trigger: 'blur' }
-  ]
+const goBack = () => {
+  router.back()
+}
+
+const openWeChatQr = () => {
+  wechatLoginRef.value?.startLogin()
+}
+
+const openQQQr = () => {
+  qqLoginRef.value?.startLogin()
 }
 
 const handleLogin = async () => {
-  if (!loginFormRef.value) return
+  if (loginMode.value === 'password') {
+    if (!form.value.username || !form.value.password) {
+      ElMessage.error('请输入用户名和密码')
+      return
+    }
+  } else {
+    if (!form.value.phone || !form.value.verifyCode) {
+      ElMessage.error('请输入手机号和验证码')
+      return
+    }
+  }
 
+  loading.value = true
   try {
-    const valid = await loginFormRef.value.validate()
-    if (!valid) return
+    let ok = false
 
-    loading.value = true
-
-    // 调用真正的登录API
-    const loginData = {
-      username: loginForm.username,
-      password: loginForm.password,
-      remember: rememberMe.value
+    if (loginMode.value === 'password') {
+      ok = await userStore.login({
+        username: form.value.username,
+        password: form.value.password
+      })
+    } else {
+      ok = await userStore.loginBySms({
+        phone: form.value.phone,
+        code: form.value.verifyCode
+      })
     }
 
-    const success = await userStore.login(loginData)
-    if (success) {
-      router.push('/home')
-    }
+    if (!ok) return
 
-  } catch (error) {
-    ElMessage.error('登录失败，请检查用户名和密码')
+    router.push('/dashboard')
   } finally {
     loading.value = false
   }
 }
 
-// 短信登录成功回调
-const handleSmsLoginSuccess = async (data) => {
-  // 存储token和用户信息
-  userStore.token = data.token
-  userStore.user = data.user
-  localStorage.setItem('token', data.token)
-
-  router.push('/home')
-}
-
-// 微信登录
-const handleWeChatLogin = async () => {
-  try {
-    // 先显示对话框
-    wechatQrDialogVisible.value = true
-
-    const response = await oauthAPI.getWeChatAuthorizeUrl('/home')
-
-    if (response.code === 200) {
-      const qrResponse = await oauthAPI.getWeChatQRCode(response.data.state)
-      if (qrResponse.code === 200) {
-        wechatQrCodeImage.value = qrResponse.data.qrCodeImage // Base64图片
-        wechatQrCodeUrl.value = qrResponse.data.qrContent // 二维码URL
-        wechatQrTip.value = qrResponse.data.tip // 提示文本
-      }
-    }
-  } catch (error) {
-    wechatQrDialogVisible.value = false
-    ElMessage.error(error.message || '微信登录发起失败')
+const sendCode = () => {
+  if (!form.value.phone) {
+    ElMessage.error('请先输入手机号')
+    return
   }
-}
 
-// QQ登录
-const handleQQLogin = async () => {
-  try {
-    // 先显示对话框
-    qqQrDialogVisible.value = true
+  authAPI
+    .sendSmsCode(form.value.phone)
+    .then(() => {
+      ElMessage.success('验证码已发送')
+    })
+    .catch(() => {
+      ElMessage.error('验证码发送失败，请稍后重试')
+    })
 
-    const response = await oauthAPI.getQQAuthorizeUrl('/home')
+  codeCountdown.value = 60
 
-    if (response.code === 200) {
-      const qrResponse = await oauthAPI.getQQQRCode(response.data.state)
-      if (qrResponse.code === 200) {
-        qqQrCodeImage.value = qrResponse.data.qrCodeImage // Base64图片
-        qqQrCodeUrl.value = qrResponse.data.qrContent // 二维码URL
-        qqQrTip.value = qrResponse.data.tip // 提示文本
-      }
+  const timer = setInterval(() => {
+    codeCountdown.value--
+    if (codeCountdown.value <= 0) {
+      clearInterval(timer)
     }
-  } catch (error) {
-    qqQrDialogVisible.value = false
-    ElMessage.error(error.message || 'QQ登录发起失败')
-  }
-}
-
-// 显示忘记密码对话框
-const showForgotPasswordDialog = () => {
-  forgotPasswordDialogVisible.value = true
-}
-
-// 忘记密码成功回调
-const handleForgotPasswordSuccess = () => {
-  ElMessage.success('密码重置成功，请使用新密码登录')
+  }, 1000)
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .auth-container {
-  min-height: 100vh;
-  display: flex;
   position: relative;
-  overflow: hidden;
-}
-
-.auth-background {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-}
-
-.background-pattern {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-image: 
-    radial-gradient(circle at 25% 25%, rgba(255,255,255,0.1) 0%, transparent 50%),
-    radial-gradient(circle at 75% 75%, rgba(255,255,255,0.1) 0%, transparent 50%);
-  background-size: 400px 400px;
-  animation: float 20s ease-in-out infinite;
-}
-
-@keyframes float {
-  0%, 100% { transform: translateY(0px) rotate(0deg); }
-  50% { transform: translateY(-20px) rotate(10deg); }
-}
-
-.auth-content {
-  flex: 1;
+  min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 20px;
-  position: relative;
-  z-index: 1;
+  overflow: hidden;
+}
+
+.auth-bg {
+  position: fixed;
+  inset: 0;
+  background: linear-gradient(135deg, #e0e7ff 0%, #dbeafe 50%, #ddd6fe 100%);
+  z-index: 0;
+}
+
+.back-btn {
+  position: fixed;
+  top: 24px;
+  left: 24px;
+  width: 40px;
+  height: 40px;
+  border: none;
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #1f2937;
+  transition: all 0.3s ease;
+  z-index: 10;
+
+  &:hover {
+    background: #ffffff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  :deep(.el-icon) {
+    font-size: 20px;
+  }
 }
 
 .auth-card {
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
+  position: relative;
+  z-index: 1;
+  background: #ffffff;
   border-radius: 20px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.12);
   padding: 40px;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
   width: 100%;
-  max-width: 400px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  max-width: 420px;
 }
 
-.logo-section {
+.auth-header {
+  margin-bottom: 28px;
   text-align: center;
-  margin-bottom: 40px;
 }
 
-.system-title {
+.auth-title {
   font-size: 28px;
   font-weight: 700;
-  color: #303133;
-  margin: 16px 0 8px 0;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: #1f2937;
+  margin: 0 0 8px;
 }
 
-.system-subtitle {
-  color: #909399;
+.auth-subtitle {
   font-size: 14px;
+  color: #6b7280;
   margin: 0;
 }
 
-.login-options {
+.auth-tabs {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 24px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.tab-btn {
+  flex: 1;
+  padding: 10px 0;
+  border: none;
+  background: transparent;
+  color: #9ca3af;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-bottom: 2px solid transparent;
+
+  &.active {
+    color: #6366f1;
+    border-bottom-color: #6366f1;
+  }
+
+  &:hover:not(.active) {
+    color: #4b5563;
+  }
+}
+
+.auth-form {
+  margin-bottom: 20px;
+}
+
+.form-group {
+  margin-bottom: 16px;
+}
+
+.input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: 44px;
+  padding: 0 12px;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+
+  &:focus-within {
+    background: #ffffff;
+    border-color: #6366f1;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
+  }
+}
+
+.input-icon {
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  color: #9ca3af;
+  margin-right: 8px;
+  font-size: 18px;
+}
+
+.form-input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  font-size: 14px;
+  color: #111827;
+  outline: none;
+
+  &::placeholder {
+    color: #d1d5db;
+  }
+}
+
+.toggle-icon {
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  color: #9ca3af;
+  cursor: pointer;
+  transition: color 0.2s ease;
+  font-size: 18px;
+
+  &:hover {
+    color: #6366f1;
+  }
+}
+
+.input-row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+
+  .input-wrapper {
+    flex: 1;
+  }
+}
+
+.form-options {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  width: 100%;
-}
-
-.login-button {
-  width: 100%;
-  height: 45px;
-  font-size: 16px;
-  font-weight: 600;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border: none;
-  border-radius: 8px;
-  transition: all 0.3s ease;
-}
-
-.login-button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
-}
-
-.register-link {
-  text-align: center;
-  color: #909399;
-  font-size: 14px;
-}
-
-:deep(.el-form-item) {
-  margin-bottom: 24px;
-}
-
-:deep(.el-input__wrapper) {
-  padding: 12px 16px;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s ease;
-}
-
-:deep(.el-input__wrapper:hover) {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-
-:deep(.el-input__wrapper.is-focus) {
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
-}
-
-.login-tabs {
-  margin-top: 20px;
-}
-
-:deep(.el-tabs__nav-wrap::after) {
-  display: none;
-}
-
-:deep(.el-tabs__active-bar) {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  height: 3px;
-}
-
-:deep(.el-tabs__item) {
-  font-size: 16px;
-  font-weight: 500;
-  color: #909399;
-}
-
-:deep(.el-tabs__item.is-active) {
-  color: #667eea;
-  font-weight: 600;
-}
-
-:deep(.el-tabs__item:hover) {
-  color: #667eea;
-}
-
-/* 社交登录区域 */
-.social-login {
-  margin-top: 0;
-}
-
-.social-login-divider {
-  text-align: center;
-  margin: 2px 0 2px 0;
-  position: relative;
-}
-
-.social-login-divider::before,
-.social-login-divider::after {
-  content: '';
-  position: absolute;
-  top: 50%;
-  width: 30%;
-  height: 1px;
-  background: #DCDFE6;
-}
-
-.social-login-divider::before {
-  left: 0;
-}
-
-.social-login-divider::after {
-  right: 0;
-}
-
-.social-login-divider span {
+  margin-bottom: 18px;
   font-size: 13px;
-  color: #909399;
-  background: rgba(255, 255, 255, 0.95);
-  padding: 0 10px;
 }
 
-.social-login-icons {
+.checkbox {
   display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  color: #6b7280;
+
+  input {
+    cursor: pointer;
+    width: 16px;
+    height: 16px;
+  }
+
+  span {
+    user-select: none;
+  }
+}
+
+.forgot-link {
+  color: #6366f1;
+  text-decoration: none;
+  font-weight: 500;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.verify-btn {
+  padding: 10px 16px;
+  border: 1px solid #e5e7eb;
+  background: #ffffff;
+  color: #6366f1;
+  font-size: 13px;
+  font-weight: 500;
+  border-radius: 6px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+
+  &:hover:not(:disabled) {
+    border-color: #6366f1;
+    background: #f3f4f6;
+  }
+
+  &:disabled {
+    color: #9ca3af;
+    cursor: not-allowed;
+  }
+}
+
+.submit-btn {
+  width: 100%;
+  height: 44px;
+  border: none;
+  background: linear-gradient(135deg, #6366f1 0%, #7c3aed 100%);
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover:not(:disabled) {
+    box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3);
+    transform: translateY(-2px);
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(0);
+  }
+
+  &:disabled {
+    opacity: 0.7;
+    cursor: default;
+  }
+}
+
+.social-login {
+  margin-bottom: 20px;
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  font-size: 13px;
+  color: #9ca3af;
+
+  &::before,
+  &::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: #e5e7eb;
+  }
+}
+
+.social-icons {
+  display: flex;
+  gap: 12px;
   justify-content: center;
-  gap: 20px;
-  margin-top: 2px;
 }
 
 .social-icon {
-  width: 50px;
-  height: 50px;
+  width: 48px;
+  height: 48px;
+  border: 1px solid #e5e7eb;
+  background: #ffffff;
   border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   cursor: pointer;
-  transition: all 0.3s ease;
-  border: 2px solid #EBEEF5;
-  background: #ffffff;
-}
-
-.social-icon:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
-}
-
-.wechat-icon {
-  color: #09BB07;
-  padding: 0;
-  overflow: hidden;
-  background: transparent;
-  border: none;
   display: flex;
   align-items: center;
   justify-content: center;
+  font-weight: 600;
+  font-size: 16px;
+  transition: all 0.2s ease;
+
+  &:hover {
+    border-color: #6366f1;
+    color: #6366f1;
+  }
+
+  &.wechat {
+    color: #09b83e;
+
+    &:hover {
+      border-color: #09b83e;
+    }
+  }
+
+  &.qq {
+    color: #fa7f16;
+
+    &:hover {
+      border-color: #fa7f16;
+    }
+  }
 }
 
-.wechat-icon:hover {
-  border: none;
-  background: transparent;
-  transform: translateY(-3px) scale(1.05);
-}
-
-.social-icon-img {
-  width: 85%;
-  height: 85%;
-  object-fit: cover;
-  border-radius: 50%;
-}
-
-.qq-icon {
-  color: #12B7F5;
-}
-
-.qq-icon:hover {
-  border-color: #12B7F5;
-  background: #f0f9ff;
-}
-
-/* 二维码弹窗样式 */
-.qr-container {
+.auth-footer {
   text-align: center;
-  padding: 20px;
-}
-
-.qr-code {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 200px;
-}
-
-/* 二维码图片容器 */
-.qrcode-image-wrapper {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 20px;
-  background: #ffffff;
-  border-radius: 12px;
-  border: 2px solid #EBEEF5;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-.qrcode-image-wrapper.qq-theme {
-  border-color: #E6F7FF;
-}
-
-.qrcode-image {
-  width: 250px;
-  height: 250px;
-  display: block;
-  border-radius: 8px;
-}
-
-.qr-hint {
-  margin-top: 20px;
-  text-align: center;
-}
-
-.hint-text {
-  margin-top: 12px;
-  color: #606266;
-  font-size: 14px;
-  line-height: 1.5;
-}
-
-.loading-qr {
-  padding: 40px;
-  color: #909399;
-}
-
-.loading-qr p {
-  margin-top: 16px;
-  font-size: 14px;
-}
-
-.qr-footer {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  margin-top: 24px;
-  padding-top: 20px;
-  border-top: 1px solid #EBEEF5;
-  color: #909399;
   font-size: 13px;
-}
+  color: #6b7280;
 
-.is-loading {
-  animation: rotating 2s linear infinite;
-}
+  .link {
+    color: #6366f1;
+    text-decoration: none;
+    font-weight: 500;
+    margin-left: 4px;
 
-@keyframes rotating {
-  from {
-    transform: rotate(0deg);
+    &:hover {
+      text-decoration: underline;
+    }
   }
-  to {
-    transform: rotate(360deg);
-  }
 }
 
-:deep(.el-dialog__header) {
-  text-align: center;
-  padding: 20px 20px 10px;
-}
-
-:deep(.el-dialog__body) {
-  padding: 10px 20px 30px;
-}
-
-@media (max-width: 480px) {
+@media (max-width: 640px) {
   .auth-card {
-    padding: 30px 20px;
-    margin: 20px;
+    padding: 24px;
     border-radius: 16px;
   }
 
-  .system-title {
+  .auth-title {
     font-size: 24px;
   }
 
-  .social-login-icons {
-    gap: 15px;
-  }
-
-  .social-icon {
-    width: 45px;
-    height: 45px;
+  .back-btn {
+    top: 16px;
+    left: 16px;
   }
 }
 </style>

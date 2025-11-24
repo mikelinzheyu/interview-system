@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.interview.mapper.TagMapper">
+
+  <resultMap id="TagResultMap" type="com.interview.entity.Tag">
+    <id column="id" property="id" />
+    <result column="name" property="name" />
+    <result column="slug" property="slug" />
+    <result column="created_at" property="createdAt" />
+  </resultMap>
+
+  <select id="selectById" resultMap="TagResultMap">
+    SELECT id, name, slug, created_at FROM tags WHERE id = #{id}
+  </select>
+
+  <select id="selectByName" resultMap="TagResultMap">
+    SELECT id, name, slug, created_at FROM tags WHERE name = #{name}
+  </select>
+
+  <insert id="insert" parameterType="com.interview.entity.Tag" useGeneratedKeys="true" keyProperty="id">
+    INSERT INTO tags (name, slug) VALUES (#{name}, #{slug})
+  </insert>
+
+  <select id="search" resultMap="TagResultMap">
+    SELECT id, name, slug, created_at FROM tags
+    <where>
+      <if test="q != null and q != ''">AND name LIKE CONCAT('%', #{q}, '%')</if>
+    </where>
+    ORDER BY id DESC
+    <if test="limit != null">LIMIT #{limit}</if>
+  </select>
+
+  <insert id="linkQuestionTag">
+    INSERT IGNORE INTO question_tags (question_id, tag_id) VALUES (#{questionId}, #{tagId})
+  </insert>
+
+</mapper>

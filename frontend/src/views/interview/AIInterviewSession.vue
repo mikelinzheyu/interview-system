@@ -80,12 +80,6 @@
       </div>
 
       <div class="interview-main">
-        <el-row style="margin-bottom: 20px;">
-          <el-col :span="24">
-            <WrongAnswerStatisticsCard />
-          </el-col>
-        </el-row>
-
         <!-- 智能专业题目生成版块 -->
         <el-row style="margin-bottom: 20px;">
           <el-col :span="24">
@@ -403,7 +397,6 @@ import aiAnalysisService from '@/services/aiAnalysisService'
 import difyService from '@/services/difyService'
 import LoadingSpinner from '@/components/common/LoadingSpinner.vue'
 import ErrorBoundary from '@/components/common/ErrorBoundary.vue'
-import WrongAnswerStatisticsCard from '@/components/home/WrongAnswerStatisticsCard.vue'
 
 export default {
   name: 'AIInterviewSession',
@@ -414,8 +407,7 @@ export default {
     VideoCamera,
     ChatDotRound,
     LoadingSpinner,
-    ErrorBoundary,
-    WrongAnswerStatisticsCard
+    ErrorBoundary
   },
   setup() {
     // 基础状态

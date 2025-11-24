@@ -312,7 +312,7 @@ function performAutoRetry() {
  * 返回首页
  */
 function goHome() {
-  router.push('/home')
+  router.push('/dashboard')
 }
 
 /**

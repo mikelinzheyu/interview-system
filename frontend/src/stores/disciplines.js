@@ -2,6 +2,9 @@ import { defineStore } from 'pinia'
 import { ref, computed, reactive } from 'vue'
 import { ElMessage } from 'element-plus'
 import api from '@/api'
+import mockDisciplines from '@/data/disciplines-complete.json'
+
+const USE_MOCK = import.meta.env.VITE_USE_MOCK_DATA !== 'false'
 
 /**
  * 学科体系 Store
@@ -39,6 +42,45 @@ export const useDisciplinesStore = defineStore('disciplines', () => {
   const searchResults = ref([])
   const searchLoading = ref(false)
 
+  const getMockDisciplineById = (id) => mockDisciplines.find(d => String(d.id) === String(id))
+
+  function ensureMockDisciplinesLoaded() {
+    if (!disciplines.value.length) {
+      disciplines.value = mockDisciplines
+    }
+  }
+
+  function getMockMajorGroups(disciplineId) {
+    const d = getMockDisciplineById(disciplineId)
+    return d?.majorGroups || []
+  }
+
+  function getMockMajorById(majorId) {
+    for (const disc of mockDisciplines) {
+      for (const group of disc.majorGroups || []) {
+        const found = (group.majors || []).find(m => String(m.id) === String(majorId))
+        if (found) {
+          return { discipline: disc, majorGroup: group, major: found }
+        }
+      }
+    }
+    return null
+  }
+
+  function getMockSpecializationById(specId) {
+    for (const disc of mockDisciplines) {
+      for (const group of disc.majorGroups || []) {
+        for (const major of group.majors || []) {
+          const found = (major.specializations || []).find(s => String(s.id) === String(specId))
+          if (found) {
+            return { discipline: disc, majorGroup: group, major, specialization: found }
+          }
+        }
+      }
+    }
+    return null
+  }
+
   // ============ 方法：一级学科加载 ============
   /**
    * 加载所有学科门类
@@ -52,6 +94,11 @@ export const useDisciplinesStore = defineStore('disciplines', () => {
     disciplinesError.value = null
 
     try {
+      if (USE_MOCK) {
+        ensureMockDisciplinesLoaded()
+        return disciplines.value
+      }
+
       const response = await api.get('/disciplines')
       const payload = response.data || response
       const list = Array.isArray(payload) ? payload : payload.data || []
@@ -110,6 +157,15 @@ export const useDisciplinesStore = defineStore('disciplines', () => {
     }
 
     try {
+      if (USE_MOCK) {
+        ensureMockDisciplinesLoaded()
+        const groups = getMockMajorGroups(disciplineId)
+        majorGroupsCache[disciplineId] = groups
+        majorGroupsError[disciplineId] = null
+        majorGroupsLoading[disciplineId] = false
+        return groups
+      }
+
       console.log('[Disciplines] 发送API请求: /disciplines/' + disciplineId + '/major-groups')
       const response = await api.get(`/disciplines/${disciplineId}/major-groups`)
       console.log('[Disciplines] API 响应:', response)
@@ -170,6 +226,18 @@ export const useDisciplinesStore = defineStore('disciplines', () => {
     }
 
     try {
+      if (USE_MOCK) {
+        ensureMockDisciplinesLoaded()
+        const found = getMockMajorById(majorId)
+        const majorDetail = found?.major || null
+
+        if (majorDetail) {
+          majorsCache[majorId] = majorDetail
+          majorsError[majorId] = null
+          return majorDetail
+        }
+      }
+
       const response = await api.get(`/majors/${majorId}/details`)
       const payload = response.data || response
       const majorDetail = payload && typeof payload === 'object' ? payload : null
@@ -230,6 +298,17 @@ export const useDisciplinesStore = defineStore('disciplines', () => {
     }
 
     try {
+      if (USE_MOCK) {
+        ensureMockDisciplinesLoaded()
+        const found = getMockSpecializationById(specializationId)
+        const specDetail = found?.specialization || null
+        if (specDetail) {
+          specializationsCache[specializationId] = specDetail
+          specializationsError[specializationId] = null
+          return specDetail
+        }
+      }
+
       const response = await api.get(`/specializations/${specializationId}`)
       const payload = response.data || response
       const specDetail = payload && typeof payload === 'object' ? payload : null

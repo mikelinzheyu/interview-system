@@ -2,12 +2,23 @@
 import { useUserStore } from '@/stores/user'
 
 const routes = [
+  // 根路由：条件重定向 - 已认证用户重定向到 /dashboard，未认证用户访问营销页面
   {
     path: '/',
-    name: 'Landing',
+    name: 'Home',
     component: () => import('@/views/marketing/Landing.vue'),
     meta: { requiresAuth: false }
   },
+
+  // 用户仪表板 - 主页面（替代 /home）
+  {
+    path: '/dashboard',
+    name: 'Dashboard',
+    component: () => import('@/views/home/Homepage.vue'),
+    meta: { requiresAuth: false }
+  },
+
+  // 认证相关路由
   {
     path: '/login',
     name: 'Login',
@@ -26,14 +37,14 @@ const routes = [
     component: () => import('@/views/auth/OAuthCallback.vue'),
     meta: { requiresGuest: true }
   },
+
+  // 传统首页（已弃用，保留兼容性）
   {
-    path: '/home',
-    name: 'Home',
+    path: '/home-legacy',
+    name: 'HomeLegacy',
     component: () => import('@/views/Home.vue'),
     meta: { requiresAuth: true }
   },
-  // ========== 题库与学习模块 ==========
-  // 主入口：学习中心
   {
     path: '/questions',
     name: 'QuestionBankRoot',
@@ -226,6 +237,14 @@ const routes = [
     path: '/community/create-post',
     name: 'CreatePost',
     component: () => import('@/views/community/CreatePost.vue'),
+    meta: { requiresAuth: true }
+  },
+
+  // 通知中心
+  {
+    path: '/notifications',
+    name: 'NotificationCenter',
+    component: () => import('@/views/community/components/NotificationCenter.vue'),
     meta: { requiresAuth: true }
   },
 
@@ -430,6 +449,14 @@ const routes = [
     name: 'EcosystemHub',
     component: () => import('@/views/EcosystemHub.vue'),
     meta: { requiresAuth: false }
+  },
+
+  // Pricing Page
+  {
+    path: '/pricing',
+    name: 'Pricing',
+    component: () => import('@/views/pricing/PricingPage.vue'),
+    meta: { requiresAuth: false }
   }
 ]
 
@@ -444,31 +471,46 @@ router.beforeEach((to, from, next) => {
   const isAuthenticated = userStore.isAuthenticated
   const isAdmin = userStore.isAdmin
 
-  // 如果在登录页且已认证，重定向到首页
-  if (to.name === 'Landing' && isAuthenticated) {
-    next('/home')
+  // 日志：路由导航开始
+  console.log(`[Router Guard] Navigation: ${from.path} → ${to.path}`, {
+    requiresAuth: to.meta.requiresAuth,
+    requiresGuest: to.meta.requiresGuest,
+    requiresAdmin: to.meta.requiresAdmin,
+    isAuthenticated,
+    isAdmin,
+    hasToken: !!userStore.token
+  })
+
+  // 已认证用户访问根路由 "/"，重定向到仪表板
+  if (to.path === '/' && isAuthenticated) {
+    console.log('[Router Guard] Authenticated user accessing /, redirecting to /dashboard')
+    next('/dashboard')
     return
   }
 
   // 检查认证要求
   if (to.meta.requiresAuth && !isAuthenticated) {
+    console.warn(`[Router Guard] Access denied: ${to.path} requires authentication but user not authenticated`)
+    console.warn('[Router Guard] Redirecting to /login')
     next('/login')
     return
   }
 
   // 检查管理员权限
   if (to.meta.requiresAdmin && !isAdmin) {
-    console.warn(`Access denied to ${to.path}: Admin privileges required`)
-    next('/home')
+    console.warn(`[Router Guard] Access denied: ${to.path} requires admin privileges`)
+    next('/dashboard')
     return
   }
 
   // 检查访客限制（登录/注册页面）
   if (to.meta.requiresGuest && isAuthenticated) {
-    next('/home')
+    console.log(`[Router Guard] Authenticated user accessing guest-only page ${to.path}, redirecting to /dashboard`)
+    next('/dashboard')
     return
   }
 
+  console.log(`[Router Guard] Navigation allowed: ${to.path}`)
   next()
 })
 
