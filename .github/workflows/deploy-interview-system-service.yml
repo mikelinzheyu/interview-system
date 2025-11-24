@@ -13,8 +13,7 @@ on:
   workflow_dispatch:  # 允许手动触发
 
 env:
-  REGISTRY: docker.io
-  IMAGE_NAME: ${{ github.repository }}/storage-service
+  DEPLOY_PATH: /home/ubuntu/interview-system/storage-service
 
 jobs:
   build-and-deploy:
@@ -43,21 +42,13 @@ jobs:
           cd storage-service
           mvn clean package -DskipTests -q
 
-      # 4. 构建 Docker 镜像
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
-
-      - name: Build Docker image
-        run: |
-          cd storage-service
-          docker build -f Dockerfile.prod -t storage-service:${{ github.sha }} -t storage-service:latest .
-
-      # 5. 部署到云服务器（通过SSH）
+      # 4. 部署到云服务器（通过SSH）
       - name: Deploy to cloud server
         env:
-          CLOUD_SERVER_IP: ${{ secrets.CLOUD_SERVER_IP }}
-          CLOUD_SERVER_USER: ${{ secrets.CLOUD_SERVER_USER }}
-          CLOUD_SERVER_KEY: ${{ secrets.CLOUD_SERVER_KEY }}
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+          DEPLOY_PRIVATE_KEY: ${{ secrets.DEPLOY_PRIVATE_KEY }}
+          DEPLOY_PORT: ${{ secrets.DEPLOY_PORT }}
           STORAGE_API_KEY: ${{ secrets.STORAGE_API_KEY }}
           REDIS_PASSWORD: ${{ secrets.REDIS_PASSWORD }}
           DOMAIN_NAME: ${{ secrets.DOMAIN_NAME }}
@@ -68,29 +59,29 @@ jobs:
           echo "================================================================"
 
           # 检查关键 secrets 是否存在
-          if [ -z "$CLOUD_SERVER_USER" ]; then
-            echo "❌ 错误：CLOUD_SERVER_USER 未配置"
+          if [ -z "$DEPLOY_USER" ]; then
+            echo "❌ 错误：DEPLOY_USER 未配置"
             exit 1
           fi
 
-          if [ -z "$CLOUD_SERVER_KEY" ]; then
-            echo "❌ 错误：CLOUD_SERVER_KEY 未配置"
+          if [ -z "$DEPLOY_PRIVATE_KEY" ]; then
+            echo "❌ 错误：DEPLOY_PRIVATE_KEY 未配置"
             exit 1
           fi
 
           echo "✅ Secrets 验证通过"
-          echo "正在连接到服务器: $CLOUD_SERVER_IP (用户: $CLOUD_SERVER_USER)"
+          echo "正在连接到服务器: $DEPLOY_HOST (用户: $DEPLOY_USER, 端口: ${DEPLOY_PORT:-22})"
           echo "================================================================"
 
           # 创建 SSH 密钥
           mkdir -p ~/.ssh
-          echo "$CLOUD_SERVER_KEY" > ~/.ssh/id_rsa
+          echo "$DEPLOY_PRIVATE_KEY" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H $CLOUD_SERVER_IP >> ~/.ssh/known_hosts 2>/dev/null || true
+          ssh-keyscan -H $DEPLOY_HOST >> ~/.ssh/known_hosts 2>/dev/null || true
 
           # 测试 SSH 连接
           echo "测试 SSH 连接..."
-          if ! ssh -i ~/.ssh/id_rsa -o ConnectTimeout=10 "$CLOUD_SERVER_USER@$CLOUD_SERVER_IP" echo "✅ SSH 连接成功"; then
+          if ! ssh -i ~/.ssh/id_rsa -o ConnectTimeout=10 -p ${DEPLOY_PORT:-22} "$DEPLOY_USER@$DEPLOY_HOST" echo "✅ SSH 连接成功"; then
             echo "❌ SSH 连接失败"
             exit 1
           fi
@@ -102,21 +93,23 @@ jobs:
 
           # 部署脚本
           # 注意：通过 export 显式传递 GITHUB_TOKEN，保证变量在远程环境中可用
-          ssh -i ~/.ssh/id_rsa "$CLOUD_SERVER_USER@$CLOUD_SERVER_IP" "export GITHUB_TOKEN='$GITHUB_TOKEN'; bash -s" << 'REMOTE_EOF'
+          ssh -i ~/.ssh/id_rsa -p ${DEPLOY_PORT:-22} "$DEPLOY_USER@$DEPLOY_HOST" "export GITHUB_TOKEN='$GITHUB_TOKEN'; bash -s" << 'REMOTE_EOF'
           set -e
 
           echo "远程服务器：准备部署环境..."
 
-          # 彻底清理部署目录 - 删除后重建
-          echo "清理并重建部署目录..."
-          rm -rf /home/interview-system
-          mkdir -p /home/interview-system
-
-          cd /home/interview-system
-
-          echo "克隆仓库..."
-          # 使用 HTTPS + GitHub Token 认证
-          git clone https://x-access-token:$GITHUB_TOKEN@github.com/${{ github.repository }}.git .
+          # 确保部署目录存在，使用 git pull 更新而不是删除
+          if [ ! -d /home/ubuntu/interview-system ]; then
+            echo "首次部署，创建部署目录并克隆仓库..."
+            mkdir -p /home/ubuntu/interview-system
+            cd /home/ubuntu/interview-system
+            git clone https://x-access-token:$GITHUB_TOKEN@github.com/${{ github.repository }}.git .
+          else
+            echo "后续部署，拉取最新更新..."
+            cd /home/ubuntu/interview-system
+            git fetch origin
+            git reset --hard origin/main
+          fi
 
           # 进入存储服务目录
           cd storage-service
