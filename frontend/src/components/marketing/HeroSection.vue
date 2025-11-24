@@ -128,6 +128,34 @@ const handleSecondary = () => {
 .hero {
   position: relative;
   padding: 140px 0 220px;
+  overflow: hidden;
+}
+
+/* Animated gradient blobs background */
+.hero::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: -10%;
+  width: 50%;
+  height: 80%;
+  background: radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, transparent 70%);
+  border-radius: 50%;
+  filter: blur(80px);
+  z-index: 0;
+}
+
+.hero::after {
+  content: '';
+  position: absolute;
+  top: 20%;
+  left: -10%;
+  width: 40%;
+  height: 60%;
+  background: radial-gradient(circle, rgba(168, 85, 247, 0.15) 0%, transparent 70%);
+  border-radius: 50%;
+  filter: blur(80px);
+  z-index: 0;
 }
 
 .hero-overlay {
@@ -181,11 +209,13 @@ const handleSecondary = () => {
   gap: 8px;
   padding: 6px 14px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.18);
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(168, 85, 247, 0.2));
+  border: 1px solid rgba(99, 102, 241, 0.3);
   font-size: 13px;
   letter-spacing: 1px;
   text-transform: uppercase;
   margin-bottom: 22px;
+  font-weight: 500;
 }
 
 .hero-actions {

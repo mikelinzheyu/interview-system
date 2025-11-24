@@ -48,24 +48,52 @@ const sectionId = computed(() => id.value || 'about')
 <style scoped>
 .testimonial-section {
   padding: 110px 0;
-  background: linear-gradient(
-    120deg,
-    rgba(31, 54, 142, 0.95),
-    rgba(79, 176, 255, 0.88)
-  );
+  background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
   color: #fff;
   display: flex;
   justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Gradient blobs background */
+.testimonial-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 25%;
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(99, 102, 241, 0.2) 0%, transparent 70%);
+  border-radius: 50%;
+  filter: blur(80px);
+  z-index: 0;
+  pointer-events: none;
+}
+
+.testimonial-section::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  right: 25%;
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(168, 85, 247, 0.2) 0%, transparent 70%);
+  border-radius: 50%;
+  filter: blur(80px);
+  z-index: 0;
+  pointer-events: none;
 }
 
 .testimonial-wrapper {
+  position: relative;
+  z-index: 10;
   width: min(1040px, 92vw);
   padding: 48px 44px;
   display: flex;
   flex-direction: column;
   gap: 36px;
-  background: rgba(12, 27, 84, 0.54);
-  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: transparent;
 }
 
 .testimonial-header h2 {
@@ -84,10 +112,18 @@ const sectionId = computed(() => id.value || 'about')
 }
 
 .stat-item {
-  background: rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.08);
   border-radius: 18px;
   padding: 20px;
   text-align: center;
+  border: 1px solid rgba(99, 102, 241, 0.2);
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+}
+
+.stat-item:hover {
+  background: rgba(99, 102, 241, 0.1);
+  border-color: rgba(99, 102, 241, 0.4);
 }
 
 .stat-value {
@@ -109,12 +145,20 @@ const sectionId = computed(() => id.value || 'about')
 }
 
 .quote-card {
-  background: rgba(17, 42, 120, 0.6);
+  background: rgba(30, 41, 59, 0.6);
   border-radius: 16px;
   padding: 24px;
   display: flex;
   flex-direction: column;
   gap: 16px;
+  border: 1px solid rgba(99, 102, 241, 0.2);
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+}
+
+.quote-card:hover {
+  background: rgba(30, 41, 59, 0.8);
+  border-color: rgba(99, 102, 241, 0.4);
 }
 
 blockquote {
