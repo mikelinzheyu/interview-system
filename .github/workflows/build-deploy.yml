@@ -13,7 +13,6 @@ env:
   REGISTRY_NAMESPACE: ai_interview
   IMAGE_FRONTEND: ai_interview_frontend
   IMAGE_BACKEND: ai_interview_backend
-  IMAGE_STORAGE: ai_interview_storage
 
 jobs:
   # ============================================
@@ -67,22 +66,11 @@ jobs:
             ${{ env.REGISTRY }}/${{ env.REGISTRY_NAMESPACE }}/${{ env.IMAGE_BACKEND }}:${{ steps.meta.outputs.tag }}
             ${{ env.REGISTRY }}/${{ env.REGISTRY_NAMESPACE }}/${{ env.IMAGE_BACKEND }}:latest
 
-      - name: Build and push Storage Service image
-        uses: docker/build-push-action@v5
-        with:
-          context: ./backend-java
-          file: ./backend-java/Dockerfile
-          push: true
-          tags: |
-            ${{ env.REGISTRY }}/${{ env.REGISTRY_NAMESPACE }}/${{ env.IMAGE_STORAGE }}:${{ steps.meta.outputs.tag }}
-            ${{ env.REGISTRY }}/${{ env.REGISTRY_NAMESPACE }}/${{ env.IMAGE_STORAGE }}:latest
-
       - name: Build Summary
         run: |
           echo "✅ 镜像构建和推送成功！"
           echo "Frontend: ${{ env.REGISTRY }}/${{ env.REGISTRY_NAMESPACE }}/${{ env.IMAGE_FRONTEND }}:${{ steps.meta.outputs.tag }}"
           echo "Backend: ${{ env.REGISTRY }}/${{ env.REGISTRY_NAMESPACE }}/${{ env.IMAGE_BACKEND }}:${{ steps.meta.outputs.tag }}"
-          echo "Storage: ${{ env.REGISTRY }}/${{ env.REGISTRY_NAMESPACE }}/${{ env.IMAGE_STORAGE }}:${{ steps.meta.outputs.tag }}"
 
   # ============================================
   # Job 2: 部署到生产服务器
@@ -153,7 +141,6 @@ jobs:
           echo "正在拉取最新镜像..."
           docker pull ${{ env.REGISTRY }}/${{ env.REGISTRY_NAMESPACE }}/${{ env.IMAGE_FRONTEND }}:latest
           docker pull ${{ env.REGISTRY }}/${{ env.REGISTRY_NAMESPACE }}/${{ env.IMAGE_BACKEND }}:latest
-          docker pull ${{ env.REGISTRY }}/${{ env.REGISTRY_NAMESPACE }}/${{ env.IMAGE_STORAGE }}:latest
 
           # 停止旧容器并清理孤立容器
           echo "正在停止旧容器并清理孤立容器..."
