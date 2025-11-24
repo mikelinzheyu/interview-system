@@ -1,10 +1,15 @@
-﻿<template>
+<template>
   <section :id="sectionId" class="hero landing-hero-bg">
     <div class="hero-overlay" />
     <div class="hero-container">
       <div class="hero-copy">
-        <span class="hero-badge">ai面试官 · AI Interview Platform</span>
-        <h1>{{ content.title }}</h1>
+        <span class="hero-badge">{{ badgeText }}</span>
+        <h1>
+          <span>{{ headingMain }}</span>
+          <span v-if="headingHighlight" class="hero-title-highlight">
+            {{ headingHighlight }}
+          </span>
+        </h1>
         <p class="hero-subtitle">{{ content.subtitle }}</p>
         <div class="hero-actions">
           <el-button
@@ -27,20 +32,14 @@
         </div>
       </div>
 
-      <div class="hero-highlights">
-        <article
-          v-for="item in content.highlights"
-          :key="item.title"
-          class="hero-highlight landing-card"
+      <div v-if="chips.length" class="hero-highlights">
+        <span
+          v-for="chip in chips"
+          :key="chip"
+          class="hero-chip"
         >
-          <div class="icon-wrapper">
-            <el-icon :size="32">
-              <component :is="resolveIcon(item.icon)" />
-            </el-icon>
-          </div>
-          <h3>{{ item.title }}</h3>
-          <p>{{ item.description }}</p>
-        </article>
+          {{ chip }}
+        </span>
       </div>
     </div>
   </section>
@@ -49,7 +48,7 @@
 <script setup>
 import { computed, toRefs } from 'vue'
 import { useRouter } from 'vue-router'
-import * as ElementIcons from '@element-plus/icons-vue'
+import { decodeUtf8Garbage } from '@/utils/textDecode'
 
 const props = defineProps({
   id: {
@@ -72,17 +71,46 @@ const { id, content, isAuthenticated } = toRefs(props)
 
 const sectionId = computed(() => id.value || 'hero')
 
-const resolveIcon = (name) => {
-  if (!name) return ElementIcons.Promotion
-  return ElementIcons[name] || ElementIcons.Promotion
-}
+const badgeText = computed(() => {
+  return decodeUtf8Garbage(content.value.badge || 'AI Interview Platform')
+})
+
+const headingMain = computed(() => {
+  const raw = content.value.titleMain || content.value.title || ''
+  return decodeUtf8Garbage(raw)
+})
+
+const headingHighlight = computed(() => {
+  return decodeUtf8Garbage(content.value.titleHighlight || '')
+})
+
+const chips = computed(() => {
+  const value = content.value
+
+  if (Array.isArray(value?.chips) && value.chips.length) {
+    return value.chips.map((c) => decodeUtf8Garbage(c))
+  }
+
+  if (Array.isArray(value?.highlights)) {
+    return value.highlights
+      .map((item) => item && decodeUtf8Garbage(item.title))
+      .filter(Boolean)
+  }
+
+  return []
+})
 
 const primaryLabel = computed(() => {
-  return isAuthenticated.value ? '进入控制台' : content.value.primaryCta.label
+  if (isAuthenticated.value) {
+    return 'Dashboard'
+  }
+
+  const raw = content.value.primaryCta?.label || 'Get started'
+  return decodeUtf8Garbage(raw)
 })
 
 const primaryTarget = computed(() => {
-  return isAuthenticated.value ? '/dashboard' : content.value.primaryCta.to
+  return isAuthenticated.value ? '/dashboard' : content.value.primaryCta?.to
 })
 
 const handlePrimary = () => {
@@ -105,7 +133,12 @@ const handleSecondary = () => {
 .hero-overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgba(10, 21, 66, 0.12) 0%, rgba(10, 21, 66, 0.45) 65%, rgba(10, 21, 66, 0.65) 100%);
+  background: linear-gradient(
+    180deg,
+    rgba(10, 21, 66, 0.12) 0%,
+    rgba(10, 21, 66, 0.45) 65%,
+    rgba(10, 21, 66, 0.65) 100%
+  );
   pointer-events: none;
 }
 
@@ -124,6 +157,15 @@ const handleSecondary = () => {
   font-size: clamp(36px, 4vw, 52px);
   margin-bottom: 24px;
   line-height: 1.1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.hero-title-highlight {
+  background: linear-gradient(120deg, #6366f1 0%, #a855f7 50%, #ec4899 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 .hero-subtitle {
@@ -153,38 +195,18 @@ const handleSecondary = () => {
 }
 
 .hero-highlights {
-  display: grid;
-  gap: 18px;
-}
-
-.hero-highlight {
-  padding: 28px;
   display: flex;
-  flex-direction: column;
-  gap: 14px;
-  color: #fff;
-  min-height: 170px;
-}
-
-.icon-wrapper {
-  width: 56px;
-  height: 56px;
-  border-radius: 18px;
-  background: rgba(255, 255, 255, 0.18);
-  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
   align-items: center;
-  justify-content: center;
 }
 
-.hero-highlight h3 {
-  font-size: 18px;
-  font-weight: 600;
-}
-
-.hero-highlight p {
-  font-size: 15px;
-  opacity: 0.85;
-  line-height: 1.6;
+.hero-chip {
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.18);
+  font-size: 13px;
+  backdrop-filter: blur(10px);
 }
 
 @media (max-width: 1024px) {
@@ -194,7 +216,7 @@ const handleSecondary = () => {
 
   .hero-container {
     grid-template-columns: 1fr;
-    gap: 36px;
+    gap: 24px;
   }
 }
 
@@ -204,8 +226,9 @@ const handleSecondary = () => {
     align-items: stretch;
   }
 
-  .hero-highlight {
-    padding: 22px;
+  .hero-highlights {
+    justify-content: flex-start;
   }
 }
 </style>
+

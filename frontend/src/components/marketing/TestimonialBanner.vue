@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <section :id="sectionId" class="testimonial-section">
     <div class="testimonial-wrapper landing-card">
       <div class="testimonial-header">
@@ -14,9 +14,13 @@
       </div>
 
       <div class="testimonial-quotes">
-        <figure v-for="quote in content.quotes" :key="quote.company" class="quote-card">
-          <blockquote>“{{ quote.content }}”</blockquote>
-          <figcaption>—— {{ quote.company }}</figcaption>
+        <figure
+          v-for="quote in content.quotes"
+          :key="quote.company"
+          class="quote-card"
+        >
+          <blockquote>"{{ quote.content }}"</blockquote>
+          <figcaption>-- {{ quote.company }}</figcaption>
         </figure>
       </div>
     </div>
@@ -44,7 +48,11 @@ const sectionId = computed(() => id.value || 'about')
 <style scoped>
 .testimonial-section {
   padding: 110px 0;
-  background: linear-gradient(120deg, rgba(31, 54, 142, 0.95), rgba(79, 176, 255, 0.88));
+  background: linear-gradient(
+    120deg,
+    rgba(31, 54, 142, 0.95),
+    rgba(79, 176, 255, 0.88)
+  );
   color: #fff;
   display: flex;
   justify-content: center;
@@ -71,7 +79,7 @@ const sectionId = computed(() => id.value || 'about')
 
 .testimonial-stats {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  grid-template-columns: repeat(4, 1fr);
   gap: 24px;
 }
 
@@ -96,7 +104,7 @@ const sectionId = computed(() => id.value || 'about')
 
 .testimonial-quotes {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  grid-template-columns: repeat(2, 1fr);
   gap: 24px;
 }
 
@@ -129,5 +137,14 @@ figcaption {
   .testimonial-wrapper {
     padding: 36px 28px;
   }
+
+  .testimonial-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .testimonial-quotes {
+    grid-template-columns: 1fr;
+  }
 }
 </style>
+

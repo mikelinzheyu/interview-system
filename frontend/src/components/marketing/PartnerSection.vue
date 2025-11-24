@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <section :id="sectionId" class="partner-section">
     <div class="section-wrapper">
       <div class="section-header">
@@ -18,8 +18,13 @@
       </div>
 
       <div class="partner-cta">
-        <el-button type="primary" round class="landing-button-glow" @click="navigate(section.action?.to)">
-          {{ section.action?.label || '联系我们' }}
+        <el-button
+          type="primary"
+          round
+          class="landing-button-glow"
+          @click="navigate(section.action?.to)"
+        >
+          {{ section.action?.label || '申请成为合作伙伴' }}
         </el-button>
       </div>
     </div>
@@ -82,7 +87,7 @@ const navigate = (path) => {
 
 .highlight-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  grid-template-columns: repeat(3, 1fr);
   gap: 24px;
 }
 
@@ -96,4 +101,17 @@ const navigate = (path) => {
   display: flex;
   justify-content: center;
 }
+
+@media (max-width: 1024px) {
+  .highlight-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .highlight-grid {
+    grid-template-columns: 1fr;
+  }
+}
 </style>
+
