@@ -1,3 +1,10 @@
+# 强制大小写敏感性（适用于Linux/macOS）
+* text=auto
+*.vue text eol=lf
+*.js text eol=lf
+*.ts text eol=lf
+*.json text eol=lf
+
 # 强制保持 Unix 行结符的文件
 nginx.conf text eol=lf
 *.sh text eol=lf
