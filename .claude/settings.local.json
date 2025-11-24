@@ -11,7 +11,8 @@
       "Bash(timeout 10 node:*)",
       "Bash(docker:*)",
       "Bash(timeout 8 node:*)",
-      "Bash(start http://localhost:5175)"
+      "Bash(start http://localhost:5175)",
+      "Bash(start http://localhost:5177)"
     ],
     "deny": [],
     "ask": []
