@@ -9,7 +9,9 @@
       "Bash(timeout 5 node:*)",
       "Bash(docker-compose:*)",
       "Bash(timeout 10 node:*)",
-      "Bash(docker:*)"
+      "Bash(docker:*)",
+      "Bash(timeout 8 node:*)",
+      "Bash(start http://localhost:5175)"
     ],
     "deny": [],
     "ask": []
