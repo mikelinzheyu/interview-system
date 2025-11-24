@@ -32,7 +32,6 @@ D:\code7*
 
 # 前端临时文件
 frontend/nul
-frontend/src/views/home/
 frontend/src/views/HomeV2/
 frontend/src/views/pricing/
 frontend/src/components/AvatarUploader.vue
