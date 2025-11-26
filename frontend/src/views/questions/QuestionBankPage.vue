@@ -599,7 +599,9 @@ async function handleExport() {
   try {
     const params = buildExportParams()
     const response = await exportQuestions(params)
-    const blob = new Blob([response.data], { type: 'text/csv;charset=utf-8;' })
+    const blob = response instanceof Blob
+      ? response
+      : new Blob([response], { type: 'text/csv;charset=utf-8;' })
     const url = window.URL.createObjectURL(blob)
     const link = document.createElement('a')
     link.href = url

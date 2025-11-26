@@ -17,6 +17,7 @@ RUN addgroup -g 1001 -S nodejs && \
 # 复制应用文件
 COPY package.json ./
 COPY mock-server.js ./
+COPY server.js ./
 COPY websocket-server.js ./
 COPY redis-client.js ./
 COPY app.js ./

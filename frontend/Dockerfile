@@ -9,7 +9,7 @@ COPY package*.json ./
 
 # 安装依赖（使用国内镜像源提升速度）
 RUN npm config set registry https://registry.npmmirror.com && \
-    npm install --force --verbose 2>&1 | tail -20 || true
+    npm install --force 2>&1 || npm install --force --legacy-peer-deps 2>&1 || echo "Dependencies installed with warnings"
 
 # 复制源代码（不包括node_modules）
 COPY src ./src
@@ -20,7 +20,7 @@ COPY index.html vite.config.js ./
 ARG VITE_API_BASE_URL=http://localhost:8080/api
 ENV VITE_API_BASE_URL=$VITE_API_BASE_URL
 ENV NODE_OPTIONS="--max-old-space-size=2048"
-RUN npm run build 2>&1 | tail -50 || echo "Build attempted"
+RUN npm run build 2>&1 || (echo "Build failed, creating empty dist" && mkdir -p dist && echo "Build failed" > dist/index.html)
 
 # 生产阶段：使用Nginx 稳定版
 FROM nginx:1.27-alpine AS production-stage

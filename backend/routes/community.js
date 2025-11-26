@@ -541,4 +541,55 @@ router.delete('/posts/:postId/like', auth, (req, res) => {
   }
 })
 
+// ===== 社区搜索与热门内容 =====
+
+// GET /api/community/search/trending - 获取热门搜索
+router.get('/search/trending', (req, res) => {
+  const trending = [
+    { keyword: 'React', count: 1234, trend: 'up' },
+    { keyword: 'Node.js', count: 987, trend: 'up' },
+    { keyword: 'Vue.js', count: 756, trend: 'stable' },
+    { keyword: '数据库优化', count: 654, trend: 'up' },
+    { keyword: '微服务架构', count: 543, trend: 'up' }
+  ]
+  res.json({
+    code: 200,
+    message: 'Trending searches retrieved',
+    data: trending
+  })
+})
+
+// GET /api/community/tags/hot - 获取热门标签
+router.get('/tags/hot', (req, res) => {
+  const hotTags = [
+    { id: 1, name: 'JavaScript', count: 3245, temperature: 'hot' },
+    { id: 2, name: 'Python', count: 2876, temperature: 'hot' },
+    { id: 3, name: 'React', count: 2543, temperature: 'hot' },
+    { id: 4, name: '面试经验', count: 2134, temperature: 'warm' },
+    { id: 5, name: '算法题解', count: 1876, temperature: 'warm' },
+    { id: 6, name: '开源项目', count: 1654, temperature: 'warm' }
+  ]
+  res.json({
+    code: 200,
+    message: 'Hot tags retrieved',
+    data: hotTags
+  })
+})
+
+// GET /api/community/forums - 获取论坛列表
+router.get('/forums', (req, res) => {
+  const forums = [
+    { id: 1, name: '技术讨论', description: '讨论各种技术话题', posts: 1234, members: 5678 },
+    { id: 2, name: '面试分享', description: '分享面试经验和题目', posts: 987, members: 4321 },
+    { id: 3, name: '项目展示', description: '展示个人项目作品', posts: 654, members: 3210 },
+    { id: 4, name: '职业发展', description: '讨论职业规划和发展', posts: 543, members: 2876 },
+    { id: 5, name: '学习资源', description: '分享学习资源和教程', posts: 432, members: 2543 }
+  ]
+  res.json({
+    code: 200,
+    message: 'Forums retrieved',
+    data: forums
+  })
+})
+
 module.exports = router

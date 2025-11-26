@@ -280,11 +280,11 @@ function getTShapeTypeName(type) {
 function getLevelType(level) {
   const map = {
     beginner: 'info',
-    intermediate: '',
+    intermediate: 'primary',
     advanced: 'warning',
     expert: 'success'
   }
-  return map[level] || ''
+  return map[level] || 'info'
 }
 
 function getLevelName(level) {

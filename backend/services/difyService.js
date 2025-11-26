@@ -10,12 +10,12 @@ const logger = require('../utils/logger');
 
 class DifyService {
   constructor() {
-    // 从环境变量加载配置，确保安全性
-    this.apiKey = process.env.DIFY_API_KEY || 'app-9AB8NRgNKmk5gtsHYt1ByRD5';
-    this.baseURL = process.env.DIFY_API_URL || 'https://api.dify.ai/v1';
+    // 从环境变量加载配置，生产环境必须配置
+    this.apiKey = process.env.DIFY_WORKFLOW_API_KEY
+    this.baseURL = process.env.DIFY_API_BASE_URL || 'https://api.dify.ai/v1'
 
     // 工作流 ID（单一工作流处理所有任务）
-    this.workflowId = process.env.DIFY_WORKFLOW_ID || 'D6kweN4qjR1FWd3g';
+    this.workflowId = process.env.DIFY_WORKFLOW_ID
 
     // 创建 axios 客户端
     this.client = axios.create({
@@ -29,12 +29,13 @@ class DifyService {
 
     // 验证必要的配置
     if (!this.apiKey || !this.workflowId) {
-      logger.warn('[Dify] API Key or Workflow ID not configured. AI features will be disabled.');
+      logger.warn('[Dify] Workflow API Key or Workflow ID not configured. AI features (summary, keypoints) will be disabled.');
     }
 
-    logger.info('[Dify] Service initialized', {
+    logger.info('[Dify Workflow] Service initialized', {
       baseURL: this.baseURL,
-      workflowId: this.workflowId,
+      workflowId: this.workflowId ? this.workflowId.substring(0, 10) + '...' : 'NOT SET',
+      configured: !!this.apiKey && !!this.workflowId,
     });
   }
 

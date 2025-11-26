@@ -34,7 +34,7 @@ async function initDatabase() {
     const sequelize = require('./config/database')
 
     // 加载模型（会在共享实例上注册）
-    const { AIConversation, AIMessage } = require('./models')
+    const { AIConversation, AIMessage, OAuthConnection } = require('./models')
 
     // 现在与已注册的模型同步
     await sequelize.sync({ alter: true })

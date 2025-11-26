@@ -2279,7 +2279,7 @@ function handleQuestionCategoryRequest(req, res) {
   }, '获取题库分类成功')
 }
 
-function buildQuestionListItem(question) {
+  function buildQuestionListItem(question) {
   const stats = question.stats || {}
   return {
     id: question.id,
@@ -4602,9 +4602,140 @@ const routes = {
         tags: summary.tagCloud.map(tag => tag.tag)
       }
     }, '获取题库列表成功')
-  },
+    },
 
-  'GET:/api/questions/recommendations': (req, res) => {
+    // 导出题库题目为 CSV
+    'GET:/api/questions/export': (req, res) => {
+      const parsedUrl = url.parse(req.url, true)
+      const query = parsedUrl.query || {}
+
+      const page = Number(query.page) || 1
+      const size = Number(query.size) || 1000
+      const difficultyFilter = query.difficulty
+        ? query.difficulty.split(',').map(item => item.trim().toLowerCase()).filter(Boolean)
+        : []
+      const typeFilter = query.type
+        ? query.type.split(',').map(item => item.trim().toLowerCase()).filter(Boolean)
+        : []
+      const keyword = (query.keyword || query.q || '').trim().toLowerCase()
+      const tagsFilter = query.tags
+        ? query.tags.split(',').map(item => item.trim().toLowerCase()).filter(Boolean)
+        : []
+      const categoryId = query.category_id ? Number(query.category_id) : null
+      const domainId = query.domain_id ? Number(query.domain_id) : null
+      const sort = query.sort || 'recent'
+
+      let candidates = mockData.questions.slice()
+
+      if (domainId) {
+        candidates = candidates.filter(q => q.domainId === domainId)
+      }
+
+      if (categoryId) {
+        const allowedCategories = getCategoryDescendants
+          ? getCategoryDescendants(categoryId)
+          : [categoryId]
+
+        candidates = candidates.filter(question => {
+          const path = Array.isArray(question.categoryPath) && question.categoryPath.length
+            ? question.categoryPath
+            : [question.categoryId].filter(Boolean)
+          return path.some(catId => allowedCategories.includes(catId))
+        })
+      }
+
+      if (difficultyFilter.length) {
+        candidates = candidates.filter(question =>
+          question.difficulty &&
+          difficultyFilter.includes(String(question.difficulty).toLowerCase())
+        )
+      }
+
+      if (typeFilter.length) {
+        candidates = candidates.filter(question =>
+          question.type &&
+          typeFilter.includes(String(question.type).toLowerCase())
+        )
+      }
+
+      if (keyword) {
+        candidates = candidates.filter(question => {
+          const target = [
+            question.title,
+            question.question,
+            question.explanation,
+            Array.isArray(question.tags) ? question.tags.join(' ') : ''
+          ].join(' ').toLowerCase()
+          return target.includes(keyword)
+        })
+      }
+
+      if (tagsFilter.length) {
+        candidates = candidates.filter(question => {
+          if (!Array.isArray(question.tags) || !question.tags.length) return false
+          const normalizedTags = question.tags.map(tag => String(tag).toLowerCase())
+          return tagsFilter.some(tag => normalizedTags.includes(tag))
+        })
+      }
+
+      candidates.sort((a, b) => {
+        const aTime = new Date(a.updatedAt || a.createdAt || 0).getTime()
+        const bTime = new Date(b.updatedAt || b.createdAt || 0).getTime()
+
+        switch (sort) {
+          case 'popular': {
+            const aScore = (a.stats?.attempts || 0) + (a.stats?.viewCount || 0)
+            const bScore = (b.stats?.attempts || 0) + (b.stats?.viewCount || 0)
+            return bScore - aScore
+          }
+          case 'difficulty':
+          case 'difficulty_desc':
+            // 这里简单按 estimatedTime 排序，缺失则保持原顺序
+            if (!a.estimatedTime || !b.estimatedTime) return 0
+            return sort === 'difficulty'
+              ? a.estimatedTime - b.estimatedTime
+              : b.estimatedTime - a.estimatedTime
+          case 'recent':
+          default:
+            return bTime - aTime
+        }
+      })
+
+      const start = (page - 1) * size
+      const end = start + size
+      const pageItems = candidates.slice(start, end)
+
+      let csv = 'id,title,difficulty,category_id,created_at\n'
+      pageItems.forEach(q => {
+        const id = q.id != null ? String(q.id) : ''
+        const rawTitle = q.title != null ? String(q.title) : ''
+        const safeTitle = rawTitle.replace(/\"/g, '\'').replace(/\r?\n/g, ' ')
+        const difficulty = q.difficulty != null ? String(q.difficulty) : ''
+        const category = q.categoryId != null ? String(q.categoryId) : ''
+        const createdAt = q.createdAt != null ? String(q.createdAt) : ''
+
+        const row = [
+          id,
+          `"${safeTitle}"`,
+          difficulty,
+          category,
+          createdAt
+        ].join(',')
+
+        csv += `${row}\n`
+      })
+
+      const buffer = Buffer.from(csv, 'utf-8')
+
+      res.writeHead(200, {
+        'Content-Type': 'text/csv; charset=utf-8',
+        'Content-Disposition': 'attachment; filename=\"questions.csv\"',
+        'Content-Length': buffer.length
+      })
+      res.end(buffer)
+    },
+
+    'GET:/api/questions/recommendations': (req, res) => {
     const parsedUrl = url.parse(req.url, true)
     const query = parsedUrl.query || {}
     const baseId = query.base_id ? Number(query.base_id) : null
@@ -4788,8 +4919,10 @@ const routes = {
 
   // 获取滑块验证码
   'GET:/api/captcha/get': (req, res) => {
-    // 生成随机位置
-    const x = Math.floor(Math.random() * (260 - 40)) + 40 // 40-300之间
+    // 生成随机位置（适当增大缺口与滑块初始位置的最小水平距离）
+    const minX = 80  // 原来是 40，增大到 80
+    const maxX = 260 // 保持右侧预留边距不变
+    const x = Math.floor(Math.random() * (maxX - minX)) + minX
     const y = Math.floor(Math.random() * 50) + 20 // 20-70之间
 
     // 生成token
@@ -5467,11 +5600,11 @@ const routes = {
           <div class="icon">✅</div>
           <h1>微信授权成功</h1>
           <p>正在跳转回应用...</p>
-          <p class="countdown" id="countdown">3</p>
+          <p class="countdown" id="countdown">1</p>
           <button class="btn" onclick="redirect()">立即跳转</button>
         </div>
         <script>
-          let count = 3;
+          let count = 1;
           const countdownEl = document.getElementById('countdown');
           const timer = setInterval(() => {
             count--;
@@ -5717,11 +5850,11 @@ const routes = {
           <div class="icon">✅</div>
           <h1>QQ授权成功</h1>
           <p>正在跳转回应用...</p>
-          <p class="countdown" id="countdown">3</p>
+          <p class="countdown" id="countdown">1</p>
           <button class="btn" onclick="redirect()">立即跳转</button>
         </div>
         <script>
-          let count = 3;
+          let count = 1;
           const countdownEl = document.getElementById('countdown');
           const timer = setInterval(() => {
             count--;
@@ -9715,6 +9848,688 @@ const payload = { ...paginatedResult, items }
 /**
  * 创建HTTP服务器
  */
+// 为“计算机科学与技术”领域补充额外简答题（用于 /learning-hub/computer-science 页面）
+const EXTRA_CS_SHORT_ANSWER_QUESTIONS = [
+  {
+    title: '操作系统中进程和线程的区别',
+    question: '简要说明操作系统中进程和线程的定义及主要区别。',
+    difficulty: 'easy',
+    difficultyScore: 0.35,
+    categoryId: 4,
+    tags: ['操作系统', '进程', '线程'],
+    estimatedTime: 6,
+    prerequisiteKnowledge: ['操作系统基础'],
+    languageRestrictions: [],
+    answer: '进程是操作系统进行资源分配和调度的基本单位，拥有独立的地址空间和系统资源；线程是进程内的执行单元，同一进程内的多个线程共享进程的内存和资源。进程之间相互独立，一个进程崩溃通常不影响其他进程；而同一进程内的线程相互影响，一个线程异常可能导致整个进程终止。创建和切换进程的开销通常大于线程。',
+    explanation: '理解进程和线程的区别有助于合理设计并发模型。进程强调资源隔离和稳定性，线程强调轻量级并发和资源共享。现代操作系统通常采用多进程+多线程的混合模型来兼顾可靠性和性能。'
+  },
+  {
+    title: '死锁产生的四个必要条件',
+    question: '简要说明系统产生死锁的四个必要条件。',
+    difficulty: 'medium',
+    difficultyScore: 0.55,
+    categoryId: 4,
+    tags: ['操作系统', '并发', '死锁'],
+    estimatedTime: 6,
+    prerequisiteKnowledge: ['并发编程', '互斥锁'],
+    languageRestrictions: [],
+    answer: '死锁产生的四个必要条件是：互斥条件、占有且等待条件、不剥夺条件和循环等待条件。互斥条件指资源一次只能被一个进程占有；占有且等待指进程至少持有一个资源，同时申请新的资源；不剥夺指已获得的资源在未使用完之前不能被强制抢占；循环等待指存在一个进程环路，每个进程都在等待下一个进程占有的资源。',
+    explanation: '只有在四个条件同时满足时才可能产生死锁，因此预防死锁的常用思路就是破坏其中至少一个条件，例如通过资源有序分配破坏循环等待条件，通过可剥夺锁设计破坏不剥夺条件。'
+  },
+  {
+    title: '虚拟内存与分页机制的作用',
+    question: '简要说明虚拟内存和分页机制解决了哪些问题。',
+    difficulty: 'medium',
+    difficultyScore: 0.55,
+    categoryId: 4,
+    tags: ['操作系统', '内存管理', '虚拟内存'],
+    estimatedTime: 7,
+    prerequisiteKnowledge: ['内存管理基础'],
+    languageRestrictions: [],
+    answer: '虚拟内存通过在逻辑地址和物理地址之间增加一层映射，使每个进程看到的是连续的大地址空间，而实际物理内存可以较小且不连续。分页机制将虚拟地址空间和物理内存划分为固定大小的页和页框，按页进行映射和调度。这样可以提高内存利用率，支持进程间隔离，减少外部碎片，并允许程序大于物理内存容量。',
+    explanation: '虚拟内存和分页是现代操作系统的核心机制，结合页表、TLB 和页面置换算法，能够在有限物理内存上运行多个大程序，同时保证安全隔离和较好的性能。'
+  },
+  {
+    title: '常见页面置换算法比较',
+    question: '简要比较 FIFO、LRU 和 LFU 三种页面置换算法的特点和适用场景。',
+    difficulty: 'medium',
+    difficultyScore: 0.6,
+    categoryId: 4,
+    tags: ['操作系统', '页面置换', '算法'],
+    estimatedTime: 7,
+    prerequisiteKnowledge: ['虚拟内存', '缓存策略'],
+    languageRestrictions: [],
+    answer: 'FIFO 按进入内存的先后顺序淘汰页面，简单但可能出现 Belady 异常；LRU 根据最近最少使用原则淘汰最长时间未被访问的页面，通常能取得较好命中率，但实现需要维护访问时间或近似结构；LFU 根据访问频率淘汰使用次数最少的页面，适合访问模式稳定的场景，但对热点突变不敏感。实际系统中常采用 LRU 的近似实现或结合多种算法的改进策略。',
+    explanation: '选择页面置换算法时需要在实现复杂度、内存开销和命中率之间权衡。理解三种算法的特点有助于在缓存、数据库和操作系统中选择合适的策略。'
+  },
+  {
+    title: 'TCP 和 UDP 的主要区别',
+    question: '从可靠性、连接方式和使用场景等维度简要比较 TCP 和 UDP。',
+    difficulty: 'easy',
+    difficultyScore: 0.4,
+    categoryId: 4,
+    tags: ['计算机网络', 'TCP', 'UDP'],
+    estimatedTime: 5,
+    prerequisiteKnowledge: ['网络模型基础'],
+    languageRestrictions: [],
+    answer: 'TCP 是面向连接的可靠传输协议，提供字节流服务，通过三次握手建立连接，具备重传、流量控制和拥塞控制机制，适合对数据可靠性要求高的场景，如网页加载、文件传输。UDP 是无连接的、不保证可靠性的报文传输协议，开销小、延迟低，不保证顺序和不重传，适合对实时性要求高且应用层可容忍丢包或自定义可靠性的场景，如视频直播、在线游戏和实时语音。',
+    explanation: '在系统设计时，选择 TCP 还是 UDP 取决于对可靠性、延迟和实现复杂度的权衡。很多实时应用使用 UDP 并在应用层实现部分可靠机制。'
+  },
+  {
+    title: 'TCP 三次握手的目的',
+    question: '简要说明 TCP 建立连接时为什么需要三次握手而不是两次。',
+    difficulty: 'medium',
+    difficultyScore: 0.55,
+    categoryId: 4,
+    tags: ['计算机网络', 'TCP', '握手'],
+    estimatedTime: 6,
+    prerequisiteKnowledge: ['TCP 基础'],
+    languageRestrictions: [],
+    answer: '三次握手的主要目的是双方确认彼此的发送和接收能力正常，并避免历史失效连接请求造成混乱。第一次握手客户端发送 SYN，表明希望建立连接并发送初始序列号；第二次握手服务端回复 SYN+ACK，确认收到客户端的 SYN 并给出自己的初始序列号；第三次握手客户端再次发送 ACK，确认收到服务端的 SYN。三次交互确保了双方的收发方向都可用，如果只有两次握手，服务端难以确认客户端是否能正常接收，从而可能导致资源浪费或状态不一致。',
+    explanation: '三次握手是 TCP 可靠连接建立的基础，理解每一步的含义有助于分析连接建立过程中的超时、半连接和 SYN 攻击等问题。'
+  },
+  {
+    title: 'HTTP 与 HTTPS 的区别',
+    question: '简要说明 HTTP 和 HTTPS 在安全性和传输方式上的主要区别。',
+    difficulty: 'easy',
+    difficultyScore: 0.4,
+    categoryId: 4,
+    tags: ['计算机网络', 'HTTP', 'HTTPS', '安全'],
+    estimatedTime: 5,
+    prerequisiteKnowledge: ['网络协议基础'],
+    languageRestrictions: [],
+    answer: 'HTTP 是基于明文的应用层协议，请求和响应内容在网络中以明文传输，容易被中间人窃听和篡改；HTTPS 在 HTTP 之下增加了 TLS 加密层，通过证书校验和对称加密结合非对称加密，实现通信加密、身份认证和数据完整性校验。HTTPS 使用专门的端口和握手流程，在安全性上明显优于 HTTP，但握手过程会带来一定性能开销。',
+    explanation: '在实际系统设计中，所有涉及用户敏感数据的接口都应使用 HTTPS，以防止中间人攻击和数据泄漏。理解 TLS 握手流程有助于排查证书配置和加密套件相关问题。'
+  },
+  {
+    title: '常见 HTTP 状态码含义',
+    question: '简要说明 200、301、400、401、403、404 和 500 这几个常见 HTTP 状态码的含义。',
+    difficulty: 'easy',
+    difficultyScore: 0.35,
+    categoryId: 4,
+    tags: ['HTTP', '状态码', 'Web 开发'],
+    estimatedTime: 5,
+    prerequisiteKnowledge: ['HTTP 基础'],
+    languageRestrictions: [],
+    answer: '200 表示请求成功；301 表示永久重定向，资源已被移动到新的 URL；400 表示客户端请求格式错误；401 表示未授权，通常需要提供认证信息；403 表示已认证但无访问权限；404 表示请求的资源不存在；500 表示服务器内部错误。通过状态码可以快速判断请求的大致处理结果。',
+    explanation: '合理使用状态码有助于前后端协作和问题排查，同时也是设计良好 API 的重要部分。区分客户端错误和服务端错误可以帮助定位责任边界。'
+  },
+  {
+    title: '数据库事务的 ACID 特性',
+    question: '简要解释数据库事务的 ACID 四个特性分别指什么。',
+    difficulty: 'easy',
+    difficultyScore: 0.4,
+    categoryId: 4,
+    tags: ['数据库', '事务', 'ACID'],
+    estimatedTime: 5,
+    prerequisiteKnowledge: ['数据库基础'],
+    languageRestrictions: [],
+    answer: 'ACID 分别表示原子性、一致性、隔离性和持久性。原子性指事务中操作要么全部成功要么全部失败；一致性指事务执行前后数据库从一个一致状态转变到另一个一致状态，不违反约束；隔离性指并发事务之间的执行应互不干扰，效果与串行执行等价；持久性指事务提交后对数据的修改是持久保存的，即使系统故障也能通过日志或备份恢复。',
+    explanation: 'ACID 是关系型数据库设计和实现的重要原则，很多锁机制、日志机制和恢复策略都是围绕保证这四个特性展开的。'
+  },
+  {
+    title: '数据库隔离级别与常见并发问题',
+    question: '简要说明常见的数据库隔离级别以及它们与脏读、不可重复读和幻读的关系。',
+    difficulty: 'medium',
+    difficultyScore: 0.6,
+    categoryId: 4,
+    tags: ['数据库', '事务', '隔离级别'],
+    estimatedTime: 7,
+    prerequisiteKnowledge: ['事务', '锁机制'],
+    languageRestrictions: [],
+    answer: '常见隔离级别从低到高依次为读未提交、读已提交、可重复读和串行化。读未提交可能产生脏读、不可重复读和幻读；读已提交避免了脏读，但仍可能出现不可重复读和幻读；可重复读避免了脏读和不可重复读，在某些实现中仍可能有幻读；串行化通过加锁或多版本控制，使并发事务的效果等同于串行执行，可以避免三种问题，但并发性能较差。',
+    explanation: '选择隔离级别需要在数据一致性和系统性能之间平衡。大部分业务系统选用读已提交或可重复读，同时结合业务逻辑和悲观锁、乐观锁来处理关键场景。'
+  },
+  {
+    title: 'B+ 树索引的特点',
+    question: '简要说明为什么关系型数据库常用 B+ 树作为索引结构，以及它的几个关键特性。',
+    difficulty: 'medium',
+    difficultyScore: 0.55,
+    categoryId: 4,
+    tags: ['数据库', '索引', 'B+ 树'],
+    estimatedTime: 6,
+    prerequisiteKnowledge: ['数据结构', '磁盘 IO'],
+    languageRestrictions: [],
+    answer: 'B+ 树是一种多路平衡搜索树，所有数据都存储在叶子节点，非叶子节点只存储键值用于索引。它的关键特性包括高度低、磁盘友好和范围查询高效。由于每个节点可以包含大量键值，树的高度通常很小，一次查找需要的磁盘 IO 次数有限；叶子节点通过链表相连，适合顺序扫描和范围查询；节点大小通常与磁盘页大小对齐，减少了磁盘读取的浪费。',
+    explanation: '与二叉搜索树相比，B+ 树在大规模数据和磁盘环境下更适用，是 MySQL 等数据库默认的索引结构。了解其特性有助于设计合理的索引方案。'
+  },
+  {
+    title: 'SQL 与 NoSQL 的差异',
+    question: '简要比较关系型数据库和常见 NoSQL 数据库在数据模型和适用场景上的区别。',
+    difficulty: 'medium',
+    difficultyScore: 0.55,
+    categoryId: 4,
+    tags: ['数据库', 'SQL', 'NoSQL'],
+    estimatedTime: 6,
+    prerequisiteKnowledge: ['数据库基础', '系统架构'],
+    languageRestrictions: [],
+    answer: '关系型数据库以表格和关系为核心，遵循严格的模式和 ACID 事务，适合强一致性需求和复杂查询场景。NoSQL 数据库包括键值存储、文档数据库、列式数据库和图数据库等，更强调可扩展性和灵活的数据模型，通常采用弱一致性或最终一致性，适合高并发、大数据量和灵活结构的场景，如缓存、日志、社交关系等。',
+    explanation: '在现代系统中，常见做法是关系型数据库负责核心事务数据，NoSQL 负责高并发或特定结构的数据，形成多种存储引擎组合的架构。'
+  },
+  {
+    title: '时间复杂度和空间复杂度的含义',
+    question: '简要说明大 O 记号中时间复杂度和空间复杂度分别描述什么。',
+    difficulty: 'easy',
+    difficultyScore: 0.35,
+    categoryId: 6,
+    tags: ['算法', '时间复杂度', '空间复杂度'],
+    estimatedTime: 5,
+    prerequisiteKnowledge: ['算法基础'],
+    languageRestrictions: [],
+    answer: '时间复杂度描述算法在输入规模 n 增大时，执行步骤数量随 n 增长的数量级，常见有 O(1)、O(log n)、O(n)、O(n log n) 等，用于估计算法运行时间随规模变化的趋势。空间复杂度描述算法在运行过程中额外占用的存储空间随输入规模 n 的增长情况，用于衡量算法对内存的消耗。大 O 记号关注的是最高阶项和常数无关的增长趋势。',
+    explanation: '分析复杂度有助于在多种解法之间进行选择，特别是在输入规模较大时，可以预估性能瓶颈并进行优化。'
+  },
+  {
+    title: '常见排序算法的比较',
+    question: '从时间复杂度、空间复杂度和稳定性角度比较快速排序、归并排序和堆排序。',
+    difficulty: 'medium',
+    difficultyScore: 0.6,
+    categoryId: 6,
+    tags: ['算法', '排序', '复杂度'],
+    estimatedTime: 7,
+    prerequisiteKnowledge: ['常见排序算法'],
+    languageRestrictions: [],
+    answer: '快速排序平均时间复杂度 O(n log n)，最坏 O(n²)，空间复杂度平均 O(log n)，通常原地排序，不稳定；归并排序时间复杂度稳定为 O(n log n)，空间复杂度 O(n)，需要额外数组，稳定；堆排序时间复杂度为 O(n log n)，空间复杂度 O(1)，原地排序，不稳定。在工程实践中，快速排序因常数因子小而常用，但在最坏情况或稳定性要求高的场景会选择归并排序。',
+    explanation: '理解不同排序算法的特性有助于根据数据规模、数据分布和稳定性要求选择合适实现，很多库排序采用混合策略。'
+  },
+  {
+    title: '哈希表冲突处理方法',
+    question: '简要说明开放地址法和链地址法处理哈希冲突的基本思路。',
+    difficulty: 'medium',
+    difficultyScore: 0.55,
+    categoryId: 6,
+    tags: ['数据结构', '哈希表', '冲突处理'],
+    estimatedTime: 6,
+    prerequisiteKnowledge: ['哈希函数', '数组和链表'],
+    languageRestrictions: [],
+    answer: '开放地址法在发生冲突时通过探查数组中的下一个或多个位置寻找空槽，例如线性探查、二次探查和双重哈希。链地址法则在每个桶中维护一个链表或其他结构，所有哈希到同一位置的元素存储在该桶的链表中。开放地址法节省指针开销但对装载因子较敏感，删除操作复杂；链地址法更灵活，适合动态扩展，但会有额外的指针和内存碎片开销。',
+    explanation: '实际工程中通常使用链地址法的变种（例如哈希桶+红黑树），在高装载因子情况下仍能保持较好的性能。'
+  },
+  {
+    title: '栈和队列的典型应用场景',
+    question: '分别举例说明栈和队列在程序设计中的一到两个典型应用。',
+    difficulty: 'easy',
+    difficultyScore: 0.35,
+    categoryId: 6,
+    tags: ['数据结构', '栈', '队列'],
+    estimatedTime: 5,
+    prerequisiteKnowledge: ['线性结构基础'],
+    languageRestrictions: [],
+    answer: '栈遵循后进先出，典型应用包括函数调用栈、表达式求值和括号匹配等。队列遵循先进先出，典型应用包括任务调度、消息队列和广度优先搜索中的节点遍历。通过栈和队列可以简化很多算法的状态管理。',
+    explanation: '理解栈和队列的性质可以帮助把握许多算法的核心思想，例如 DFS 与 BFS 的差异本质上就在于使用栈还是队列来管理待处理节点。'
+  },
+  {
+    title: '深度优先搜索与广度优先搜索',
+    question: '简要说明深度优先搜索和广度优先搜索在实现方式和适用场景上的区别。',
+    difficulty: 'medium',
+    difficultyScore: 0.55,
+    categoryId: 6,
+    tags: ['算法', '图论', '搜索'],
+    estimatedTime: 6,
+    prerequisiteKnowledge: ['图的遍历'],
+    languageRestrictions: [],
+    answer: '深度优先搜索使用栈或递归实现，每次尽可能向下探索到路径末端再回溯，适合解决连通性、拓扑排序和求解所有路径等问题。广度优先搜索使用队列，从起点开始一层一层向外扩展，适合求解最短路径（在无权图中）和层序遍历等问题。DFS 更节省空间但可能陷入深层分支，BFS 空间开销较大但能保证最短步数。',
+    explanation: '在设计搜索算法时，需要根据问题是否关心路径长度、搜索空间规模以及对递归深度的约束等因素选择 DFS 或 BFS，很多复杂算法是两者的组合或变体。'
+  },
+  {
+    title: '面向对象的三大特性',
+    question: '简要说明封装、继承和多态三大面向对象特性的含义。',
+    difficulty: 'easy',
+    difficultyScore: 0.35,
+    categoryId: 5,
+    tags: ['面向对象', '封装', '继承', '多态'],
+    estimatedTime: 5,
+    prerequisiteKnowledge: ['面向对象编程基础'],
+    languageRestrictions: [],
+    answer: '封装是将数据和行为组合在一起，通过访问控制隐藏内部实现细节，只暴露必要接口；继承是子类复用父类属性和方法的机制，可以在不修改父类代码的前提下扩展行为；多态是指在统一接口下，根据实际对象类型执行不同实现，例如通过方法重写和接口实现，使调用方只依赖抽象而不关心具体类型。',
+    explanation: '面向对象的三大特性为复杂系统建模提供了良好的抽象能力，有助于降低耦合度、提高可维护性和扩展性。'
+  },
+  {
+    title: '单一职责原则的含义',
+    question: '简要说明单一职责原则的定义，并举一个简单示例。',
+    difficulty: 'easy',
+    difficultyScore: 0.35,
+    categoryId: 5,
+    tags: ['设计原则', '单一职责', '面向对象'],
+    estimatedTime: 5,
+    prerequisiteKnowledge: ['面向对象设计'],
+    languageRestrictions: [],
+    answer: '单一职责原则指一个类或模块应该仅有一个引起它变化的原因，即只负责一项职责。这样一旦需求变更，只会影响到少量的类，降低修改风险。例如，将日志记录与业务处理拆分成两个类，一个专门负责业务逻辑，另一个负责写日志，而不是在同一个类里同时做两件事。',
+    explanation: '单一职责原则有助于控制类的规模和复杂度，使代码更易于理解和测试，也是很多重构手法的指导原则。'
+  },
+  {
+    title: '常见设计模式举例',
+    question: '简要说明工厂模式和单例模式解决的典型问题。',
+    difficulty: 'medium',
+    difficultyScore: 0.55,
+    categoryId: 5,
+    tags: ['设计模式', '工厂模式', '单例模式'],
+    estimatedTime: 6,
+    prerequisiteKnowledge: ['面向对象设计', '创建型模式'],
+    languageRestrictions: [],
+    answer: '工厂模式通过引入工厂类或工厂方法，将对象创建与使用解耦，调用方只依赖抽象接口，具体产品类型的选择由工厂统一管理，适合经常扩展新实现的场景。单例模式保证系统中某个类只有一个实例，并提供全局访问点，常用于配置管理、连接池、缓存等场景，但需要注意线程安全和测试可替换性。',
+    explanation: '设计模式的本质是总结在特定上下文中经验证的设计经验，需要结合具体场景权衡使用，避免过度设计。'
+  },
+  {
+    title: 'MVC 与 MVVM 架构的区别',
+    question: '简要比较 MVC 和 MVVM 两种前后端常见架构模式的核心差异。',
+    difficulty: 'medium',
+    difficultyScore: 0.55,
+    categoryId: 1,
+    tags: ['架构模式', 'MVC', 'MVVM'],
+    estimatedTime: 6,
+    prerequisiteKnowledge: ['前端框架基础'],
+    languageRestrictions: [],
+    answer: 'MVC 将应用分为模型、视图和控制器三部分，控制器负责接收用户输入并协调模型和视图；MVVM 引入 ViewModel 作为视图和模型之间的中介，通过数据绑定机制自动同步视图和状态。MVC 中视图和控制器耦合较紧，而 MVVM 借助双向绑定或单向数据流，使视图逻辑更多集中在 ViewModel 中，更适合前端组件化开发。',
+    explanation: '在现代前端框架中，更多采用基于 MVVM 或其变体的架构，以提高可测试性和组件复用性；而在后端 Web 框架中依然常见基于 MVC 的路由和控制器设计。'
+  },
+  {
+    title: '微服务架构的优点和挑战',
+    question: '简要说明微服务架构相对于单体应用的主要优点和带来的新挑战。',
+    difficulty: 'medium',
+    difficultyScore: 0.6,
+    categoryId: 4,
+    tags: ['系统架构', '微服务', '分布式'],
+    estimatedTime: 7,
+    prerequisiteKnowledge: ['分布式系统基础'],
+    languageRestrictions: [],
+    answer: '微服务架构将单体应用拆分为多个围绕业务能力构建的小服务，每个服务可以独立部署和扩展，技术栈也可不同，有利于提高团队自治和发布效率。它的主要挑战包括分布式事务、一致性、服务发现、链路追踪、接口兼容和运维复杂度提升等，需要引入服务注册、配置中心、网关、监控和自动化运维等配套设施。',
+    explanation: '是否采用微服务需要结合团队规模、业务复杂度和运维能力综合评估，盲目拆分可能带来比单体更大的复杂度。'
+  },
+  {
+    title: 'CAP 定理的三个要素',
+    question: '简要说明 CAP 定理中的一致性、可用性和分区容错性分别指什么。',
+    difficulty: 'medium',
+    difficultyScore: 0.6,
+    categoryId: 4,
+    tags: ['分布式系统', 'CAP', '一致性'],
+    estimatedTime: 6,
+    prerequisiteKnowledge: ['分布式基础'],
+    languageRestrictions: [],
+    answer: '一致性指在同一时间所有节点对外展示的数据视图相同；可用性指每个请求都能在有限时间内获得响应，即使响应可能不是最新数据；分区容错性指系统在出现网络分区等通信失败时仍能继续提供服务。CAP 定理指出在出现网络分区的情况下，一个分布式系统无法同时完全满足一致性和可用性，只能在两者之间做权衡。',
+    explanation: '理解 CAP 有助于分析不同分布式存储系统的设计取向，例如某些系统偏向 CP，另一些偏向 AP，工程实践中常用最终一致性和补偿机制来平衡用户体验与数据正确性。'
+  },
+  {
+    title: '常见缓存问题：穿透、击穿和雪崩',
+    question: '简要说明缓存穿透、缓存击穿和缓存雪崩三种问题及常见解决思路。',
+    difficulty: 'medium',
+    difficultyScore: 0.6,
+    categoryId: 4,
+    tags: ['缓存', '系统架构', '性能优化'],
+    estimatedTime: 7,
+    prerequisiteKnowledge: ['缓存设计', '高并发基础'],
+    languageRestrictions: [],
+    answer: '缓存穿透指大量请求访问不存在的数据，缓存和数据库都要查，常见做法是对不存在的键也进行短期缓存或使用布隆过滤器拦截。缓存击穿指某个热点键在过期瞬间有大量并发请求直接击中数据库，可以通过互斥锁或逻辑过期控制重建。缓存雪崩指大量缓存键在同一时间集中过期或缓存服务整体不可用导致数据库被打爆，可以通过过期时间随机化、多级缓存和限流降级来缓解。',
+    explanation: '在高并发场景下合理设计缓存策略非常关键，需要从访问模式和故障模式两个维度考虑防护措施。'
+  },
+  {
+    title: '幂等性的概念与实现',
+    question: '简要说明接口幂等性的含义，并举例说明如何实现一个幂等的订单支付接口。',
+    difficulty: 'medium',
+    difficultyScore: 0.6,
+    categoryId: 4,
+    tags: ['分布式系统', '接口设计', '幂等'],
+    estimatedTime: 7,
+    prerequisiteKnowledge: ['HTTP 接口设计', '事务处理'],
+    languageRestrictions: [],
+    answer: '幂等性指对同一操作多次执行，其对系统的影响与执行一次的效果相同。在订单支付场景中，可以通过业务唯一标识（如订单号）和支付状态表来保证幂等：每次请求根据订单号查询支付记录，如果已成功则直接返回成功，不重复扣款；如果处于处理中则返回相应状态；只有在未支付状态才发起真正的扣款流程。也可以结合幂等令牌和去重表进一步控制。',
+    explanation: '幂等性是分布式环境下应对重试、网络抖动和重复提交的重要手段，接口设计时应显式考虑哪些操作需要保证幂等。'
+  },
+  {
+    title: '消息队列在系统中的作用',
+    question: '简要说明引入消息队列可以解决哪些问题，并举两个典型使用场景。',
+    difficulty: 'easy',
+    difficultyScore: 0.4,
+    categoryId: 4,
+    tags: ['消息队列', '系统解耦', '异步'],
+    estimatedTime: 6,
+    prerequisiteKnowledge: ['系统架构基础'],
+    languageRestrictions: [],
+    answer: '消息队列可以将调用方和被调用方解耦，通过异步处理提高系统吞吐，并具备一定的削峰填谷能力。典型场景包括订单下单后异步发送短信或邮件通知、用户上传图片后异步生成缩略图等。通过队列可以避免请求直接阻塞在耗时操作上，同时在消费端异常时也可以缓冲请求。',
+    explanation: '消息队列引入后需要考虑消息可靠性、顺序性和重复消费等问题，通常需要配合幂等性和重试策略一起设计。'
+  },
+  {
+    title: '单元测试、集成测试与端到端测试',
+    question: '简要说明单元测试、集成测试和端到端测试的关注点和差异。',
+    difficulty: 'easy',
+    difficultyScore: 0.4,
+    categoryId: 4,
+    tags: ['测试', '质量保障', '工程实践'],
+    estimatedTime: 5,
+    prerequisiteKnowledge: ['软件工程基础'],
+    languageRestrictions: [],
+    answer: '单元测试关注单个函数或类的正确性，强调快速和稳定，通常隔离外部依赖；集成测试关注多个模块或服务之间的协同行为，验证接口契约和数据流是否正确；端到端测试从用户视角验证整个系统的关键业务流程，覆盖 UI、接口和后端，通常最慢也最脆弱。三者层层递进，合理的测试金字塔应该单元测试最多，端到端测试最少。',
+    explanation: '合理的测试策略可以在保证质量的同时控制维护成本，过多依赖端到端测试会导致反馈缓慢且难以定位问题。'
+  },
+  {
+    title: '持续集成与持续交付的核心价值',
+    question: '简要说明持续集成（CI）和持续交付（CD）的核心目标各是什么。',
+    difficulty: 'easy',
+    difficultyScore: 0.4,
+    categoryId: 4,
+    tags: ['DevOps', 'CI', 'CD'],
+    estimatedTime: 5,
+    prerequisiteKnowledge: ['软件工程实践'],
+    languageRestrictions: [],
+    answer: '持续集成的核心目标是让代码频繁合入主干，并在每次集成时自动运行构建和测试，以尽早发现集成问题和回归缺陷。持续交付在持续集成基础上，将构建、测试、打包和部署过程自动化，使软件随时处于可以安全发布的状态，减少人工操作和发布风险。',
+    explanation: 'CI/CD 通过自动化流水线缩短了从开发到上线的周期，是现代软件工程的重要实践，能显著提升交付效率和稳定性。'
+  },
+  {
+    title: '容器与虚拟机的区别',
+    question: '简要比较容器和虚拟机在资源隔离方式和启动开销上的差异。',
+    difficulty: 'medium',
+    difficultyScore: 0.55,
+    categoryId: 4,
+    tags: ['容器技术', '虚拟化', 'Docker'],
+    estimatedTime: 6,
+    prerequisiteKnowledge: ['操作系统', '虚拟化基础'],
+    languageRestrictions: [],
+    answer: '虚拟机通过在宿主机上运行一个完整的虚拟化层，为每个虚拟机提供独立的操作系统实例，隔离性强但资源开销大、启动较慢。容器基于操作系统内核的命名空间和 cgroup 等机制，在同一个内核上运行多个相互隔离的进程，镜像通常只包含运行时和应用，启动速度快、资源利用率高，但隔离粒度略弱。',
+    explanation: '容器更适合云原生场景和弹性扩缩容，而虚拟机适合需要强隔离或多操作系统共存的场景，实际部署中常用“虚拟机+容器”的组合。'
+  },
+  {
+    title: 'Kubernetes 中常见核心对象',
+    question: '简要说明 Pod、Deployment 和 Service 在 Kubernetes 集群中的作用。',
+    difficulty: 'medium',
+    difficultyScore: 0.55,
+    categoryId: 4,
+    tags: ['Kubernetes', '容器编排', '云原生'],
+    estimatedTime: 6,
+    prerequisiteKnowledge: ['容器技术基础'],
+    languageRestrictions: [],
+    answer: 'Pod 是 Kubernetes 中最小的调度单位，通常封装一个或多个紧密关联的容器；Deployment 用于管理一组无状态 Pod 的副本数、滚动更新和回滚等，是声明式管理应用的核心对象；Service 提供一组 Pod 的稳定访问入口，通过标签选择器将请求负载均衡到后端 Pod 上，屏蔽 Pod IP 的变化。',
+    explanation: '理解这三个对象的关系是使用 Kubernetes 的基础，它们共同构建了弹性扩缩容和服务发现的能力。'
+  },
+  {
+    title: '常见 Web 安全攻击类型',
+    question: '简要说明 XSS 和 CSRF 攻击的基本原理以及常见防御措施。',
+    difficulty: 'medium',
+    difficultyScore: 0.6,
+    categoryId: 4,
+    tags: ['Web 安全', 'XSS', 'CSRF'],
+    estimatedTime: 7,
+    prerequisiteKnowledge: ['Web 基础', '浏览器安全模型'],
+    languageRestrictions: [],
+    answer: 'XSS 攻击通过向页面注入恶意脚本代码，在用户浏览页面时在其浏览器中执行，从而窃取 Cookie、伪造操作或加载恶意内容。防御措施包括对输出进行严格的转义、使用内容安全策略和避免信任用户输入。CSRF 攻击则利用浏览器自动附带 Cookie 的特点，引导用户在已登录的站点上发起恶意请求。防御措施包括使用 CSRF Token、检查 Referer 或 Origin 头以及对关键操作使用双重确认。',
+    explanation: 'Web 安全问题往往是工程实现中的薄弱环节，理解攻击原理有助于在设计接口和前端页面时主动加固安全策略。'
+  },
+  {
+    title: 'DNS 解析过程',
+    question: '简要说明浏览器访问一个域名时，DNS 解析大致会经历哪些步骤。',
+    difficulty: 'easy',
+    difficultyScore: 0.4,
+    categoryId: 4,
+    tags: ['计算机网络', 'DNS', '域名解析'],
+    estimatedTime: 6,
+    prerequisiteKnowledge: ['网络基础'],
+    languageRestrictions: [],
+    answer: '浏览器首先在本地缓存中查找域名对应的 IP，如果没有命中，则查询操作系统缓存；若仍未命中，会向本地域名服务器发送查询请求，本地域名服务器可能再次查本地缓存或转向根服务器。根服务器返回顶级域名服务器地址，随后递归地查询权威域名服务器，最终获得目标域名的 IP 地址。整个过程中各级服务器会缓存结果以提高后续查询效率。',
+    explanation: '理解 DNS 解析过程有助于分析访问延迟和 DNS 污染等问题，合理配置缓存时间和使用权威 DNS 可以改善访问体验。'
+  },
+  {
+    title: '日志与链路追踪在分布式系统中的作用',
+    question: '简要说明集中日志和分布式链路追踪对定位问题的帮助。',
+    difficulty: 'medium',
+    difficultyScore: 0.55,
+    categoryId: 4,
+    tags: ['可观测性', '日志', '链路追踪'],
+    estimatedTime: 6,
+    prerequisiteKnowledge: ['分布式系统', '运维监控'],
+    languageRestrictions: [],
+    answer: '集中日志系统可以将各个服务的日志统一采集、存储和检索，方便跨服务查询和统计，便于快速定位某个时间段或某个用户的异常行为。分布式链路追踪通过在请求链路上传播 TraceId 和 SpanId，将一次用户请求在多个服务间的调用关系串联起来，直观展示调用拓扑和延迟分布，有助于定位性能瓶颈和故障点。',
+    explanation: '在微服务架构下，仅依靠单个服务的本地日志很难快速排查问题，可观测性体系（日志、指标和链路）是保障稳定性的基础设施。'
+  },
+  {
+    title: 'REST API 设计的几个基本原则',
+    question: '简要说明设计 REST 风格 API 时常见的几条基本原则。',
+    difficulty: 'easy',
+    difficultyScore: 0.4,
+    categoryId: 4,
+    tags: ['REST', 'API 设计', '后端开发'],
+    estimatedTime: 5,
+    prerequisiteKnowledge: ['HTTP 基础'],
+    languageRestrictions: [],
+    answer: '常见原则包括：使用资源名而不是动作词设计路径，例如 /users 而不是 /getUsers；合理使用 HTTP 方法表达语义，如 GET 查询、POST 新增、PUT 替换、PATCH 部分更新、DELETE 删除；使用合适的状态码反馈结果；接口应保持无状态，所有必要信息通过请求参数或头部传递；对列表接口支持分页和过滤参数；通过版本号或向后兼容策略管理接口演进。',
+    explanation: '遵循基本 REST 原则可以提高接口的一致性和可理解性，降低前后端沟通成本，也便于后续维护和扩展。'
+  },
+  {
+    title: '软件性能优化的常见方向',
+    question: '简要列举在优化一个后端系统性能时常见的几个方向。',
+    difficulty: 'medium',
+    difficultyScore: 0.55,
+    categoryId: 4,
+    tags: ['性能优化', '后端开发', '系统架构'],
+    estimatedTime: 7,
+    prerequisiteKnowledge: ['系统分析', '性能测试'],
+    languageRestrictions: [],
+    answer: '常见优化方向包括：减少不必要的网络往返和序列化开销，例如接口合并和使用高效协议；优化数据库访问，如合理建索引、使用批量操作和读写分离；引入缓存降低热点数据访问延迟；通过异步化和消息队列提高吞吐；优化算法和数据结构降低时间复杂度；通过水平扩展和负载均衡提高系统整体处理能力。同时需要通过压测和监控找到真正的瓶颈点。',
+    explanation: '性能优化应以数据为依据，避免盲目微调代码细节，优先处理对整体性能影响最大的瓶颈。'
+  },
+  {
+    title: '线程池的核心参数含义',
+    question: '简要说明线程池中核心线程数、最大线程数和队列容量等参数的含义及作用。',
+    difficulty: 'medium',
+    difficultyScore: 0.6,
+    categoryId: 5,
+    tags: ['并发编程', '线程池', 'Java'],
+    estimatedTime: 7,
+    prerequisiteKnowledge: ['多线程基础'],
+    languageRestrictions: ['Java'],
+    answer: '核心线程数是线程池长期维持的基本线程数量，当有新任务到达且当前线程数小于核心线程数时会创建新线程；最大线程数是线程池允许创建的线程上限，当队列已满且线程数小于最大值时，会继续创建新线程以应对高峰；队列容量用于缓存等待执行的任务过多时的排队长度。合理配置这些参数可以在吞吐量和资源占用之间取得平衡，避免频繁创建销毁线程或任务积压。',
+    explanation: '线程池参数配置需要结合机器核心数、任务类型（CPU 密集或 IO 密集）以及响应时间要求综合考虑，常需通过压测进行调优。'
+  },
+  {
+    title: '数据库连接池的作用',
+    question: '简要说明为什么需要数据库连接池，它解决了什么性能问题。',
+    difficulty: 'easy',
+    difficultyScore: 0.4,
+    categoryId: 4,
+    tags: ['数据库', '连接池', '性能优化'],
+    estimatedTime: 5,
+    prerequisiteKnowledge: ['数据库访问基础'],
+    languageRestrictions: [],
+    answer: '数据库连接的建立和释放是一个相对昂贵的操作，如果每次请求都新建连接，会产生大量资源开销和延迟。连接池通过预先创建并复用一定数量的数据库连接，避免频繁创建销毁，显著降低延迟并提高吞吐。同时可以通过最大连接数限制保护数据库不被过载。',
+    explanation: '几乎所有生产环境的应用都会使用数据库连接池，合理配置池大小和超时参数是系统性能调优的重要一环。'
+  },
+  {
+    title: '索引失效的常见原因',
+    question: '简要列举几个可能导致数据库查询索引失效的原因。',
+    difficulty: 'medium',
+    difficultyScore: 0.55,
+    categoryId: 4,
+    tags: ['数据库', '索引', '性能优化'],
+    estimatedTime: 6,
+    prerequisiteKnowledge: ['索引原理', 'SQL 编写'],
+    languageRestrictions: [],
+    answer: '常见原因包括：在索引列上使用函数或表达式导致无法使用索引；在组合索引上没有按照最左前缀规则使用条件；对字符串列进行前后模糊匹配如 %key% 导致无法利用普通索引；类型隐式转换使索引列被当作函数处理；统计信息不准确导致优化器选择了全表扫描。',
+    explanation: '在编写 SQL 时应注意索引友好性，必要时可以通过执行计划分析确认查询是否正确走索引。'
+  },
+  {
+    title: '一致性哈希的基本思想',
+    question: '简要说明一致性哈希在分布式缓存或存储中的作用和基本思想。',
+    difficulty: 'medium',
+    difficultyScore: 0.6,
+    categoryId: 4,
+    tags: ['分布式系统', '一致性哈希', '负载均衡'],
+    estimatedTime: 7,
+    prerequisiteKnowledge: ['哈希', '分布式缓存'],
+    languageRestrictions: [],
+    answer: '一致性哈希通过将节点和数据映射到一个逻辑环上，数据沿顺时针方向存储到第一个大于等于其哈希值的节点上。当节点增加或减少时，只需要重新分配环上相邻区间的数据，从而将迁移数据量控制在总量的较小比例。为了避免数据倾斜，会为每个物理节点创建多个虚拟节点分布在环上。',
+    explanation: '一致性哈希常用于分布式缓存、存储和负载均衡场景，可以在节点变动频繁的情况下保持较好的数据分布和稳定性。'
+  },
+  {
+    title: '水平拆分与垂直拆分',
+    question: '简要说明数据库或服务做水平拆分和垂直拆分的区别。',
+    difficulty: 'easy',
+    difficultyScore: 0.4,
+    categoryId: 4,
+    tags: ['系统架构', '拆分策略', '扩展性'],
+    estimatedTime: 5,
+    prerequisiteKnowledge: ['系统设计基础'],
+    languageRestrictions: [],
+    answer: '垂直拆分是按功能或模块将数据库表或服务拆分到不同的节点或应用中，例如将用户、订单和日志拆成不同的库或服务；水平拆分是按数据范围或规则将同一张表的数据切分到多个节点上，例如按用户 ID 取模分片。垂直拆分主要解决单点压力过大和职责边界问题，水平拆分主要解决单表数据量过大和吞吐不足的问题。',
+    explanation: '实际系统演化中往往先做垂直拆分，再在热点数据上进行水平拆分，逐步提升系统的可扩展性。'
+  },
+  {
+    title: '分布式事务的基本挑战',
+    question: '简要说明分布式事务相比本地事务额外增加了哪些复杂性。',
+    difficulty: 'hard',
+    difficultyScore: 0.75,
+    categoryId: 4,
+    tags: ['分布式系统', '事务', '一致性'],
+    estimatedTime: 8,
+    prerequisiteKnowledge: ['事务原理', '网络故障模型'],
+    languageRestrictions: [],
+    answer: '分布式事务涉及多个服务或数据源，在网络不可靠、节点可能故障的环境下，要同时保证原子性和一致性非常困难。额外复杂性包括：需要协调者组件来管理多方提交和回滚；需要处理网络超时、部分节点失败和重复请求；需要解决锁粒度和长事务对性能的影响。传统的两阶段提交协议在可靠性和性能上存在局限，因此实际工程中常通过本地事务加补偿、可靠消息、TCC 等模式来折衷处理。',
+    explanation: '理解分布式事务的本质是在不可靠网络环境下维护跨节点状态的一致性，有助于在系统设计时避免过度依赖强一致，而是采用最终一致性和幂等设计。'
+  },
+  {
+    title: '二叉搜索树与平衡二叉树',
+    question: '简要说明普通二叉搜索树与平衡二叉树（如 AVL、红黑树）的差异，以及为什么需要“平衡”。',
+    difficulty: 'medium',
+    difficultyScore: 0.6,
+    categoryId: 6,
+    tags: ['数据结构', '二叉树', '平衡树'],
+    estimatedTime: 6,
+    prerequisiteKnowledge: ['二叉搜索树', '递归'],
+    languageRestrictions: [],
+    answer: '二叉搜索树要求左子树所有节点小于根节点，右子树所有节点大于根节点，但不保证树的高度接近对数级，如果插入数据接近有序，树会退化成链表，查找复杂度变为 O(n)。平衡二叉树通过在插入和删除时进行旋转调整，使树的高度保持在 O(log n) 范围内，从而保证查找、插入和删除等操作的时间复杂度稳定在 O(log n)。',
+    explanation: '“平衡”的目标是控制树的高度，避免极端数据分布导致性能退化，红黑树等平衡树在标准库和数据库索引实现中应用广泛。'
+  },
+  {
+    title: '编译型语言与解释型语言',
+    question: '简要比较编译型语言和解释型语言在执行方式和典型代表上的差异。',
+    difficulty: 'easy',
+    difficultyScore: 0.4,
+    categoryId: 5,
+    tags: ['编程语言', '编译', '解释'],
+    estimatedTime: 5,
+    prerequisiteKnowledge: ['程序执行流程基础'],
+    languageRestrictions: [],
+    answer: '编译型语言在执行前会将源代码整体编译为机器码或中间代码，再由操作系统或运行时直接执行，典型代表有 C/C++、Go 等；解释型语言通常在运行时由解释器逐行读取和执行源代码或字节码，典型代表有 Python、JavaScript 等。编译型语言启动前开销较大但运行效率高，解释型语言启动快、开发迭代方便但执行速度相对较慢。',
+    explanation: '现代语言往往采用“编译+解释”或 JIT 的混合方式，例如 Java 和 JavaScript 引擎，通过热点代码编译提升性能，同时保留一定的灵活性。'
+  },
+  {
+    title: '垃圾回收机制解决了什么问题',
+    question: '简要说明自动垃圾回收（GC）机制主要解决了哪些问题，同时带来了哪些新的开销。',
+    difficulty: 'medium',
+    difficultyScore: 0.55,
+    categoryId: 5,
+    tags: ['内存管理', '垃圾回收', '编程语言'],
+    estimatedTime: 6,
+    prerequisiteKnowledge: ['堆内存', '对象生命周期'],
+    languageRestrictions: [],
+    answer: '垃圾回收自动负责回收不再被引用的对象，解决了手动内存管理中常见的内存泄漏和悬空指针问题，简化了开发者的内存管理负担。但 GC 需要定期扫描对象图并回收内存，会引入额外的 CPU 开销和停顿时间，对延迟敏感的系统需要精心调优或搭配其他技术。',
+    explanation: '理解 GC 的基本原理和触发时机有助于在 Java、Go 等语言中编写更友好的代码，例如减少短命对象的创建或避免大对象频繁分配释放。'
+  },
+  {
+    title: '不可变对象的优势',
+    question: '简要说明在多线程或函数式编程中使用不可变对象的好处。',
+    difficulty: 'medium',
+    difficultyScore: 0.55,
+    categoryId: 5,
+    tags: ['并发编程', '不可变对象', '函数式编程'],
+    estimatedTime: 6,
+    prerequisiteKnowledge: ['对象引用', '线程安全'],
+    languageRestrictions: [],
+    answer: '不可变对象一旦创建，其内部状态在整个生命周期内不会发生变化，因此在多线程环境中可安全共享，无需加锁也不会出现竞态条件；在函数式编程中配合纯函数使用，可以简化推理和调试。代价是频繁创建新对象可能增加内存分配和 GC 压力，需要结合持久化数据结构或结构共享技术来优化。',
+    explanation: '合理使用不可变对象可以在很多场景下用空间换时间，换取更简单的并发模型和更可靠的程序行为。'
+  },
+  {
+    title: '事件驱动架构的核心思想',
+    question: '简要说明事件驱动架构（EDA）的核心思想和适用场景。',
+    difficulty: 'medium',
+    difficultyScore: 0.6,
+    categoryId: 4,
+    tags: ['系统架构', '事件驱动', '异步'],
+    estimatedTime: 7,
+    prerequisiteKnowledge: ['消息队列', '发布订阅'],
+    languageRestrictions: [],
+    answer: '事件驱动架构以“事件”作为系统中各组件交互的核心抽象，生产者在发生业务变化时发布事件，消费者订阅感兴趣的事件并做出相应处理，从而实现松耦合和异步处理。它适合业务流程复杂、需要对业务行为进行审计和扩展的场景，如订单状态变化触发库存扣减、积分发放和消息通知等。',
+    explanation: 'EDA 可以与消息队列和日志系统结合，实现可重放的事件流，但也带来了数据一致性、幂等性和事件顺序管理等新挑战。'
+  },
+  {
+    title: '领域驱动设计中的“实体”和“值对象”',
+    question: '简要说明在领域驱动设计（DDD）中实体（Entity）和值对象（Value Object）的区别。',
+    difficulty: 'hard',
+    difficultyScore: 0.7,
+    categoryId: 5,
+    tags: ['DDD', '实体', '值对象', '建模'],
+    estimatedTime: 8,
+    prerequisiteKnowledge: ['面向对象分析', '业务建模'],
+    languageRestrictions: [],
+    answer: '实体具有持久的唯一标识，其身份在生命周期中相对稳定，即使属性发生变化也被视为同一个对象，例如订单或用户。值对象没有独立身份，仅由其属性值定义，例如金额、地址或时间区间，相同值对象可以被重用且通常是不可变的。区分两者有助于更清晰地建模业务，简化持久化和对象比较逻辑。',
+    explanation: '合理使用值对象可以减少领域模型中的“贫血”数据结构，让大量与业务含义紧密相关的规则聚合在一起，提高可读性和可维护性。'
+  },
+  {
+    title: '代码重构的常见动机',
+    question: '简要说明在什么情况下应该考虑对现有代码进行重构，并举一两个常见信号。',
+    difficulty: 'easy',
+    difficultyScore: 0.4,
+    categoryId: 5,
+    tags: ['重构', '代码质量', '软件工程'],
+    estimatedTime: 5,
+    prerequisiteKnowledge: ['软件维护'],
+    languageRestrictions: [],
+    answer: '当修改一个需求需要在多个看似无关的地方反复修改、或者难以理解某个模块的行为、或者 bug 频繁出现在同一块代码时，往往意味着设计已不再适应当前需求，需要重构。常见信号包括：重复代码大量存在、方法或类过于臃肿、依赖关系混乱以及过多的条件分支等。',
+    explanation: '重构的目的是在不改变外部行为的前提下改善内部结构，通常应配合测试用例一起进行，以降低引入新缺陷的风险。'
+  },
+  {
+    title: '技术债务的概念',
+    question: '简要解释“技术债务”的含义，以及为什么需要在项目过程中刻意管理技术债。',
+    difficulty: 'easy',
+    difficultyScore: 0.4,
+    categoryId: 4,
+    tags: ['技术债务', '软件工程', '项目管理'],
+    estimatedTime: 5,
+    prerequisiteKnowledge: ['项目开发流程'],
+    languageRestrictions: [],
+    answer: '技术债务指在开发过程中为了快速交付而做出的不理想技术决策或临时性实现，这些选择就像借来的“债”，以后需要通过重构、优化或重写来“还”。如果长期忽视技术债，系统的复杂度和缺陷率会逐渐上升，新功能开发速度会越来越慢。刻意管理技术债可以在业务迭代和代码质量之间取得平衡。',
+    explanation: '良好的团队实践会在迭代计划中预留一定比例的时间用于偿还技术债，例如重构核心模块、补充测试或升级依赖。'
+  }
+]
+
+if (Array.isArray(mockData.questions)) {
+  const baseId = mockData.questions.reduce((maxId, q) => {
+    const id = Number(q.id) || 0
+    return id > maxId ? id : maxId
+  }, 0)
+
+  EXTRA_CS_SHORT_ANSWER_QUESTIONS.forEach((item, index) => {
+    const now = new Date().toISOString()
+    mockData.questions.push({
+      id: baseId + index + 1,
+      title: item.title,
+      question: item.question,
+      type: 'short_answer',
+      difficulty: item.difficulty || 'medium',
+      difficultyScore: item.difficultyScore != null ? item.difficultyScore : 0.5,
+      domainId: 1,
+      categoryId: item.categoryId || 6,
+      categoryPath: [item.categoryId || 6],
+      tags: item.tags || [],
+      estimatedTime: item.estimatedTime || 6,
+      source: 'manual',
+      metadata: {
+        prerequisiteKnowledge: item.prerequisiteKnowledge || [],
+        languageRestrictions: item.languageRestrictions || [],
+        yearRelevance: item.yearRelevance || 2024
+      },
+      answer: item.answer,
+      explanation: item.explanation,
+      stats: {
+        attempts: 0,
+        correctCount: 0,
+        averageScore: 0,
+        likeCount: 0,
+        viewCount: 0
+      },
+      createdAt: item.createdAt || now,
+      updatedAt: item.updatedAt || now
+    })
+  })
+}
+
 const server = http.createServer((req, res) => {
   const parsedUrl = url.parse(req.url, true)
   const method = req.method

@@ -89,10 +89,7 @@ export default defineConfig(({ mode }) => {
   // Load envs relative to the frontend directory regardless of CWD
   const env = loadEnv(mode, __dirname, '')
 
-  // 对于本地开发，始终使用localhost
-  const proxyTarget = 'http://localhost:3001'
-
-  console.log(`[VITE] API proxy target: ${proxyTarget}`)
+  console.log('[VITE] Configuration loaded, proxy target: http://localhost:3001')
 
   return {
     // Ensure Vite resolves paths relative to the frontend directory
@@ -124,37 +121,12 @@ export default defineConfig(({ mode }) => {
       },
       proxy: {
         '/api': {
-          target: proxyTarget,
+          target: 'http://localhost:3001',
           changeOrigin: true,
-          secure: false,
-          rewrite: (path) => {
-            const timestamp = new Date().toISOString()
-            console.log(`[${timestamp}] [PROXY] 转发: ${path} -> ${path}`)
-            return path
-          },
-          configure: (proxy, options) => {
-            const formatLog = (level, type, message) => {
-              const timestamp = new Date().toISOString()
-              return `[${timestamp}] [${level}] [${type}] ${message}`
-            }
-
-            proxy.on('error', (err, req, res) => {
-              console.error(formatLog('ERROR', 'PROXY', `${req.method} ${req.url} -> ${err.message}`))
-            })
-
-            proxy.on('proxyReq', (proxyReq, req, res) => {
-              console.log(formatLog('INFO', 'PROXY', `${req.method} ${req.url} -> ${options.target}${proxyReq.path}`))
-            })
-
-            proxy.on('proxyRes', (proxyRes, req, res) => {
-              const status = proxyRes.statusCode
-              const level = status >= 400 ? 'WARN' : 'INFO'
-              console.log(formatLog(level, 'PROXY', `${req.method} ${req.url} <- ${status}`))
-            })
-          }
+          secure: false
         },
         '/socket.io': {
-          target: proxyTarget,
+          target: 'http://localhost:3001',
           ws: true,
           changeOrigin: true,
           secure: false

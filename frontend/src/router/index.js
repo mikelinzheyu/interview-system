@@ -2,7 +2,7 @@
 import { useUserStore } from '@/stores/user'
 
 const routes = [
-  // 根路由：条件重定向 - 已认证用户重定向到 /dashboard，未认证用户访问营销页面
+  // 根路由：营销首页（登录状态下也可访问）
   {
     path: '/',
     name: 'Home',
@@ -481,13 +481,6 @@ router.beforeEach((to, from, next) => {
     hasToken: !!userStore.token
   })
 
-  // 已认证用户访问根路由 "/"，重定向到仪表板
-  if (to.path === '/' && isAuthenticated) {
-    console.log('[Router Guard] Authenticated user accessing /, redirecting to /dashboard')
-    next('/dashboard')
-    return
-  }
-
   // 检查认证要求
   if (to.meta.requiresAuth && !isAuthenticated) {
     console.warn(`[Router Guard] Access denied: ${to.path} requires authentication but user not authenticated`)
@@ -505,8 +498,8 @@ router.beforeEach((to, from, next) => {
 
   // 检查访客限制（登录/注册页面）
   if (to.meta.requiresGuest && isAuthenticated) {
-    console.log(`[Router Guard] Authenticated user accessing guest-only page ${to.path}, redirecting to /dashboard`)
-    next('/dashboard')
+    console.log(`[Router Guard] Authenticated user accessing guest-only page ${to.path}, redirecting to /`)
+    next('/')
     return
   }
 
@@ -515,4 +508,3 @@ router.beforeEach((to, from, next) => {
 })
 
 export default router
-

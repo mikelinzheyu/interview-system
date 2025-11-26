@@ -1,49 +1,46 @@
 import axios from 'axios'
 import { ElMessage } from 'element-plus'
 
-// 创建axios实例
+// 统一创建 axios 实例，支持通过 VITE_API_BASE_URL 配置后端地址
 const api = axios.create({
-  baseURL: '/api',
-  timeout: 90000, // 增加 90 秒以支持 Dify 工作流长时间执行
+  baseURL: import.meta.env.VITE_API_BASE_URL || '/api',
+  timeout: 90000,
   headers: {
     'Content-Type': 'application/json'
   }
 })
 
-// 请求拦截器
+// 请求拦截器：自动附加 token
 api.interceptors.request.use(
-  config => {
+  (config) => {
     const token = localStorage.getItem('token')
     if (token) {
       config.headers.Authorization = `Bearer ${token}`
     }
     return config
   },
-  error => {
-    return Promise.reject(error)
-  }
+  (error) => Promise.reject(error)
 )
 
-// 响应拦截器
+// 响应拦截器：统一处理 code !== 200 的业务错误和 HTTP 错误
 api.interceptors.response.use(
-  response => {
+  (response) => {
     const res = response.data
 
-    // 如果返回的状态码不是 200，则认为是错误
-    if (res.code !== 200) {
-      ElMessage.error(res.message || '请求失败')
-      return Promise.reject(new Error(res.message || '请求失败'))
+    if (res && typeof res.code !== 'undefined' && res.code !== 200) {
+      const msg = res.message || '请求失败，请稍后重试'
+      ElMessage.error(msg)
+      return Promise.reject(new Error(msg))
     }
 
     return res
   },
-  error => {
+  (error) => {
     const status = error?.response?.status
     const backendMessage = error?.response?.data?.message
-    const message = backendMessage || error?.message || '网络错误'
+    const message = backendMessage || error?.message || '请求失败，请稍后重试'
     const url = error?.response?.config?.url || error?.config?.url
 
-    // 避免出现难以理解的错误信息，同时带上 URL 方便排查
     console.error('API Error:', { status, message, url })
 
     if (error.response) {
@@ -51,32 +48,32 @@ api.interceptors.response.use(
 
       switch (status) {
         case 401:
-          ElMessage.error('未授权，请重新登录')
+          ElMessage.error('登录状态已过期，请重新登录')
           localStorage.removeItem('token')
           window.location.href = '/login'
           break
         case 403:
-          ElMessage.error('权限不足')
+          ElMessage.error('没有权限访问该资源')
           break
         case 404:
           ElMessage.error('请求的资源不存在')
           break
         case 500:
-          ElMessage.error('服务器内部错误')
+          ElMessage.error('服务器内部错误，请稍后重试')
           break
         default: {
-          // 特例：/users/me 返回 400（例如 "Invalid user ID"）时，只记录日志，不打断用户体验
+          // 对 /users/me 的 400 错误不弹出提示（通常是未登录状态）
           if (status === 400 && typeof url === 'string' && url.includes('/users/me')) {
             console.warn('[API] Suppressing toast for /users/me 400 error:', message)
           } else {
-            ElMessage.error(data?.message || message || '网络错误')
+            ElMessage.error(data?.message || message || '请求失败，请稍后重试')
           }
         }
       }
     } else if (error.request) {
-      ElMessage.error('网络连接失败')
+      ElMessage.error('网络异常，请检查您的网络连接')
     } else {
-      ElMessage.error('请求配置错误')
+      ElMessage.error('请求出错，请稍后重试')
     }
 
     return Promise.reject(error)

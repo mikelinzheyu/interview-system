@@ -7,6 +7,7 @@ const http = require('http')
 const express = require('express')
 const bodyParser = require('body-parser')
 const cors = require('cors')
+const path = require('path')
 const { initializeWebSocket } = require('./websocket-server')
 const apiRouter = require('./routes/api')
 const { initializeControllers } = require('./services/dataService')
@@ -42,11 +43,29 @@ function createBackendServer(PORT = 3001) {
   apiApp.use(bodyParser.json({ limit: '50mb' }))
   apiApp.use(bodyParser.urlencoded({ limit: '50mb', extended: true }))
 
+  // 静态提供用户上传的资源（头像等）
+  apiApp.use('/api/uploads', express.static(path.join(__dirname, 'uploads')))
+
   // 初始化数据和控制器
   console.log('[Init] 正在初始化数据层...')
   initializeControllers()
 
   // 注册路由
+  apiApp.get('/', (req, res) => {
+    res.json({
+      code: 200,
+      message: 'AI Interview System API Server',
+      version: '1.0.0',
+      status: 'running',
+      timestamp: new Date().toISOString(),
+      endpoints: {
+        health: '/health',
+        api: '/api',
+        documentation: '/api/health'
+      }
+    })
+  })
+
   apiApp.get('/health', (req, res) => {
     res.json({
       code: 200,

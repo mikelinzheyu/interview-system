@@ -5,7 +5,11 @@
       "title": "打造稳定的 WebSocket 聊天室：如何处理断线重连与历史消息同步？",
       "difficulty": "中等",
       "category": "实时通信",
-      "tags": ["Node.js", "WebSocket", "Redis"],
+      "tags": [
+        "Node.js",
+        "WebSocket",
+        "Redis"
+      ],
       "author": "Nova",
       "authorId": 9,
       "publishedAt": "2025-11-05 14:20",
@@ -40,7 +44,11 @@
       "title": "面向增长团队的 A/B 测试埋点题库",
       "difficulty": "简单",
       "category": "数据分析",
-      "tags": ["A/B 测试", "埋点", "数据治理"],
+      "tags": [
+        "A/B 测试",
+        "埋点",
+        "数据治理"
+      ],
       "author": "Mia",
       "authorId": 5,
       "publishedAt": "2025-10-29 10:05",
@@ -70,7 +78,11 @@
       "title": "构建可维护的 Vue3 题库系统：从路由到权限的全链路设计",
       "difficulty": "困难",
       "category": "前端工程",
-      "tags": ["Vue3", "Pinia", "Vite"],
+      "tags": [
+        "Vue3",
+        "Pinia",
+        "Vite"
+      ],
       "author": "Lina",
       "authorId": 3,
       "publishedAt": "2025-11-10 09:00",
@@ -99,6 +111,1810 @@
           ]
         }
       ]
+    },
+    {
+      "id": 101,
+      "title": "解释Big-O记号在算法分析中的意义",
+      "difficulty": "简单",
+      "category": "算法与数据结构",
+      "tags": [
+        "算法",
+        "复杂度分析"
+      ],
+      "author": "系统",
+      "authorId": 0,
+      "publishedAt": "2025-01-01 00:00",
+      "views": 100,
+      "content": "Big-O记号用于描述算法时间或空间复杂度的上界",
+      "isFavorited": false,
+      "favorites": 0,
+      "discussions": []
+    },
+    {
+      "id": 102,
+      "title": "二叉搜索树的插入和删除操作",
+      "difficulty": "中等",
+      "category": "数据结构",
+      "tags": [
+        "二叉树",
+        "搜索树"
+      ],
+      "author": "系统",
+      "authorId": 0,
+      "publishedAt": "2025-01-01 00:00",
+      "views": 100,
+      "content": "二叉搜索树的关键性质是：左子树 < 根 < 右子树",
+      "isFavorited": false,
+      "favorites": 0,
+      "discussions": []
+    },
+    {
+      "id": 103,
+      "title": "堆及堆排序算法",
+      "difficulty": "中等",
+      "category": "数据结构",
+      "tags": [
+        "堆",
+        "排序"
+      ],
+      "author": "系统",
+      "authorId": 0,
+      "publishedAt": "2025-01-01 00:00",
+      "views": 100,
+      "content": "最大堆和最小堆在优先队列和排序中的应用",
+      "isFavorited": false,
+      "favorites": 0,
+      "discussions": []
+    },
+    {
+      "id": 104,
+      "title": "哈希表冲突解决策略",
+      "difficulty": "中等",
+      "category": "数据结构",
+      "tags": [
+        "哈希表"
+      ],
+      "author": "系统",
+      "authorId": 0,
+      "publishedAt": "2025-01-01 00:00",
+      "views": 100,
+      "content": "链表法、开放地址法、双哈希等冲突解决方案",
+      "isFavorited": false,
+      "favorites": 0,
+      "discussions": []
+    },
+    {
+      "id": 105,
+      "title": "图的DFS和BFS遍历",
+      "difficulty": "中等",
+      "category": "图论",
+      "tags": [
+        "图",
+        "搜索"
+      ],
+      "author": "系统",
+      "authorId": 0,
+      "publishedAt": "2025-01-01 00:00",
+      "views": 100,
+      "content": "深度优先搜索使用栈，广度优先搜索使用队列",
+      "isFavorited": false,
+      "favorites": 0,
+      "discussions": []
+    },
+    {
+      "id": 106,
+      "title": "链表环检测算法",
+      "difficulty": "中等",
+      "category": "链表",
+      "tags": [
+        "链表",
+        "双指针"
+      ],
+      "author": "系统",
+      "authorId": 0,
+      "publishedAt": "2025-01-01 00:00",
+      "views": 100,
+      "content": "Floyd环检测算法的原理和实现",
+      "isFavorited": false,
+      "favorites": 0,
+      "discussions": []
+    },
+    {
+      "id": 107,
+      "title": "动态规划的核心思想",
+      "difficulty": "中等",
+      "category": "算法",
+      "tags": [
+        "动态规划"
+      ],
+      "author": "系统",
+      "authorId": 0,
+      "publishedAt": "2025-01-01 00:00",
+      "views": 100,
+      "content": "最优子结构、无后效性、重叠子问题",
+      "isFavorited": false,
+      "favorites": 0,
+      "discussions": []
+    },
+    {
+      "id": 108,
+      "title": "贪心算法的适用场景",
+      "difficulty": "简单",
+      "category": "算法",
+      "tags": [
+        "贪心算法"
+      ],
+      "author": "系统",
+      "authorId": 0,
+      "publishedAt": "2025-01-01 00:00",
+      "views": 100,
+      "content": "贪心选择性质和最优子结构的要求",
+      "isFavorited": false,
+      "favorites": 0,
+      "discussions": []
+    },
+    {
+      "id": 109,
+      "title": "快速排序的分析和优化",
+      "difficulty": "中等",
+      "category": "排序算法",
+      "tags": [
+        "排序",
+        "分治"
+      ],
+      "author": "系统",
+      "authorId": 0,
+      "publishedAt": "2025-01-01 00:00",
+      "views": 100,
+      "content": "平均时间复杂度O(n log n)，最坏情况O(n²)",
+      "isFavorited": false,
+      "favorites": 0,
+      "discussions": []
+    },
+    {
+      "id": 110,
+      "title": "进程vs线程的区别",
+      "difficulty": "中等",
+      "category": "操作系统",
+      "tags": [
+        "进程",
+        "线程",
+        "并发"
+      ],
+      "author": "系统",
+      "authorId": 0,
+      "publishedAt": "2025-01-01 00:00",
+      "views": 100,
+      "content": "资源分配、上下文切换、通信机制的差异",
+      "isFavorited": false,
+      "favorites": 0,
+      "discussions": []
+    },
+    {
+      "id": 111,
+      "title": "死锁的四个必要条件和预防策略",
+      "difficulty": "难",
+      "category": "操作系统",
+      "tags": [
+        "死锁",
+        "并发"
+      ],
+      "author": "系统",
+      "authorId": 0,
+      "publishedAt": "2025-01-01 00:00",
+      "views": 100,
+      "content": "互斥、占有且等待、不可抢占、循环等待",
+      "isFavorited": false,
+      "favorites": 0,
+      "discussions": []
+    },
+    {
+      "id": 112,
+      "title": "分页和分段存储管理的比较",
+      "difficulty": "中等",
+      "category": "操作系统",
+      "tags": [
+        "内存管理"
+      ],
+      "author": "系统",
+      "authorId": 0,
+      "publishedAt": "2025-01-01 00:00",
+      "views": 100,
+      "content": "固定大小页面vs可变大小段的权衡",
+      "isFavorited": false,
+      "favorites": 0,
+      "discussions": []
+    },
+    {
+      "id": 113,
+      "title": "虚拟内存原理与缺页中断",
+      "difficulty": "中等",
+      "category": "操作系统",
+      "tags": [
+        "虚拟内存",
+        "分页"
+      ],
+      "author": "系统",
+      "authorId": 0,
+      "publishedAt": "2025-01-01 00:00",
+      "views": 100,
+      "content": "按需分页和缺页中断处理机制",
+      "isFavorited": false,
+      "favorites": 0,
+      "discussions": []
+    },
+    {
+      "id": 114,
+      "title": "OSI七层模型详解",
+      "difficulty": "简单",
+      "category": "计算机网络",
+      "tags": [
+        "网络",
+        "OSI"
+      ],
+      "author": "系统",
+      "authorId": 0,
+      "publishedAt": "2025-01-01 00:00",
+      "views": 100,
+      "content": "物理、数据链路、网络、传输、会话、表示、应用七层",
+      "isFavorited": false,
+      "favorites": 0,
+      "discussions": []
+    },
+    {
+      "id": 115,
+      "title": "TCP vs UDP协议比较",
+      "difficulty": "中等",
+      "category": "计算机网络",
+      "tags": [
+        "TCP",
+        "UDP",
+        "传输层"
+      ],
+      "author": "系统",
+      "authorId": 0,
+      "publishedAt": "2025-01-01 00:00",
+      "views": 100,
+      "content": "连接、可靠性、应用场景、协议头开销的差异",
+      "isFavorited": false,
+      "favorites": 0,
+      "discussions": []
+    },
+    {
+      "id": 116,
+      "title": "HTTPS工作原理和SSL/TLS",
+      "difficulty": "中等",
+      "category": "计算机网络",
+      "tags": [
+        "HTTPS",
+        "加密",
+        "安全"
+      ],
+      "author": "系统",
+      "authorId": 0,
+      "publishedAt": "2025-01-01 00:00",
+      "views": 100,
+      "content": "对称加密、非对称加密和证书验证的组合",
+      "isFavorited": false,
+      "favorites": 0,
+      "discussions": []
+    },
+    {
+      "id": 117,
+      "title": "IPv4和IPv6地址分配",
+      "difficulty": "简单",
+      "category": "计算机网络",
+      "tags": [
+        "IP",
+        "网络层"
+      ],
+      "author": "系统",
+      "authorId": 0,
+      "publishedAt": "2025-01-01 00:00",
+      "views": 100,
+      "content": "32位vs128位、CIDR、子网划分",
+      "isFavorited": false,
+      "favorites": 0,
+      "discussions": []
+    },
+    {
+      "id": 118,
+      "title": "DNS域名解析过程",
+      "difficulty": "中等",
+      "category": "计算机网络",
+      "tags": [
+        "DNS",
+        "应用层"
+      ],
+      "author": "系统",
+      "authorId": 0,
+      "publishedAt": "2025-01-01 00:00",
+      "views": 100,
+      "content": "递归查询、迭代查询和缓存机制",
+      "isFavorited": false,
+      "favorites": 0,
+      "discussions": []
+    },
+    {
+      "id": 119,
+      "title": "SQL基本语句和查询优化",
+      "difficulty": "简单",
+      "category": "数据库",
+      "tags": [
+        "数据库",
+        "SQL"
+      ],
+      "author": "系统",
+      "authorId": 0,
+      "publishedAt": "2025-01-01 00:00",
+      "views": 100,
+      "content": "SELECT、INSERT、UPDATE、DELETE和JOIN操作",
+      "isFavorited": false,
+      "favorites": 0,
+      "discussions": []
+    },
+    {
+      "id": 120,
+      "title": "数据库索引结构和查询优化",
+      "difficulty": "中等",
+      "category": "数据库",
+      "tags": [
+        "数据库",
+        "索引",
+        "B树"
+      ],
+      "author": "系统",
+      "authorId": 0,
+      "publishedAt": "2025-01-01 00:00",
+      "views": 100,
+      "content": "B树、B+树、哈希索引的优缺点",
+      "isFavorited": false,
+      "favorites": 0,
+      "discussions": []
+    },
+    {
+      "id": 121,
+      "title": "数据库范式和规范化设计",
+      "difficulty": "中等",
+      "category": "数据库",
+      "tags": [
+        "数据库",
+        "范式"
+      ],
+      "author": "系统",
+      "authorId": 0,
+      "publishedAt": "2025-01-01 00:00",
+      "views": 100,
+      "content": "第一、二、三范式和BCNF",
+      "isFavorited": false,
+      "favorites": 0,
+      "discussions": []
+    },
+    {
+      "id": 122,
+      "title": "ACID特性和事务隔离",
+      "difficulty": "难",
+      "category": "数据库",
+      "tags": [
+        "事务",
+        "ACID",
+        "隔离"
+      ],
+      "author": "系统",
+      "authorId": 0,
+      "publishedAt": "2025-01-01 00:00",
+      "views": 100,
+      "content": "原子性、一致性、隔离性、持久性的实现",
+      "isFavorited": false,
+      "favorites": 0,
+      "discussions": []
+    },
+    {
+      "id": 123,
+      "title": "编译型语言vs解释型语言",
+      "difficulty": "简单",
+      "category": "编程语言",
+      "tags": [
+        "编程语言",
+        "编译"
+      ],
+      "author": "系统",
+      "authorId": 0,
+      "publishedAt": "2025-01-01 00:00",
+      "views": 100,
+      "content": "执行过程、性能、可移植性的差异",
+      "isFavorited": false,
+      "favorites": 0,
+      "discussions": []
+    },
+    {
+      "id": 124,
+      "title": "面向对象的三大特性",
+      "difficulty": "简单",
+      "category": "编程范式",
+      "tags": [
+        "OOP",
+        "面向对象"
+      ],
+      "author": "系统",
+      "authorId": 0,
+      "publishedAt": "2025-01-01 00:00",
+      "views": 100,
+      "content": "封装、继承、多态及其应用",
+      "isFavorited": false,
+      "favorites": 0,
+      "discussions": []
+    },
+    {
+      "id": 125,
+      "title": "函数式编程的核心概念",
+      "difficulty": "中等",
+      "category": "编程范式",
+      "tags": [
+        "函数式编程",
+        "纯函数"
+      ],
+      "author": "系统",
+      "authorId": 0,
+      "publishedAt": "2025-01-01 00:00",
+      "views": 100,
+      "content": "纯函数、不可变性、高阶函数、柯里化",
+      "isFavorited": false,
+      "favorites": 0,
+      "discussions": []
+    },
+    {
+      "id": 126,
+      "title": "常见Web框架及其特点",
+      "difficulty": "简单",
+      "category": "Web开发",
+      "tags": [
+        "Web框架"
+      ],
+      "author": "系统",
+      "authorId": 0,
+      "publishedAt": "2025-01-01 00:00",
+      "views": 100,
+      "content": "Django、Flask、Spring、Express的对比",
+      "isFavorited": false,
+      "favorites": 0,
+      "discussions": []
+    },
+    {
+      "id": 127,
+      "title": "RESTful API设计原则",
+      "difficulty": "中等",
+      "category": "Web开发",
+      "tags": [
+        "REST",
+        "API"
+      ],
+      "author": "系统",
+      "authorId": 0,
+      "publishedAt": "2025-01-01 00:00",
+      "views": 100,
+      "content": "资源导向、HTTP方法、状态码、版本控制",
+      "isFavorited": false,
+      "favorites": 0,
+      "discussions": []
+    },
+    {
+      "id": 128,
+      "title": "前后端分离架构的优势",
+      "difficulty": "简单",
+      "category": "Web开发",
+      "tags": [
+        "前后端分离",
+        "架构"
+      ],
+      "author": "系统",
+      "authorId": 0,
+      "publishedAt": "2025-01-01 00:00",
+      "views": 100,
+      "content": "独立开发、异步迭代、技术栈灵活性",
+      "isFavorited": false,
+      "favorites": 0,
+      "discussions": []
+    },
+    {
+      "id": 129,
+      "title": "MVC架构模式详解",
+      "difficulty": "中等",
+      "category": "软件架构",
+      "tags": [
+        "MVC",
+        "架构模式"
+      ],
+      "author": "系统",
+      "authorId": 0,
+      "publishedAt": "2025-01-01 00:00",
+      "views": 100,
+      "content": "Model-View-Controller的职责分离",
+      "isFavorited": false,
+      "favorites": 0,
+      "discussions": []
+    },
+    {
+      "id": 130,
+      "title": "常见设计模式及应用",
+      "difficulty": "中等",
+      "category": "软件设计",
+      "tags": [
+        "设计模式"
+      ],
+      "author": "系统",
+      "authorId": 0,
+      "publishedAt": "2025-01-01 00:00",
+      "views": 100,
+      "content": "单例、工厂、观察者、装饰器、代理等模式",
+      "isFavorited": false,
+      "favorites": 0,
+      "discussions": []
+    },
+    {
+      "id": 131,
+      "title": "Git版本控制系统",
+      "difficulty": "简单",
+      "category": "开发工具",
+      "tags": [
+        "Git",
+        "版本控制"
+      ],
+      "author": "系统",
+      "authorId": 0,
+      "publishedAt": "2025-01-01 00:00",
+      "views": 100,
+      "content": "分布式版本控制、分支、合并、冲突解决",
+      "isFavorited": false,
+      "favorites": 0,
+      "discussions": []
+    },
+    {
+      "id": 132,
+      "title": "CI/CD流程和DevOps",
+      "difficulty": "中等",
+      "category": "DevOps",
+      "tags": [
+        "CI/CD",
+        "自动化"
+      ],
+      "author": "系统",
+      "authorId": 0,
+      "publishedAt": "2025-01-01 00:00",
+      "views": 100,
+      "content": "持续集成、持续交付、自动化测试和部署",
+      "isFavorited": false,
+      "favorites": 0,
+      "discussions": []
+    },
+    {
+      "id": 133,
+      "title": "Docker容器化技术",
+      "difficulty": "中等",
+      "category": "容器化",
+      "tags": [
+        "Docker",
+        "容器"
+      ],
+      "author": "系统",
+      "authorId": 0,
+      "publishedAt": "2025-01-01 00:00",
+      "views": 100,
+      "content": "镜像、容器、Dockerfile、容器编排",
+      "isFavorited": false,
+      "favorites": 0,
+      "discussions": []
+    },
+    {
+      "id": 134,
+      "title": "微服务架构的挑战",
+      "difficulty": "难",
+      "category": "分布式系统",
+      "tags": [
+        "微服务",
+        "分布式"
+      ],
+      "author": "系统",
+      "authorId": 0,
+      "publishedAt": "2025-01-01 00:00",
+      "views": 100,
+      "content": "服务拆分、通信、数据一致性、部署运维",
+      "isFavorited": false,
+      "favorites": 0,
+      "discussions": []
+    },
+    {
+      "id": 135,
+      "title": "API网关的作用",
+      "difficulty": "中等",
+      "category": "分布式系统",
+      "tags": [
+        "API网关",
+        "微服务"
+      ],
+      "author": "系统",
+      "authorId": 0,
+      "publishedAt": "2025-01-01 00:00",
+      "views": 100,
+      "content": "请求路由、认证授权、流量控制、日志监控",
+      "isFavorited": false,
+      "favorites": 0,
+      "discussions": []
+    },
+    {
+      "id": 136,
+      "title": "分布式事务一致性方案",
+      "difficulty": "难",
+      "category": "分布式系统",
+      "tags": [
+        "分布式事务",
+        "一致性"
+      ],
+      "author": "系统",
+      "authorId": 0,
+      "publishedAt": "2025-01-01 00:00",
+      "views": 100,
+      "content": "两阶段提交、Saga模式、最终一致性",
+      "isFavorited": false,
+      "favorites": 0,
+      "discussions": []
+    },
+    {
+      "id": 137,
+      "title": "缓存技术和淘汰策略",
+      "difficulty": "中等",
+      "category": "缓存技术",
+      "tags": [
+        "缓存",
+        "LRU"
+      ],
+      "author": "系统",
+      "authorId": 0,
+      "publishedAt": "2025-01-01 00:00",
+      "views": 100,
+      "content": "LRU、LFU、FIFO缓存淘汰策略",
+      "isFavorited": false,
+      "favorites": 0,
+      "discussions": []
+    },
+    {
+      "id": 138,
+      "title": "Redis数据结构和应用",
+      "difficulty": "中等",
+      "category": "数据库",
+      "tags": [
+        "Redis",
+        "缓存",
+        "内存数据库"
+      ],
+      "author": "系统",
+      "authorId": 0,
+      "publishedAt": "2025-01-01 00:00",
+      "views": 100,
+      "content": "String、List、Set、Hash、ZSet及其应用场景",
+      "isFavorited": false,
+      "favorites": 0,
+      "discussions": []
+    },
+    {
+      "id": 139,
+      "title": "消息队列系统",
+      "difficulty": "中等",
+      "category": "分布式系统",
+      "tags": [
+        "消息队列",
+        "异步"
+      ],
+      "author": "系统",
+      "authorId": 0,
+      "publishedAt": "2025-01-01 00:00",
+      "views": 100,
+      "content": "RabbitMQ、Kafka、RocketMQ的特性比较",
+      "isFavorited": false,
+      "favorites": 0,
+      "discussions": []
+    },
+    {
+      "id": 140,
+      "title": "CAP理论和分布式系统设计",
+      "difficulty": "难",
+      "category": "分布式系统",
+      "tags": [
+        "CAP理论"
+      ],
+      "author": "系统",
+      "authorId": 0,
+      "publishedAt": "2025-01-01 00:00",
+      "views": 100,
+      "content": "一致性、可用性、分区容错性的权衡",
+      "isFavorited": false,
+      "favorites": 0,
+      "discussions": []
+    },
+    {
+      "id": 141,
+      "title": "加密算法基础",
+      "difficulty": "中等",
+      "category": "信息安全",
+      "tags": [
+        "加密",
+        "对称",
+        "非对称"
+      ],
+      "author": "系统",
+      "authorId": 0,
+      "publishedAt": "2025-01-01 00:00",
+      "views": 100,
+      "content": "对称加密(AES)和非对称加密(RSA)的原理",
+      "isFavorited": false,
+      "favorites": 0,
+      "discussions": []
+    },
+    {
+      "id": 142,
+      "title": "SQL注入攻击及防护",
+      "difficulty": "中等",
+      "category": "信息安全",
+      "tags": [
+        "SQL注入",
+        "安全漏洞"
+      ],
+      "author": "系统",
+      "authorId": 0,
+      "publishedAt": "2025-01-01 00:00",
+      "views": 100,
+      "content": "参数化查询、输入验证、最小权限原则",
+      "isFavorited": false,
+      "favorites": 0,
+      "discussions": []
+    },
+    {
+      "id": 143,
+      "title": "XSS跨站脚本攻击",
+      "difficulty": "中等",
+      "category": "信息安全",
+      "tags": [
+        "XSS",
+        "Web安全"
+      ],
+      "author": "系统",
+      "authorId": 0,
+      "publishedAt": "2025-01-01 00:00",
+      "views": 100,
+      "content": "内容转义、CSP、HttpOnly标志的防护",
+      "isFavorited": false,
+      "favorites": 0,
+      "discussions": []
+    },
+    {
+      "id": 144,
+      "title": "CSRF跨站请求伪造",
+      "difficulty": "中等",
+      "category": "信息安全",
+      "tags": [
+        "CSRF",
+        "Web安全"
+      ],
+      "author": "系统",
+      "authorId": 0,
+      "publishedAt": "2025-01-01 00:00",
+      "views": 100,
+      "content": "CSRF token、SameSite、同源策略防护",
+      "isFavorited": false,
+      "favorites": 0,
+      "discussions": []
+    },
+    {
+      "id": 145,
+      "title": "软件测试分类和策略",
+      "difficulty": "简单",
+      "category": "软件测试",
+      "tags": [
+        "测试"
+      ],
+      "author": "系统",
+      "authorId": 0,
+      "publishedAt": "2025-01-01 00:00",
+      "views": 100,
+      "content": "单元、集成、系统、验收测试的区别",
+      "isFavorited": false,
+      "favorites": 0,
+      "discussions": []
+    },
+    {
+      "id": 146,
+      "title": "单元测试编写和覆盖率",
+      "difficulty": "中等",
+      "category": "软件测试",
+      "tags": [
+        "单元测试",
+        "质量"
+      ],
+      "author": "系统",
+      "authorId": 0,
+      "publishedAt": "2025-01-01 00:00",
+      "views": 100,
+      "content": "测试框架、Mock、断言、代码覆盖率",
+      "isFavorited": false,
+      "favorites": 0,
+      "discussions": []
+    },
+    {
+      "id": 147,
+      "title": "云计算模型和服务",
+      "difficulty": "简单",
+      "category": "云计算",
+      "tags": [
+        "云计算",
+        "IaaS",
+        "PaaS",
+        "SaaS"
+      ],
+      "author": "系统",
+      "authorId": 0,
+      "publishedAt": "2025-01-01 00:00",
+      "views": 100,
+      "content": "基础设施、平台、软件即服务的特点",
+      "isFavorited": false,
+      "favorites": 0,
+      "discussions": []
+    },
+    {
+      "id": 148,
+      "title": "人工智能基础概念",
+      "difficulty": "简单",
+      "category": "人工智能",
+      "tags": [
+        "AI",
+        "机器学习",
+        "深度学习"
+      ],
+      "author": "系统",
+      "authorId": 0,
+      "publishedAt": "2025-01-01 00:00",
+      "views": 100,
+      "content": "AI、ML、DL的层级关系和基本概念",
+      "isFavorited": false,
+      "favorites": 0,
+      "discussions": []
+    },
+    {
+      "id": 149,
+      "title": "神经网络原理和训练",
+      "difficulty": "难",
+      "category": "人工智能",
+      "tags": [
+        "神经网络",
+        "反向传播"
+      ],
+      "author": "系统",
+      "authorId": 0,
+      "publishedAt": "2025-01-01 00:00",
+      "views": 100,
+      "content": "前向传播、反向传播、梯度下降优化",
+      "isFavorited": false,
+      "favorites": 0,
+      "discussions": []
+    },
+    {
+      "id": 150,
+      "title": "计算机视觉任务和应用",
+      "difficulty": "中等",
+      "category": "人工智能",
+      "tags": [
+        "计算机视觉",
+        "CNN"
+      ],
+      "author": "系统",
+      "authorId": 0,
+      "publishedAt": "2025-01-01 00:00",
+      "views": 100,
+      "content": "图像分类、目标检测、语义分割等任务",
+      "isFavorited": false,
+      "favorites": 0,
+      "discussions": []
+    },
+    {
+      "id": 101,
+      "title": "解释Big-O记号在算法分析中的意义",
+      "difficulty": "简单",
+      "category": "算法与数据结构",
+      "tags": [
+        "算法",
+        "复杂度分析"
+      ],
+      "author": "系统",
+      "authorId": 0,
+      "publishedAt": "2025-01-01 00:00",
+      "views": 100,
+      "content": "Big-O记号用于描述算法时间或空间复杂度的上界",
+      "isFavorited": false,
+      "favorites": 0,
+      "discussions": []
+    },
+    {
+      "id": 102,
+      "title": "二叉搜索树的插入和删除操作",
+      "difficulty": "中等",
+      "category": "数据结构",
+      "tags": [
+        "二叉树",
+        "搜索树"
+      ],
+      "author": "系统",
+      "authorId": 0,
+      "publishedAt": "2025-01-01 00:00",
+      "views": 100,
+      "content": "二叉搜索树的关键性质是：左子树 < 根 < 右子树",
+      "isFavorited": false,
+      "favorites": 0,
+      "discussions": []
+    },
+    {
+      "id": 103,
+      "title": "堆及堆排序算法",
+      "difficulty": "中等",
+      "category": "数据结构",
+      "tags": [
+        "堆",
+        "排序"
+      ],
+      "author": "系统",
+      "authorId": 0,
+      "publishedAt": "2025-01-01 00:00",
+      "views": 100,
+      "content": "最大堆和最小堆在优先队列和排序中的应用",
+      "isFavorited": false,
+      "favorites": 0,
+      "discussions": []
+    },
+    {
+      "id": 104,
+      "title": "哈希表冲突解决策略",
+      "difficulty": "中等",
+      "category": "数据结构",
+      "tags": [
+        "哈希表"
+      ],
+      "author": "系统",
+      "authorId": 0,
+      "publishedAt": "2025-01-01 00:00",
+      "views": 100,
+      "content": "链表法、开放地址法、双哈希等冲突解决方案",
+      "isFavorited": false,
+      "favorites": 0,
+      "discussions": []
+    },
+    {
+      "id": 105,
+      "title": "图的DFS和BFS遍历",
+      "difficulty": "中等",
+      "category": "图论",
+      "tags": [
+        "图",
+        "搜索"
+      ],
+      "author": "系统",
+      "authorId": 0,
+      "publishedAt": "2025-01-01 00:00",
+      "views": 100,
+      "content": "深度优先搜索使用栈，广度优先搜索使用队列",
+      "isFavorited": false,
+      "favorites": 0,
+      "discussions": []
+    },
+    {
+      "id": 106,
+      "title": "链表环检测算法",
+      "difficulty": "中等",
+      "category": "链表",
+      "tags": [
+        "链表",
+        "双指针"
+      ],
+      "author": "系统",
+      "authorId": 0,
+      "publishedAt": "2025-01-01 00:00",
+      "views": 100,
+      "content": "Floyd环检测算法的原理和实现",
+      "isFavorited": false,
+      "favorites": 0,
+      "discussions": []
+    },
+    {
+      "id": 107,
+      "title": "动态规划的核心思想",
+      "difficulty": "中等",
+      "category": "算法",
+      "tags": [
+        "动态规划"
+      ],
+      "author": "系统",
+      "authorId": 0,
+      "publishedAt": "2025-01-01 00:00",
+      "views": 100,
+      "content": "最优子结构、无后效性、重叠子问题",
+      "isFavorited": false,
+      "favorites": 0,
+      "discussions": []
+    },
+    {
+      "id": 108,
+      "title": "贪心算法的适用场景",
+      "difficulty": "简单",
+      "category": "算法",
+      "tags": [
+        "贪心算法"
+      ],
+      "author": "系统",
+      "authorId": 0,
+      "publishedAt": "2025-01-01 00:00",
+      "views": 100,
+      "content": "贪心选择性质和最优子结构的要求",
+      "isFavorited": false,
+      "favorites": 0,
+      "discussions": []
+    },
+    {
+      "id": 109,
+      "title": "快速排序的分析和优化",
+      "difficulty": "中等",
+      "category": "排序算法",
+      "tags": [
+        "排序",
+        "分治"
+      ],
+      "author": "系统",
+      "authorId": 0,
+      "publishedAt": "2025-01-01 00:00",
+      "views": 100,
+      "content": "平均时间复杂度O(n log n)，最坏情况O(n²)",
+      "isFavorited": false,
+      "favorites": 0,
+      "discussions": []
+    },
+    {
+      "id": 110,
+      "title": "进程vs线程的区别",
+      "difficulty": "中等",
+      "category": "操作系统",
+      "tags": [
+        "进程",
+        "线程",
+        "并发"
+      ],
+      "author": "系统",
+      "authorId": 0,
+      "publishedAt": "2025-01-01 00:00",
+      "views": 100,
+      "content": "资源分配、上下文切换、通信机制的差异",
+      "isFavorited": false,
+      "favorites": 0,
+      "discussions": []
+    },
+    {
+      "id": 111,
+      "title": "死锁的四个必要条件和预防策略",
+      "difficulty": "难",
+      "category": "操作系统",
+      "tags": [
+        "死锁",
+        "并发"
+      ],
+      "author": "系统",
+      "authorId": 0,
+      "publishedAt": "2025-01-01 00:00",
+      "views": 100,
+      "content": "互斥、占有且等待、不可抢占、循环等待",
+      "isFavorited": false,
+      "favorites": 0,
+      "discussions": []
+    },
+    {
+      "id": 112,
+      "title": "分页和分段存储管理的比较",
+      "difficulty": "中等",
+      "category": "操作系统",
+      "tags": [
+        "内存管理"
+      ],
+      "author": "系统",
+      "authorId": 0,
+      "publishedAt": "2025-01-01 00:00",
+      "views": 100,
+      "content": "固定大小页面vs可变大小段的权衡",
+      "isFavorited": false,
+      "favorites": 0,
+      "discussions": []
+    },
+    {
+      "id": 113,
+      "title": "虚拟内存原理与缺页中断",
+      "difficulty": "中等",
+      "category": "操作系统",
+      "tags": [
+        "虚拟内存",
+        "分页"
+      ],
+      "author": "系统",
+      "authorId": 0,
+      "publishedAt": "2025-01-01 00:00",
+      "views": 100,
+      "content": "按需分页和缺页中断处理机制",
+      "isFavorited": false,
+      "favorites": 0,
+      "discussions": []
+    },
+    {
+      "id": 114,
+      "title": "OSI七层模型详解",
+      "difficulty": "简单",
+      "category": "计算机网络",
+      "tags": [
+        "网络",
+        "OSI"
+      ],
+      "author": "系统",
+      "authorId": 0,
+      "publishedAt": "2025-01-01 00:00",
+      "views": 100,
+      "content": "物理、数据链路、网络、传输、会话、表示、应用七层",
+      "isFavorited": false,
+      "favorites": 0,
+      "discussions": []
+    },
+    {
+      "id": 115,
+      "title": "TCP vs UDP协议比较",
+      "difficulty": "中等",
+      "category": "计算机网络",
+      "tags": [
+        "TCP",
+        "UDP",
+        "传输层"
+      ],
+      "author": "系统",
+      "authorId": 0,
+      "publishedAt": "2025-01-01 00:00",
+      "views": 100,
+      "content": "连接、可靠性、应用场景、协议头开销的差异",
+      "isFavorited": false,
+      "favorites": 0,
+      "discussions": []
+    },
+    {
+      "id": 116,
+      "title": "HTTPS工作原理和SSL/TLS",
+      "difficulty": "中等",
+      "category": "计算机网络",
+      "tags": [
+        "HTTPS",
+        "加密",
+        "安全"
+      ],
+      "author": "系统",
+      "authorId": 0,
+      "publishedAt": "2025-01-01 00:00",
+      "views": 100,
+      "content": "对称加密、非对称加密和证书验证的组合",
+      "isFavorited": false,
+      "favorites": 0,
+      "discussions": []
+    },
+    {
+      "id": 117,
+      "title": "IPv4和IPv6地址分配",
+      "difficulty": "简单",
+      "category": "计算机网络",
+      "tags": [
+        "IP",
+        "网络层"
+      ],
+      "author": "系统",
+      "authorId": 0,
+      "publishedAt": "2025-01-01 00:00",
+      "views": 100,
+      "content": "32位vs128位、CIDR、子网划分",
+      "isFavorited": false,
+      "favorites": 0,
+      "discussions": []
+    },
+    {
+      "id": 118,
+      "title": "DNS域名解析过程",
+      "difficulty": "中等",
+      "category": "计算机网络",
+      "tags": [
+        "DNS",
+        "应用层"
+      ],
+      "author": "系统",
+      "authorId": 0,
+      "publishedAt": "2025-01-01 00:00",
+      "views": 100,
+      "content": "递归查询、迭代查询和缓存机制",
+      "isFavorited": false,
+      "favorites": 0,
+      "discussions": []
+    },
+    {
+      "id": 119,
+      "title": "SQL基本语句和查询优化",
+      "difficulty": "简单",
+      "category": "数据库",
+      "tags": [
+        "数据库",
+        "SQL"
+      ],
+      "author": "系统",
+      "authorId": 0,
+      "publishedAt": "2025-01-01 00:00",
+      "views": 100,
+      "content": "SELECT、INSERT、UPDATE、DELETE和JOIN操作",
+      "isFavorited": false,
+      "favorites": 0,
+      "discussions": []
+    },
+    {
+      "id": 120,
+      "title": "数据库索引结构和查询优化",
+      "difficulty": "中等",
+      "category": "数据库",
+      "tags": [
+        "数据库",
+        "索引",
+        "B树"
+      ],
+      "author": "系统",
+      "authorId": 0,
+      "publishedAt": "2025-01-01 00:00",
+      "views": 100,
+      "content": "B树、B+树、哈希索引的优缺点",
+      "isFavorited": false,
+      "favorites": 0,
+      "discussions": []
+    },
+    {
+      "id": 121,
+      "title": "数据库范式和规范化设计",
+      "difficulty": "中等",
+      "category": "数据库",
+      "tags": [
+        "数据库",
+        "范式"
+      ],
+      "author": "系统",
+      "authorId": 0,
+      "publishedAt": "2025-01-01 00:00",
+      "views": 100,
+      "content": "第一、二、三范式和BCNF",
+      "isFavorited": false,
+      "favorites": 0,
+      "discussions": []
+    },
+    {
+      "id": 122,
+      "title": "ACID特性和事务隔离",
+      "difficulty": "难",
+      "category": "数据库",
+      "tags": [
+        "事务",
+        "ACID",
+        "隔离"
+      ],
+      "author": "系统",
+      "authorId": 0,
+      "publishedAt": "2025-01-01 00:00",
+      "views": 100,
+      "content": "原子性、一致性、隔离性、持久性的实现",
+      "isFavorited": false,
+      "favorites": 0,
+      "discussions": []
+    },
+    {
+      "id": 123,
+      "title": "编译型语言vs解释型语言",
+      "difficulty": "简单",
+      "category": "编程语言",
+      "tags": [
+        "编程语言",
+        "编译"
+      ],
+      "author": "系统",
+      "authorId": 0,
+      "publishedAt": "2025-01-01 00:00",
+      "views": 100,
+      "content": "执行过程、性能、可移植性的差异",
+      "isFavorited": false,
+      "favorites": 0,
+      "discussions": []
+    },
+    {
+      "id": 124,
+      "title": "面向对象的三大特性",
+      "difficulty": "简单",
+      "category": "编程范式",
+      "tags": [
+        "OOP",
+        "面向对象"
+      ],
+      "author": "系统",
+      "authorId": 0,
+      "publishedAt": "2025-01-01 00:00",
+      "views": 100,
+      "content": "封装、继承、多态及其应用",
+      "isFavorited": false,
+      "favorites": 0,
+      "discussions": []
+    },
+    {
+      "id": 125,
+      "title": "函数式编程的核心概念",
+      "difficulty": "中等",
+      "category": "编程范式",
+      "tags": [
+        "函数式编程",
+        "纯函数"
+      ],
+      "author": "系统",
+      "authorId": 0,
+      "publishedAt": "2025-01-01 00:00",
+      "views": 100,
+      "content": "纯函数、不可变性、高阶函数、柯里化",
+      "isFavorited": false,
+      "favorites": 0,
+      "discussions": []
+    },
+    {
+      "id": 126,
+      "title": "常见Web框架及其特点",
+      "difficulty": "简单",
+      "category": "Web开发",
+      "tags": [
+        "Web框架"
+      ],
+      "author": "系统",
+      "authorId": 0,
+      "publishedAt": "2025-01-01 00:00",
+      "views": 100,
+      "content": "Django、Flask、Spring、Express的对比",
+      "isFavorited": false,
+      "favorites": 0,
+      "discussions": []
+    },
+    {
+      "id": 127,
+      "title": "RESTful API设计原则",
+      "difficulty": "中等",
+      "category": "Web开发",
+      "tags": [
+        "REST",
+        "API"
+      ],
+      "author": "系统",
+      "authorId": 0,
+      "publishedAt": "2025-01-01 00:00",
+      "views": 100,
+      "content": "资源导向、HTTP方法、状态码、版本控制",
+      "isFavorited": false,
+      "favorites": 0,
+      "discussions": []
+    },
+    {
+      "id": 128,
+      "title": "前后端分离架构的优势",
+      "difficulty": "简单",
+      "category": "Web开发",
+      "tags": [
+        "前后端分离",
+        "架构"
+      ],
+      "author": "系统",
+      "authorId": 0,
+      "publishedAt": "2025-01-01 00:00",
+      "views": 100,
+      "content": "独立开发、异步迭代、技术栈灵活性",
+      "isFavorited": false,
+      "favorites": 0,
+      "discussions": []
+    },
+    {
+      "id": 129,
+      "title": "MVC架构模式详解",
+      "difficulty": "中等",
+      "category": "软件架构",
+      "tags": [
+        "MVC",
+        "架构模式"
+      ],
+      "author": "系统",
+      "authorId": 0,
+      "publishedAt": "2025-01-01 00:00",
+      "views": 100,
+      "content": "Model-View-Controller的职责分离",
+      "isFavorited": false,
+      "favorites": 0,
+      "discussions": []
+    },
+    {
+      "id": 130,
+      "title": "常见设计模式及应用",
+      "difficulty": "中等",
+      "category": "软件设计",
+      "tags": [
+        "设计模式"
+      ],
+      "author": "系统",
+      "authorId": 0,
+      "publishedAt": "2025-01-01 00:00",
+      "views": 100,
+      "content": "单例、工厂、观察者、装饰器、代理等模式",
+      "isFavorited": false,
+      "favorites": 0,
+      "discussions": []
+    },
+    {
+      "id": 131,
+      "title": "Git版本控制系统",
+      "difficulty": "简单",
+      "category": "开发工具",
+      "tags": [
+        "Git",
+        "版本控制"
+      ],
+      "author": "系统",
+      "authorId": 0,
+      "publishedAt": "2025-01-01 00:00",
+      "views": 100,
+      "content": "分布式版本控制、分支、合并、冲突解决",
+      "isFavorited": false,
+      "favorites": 0,
+      "discussions": []
+    },
+    {
+      "id": 132,
+      "title": "CI/CD流程和DevOps",
+      "difficulty": "中等",
+      "category": "DevOps",
+      "tags": [
+        "CI/CD",
+        "自动化"
+      ],
+      "author": "系统",
+      "authorId": 0,
+      "publishedAt": "2025-01-01 00:00",
+      "views": 100,
+      "content": "持续集成、持续交付、自动化测试和部署",
+      "isFavorited": false,
+      "favorites": 0,
+      "discussions": []
+    },
+    {
+      "id": 133,
+      "title": "Docker容器化技术",
+      "difficulty": "中等",
+      "category": "容器化",
+      "tags": [
+        "Docker",
+        "容器"
+      ],
+      "author": "系统",
+      "authorId": 0,
+      "publishedAt": "2025-01-01 00:00",
+      "views": 100,
+      "content": "镜像、容器、Dockerfile、容器编排",
+      "isFavorited": false,
+      "favorites": 0,
+      "discussions": []
+    },
+    {
+      "id": 134,
+      "title": "微服务架构的挑战",
+      "difficulty": "难",
+      "category": "分布式系统",
+      "tags": [
+        "微服务",
+        "分布式"
+      ],
+      "author": "系统",
+      "authorId": 0,
+      "publishedAt": "2025-01-01 00:00",
+      "views": 100,
+      "content": "服务拆分、通信、数据一致性、部署运维",
+      "isFavorited": false,
+      "favorites": 0,
+      "discussions": []
+    },
+    {
+      "id": 135,
+      "title": "API网关的作用",
+      "difficulty": "中等",
+      "category": "分布式系统",
+      "tags": [
+        "API网关",
+        "微服务"
+      ],
+      "author": "系统",
+      "authorId": 0,
+      "publishedAt": "2025-01-01 00:00",
+      "views": 100,
+      "content": "请求路由、认证授权、流量控制、日志监控",
+      "isFavorited": false,
+      "favorites": 0,
+      "discussions": []
+    },
+    {
+      "id": 136,
+      "title": "分布式事务一致性方案",
+      "difficulty": "难",
+      "category": "分布式系统",
+      "tags": [
+        "分布式事务",
+        "一致性"
+      ],
+      "author": "系统",
+      "authorId": 0,
+      "publishedAt": "2025-01-01 00:00",
+      "views": 100,
+      "content": "两阶段提交、Saga模式、最终一致性",
+      "isFavorited": false,
+      "favorites": 0,
+      "discussions": []
+    },
+    {
+      "id": 137,
+      "title": "缓存技术和淘汰策略",
+      "difficulty": "中等",
+      "category": "缓存技术",
+      "tags": [
+        "缓存",
+        "LRU"
+      ],
+      "author": "系统",
+      "authorId": 0,
+      "publishedAt": "2025-01-01 00:00",
+      "views": 100,
+      "content": "LRU、LFU、FIFO缓存淘汰策略",
+      "isFavorited": false,
+      "favorites": 0,
+      "discussions": []
+    },
+    {
+      "id": 138,
+      "title": "Redis数据结构和应用",
+      "difficulty": "中等",
+      "category": "数据库",
+      "tags": [
+        "Redis",
+        "缓存",
+        "内存数据库"
+      ],
+      "author": "系统",
+      "authorId": 0,
+      "publishedAt": "2025-01-01 00:00",
+      "views": 100,
+      "content": "String、List、Set、Hash、ZSet及其应用场景",
+      "isFavorited": false,
+      "favorites": 0,
+      "discussions": []
+    },
+    {
+      "id": 139,
+      "title": "消息队列系统",
+      "difficulty": "中等",
+      "category": "分布式系统",
+      "tags": [
+        "消息队列",
+        "异步"
+      ],
+      "author": "系统",
+      "authorId": 0,
+      "publishedAt": "2025-01-01 00:00",
+      "views": 100,
+      "content": "RabbitMQ、Kafka、RocketMQ的特性比较",
+      "isFavorited": false,
+      "favorites": 0,
+      "discussions": []
+    },
+    {
+      "id": 140,
+      "title": "CAP理论和分布式系统设计",
+      "difficulty": "难",
+      "category": "分布式系统",
+      "tags": [
+        "CAP理论"
+      ],
+      "author": "系统",
+      "authorId": 0,
+      "publishedAt": "2025-01-01 00:00",
+      "views": 100,
+      "content": "一致性、可用性、分区容错性的权衡",
+      "isFavorited": false,
+      "favorites": 0,
+      "discussions": []
+    },
+    {
+      "id": 141,
+      "title": "加密算法基础",
+      "difficulty": "中等",
+      "category": "信息安全",
+      "tags": [
+        "加密",
+        "对称",
+        "非对称"
+      ],
+      "author": "系统",
+      "authorId": 0,
+      "publishedAt": "2025-01-01 00:00",
+      "views": 100,
+      "content": "对称加密(AES)和非对称加密(RSA)的原理",
+      "isFavorited": false,
+      "favorites": 0,
+      "discussions": []
+    },
+    {
+      "id": 142,
+      "title": "SQL注入攻击及防护",
+      "difficulty": "中等",
+      "category": "信息安全",
+      "tags": [
+        "SQL注入",
+        "安全漏洞"
+      ],
+      "author": "系统",
+      "authorId": 0,
+      "publishedAt": "2025-01-01 00:00",
+      "views": 100,
+      "content": "参数化查询、输入验证、最小权限原则",
+      "isFavorited": false,
+      "favorites": 0,
+      "discussions": []
+    },
+    {
+      "id": 143,
+      "title": "XSS跨站脚本攻击",
+      "difficulty": "中等",
+      "category": "信息安全",
+      "tags": [
+        "XSS",
+        "Web安全"
+      ],
+      "author": "系统",
+      "authorId": 0,
+      "publishedAt": "2025-01-01 00:00",
+      "views": 100,
+      "content": "内容转义、CSP、HttpOnly标志的防护",
+      "isFavorited": false,
+      "favorites": 0,
+      "discussions": []
+    },
+    {
+      "id": 144,
+      "title": "CSRF跨站请求伪造",
+      "difficulty": "中等",
+      "category": "信息安全",
+      "tags": [
+        "CSRF",
+        "Web安全"
+      ],
+      "author": "系统",
+      "authorId": 0,
+      "publishedAt": "2025-01-01 00:00",
+      "views": 100,
+      "content": "CSRF token、SameSite、同源策略防护",
+      "isFavorited": false,
+      "favorites": 0,
+      "discussions": []
+    },
+    {
+      "id": 145,
+      "title": "软件测试分类和策略",
+      "difficulty": "简单",
+      "category": "软件测试",
+      "tags": [
+        "测试"
+      ],
+      "author": "系统",
+      "authorId": 0,
+      "publishedAt": "2025-01-01 00:00",
+      "views": 100,
+      "content": "单元、集成、系统、验收测试的区别",
+      "isFavorited": false,
+      "favorites": 0,
+      "discussions": []
+    },
+    {
+      "id": 146,
+      "title": "单元测试编写和覆盖率",
+      "difficulty": "中等",
+      "category": "软件测试",
+      "tags": [
+        "单元测试",
+        "质量"
+      ],
+      "author": "系统",
+      "authorId": 0,
+      "publishedAt": "2025-01-01 00:00",
+      "views": 100,
+      "content": "测试框架、Mock、断言、代码覆盖率",
+      "isFavorited": false,
+      "favorites": 0,
+      "discussions": []
+    },
+    {
+      "id": 147,
+      "title": "云计算模型和服务",
+      "difficulty": "简单",
+      "category": "云计算",
+      "tags": [
+        "云计算",
+        "IaaS",
+        "PaaS",
+        "SaaS"
+      ],
+      "author": "系统",
+      "authorId": 0,
+      "publishedAt": "2025-01-01 00:00",
+      "views": 100,
+      "content": "基础设施、平台、软件即服务的特点",
+      "isFavorited": false,
+      "favorites": 0,
+      "discussions": []
+    },
+    {
+      "id": 148,
+      "title": "人工智能基础概念",
+      "difficulty": "简单",
+      "category": "人工智能",
+      "tags": [
+        "AI",
+        "机器学习",
+        "深度学习"
+      ],
+      "author": "系统",
+      "authorId": 0,
+      "publishedAt": "2025-01-01 00:00",
+      "views": 100,
+      "content": "AI、ML、DL的层级关系和基本概念",
+      "isFavorited": false,
+      "favorites": 0,
+      "discussions": []
+    },
+    {
+      "id": 149,
+      "title": "神经网络原理和训练",
+      "difficulty": "难",
+      "category": "人工智能",
+      "tags": [
+        "神经网络",
+        "反向传播"
+      ],
+      "author": "系统",
+      "authorId": 0,
+      "publishedAt": "2025-01-01 00:00",
+      "views": 100,
+      "content": "前向传播、反向传播、梯度下降优化",
+      "isFavorited": false,
+      "favorites": 0,
+      "discussions": []
+    },
+    {
+      "id": 150,
+      "title": "计算机视觉任务和应用",
+      "difficulty": "中等",
+      "category": "人工智能",
+      "tags": [
+        "计算机视觉",
+        "CNN"
+      ],
+      "author": "系统",
+      "authorId": 0,
+      "publishedAt": "2025-01-01 00:00",
+      "views": 100,
+      "content": "图像分类、目标检测、语义分割等任务",
+      "isFavorited": false,
+      "favorites": 0,
+      "discussions": []
     }
   ],
   "submissions": [
@@ -238,13 +2054,19 @@
     {
       "id": 9901,
       "title": "Serverless 题库：函数冷启动调优",
-      "tags": ["Serverless", "性能优化"],
+      "tags": [
+        "Serverless",
+        "性能优化"
+      ],
       "difficulty": "中等"
     },
     {
       "id": 9902,
       "title": "知识图谱问答系统题库",
-      "tags": ["图数据库", "NLP"],
+      "tags": [
+        "图数据库",
+        "NLP"
+      ],
       "difficulty": "困难"
     }
   ]

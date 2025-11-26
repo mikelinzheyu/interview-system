@@ -135,7 +135,7 @@ const domainStore = useDomainStore()
 const questionStore = useQuestionBankStore()
 const userStore = useUserStore()
 
-const { analyticsLoading, activities, collectionItems, progressCache } = storeToRefs(domainStore)
+const { analyticsLoading, activities, collectionItems, progressCache, learningGoals } = storeToRefs(domainStore)
 const { summary } = storeToRefs(questionStore)
 
 const currentDomain = ref(null)
@@ -214,6 +214,45 @@ const recentLearningItems = computed(() => {
 })
 
 const progressSummary = computed(() => summary.value || {})
+
+const learningGoalsList = computed(() => {
+  const goals = learningGoals.value || {}
+  const stats = summary.value || {}
+
+  const items = []
+
+  if (goals.domainsToComplete) {
+    items.push({
+      id: 'domains',
+      name: '完成学科数量',
+      description: '计划完成的学科总数',
+      completed: stats.completedDomains || stats.domainsTracked || 0,
+      total: goals.domainsToComplete
+    })
+  }
+
+  if (goals.targetAccuracy) {
+    items.push({
+      id: 'accuracy',
+      name: '总体正确率',
+      description: '目标正确率',
+      completed: stats.accuracy || stats.overallAccuracy || 0,
+      total: goals.targetAccuracy
+    })
+  }
+
+  if (goals.dailyHours) {
+    items.push({
+      id: 'dailyHours',
+      name: '每日学习时长',
+      description: '目标每日学习时长（小时）',
+      completed: stats.dailyHours || 0,
+      total: goals.dailyHours
+    })
+  }
+
+  return items
+})
 
 onMounted(async () => {
   loading.value = true

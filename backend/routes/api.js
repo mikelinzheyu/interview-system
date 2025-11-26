@@ -6,6 +6,8 @@
 
 const express = require('express')
 const router = express.Router()
+const fs = require('fs')
+const path = require('path')
 const { getControllers } = require('../services/dataService')
 const { eventBridge } = require('../services/eventBridge')
 const { updateUserAvatar, getUserById, updateUserProfile } = require('../services/userDbService')
@@ -19,6 +21,9 @@ const contributionsRouter = require('./contributions')
 const wrongAnswersRouter = require('./wrongAnswers')
 const recommendationsRouter = require('./recommendations')
 const hierarchicalDomains = require('../data/mock-domains-hierarchical.json')
+const contributionsData = require('../data/contributions-data.json')
+
+const questionCatalog = Array.isArray(contributionsData.questions) ? contributionsData.questions : []
 
 // ==================== 工具函数 ====================
 
@@ -36,6 +41,59 @@ function safeParseInt(value) {
 function asyncHandler(fn) {
   return (req, res, next) => {
     Promise.resolve(fn(req, res, next)).catch(next)
+  }
+}
+
+function paginate(list, page = 1, size = 20) {
+  const currentPage = Math.max(parseInt(page, 10) || 1, 1)
+  const pageSize = Math.max(parseInt(size, 10) || 20, 1)
+  const start = (currentPage - 1) * pageSize
+  const items = list.slice(start, start + pageSize)
+  return {
+    items,
+    page: currentPage,
+    size: pageSize,
+    total: list.length,
+    totalPages: Math.max(1, Math.ceil(list.length / pageSize))
+  }
+}
+
+function buildQuestionFacets(list) {
+  const difficulties = {}
+  const categories = {}
+  const tags = {}
+
+  list.forEach((q) => {
+    const diffKey = (q.difficulty || 'unknown').toString()
+    difficulties[diffKey] = (difficulties[diffKey] || 0) + 1
+
+    const catKey = (q.category || '未分类').toString()
+    categories[catKey] = (categories[catKey] || 0) + 1
+
+    ;(q.tags || []).forEach((tag) => {
+      const key = tag.toString()
+      tags[key] = (tags[key] || 0) + 1
+    })
+  })
+
+  return {
+    difficulties: Object.keys(difficulties).map((key) => ({
+      id: key,
+      key,
+      label: key,
+      count: difficulties[key]
+    })),
+    categories: Object.keys(categories).map((key) => ({
+      id: key,
+      name: key,
+      count: categories[key]
+    })),
+    tags: Object.keys(tags).map((key) => ({
+      id: key,
+      name: key,
+      tag: key,
+      count: tags[key]
+    }))
   }
 }
 
@@ -1523,6 +1581,7 @@ router.get('/health', (req, res) => {
  */
 router.get('/dms', auth, (req, res) => {
   // TODO: 从数据库获取用户的所有 DM 对话
+  // Legacy inline handler disabled
   res.json({
     code: 200,
     message: 'DM conversations retrieved',
@@ -1630,18 +1689,10 @@ router.use('/auth', authRouter)
  * 提供题库贡献、讨论、收藏等功能
  */
 router.use('/contributions', contributionsRouter)
-
 /**
- * 挂载推荐路由
- * 提供首页和统计模块推荐数据
+ * 快捷路由：直接访问 /api/questions 等同于 /api/contributions/questions
  */
-router.use('/', recommendationsRouter)
-
-/**
- * 挂载错题本路由
- * 提供错题记录与复习功能
- */
-router.use('/', wrongAnswersRouter)
+// router.use('/questions', contributionsRouter)
 
 /**
  * 挂载社区路由
@@ -1734,13 +1785,422 @@ router.put('/users/profile', auth, async (req, res) => {
   }
 })
 
-router.use((req, res) => {
-  res.status(404).json({
-    code: 404,
-    message: 'API endpoint not found',
-    path: req.path
+// ==================== 全局数据端点 ====================
+
+// GET /api/domains - 获取所有学科域
+router.get('/domains', (req, res) => {
+  const domains = [
+    { id: 1, name: '计算机科学', description: '计算机科学基础与应用' },
+    { id: 2, name: '前端开发', description: 'Web前端技术' },
+    { id: 3, name: '后端开发', description: '后端服务开发' },
+    { id: 4, name: '移动开发', description: '移动应用开发' },
+    { id: 5, name: '数据科学', description: '数据分析与机器学习' },
+    { id: 6, name: '云计算与DevOps', description: '云平台与运维技术' }
+  ]
+  res.json({
+    code: 200,
+    message: 'Domains retrieved successfully',
+    data: domains
   })
 })
+
+// GET /api/domains/recommended - 获取推荐学科
+router.get('/domains/recommended', (req, res) => {
+  const recommended = [
+    { id: 1, name: '计算机科学', score: 95 },
+    { id: 2, name: '前端开发', score: 87 },
+    { id: 3, name: '后端开发', score: 82 }
+  ]
+  res.json({
+    code: 200,
+    message: 'Recommended domains retrieved',
+    data: recommended
+  })
+})
+
+// GET /api/categories - 获取分类
+router.get('/categories', (req, res) => {
+  const type = req.query.type
+  const categories = [
+    { id: 1, name: '技术基础', type: 'domain' },
+    { id: 2, name: '算法与数据结构', type: 'domain' },
+    { id: 3, name: '系统设计', type: 'domain' },
+    { id: 4, name: '数据库', type: 'domain' },
+    { id: 5, name: '前端框架', type: 'domain' },
+    { id: 6, name: '后端框架', type: 'domain' }
+  ]
+
+  if (type) {
+    res.json({
+      code: 200,
+      message: 'Categories retrieved',
+      data: categories.filter(c => c.type === type)
+    })
+  } else {
+    res.json({
+      code: 200,
+      message: 'Categories retrieved',
+      data: categories
+    })
+  }
+})
+
+// GET /api/disciplines - 获取学科
+router.get('/disciplines', (req, res) => {
+  const disciplines = [
+    { id: 1, name: '编程语言', count: 156 },
+    { id: 2, name: '数据结构', count: 134 },
+    { id: 3, name: '算法设计', count: 98 },
+    { id: 4, name: '数据库原理', count: 87 },
+    { id: 5, name: 'Web框架', count: 76 },
+    { id: 6, name: '分布式系统', count: 65 }
+  ]
+  res.json({
+    code: 200,
+    message: 'Disciplines retrieved successfully',
+    data: disciplines
+  })
+})
+
+// ==================== 题库 / 问题相关 API ====================
+
+// GET /api/questions - 获取题库列表
+router.get('/questions', (req, res) => {
+  try {
+    const {
+      page = 1,
+      size = 20,
+      difficulty,
+      type,
+      tags,
+      keyword,
+      sort = 'recent'
+    } = req.query
+
+    let list = [...questionCatalog]
+
+    if (difficulty) {
+      const difficultySet = String(difficulty)
+        .split(',')
+        .map((v) => v.trim())
+        .filter(Boolean)
+      if (difficultySet.length) {
+        list = list.filter((q) => difficultySet.includes(q.difficulty))
+      }
+    }
+
+    if (type) {
+      const typeSet = String(type)
+        .split(',')
+        .map((v) => v.trim())
+        .filter(Boolean)
+      if (typeSet.length) {
+        list = list.filter((q) => typeSet.includes(q.type))
+      }
+    }
+
+    if (tags) {
+      const tagSet = String(tags)
+        .split(',')
+        .map((v) => v.trim())
+        .filter(Boolean)
+      if (tagSet.length) {
+        list = list.filter((q) =>
+          Array.isArray(q.tags) && tagSet.every((tag) => q.tags.includes(tag))
+        )
+      }
+    }
+
+    if (keyword) {
+      const kw = String(keyword).toLowerCase().trim()
+      if (kw) {
+        list = list.filter((q) => {
+          const title = (q.title || '').toLowerCase()
+          const content = (q.content || '').toLowerCase()
+          return title.includes(kw) || content.includes(kw)
+        })
+      }
+    }
+
+    if (sort === 'popular') {
+      list.sort(
+        (a, b) =>
+          (b.views || 0) + (b.favorites || 0) - ((a.views || 0) + (a.favorites || 0))
+      )
+    } else {
+      list.sort((a, b) => {
+        const aTime = new Date(a.publishedAt || 0).getTime()
+        const bTime = new Date(b.publishedAt || 0).getTime()
+        return bTime - aTime
+      })
+    }
+
+    const paged = paginate(list, page, size)
+    const facets = buildQuestionFacets(list)
+
+    res.json({
+      code: 200,
+      message: 'Questions retrieved successfully',
+      data: {
+        items: paged.items,
+        page: paged.page,
+        size: paged.size,
+        total: paged.total,
+        totalPages: paged.totalPages,
+        summary: {
+          total: paged.total,
+          page: paged.page,
+          size: paged.size,
+          totalPages: paged.totalPages
+        },
+        facets
+      }
+    })
+  } catch (error) {
+    console.error('[GET /questions] Error:', error)
+    res.status(500).json({
+      code: 500,
+      message: 'Failed to load questions',
+      error: error.message
+    })
+  }
+})
+
+// GET /api/questions/categories - 获取题库分类树
+router.get('/questions/categories', (req, res) => {
+  try {
+    const byCategory = {}
+    questionCatalog.forEach((q) => {
+      const name = q.category || '未分类'
+      if (!byCategory[name]) {
+        byCategory[name] = []
+      }
+      byCategory[name].push(q)
+    })
+
+    const tree = Object.keys(byCategory).map((name) => ({
+      id: name,
+      name,
+      children: byCategory[name].map((q) => ({
+        id: q.id,
+        name: q.title
+      }))
+    }))
+
+    res.json({
+      code: 200,
+      message: 'Question categories retrieved',
+      data: {
+        tree,
+        flat: tree.map((node) => ({ id: node.id, name: node.name, parentId: null }))
+      }
+    })
+  } catch (error) {
+    console.error('[GET /questions/categories] Error:', error)
+    res.status(500).json({
+      code: 500,
+      message: 'Failed to load question categories',
+      error: error.message
+    })
+  }
+})
+
+// GET /api/questions/tags - 获取题库标签
+router.get('/questions/tags', (req, res) => {
+  try {
+    const tagCount = {}
+    questionCatalog.forEach((q) => {
+      ;(q.tags || []).forEach((tag) => {
+        const key = tag.toString()
+        tagCount[key] = (tagCount[key] || 0) + 1
+      })
+    })
+
+    const items = Object.keys(tagCount).map((key) => ({
+      id: key,
+      name: key,
+      tag: key,
+      count: tagCount[key]
+    }))
+
+    res.json({
+      code: 200,
+      message: 'Question tags retrieved',
+      data: {
+        items
+      }
+    })
+  } catch (error) {
+    console.error('[GET /questions/tags] Error:', error)
+    res.status(500).json({
+      code: 500,
+      message: 'Failed to load question tags',
+      error: error.message
+    })
+  }
+})
+
+// GET /api/questions/facets - 获取题库条件概览
+router.get('/questions/facets', (req, res) => {
+  try {
+    const facets = buildQuestionFacets(questionCatalog)
+    res.json({
+      code: 200,
+      message: 'Question facets retrieved',
+      data: facets
+    })
+  } catch (error) {
+    console.error('[GET /questions/facets] Error:', error)
+    res.status(500).json({
+      code: 500,
+      message: 'Failed to load question facets',
+      error: error.message
+    })
+  }
+})
+
+// GET /api/questions/trending - 热门题目
+router.get('/questions/trending', (req, res) => {
+  try {
+    const size = parseInt(req.query.size, 10) || 10
+    const sorted = [...questionCatalog].sort(
+      (a, b) =>
+        (b.views || 0) + (b.favorites || 0) - ((a.views || 0) + (a.favorites || 0))
+    )
+    const items = sorted.slice(0, size)
+
+    res.json({
+      code: 200,
+      message: 'Trending questions retrieved',
+      data: {
+        items
+      }
+    })
+  } catch (error) {
+    console.error('[GET /questions/trending] Error:', error)
+    res.status(500).json({
+      code: 500,
+      message: 'Failed to load trending questions',
+      error: error.message
+    })
+  }
+})
+
+// GET /api/questions/recommendations - 题库推荐
+router.get('/questions/recommendations', (req, res) => {
+  try {
+    const items = Array.isArray(contributionsData.recommendations)
+      ? contributionsData.recommendations
+      : []
+    res.json({
+      code: 200,
+      message: 'Question recommendations retrieved',
+      data: {
+        items
+      }
+    })
+  } catch (error) {
+    console.error('[GET /questions/recommendations] Error:', error)
+    res.status(500).json({
+      code: 500,
+      message: 'Failed to load question recommendations',
+      error: error.message
+    })
+  }
+})
+
+// GET /api/questions/:id - 单题详情
+router.get('/questions/:id', (req, res) => {
+  try {
+    const id = req.params.id
+    const question = questionCatalog.find((q) => String(q.id) === String(id))
+    if (!question) {
+      return res.status(404).json({
+        code: 404,
+        message: 'Question not found'
+      })
+    }
+
+    res.json({
+      code: 200,
+      message: 'Question retrieved',
+      data: question
+    })
+  } catch (error) {
+    console.error('[GET /questions/:id] Error:', error)
+    res.status(500).json({
+      code: 500,
+      message: 'Failed to load question detail',
+      error: error.message
+    })
+  }
+})
+
+// POST /api/questions/:id/submit - 提交答案（简化版）
+router.post('/questions/:id/submit', (req, res) => {
+  try {
+    const id = req.params.id
+    const question = questionCatalog.find((q) => String(q.id) === String(id))
+    if (!question) {
+      return res.status(404).json({
+        code: 404,
+        message: 'Question not found'
+      })
+    }
+
+    const payload = req.body || {}
+
+    res.json({
+      code: 200,
+      message: 'Answer submitted',
+      data: {
+        questionId: question.id,
+        receivedAt: new Date().toISOString(),
+        payload
+      }
+    })
+  } catch (error) {
+    console.error('[POST /questions/:id/submit] Error:', error)
+    res.status(500).json({
+      code: 500,
+      message: 'Failed to submit answer',
+      error: error.message
+    })
+  }
+})
+
+// GET /api/questions/:id/practice-records - 获取简单的练习记录
+router.get('/questions/:id/practice-records', (req, res) => {
+  try {
+    const id = req.params.id
+    const question = questionCatalog.find((q) => String(q.id) === String(id))
+    if (!question) {
+      return res.status(404).json({
+        code: 404,
+        message: 'Question not found'
+      })
+    }
+
+    res.json({
+      code: 200,
+      message: 'Practice records retrieved',
+      data: {
+        items: [],
+        total: 0
+      }
+    })
+  } catch (error) {
+    console.error('[GET /questions/:id/practice-records] Error:', error)
+    res.status(500).json({
+      code: 500,
+      message: 'Failed to load practice records',
+      error: error.message
+    })
+  }
+})
+
+// NOTE: 404 handler moved to top-level server (backend/server.js),
+// so this router-level catch-all is removed to avoid shadowing later routes.
 
 // ==================== 会话管理端点 ====================
 
@@ -1753,5 +2213,16 @@ router.get('/sessions', (req, res) => {
   })
 })
 
-module.exports = router
+// ==================== 错题本路由挂载 ====================
 
+router.get('/sessions', (req, res) => {
+  res.json({
+    code: 200,
+    message: 'OK',
+    data: []
+  })
+})
+
+router.use('/', wrongAnswersRouter)
+
+module.exports = router

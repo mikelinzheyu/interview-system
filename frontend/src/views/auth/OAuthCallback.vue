@@ -80,7 +80,7 @@ onMounted(async () => {
       // 延迟跳转，让用户看到成功提示
       setTimeout(() => {
         router.push('/dashboard')
-      }, 1000)
+      }, 500)
     }
   } catch (err) {
     console.error('OAuth回调错误:', err)

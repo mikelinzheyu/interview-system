@@ -10,7 +10,7 @@ import { useUserStore } from '@/stores/user'
 import socketService from '@/utils/socket'
 
 const userStore = useUserStore()
-const isMockMode = import.meta.env.VITE_USE_MOCK_DATA !== 'false'
+const isMockMode = import.meta.env.VITE_USE_MOCK_DATA === 'true'
 const WS_ENABLED = !isMockMode && import.meta.env.VITE_WS_ENABLED !== 'false'
 
 watch(

@@ -12,7 +12,7 @@
           <el-icon><VideoPlay /></el-icon>
           开始 AI 模拟面试
         </button>
-        <button class="hero-btn secondary-btn">
+        <button class="hero-btn secondary-btn" @click="$emit('browse-questions')">
           <el-icon><DocumentCopy /></el-icon>
           浏览题库
         </button>
@@ -26,7 +26,7 @@ import { computed } from 'vue'
 import { VideoPlay, DocumentCopy } from '@element-plus/icons-vue'
 import { useUserStore } from '@/stores/user'
 
-defineEmits(['start-interview'])
+defineEmits(['start-interview', 'browse-questions'])
 
 const userStore = useUserStore()
 
