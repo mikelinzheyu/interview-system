@@ -100,6 +100,10 @@ interface Plan {
   price: string | number
   period: string
   benefits: string[]
+  badge?: string
+  tag?: string
+  note?: string
+  footer?: string
   savings?: string
 }
 

@@ -72,7 +72,7 @@ const resolveIcon = (name) => ElementIcons[name] || ElementIcons.Tickets
 
 .feature-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  grid-template-columns: repeat(4, 1fr);
   gap: 24px;
 }
 
@@ -80,6 +80,34 @@ const resolveIcon = (name) => ElementIcons[name] || ElementIcons.Tickets
   padding: 28px;
   color: #132050;
   background: rgba(255, 255, 255, 0.75);
+  border-radius: 16px;
+  border: 1px solid rgba(99, 102, 241, 0.1);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.feature-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 100px;
+  height: 100px;
+  background: radial-gradient(circle, rgba(99, 102, 241, 0.08), transparent);
+  border-radius: 50%;
+  transform: translate(40%, -40%);
+  transition: transform 0.3s ease;
+}
+
+.feature-card:hover {
+  box-shadow: 0 20px 40px rgba(99, 102, 241, 0.15);
+  transform: translateY(-6px);
+  border-color: rgba(99, 102, 241, 0.2);
+}
+
+.feature-card:hover::before {
+  transform: translate(30%, -30%);
 }
 
 .feature-icon {
@@ -102,5 +130,17 @@ const resolveIcon = (name) => ElementIcons[name] || ElementIcons.Tickets
 .feature-card p {
   color: #566087;
   line-height: 1.6;
+}
+
+@media (max-width: 1024px) {
+  .feature-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .feature-grid {
+    grid-template-columns: 1fr;
+  }
 }
 </style>

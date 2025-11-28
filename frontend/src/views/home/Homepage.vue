@@ -17,7 +17,10 @@
       <MainContent>
         <template v-if="activeMenu === 'overview'">
           <!-- Hero Section will go here (Phase 2) -->
-          <HeroSection @start-interview="startInterview" />
+          <HeroSection
+            @start-interview="startInterview"
+            @browse-questions="goToQuestionBank"
+          />
 
           <!-- Statistics Cards will go here (Phase 2) -->
           <StatisticsCards :data="statistics" />
@@ -147,6 +150,10 @@ const checkSystemRequirements = (): boolean => {
   // Basic check - will be enhanced in Phase 2
   const browserSupport = !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia)
   return browserSupport
+}
+
+const goToQuestionBank = () => {
+  router.push({ name: 'LearningHub' })
 }
 
 const goToWrongAnswers = () => {

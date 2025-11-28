@@ -598,7 +598,9 @@ const handleAvatarUpload = async (file) => {
   try {
     const response = await userAPI.uploadAvatar(formData)
     if (response.code === 200) {
-      profileForm.avatar = response.data.url
+      const url = response.data?.url || response.data?.avatar || profileForm.avatar
+      profileForm.avatar = url
+      await userStore.fetchUserInfo()
       ElMessage.success('头像上传成功')
     }
   } catch (error) {

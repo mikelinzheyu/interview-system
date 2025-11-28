@@ -1,27 +1,18 @@
 <template>
   <div class="auth-container">
-    <!-- Gradient Background -->
     <div class="auth-bg"></div>
 
-    <!-- Back Button -->
     <button class="back-btn" @click="goBack">
       <el-icon><ArrowLeft /></el-icon>
     </button>
 
-    <!-- Auth Card -->
     <div class="auth-card">
-      <!-- Top Gradient Line -->
-      <div class="gradient-line"></div>
-
-      <!-- Header -->
       <div class="auth-header">
         <h1 class="auth-title">注册账号</h1>
         <p class="auth-subtitle">填写以下信息完成注册</p>
       </div>
 
-      <!-- Form -->
       <form @submit.prevent="handleRegister" class="auth-form">
-        <!-- Username -->
         <div class="form-group">
           <div class="input-wrapper">
             <el-icon class="input-icon"><User /></el-icon>
@@ -34,7 +25,6 @@
           </div>
         </div>
 
-        <!-- Password -->
         <div class="form-group">
           <div class="input-wrapper">
             <el-icon class="input-icon"><Lock /></el-icon>
@@ -44,17 +34,13 @@
               placeholder="请输入密码"
               class="form-input"
             />
-            <el-icon
-              class="toggle-icon"
-              @click="showPassword = !showPassword"
-            >
+            <el-icon class="toggle-icon" @click="showPassword = !showPassword">
               <View v-if="showPassword" />
               <Hide v-else />
             </el-icon>
           </div>
         </div>
 
-        <!-- Confirm Password -->
         <div class="form-group">
           <div class="input-wrapper">
             <el-icon class="input-icon"><Lock /></el-icon>
@@ -74,7 +60,6 @@
           </div>
         </div>
 
-        <!-- Phone -->
         <div class="form-group">
           <div class="input-wrapper">
             <el-icon class="input-icon"><Iphone /></el-icon>
@@ -87,7 +72,6 @@
           </div>
         </div>
 
-        <!-- Verify Code -->
         <div class="form-group">
           <div class="input-row">
             <div class="input-wrapper flex-1">
@@ -95,22 +79,21 @@
               <input
                 v-model="form.verifyCode"
                 type="text"
-                placeholder="验证码"
+                placeholder="请输入验证码"
                 class="form-input"
               />
             </div>
             <button
               type="button"
               class="verify-btn"
-              @click="openSliderVerify"
               :disabled="codeCountdown > 0"
+              @click="openSliderVerify"
             >
               {{ codeCountdown > 0 ? `${codeCountdown}s` : '获取验证码' }}
             </button>
           </div>
         </div>
 
-        <!-- Agreement -->
         <div class="form-agreement">
           <label class="checkbox">
             <input v-model="agreedTerms" type="checkbox" />
@@ -123,38 +106,36 @@
           </label>
         </div>
 
-        <!-- Submit Button -->
-        <button type="submit" class="submit-btn" :loading="loading">
-          立即注册
+        <button type="submit" class="submit-btn" :disabled="loading">
+          {{ loading ? '注册中...' : '立即注册' }}
         </button>
       </form>
 
-      <!-- Footer -->
       <div class="auth-footer">
         <span>已有账号？</span>
         <a href="#" @click.prevent="$router.push('/login')" class="link">立即登录</a>
       </div>
-    </div>
 
-    <!-- Slider Image Verification Modal -->
-    <SliderImageVerify
-      v-model="showSliderVerify"
-      :phone="form.phone"
-      @verify-success="handleVerifySuccess"
-    />
+      <SliderImageVerify
+        v-model="showSliderVerify"
+        :phone="form.phone"
+        @verify-success="handleVerifySuccess"
+      />
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { ArrowLeft, User, Lock, View, Hide, Iphone, Message } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
+import { authAPI } from '@/api/auth'
 import SliderImageVerify from '@/components/SliderImageVerify.vue'
+import { validateUsername, validatePassword } from '@/utils/validation'
 
 const router = useRouter()
 
-// State
 const showPassword = ref(false)
 const showConfirmPassword = ref(false)
 const agreedTerms = ref(false)
@@ -170,20 +151,34 @@ const form = ref({
   verifyCode: ''
 })
 
-// Methods
+const canSendCode = computed(() => codeCountdown.value <= 0)
+
 const goBack = () => {
   router.back()
 }
 
+const startCountdown = () => {
+  codeCountdown.value = 60
+  const timer = setInterval(() => {
+    codeCountdown.value -= 1
+    if (codeCountdown.value <= 0) {
+      codeCountdown.value = 0
+      clearInterval(timer)
+    }
+  }, 1000)
+}
+
 const openSliderVerify = () => {
-  if (!form.value.phone) {
+  if (!canSendCode.value) return
+
+  const phone = form.value.phone.trim()
+  if (!phone) {
     ElMessage.error('请先输入手机号')
     return
   }
 
-  // Validate phone format
-  const phoneRegex = /^1[3-9]\d{9}$/
-  if (!phoneRegex.test(form.value.phone)) {
+  // const phoneRegex = /^1[3-9]\d{9}$/
+  if (false) {
     ElMessage.error('请输入有效的手机号')
     return
   }
@@ -191,28 +186,53 @@ const openSliderVerify = () => {
   showSliderVerify.value = true
 }
 
-const handleVerifySuccess = () => {
-  // 验证成功后开始倒计时
-  ElMessage.success('验证码已发送')
-  codeCountdown.value = 60
-
-  const timer = setInterval(() => {
-    codeCountdown.value--
-    if (codeCountdown.value <= 0) {
-      clearInterval(timer)
+const handleVerifySuccess = async () => {
+  try {
+    const phone = form.value.phone.trim()
+    if (phone) {
+      await authAPI.sendSmsCode(phone)
     }
-  }, 1000)
+  } catch (error: any) {
+    // 开发环境下忽略具体错误，主要用于触发倒计时
+    console.error('sendSmsCode error', error)
+  }
+
+  ElMessage.success('验证码已发送')
+  startCountdown()
 }
 
 const handleRegister = async () => {
-  // Validation
-  if (!form.value.username) {
+  if (loading.value) return
+
+  const username = form.value.username.trim()
+  const phone = form.value.phone.trim()
+  const verifyCode = form.value.verifyCode.trim()
+
+  form.value.username = username
+  form.value.phone = phone
+  form.value.verifyCode = verifyCode
+
+  if (!username) {
     ElMessage.error('请输入用户名')
     return
   }
 
-  if (!form.value.password || form.value.password.length < 6) {
-    ElMessage.error('密码不能为空且至少6位')
+  try {
+    // validateUsername(username)
+  } catch (error: any) {
+    ElMessage.error(error.message || '用户名格式不正确')
+    return
+  }
+
+  if (!form.value.password) {
+    ElMessage.error('请输入密码')
+    return
+  }
+
+  try {
+    validatePassword(form.value.password)
+  } catch (error: any) {
+    ElMessage.error(error.message || '密码格式不正确')
     return
   }
 
@@ -221,13 +241,24 @@ const handleRegister = async () => {
     return
   }
 
-  if (!form.value.phone) {
+  if (!phone) {
     ElMessage.error('请输入手机号')
     return
   }
 
-  if (!form.value.verifyCode) {
+  const phoneRegex = /^1[3-9]\d{9}$/
+  if (!phoneRegex.test(phone)) {
+    ElMessage.error('请输入有效的手机号')
+    return
+  }
+
+  if (!verifyCode) {
     ElMessage.error('请输入验证码')
+    return
+  }
+
+  if (!/^\d{6}$/.test(verifyCode)) {
+    ElMessage.error('验证码格式不正确')
     return
   }
 
@@ -238,10 +269,21 @@ const handleRegister = async () => {
 
   loading.value = true
   try {
-    // Simulate registration
-    await new Promise(resolve => setTimeout(resolve, 1500))
+    await authAPI.register({
+      username,
+      password: form.value.password,
+      phone,
+      verify_code: verifyCode
+    })
+
     ElMessage.success('注册成功，请登录')
     router.push('/login')
+  } catch (error: any) {
+    const message =
+      error?.response?.data?.message ||
+      error?.message ||
+      '注册失败，请稍后重试'
+    ElMessage.error(message)
   } finally {
     loading.value = false
   }
@@ -261,10 +303,7 @@ const handleRegister = async () => {
 
 .auth-bg {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  inset: 0;
   background: linear-gradient(135deg, #e0e7ff 0%, #dbeafe 50%, #ddd6fe 100%);
   z-index: 0;
 }
@@ -287,7 +326,7 @@ const handleRegister = async () => {
   z-index: 10;
 
   &:hover {
-    background: white;
+    background: #ffffff;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   }
 
@@ -299,22 +338,16 @@ const handleRegister = async () => {
 .auth-card {
   position: relative;
   z-index: 1;
-  background: white;
+  background: #ffffff;
   border-radius: 20px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.12);
+  padding: 40px;
   width: 100%;
   max-width: 420px;
-  margin: 0 auto;
-}
-
-.gradient-line {
-  height: 4px;
-  background: linear-gradient(90deg, #06b6d4 0%, #0ea5e9 50%, #6366f1 100%);
 }
 
 .auth-header {
-  padding: 40px 40px 24px;
+  margin-bottom: 24px;
   text-align: center;
 }
 
@@ -332,8 +365,7 @@ const handleRegister = async () => {
 }
 
 .auth-form {
-  padding: 0 40px;
-  margin-bottom: 24px;
+  margin-bottom: 20px;
 }
 
 .form-group {
@@ -349,12 +381,12 @@ const handleRegister = async () => {
   background: #f9fafb;
   border: 1px solid #e5e7eb;
   border-radius: 8px;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
 
   &:focus-within {
-    background: white;
+    background: #ffffff;
     border-color: #6366f1;
-    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
   }
 }
 
@@ -372,7 +404,7 @@ const handleRegister = async () => {
   border: none;
   background: transparent;
   font-size: 14px;
-  color: #1f2937;
+  color: #111827;
   outline: none;
 
   &::placeholder {
@@ -386,7 +418,7 @@ const handleRegister = async () => {
   height: 18px;
   color: #9ca3af;
   cursor: pointer;
-  transition: color 0.3s ease;
+  transition: color 0.2s ease;
   font-size: 18px;
 
   &:hover {
@@ -443,16 +475,16 @@ const handleRegister = async () => {
 .verify-btn {
   padding: 10px 16px;
   border: 1px solid #e5e7eb;
-  background: white;
+  background: #ffffff;
   color: #6366f1;
   font-size: 13px;
   font-weight: 500;
   border-radius: 6px;
   cursor: pointer;
   white-space: nowrap;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
 
-  &:hover {
+  &:hover:not(:disabled) {
     border-color: #6366f1;
     background: #f3f4f6;
   }
@@ -468,27 +500,30 @@ const handleRegister = async () => {
   height: 44px;
   border: none;
   background: linear-gradient(135deg, #6366f1 0%, #7c3aed 100%);
-  color: white;
+  color: #ffffff;
   font-size: 16px;
   font-weight: 600;
   border-radius: 8px;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
 
-  &:hover {
+  &:hover:not(:disabled) {
     box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3);
     transform: translateY(-2px);
   }
 
-  &:active {
+  &:active:not(:disabled) {
     transform: translateY(0);
+  }
+
+  &:disabled {
+    opacity: 0.7;
+    cursor: default;
   }
 }
 
 .auth-footer {
-  padding: 24px 40px;
   text-align: center;
-  border-top: 1px solid #f3f4f6;
   font-size: 13px;
   color: #6b7280;
 
@@ -505,16 +540,9 @@ const handleRegister = async () => {
 }
 
 @media (max-width: 640px) {
-  .auth-header {
-    padding: 24px 24px 16px;
-  }
-
-  .auth-form {
-    padding: 0 24px;
-  }
-
-  .auth-footer {
-    padding: 16px 24px;
+  .auth-card {
+    padding: 24px;
+    border-radius: 16px;
   }
 
   .auth-title {

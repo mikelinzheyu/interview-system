@@ -555,4 +555,57 @@ router.get('/badges', (req, res) => {
   })
 })
 
+// ===== 热门问题 =====
+router.get('/trending', (req, res) => {
+  const size = parseInt(req.query.size || '10', 10)
+  const trending = questions.slice(0, size).map(q => ({
+    id: q.id,
+    title: q.title,
+    difficulty: q.difficulty || 'medium',
+    views: Math.floor(Math.random() * 10000),
+    favorites: Math.floor(Math.random() * 1000)
+  }))
+  res.json({
+    code: 200,
+    message: 'Trending questions',
+    data: trending
+  })
+})
+
+// ===== 问题分类 =====
+router.get('/categories', (req, res) => {
+  const categories = [
+    { id: 1, name: '技术基础', count: 245 },
+    { id: 2, name: '算法设计', count: 189 },
+    { id: 3, name: '系统设计', count: 156 },
+    { id: 4, name: '数据库', count: 134 },
+    { id: 5, name: '前端开发', count: 267 },
+    { id: 6, name: '后端开发', count: 312 }
+  ]
+  res.json({
+    code: 200,
+    message: 'Question categories',
+    data: categories
+  })
+})
+
+// ===== 问题标签 =====
+router.get('/tags', (req, res) => {
+  const tags = [
+    { id: 1, name: 'JavaScript', count: 156 },
+    { id: 2, name: 'React', count: 134 },
+    { id: 3, name: 'Node.js', count: 98 },
+    { id: 4, name: 'Python', count: 167 },
+    { id: 5, name: 'SQL', count: 89 },
+    { id: 6, name: 'REST API', count: 76 },
+    { id: 7, name: 'Docker', count: 65 },
+    { id: 8, name: 'Kubernetes', count: 54 }
+  ]
+  res.json({
+    code: 200,
+    message: 'Question tags',
+    data: tags
+  })
+})
+
 module.exports = router

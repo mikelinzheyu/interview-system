@@ -28,8 +28,11 @@
           </el-button>
         </template>
         <template v-else>
+          <el-button text type="primary" @click="router.push('/dashboard')">
+            登录
+          </el-button>
           <el-button type="primary" round class="landing-button-glow" @click="router.push('/dashboard')">
-            进入控制台
+            注册
           </el-button>
         </template>
       </div>
@@ -62,7 +65,8 @@
             <el-button text type="primary" @click="handleMobileAction('/login')">登录</el-button>
           </template>
           <template v-else>
-            <el-button type="primary" @click="handleMobileAction('/dashboard')">进入控制台</el-button>
+            <el-button text type="primary" @click="handleMobileAction('/dashboard')">登录</el-button>
+            <el-button type="primary" @click="handleMobileAction('/dashboard')">注册</el-button>
           </template>
         </div>
       </div>

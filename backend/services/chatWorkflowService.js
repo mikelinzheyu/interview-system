@@ -8,9 +8,10 @@ const https = require('https')
 
 class ChatWorkflowService {
   constructor() {
-    this.apiKey = process.env.DIFY_CHAT_API_KEY || 'app-Bj1UccX9v9X1aw6st7OW5paG'
-    this.appId = process.env.DIFY_CHAT_APP_ID || 'NF8mUftOYiGfQEzE'
-    this.baseURL = process.env.DIFY_API_URL || 'https://api.dify.ai/v1'
+    // 从环境变量读取配置（生产环境必须配置，不允许使用硬编码默认值）
+    this.apiKey = process.env.DIFY_CHAT_API_KEY
+    this.appId = process.env.DIFY_CHAT_APP_ID
+    this.baseURL = process.env.DIFY_API_BASE_URL || 'https://api.dify.ai/v1'
     this.isConfigured = !!(this.apiKey && this.appId)
 
     // 增强的配置日志

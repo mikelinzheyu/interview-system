@@ -29,30 +29,45 @@
       title="QQ扫码登录"
       width="400px"
       :close-on-click-modal="false"
+      @close="closeDialog"
     >
       <div class="qr-container">
-        <div v-if="qrCodeUrl" class="qr-code">
-          <div class="dev-qrcode">
-            <el-icon :size="120" color="#12B7F5">
-              <Grid />
-            </el-icon>
-            <p class="qr-tip">开发模式：点击下方按钮模拟扫码</p>
-          </div>
-          <el-button
-            type="primary"
-            style="margin-top: 20px; background: #12B7F5; border-color: #12B7F5;"
-            @click="openMockScanUrl"
-          >
-            模拟QQ扫码授权
-          </el-button>
+        <!-- 等待扫码 -->
+        <div v-if="qrStatus === 'waiting'" class="qr-waiting">
+          <img :src="qrCodeDataUrl" class="qr-image" />
+          <p class="qr-tip">请使用手机QQ扫描二维码</p>
+          <p class="qr-countdown">{{ countdownSeconds }}s 后过期</p>
         </div>
-        <div v-else class="loading-qr">
+
+        <!-- 已扫码，等待确认 -->
+        <div v-else-if="qrStatus === 'scanned'" class="qr-scanned">
+          <el-icon :size="64" color="#67C23A"><CircleCheck /></el-icon>
+          <p class="qr-tip">扫码成功！</p>
+          <p class="user-info" v-if="scannedUser">
+            <el-avatar :src="scannedUser.avatar" :size="40" />
+            {{ scannedUser.username }}
+          </p>
+          <p class="confirming">正在等待确认...</p>
+        </div>
+
+        <!-- 确认成功 -->
+        <div v-else-if="qrStatus === 'confirmed'" class="qr-confirmed">
+          <el-icon :size="64" color="#67C23A"><CircleCheck /></el-icon>
+          <p class="qr-tip">登录成功！</p>
+          <p>正在跳转到仪表板...</p>
+        </div>
+
+        <!-- 二维码过期 -->
+        <div v-else-if="qrStatus === 'expired'" class="qr-expired">
+          <el-icon :size="64" color="#F56C6C"><CircleClose /></el-icon>
+          <p class="qr-tip">二维码已过期</p>
+          <el-button type="primary" @click="handleQQLogin">刷新二维码</el-button>
+        </div>
+
+        <!-- 加载中 -->
+        <div v-else-if="qrStatus === 'loading'" class="qr-loading">
           <el-icon :size="48" class="is-loading"><Loading /></el-icon>
           <p>正在生成二维码...</p>
-        </div>
-        <div class="qr-footer">
-          <el-icon :size="16"><InfoFilled /></el-icon>
-          <span>请使用手机QQ扫描二维码登录</span>
         </div>
       </div>
     </el-dialog>
@@ -60,11 +75,16 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onBeforeUnmount } from 'vue'
+import { useRouter } from 'vue-router'
+import { useUserStore } from '@/stores/user'
 import { ElMessage } from 'element-plus'
-import { Connection, Grid, Loading, InfoFilled } from '@element-plus/icons-vue'
+import { Connection, CircleCheck, CircleClose, Loading } from '@element-plus/icons-vue'
 import { oauthAPI } from '@/api/oauth'
-import { buildApiUrl } from '@/utils/networkConfig'
+import QRCode from 'qrcode'
+
+const router = useRouter()
+const userStore = useUserStore()
 
 const props = defineProps({
   compact: {
@@ -77,45 +97,147 @@ const emit = defineEmits(['login-success'])
 
 const loading = ref(false)
 const qrDialogVisible = ref(false)
-const qrCodeUrl = ref('')
-const mockScanUrl = ref('')
+const qrCodeDataUrl = ref('')
+const qrStatus = ref('loading') // loading, waiting, scanned, confirmed, expired
+const scannedUser = ref(null)
+const state = ref('')
+const countdownSeconds = ref(600) // 10分钟
+
+let pollingTimer = null
+let countdownTimer = null
 
 const handleQQLogin = async () => {
   loading.value = true
+  qrStatus.value = 'loading'
 
   try {
-    const response = await oauthAPI.getQQAuthorizeUrl('/home')
+    // 1. 获取授权 URL 和 state
+    const authRes = await oauthAPI.getQQAuthorizeUrl('/dashboard')
 
-    if (response.code === 200) {
-      mockScanUrl.value = buildApiUrl(`/api/auth/oauth/qq/mock-scan?state=${response.data.state}`)
-
-      const qrResponse = await oauthAPI.getQQQRCode(response.data.state)
-      if (qrResponse.code === 200) {
-        qrCodeUrl.value = qrResponse.data.qrContent
-        qrDialogVisible.value = true
-      }
+    if (authRes.code !== 200) {
+      throw new Error(authRes.message || 'Failed to get authorize URL')
     }
-  } catch (error) {
-    ElMessage.error(error.message || 'QQ登录发起失败')
-  } finally {
+
+    state.value = authRes.data.state
+
+    // 2. 获取二维码
+    const qrRes = await oauthAPI.getQQQRCode(authRes.data.state)
+
+    if (qrRes.code !== 200) {
+      throw new Error(qrRes.message || 'Failed to generate QR code')
+    }
+
+    // 3. 生成二维码图片
+    qrCodeDataUrl.value = await QRCode.toDataURL(qrRes.data.qrContent || qrRes.data.qrCodeUrl, {
+      width: 240,
+      margin: 1,
+      color: {
+        dark: '#000000',
+        light: '#FFFFFF'
+      }
+    })
+
+    // 4. 显示对话框
+    qrDialogVisible.value = true
+    qrStatus.value = 'waiting'
+    countdownSeconds.value = 600
+    scannedUser.value = null
+
+    // 5. 开始轮询状态
+    startPolling(authRes.data.state)
+
+    // 6. 开始倒计时
+    startCountdown()
+
     loading.value = false
+  } catch (error) {
+    loading.value = false
+    qrDialogVisible.value = false
+    ElMessage.error(error.message || 'QQ登录发起失败')
+    stopPolling()
+    stopCountdown()
   }
 }
 
-const openMockScanUrl = () => {
-  if (mockScanUrl.value) {
-    window.open(mockScanUrl.value, '_blank', 'width=600,height=600')
+function startPolling(currentState) {
+  // 每2秒轮询一次
+  pollingTimer = setInterval(async () => {
+    try {
+      const res = await oauthAPI.pollQQQRStatus(currentState)
+
+      if (res.code !== 200) {
+        return
+      }
+
+      const { status, username, avatar } = res.data
+
+      if (status === 'scanned') {
+        qrStatus.value = 'scanned'
+        scannedUser.value = { username, avatar }
+      } else if (status === 'confirmed') {
+        qrStatus.value = 'confirmed'
+        stopPolling()
+        stopCountdown()
+
+        // 等待后端处理完成，然后跳转
+        setTimeout(() => {
+          router.push('/dashboard')
+          qrDialogVisible.value = false
+        }, 500)
+      } else if (status === 'expired') {
+        qrStatus.value = 'expired'
+        stopPolling()
+        stopCountdown()
+      }
+    } catch (error) {
+      console.error('轮询失败:', error)
+    }
+  }, 2000)
+}
+
+function startCountdown() {
+  countdownTimer = setInterval(() => {
+    countdownSeconds.value--
+
+    if (countdownSeconds.value <= 0) {
+      qrStatus.value = 'expired'
+      stopPolling()
+      stopCountdown()
+    }
+  }, 1000)
+}
+
+function stopPolling() {
+  if (pollingTimer) {
+    clearInterval(pollingTimer)
+    pollingTimer = null
   }
 }
 
-const closeDialog = () => {
+function stopCountdown() {
+  if (countdownTimer) {
+    clearInterval(countdownTimer)
+    countdownTimer = null
+  }
+}
+
+function closeDialog() {
   qrDialogVisible.value = false
-  qrCodeUrl.value = ''
+  stopPolling()
+  stopCountdown()
+  qrCodeDataUrl.value = ''
+  qrStatus.value = 'loading'
+  scannedUser.value = null
 }
 
 defineExpose({
   closeDialog,
   startLogin: handleQQLogin
+})
+
+onBeforeUnmount(() => {
+  stopPolling()
+  stopCountdown()
 })
 </script>
 
@@ -168,59 +290,79 @@ defineExpose({
   padding: 20px;
 }
 
-.qr-code {
+/* 等待扫码状态 */
+.qr-waiting {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  min-height: 300px;
+}
+
+.qr-image {
+  width: 240px;
+  height: 240px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+}
+
+.qr-countdown {
+  font-size: 12px;
+  color: #F56C6C;
+  margin-top: 8px;
+  font-weight: 500;
+}
+
+/* 已扫码状态 */
+.qr-scanned,
+.qr-confirmed,
+.qr-expired {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 280px;
+}
+
+.qr-scanned .qr-tip,
+.qr-confirmed .qr-tip,
+.qr-expired .qr-tip {
+  margin-top: 16px;
+  margin-bottom: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #303133;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 12px 0;
+  font-size: 14px;
+  color: #606266;
+}
+
+.confirming {
+  font-size: 13px;
+  color: #909399;
+  margin-top: 8px;
+}
+
+.qr-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
   min-height: 200px;
 }
 
-.dev-qrcode {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 30px;
-  background: #f0f9ff;
-  border-radius: 12px;
-  border: 2px dashed #12B7F5;
-}
-
-.qr-tip {
+.qr-loading p {
   margin-top: 16px;
+  font-size: 14px;
   color: #606266;
-  font-size: 14px;
-}
-
-.loading-qr {
-  padding: 40px;
-  color: #909399;
-}
-
-.loading-qr p {
-  margin-top: 16px;
-  font-size: 14px;
-}
-
-.qr-footer {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  margin-top: 24px;
-  padding-top: 20px;
-  border-top: 1px solid #EBEEF5;
-  color: #909399;
-  font-size: 13px;
-}
-
-:deep(.el-dialog__header) {
-  text-align: center;
-  padding: 20px 20px 10px;
-}
-
-:deep(.el-dialog__body) {
-  padding: 10px 20px 30px;
 }
 
 .is-loading {

@@ -6,6 +6,7 @@
 const express = require('express')
 const cors = require('cors')
 const bodyParser = require('body-parser')
+const path = require('path')
 const apiRouter = require('./routes/api')
 const { initializeControllers } = require('./services/dataService')
 
@@ -34,6 +35,25 @@ app.use(bodyParser.json({ limit: '50mb' }))
 app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }))
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
+
+// 静态提供用户上传的资源（头像等）
+app.use('/api/uploads', express.static(path.join(__dirname, 'uploads')))
+
+// 根路径端点
+app.get('/', (req, res) => {
+  res.json({
+    code: 200,
+    message: 'AI Interview System API Server',
+    version: '1.0.0',
+    status: 'running',
+    timestamp: new Date().toISOString(),
+    endpoints: {
+      health: '/health',
+      api: '/api',
+      documentation: '/api/health'
+    }
+  })
+})
 
 // 健康检查端点（在所有其他路由之前）
 app.get('/health', (req, res) => {
