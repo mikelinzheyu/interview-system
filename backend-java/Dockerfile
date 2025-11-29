@@ -4,22 +4,19 @@
 # ====================================================
 
 # ==================== 构建阶段 ====================
-FROM node:18-alpine AS build
+FROM maven:3.9.0-eclipse-temurin-17-alpine AS build
 
 WORKDIR /build
-
-# Install JDK and Maven on Alpine
-RUN apk add --no-cache openjdk17 maven bash curl git
 
 # 首先复制pom.xml以利用Docker缓存
 COPY pom.xml /build/
 
 # 使用国内Maven镜像加速构建
 RUN mkdir -p /root/.m2 && \
-    printf '<?xml version="1.0" encoding="UTF-8"?>\n<settings>\n  <mirrors>\n    <mirror>\n      <id>aliyun</id>\n      <mirrorOf>central</mirrorOf>\n      <name>Aliyun Maven</name>\n      <url>https://maven.aliyun.com/repository/public</url>\n    </mirror>\n  </mirrors>\n</settings>' > /root/.m2/settings.xml
+    echo '<?xml version="1.0" encoding="UTF-8"?><settings><mirrors><mirror><id>aliyun</id><mirrorOf>central</mirrorOf><name>Aliyun Maven</name><url>https://maven.aliyun.com/repository/public</url></mirror></mirrors></settings>' > /root/.m2/settings.xml
 
 # 下载依赖（利用Docker层缓存）
-RUN mvn -v && mvn dependency:go-offline -B || true
+RUN mvn dependency:go-offline -B || true
 
 # 复制源代码
 COPY src /build/src
@@ -28,10 +25,10 @@ COPY src /build/src
 RUN mvn clean package -DskipTests -Dmaven.test.skip=true
 
 # ==================== 运行阶段 ====================
-FROM node:18-alpine
+FROM eclipse-temurin:17-jre-alpine
 
 # 安装必要工具
-RUN apk add --no-cache openjdk17-jre curl
+RUN apk add --no-cache curl
 
 # 设置时区
 ENV TZ=Asia/Shanghai
@@ -42,7 +39,7 @@ RUN addgroup -g 1001 -S appuser && adduser -S appuser -u 1001 -G appuser
 WORKDIR /app
 
 # 从构建阶段复制JAR文件
-COPY --from=build /build/target/*.jar /app/app.jar
+COPY --from=build /build/target/interview-server.jar /app/app.jar
 
 # 创建日志目录
 RUN mkdir -p /app/logs /app/uploads && \

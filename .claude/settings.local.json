@@ -20,7 +20,18 @@
       "Bash(git push:*)",
       "Bash(timeout 10 git push:*)",
       "Bash(git config:*)",
-      "Bash(git reset:*)"
+      "Bash(git reset:*)",
+      "Bash(docker compose:*)",
+      "Bash(docker ps:*)",
+      "Bash(xargs:*)",
+      "Bash(git fetch:*)",
+      "Bash(if [ -f .env ])",
+      "Bash(then echo \"✅ .env exists\")",
+      "Bash(cat:*)",
+      "Bash(else echo \"⚠️  .env not found, will copy from .env.production\")",
+      "Bash(fi)",
+      "Bash(docker volume ls:*)",
+      "Bash(timeout 300 docker-compose:*)"
     ],
     "deny": [],
     "ask": []

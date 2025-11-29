@@ -1,0 +1,18 @@
+{
+  "name": "interview-storage-service",
+  "version": "1.0.0",
+  "description": "Storage API Service for Interview System",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "redis": "^4.6.12",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
