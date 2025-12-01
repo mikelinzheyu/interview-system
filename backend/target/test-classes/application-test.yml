@@ -1,0 +1,24 @@
+﻿spring:
+  datasource:
+    url: jdbc:h2:mem:wronganswer;MODE=MySQL;DB_CLOSE_DELAY=-1;DATABASE_TO_UPPER=false
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: 
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:schema.sql
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration
+      - org.springframework.boot.autoconfigure.data.redis.RedisRepositoriesAutoConfiguration
+
+mybatis:
+  mapper-locations: classpath*:mapper/*.xml
+  type-aliases-package: com.interview.entity
+  configuration:
+    map-underscore-to-camel-case: true
+
+server:
+  servlet:
+    context-path: /api/v1
