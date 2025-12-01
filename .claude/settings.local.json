@@ -20,7 +20,16 @@
       "Bash(git push:*)",
       "Bash(timeout 10 git push:*)",
       "Bash(git config:*)",
-      "Bash(git reset:*)"
+      "Bash(git reset:*)",
+      "Bash(git fetch:*)",
+      "Bash(cd:*)",
+      "Bash(dir /s /b docker-compose* package.json pom.xml)",
+      "Bash(cat:*)",
+      "Bash(npm start)",
+      "Bash(npm run dev:*)",
+      "Bash(netstat:*)",
+      "Bash(timeout 5 sleep:*)",
+      "Bash(mysql:*)"
     ],
     "deny": [],
     "ask": []
