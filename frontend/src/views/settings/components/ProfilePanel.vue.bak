@@ -1,0 +1,358 @@
+<template>
+  <SettingsCard>
+    <div class="profile-grid">
+      
+      <!-- Left Column: Avatar -->
+      <div class="avatar-col">
+        <div class="avatar-wrapper">
+          <!-- Placeholder for Avatar Image -->
+          <div class="avatar-image" :class="{ 'has-image': form.avatarUrl }">
+            <img v-if="form.avatarUrl" :src="form.avatarUrl" alt="Avatar" />
+            <User v-else :size="48" class="avatar-icon" />
+          </div>
+          
+          <button class="upload-btn">
+            <Camera :size="16" />
+            <span>更换头像</span>
+          </button>
+          
+          <p class="avatar-tip">支持 JPG, PNG 格式<br>文件小于 2MB</p>
+        </div>
+      </div>
+
+      <!-- Right Column: Form -->
+      <div class="form-col">
+        <form class="form-stack" @submit.prevent="saveProfile">
+          
+          <!-- Username (Readonly) -->
+          <div class="form-group">
+            <label class="form-label">用户名</label>
+            <div class="input-wrapper disabled">
+              <User :size="18" class="input-icon" />
+              <input type="text" v-model="form.username" readonly class="form-input" />
+              <Lock :size="14" class="lock-icon" />
+            </div>
+          </div>
+
+          <!-- Nickname -->
+          <div class="form-group">
+            <label class="form-label">昵称</label>
+            <div class="input-wrapper">
+              <input type="text" v-model="form.nickname" placeholder="如何称呼您？" class="form-input" />
+            </div>
+          </div>
+
+          <!-- Gender -->
+          <div class="form-group">
+            <label class="form-label">性别</label>
+            <div class="gender-options">
+              <label 
+                v-for="g in genders" 
+                :key="g.value"
+                class="gender-radio"
+                :class="{ active: form.gender === g.value }"
+              >
+                <input type="radio" v-model="form.gender" :value="g.value" class="sr-only">
+                <span>{{ g.label }}</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Birthday -->
+          <div class="form-group">
+            <label class="form-label">生日</label>
+            <input type="date" v-model="form.birthday" class="form-input" />
+          </div>
+
+          <!-- Bio -->
+          <div class="form-group">
+            <label class="form-label">个性签名</label>
+            <textarea 
+              v-model="form.bio" 
+              rows="4" 
+              placeholder="写点什么介绍一下自己吧..." 
+              class="form-textarea"
+            ></textarea>
+            <div class="char-count">{{ form.bio.length }}/100</div>
+          </div>
+
+          <!-- Actions -->
+          <div class="form-actions">
+            <button type="submit" class="save-btn">
+              保存修改
+            </button>
+          </div>
+
+        </form>
+      </div>
+
+    </div>
+  </SettingsCard>
+</template>
+
+<script setup>
+import { reactive } from 'vue';
+import SettingsCard from './SettingsCard.vue';
+import { User, Camera, Lock } from 'lucide-vue-next';
+
+const form = reactive({
+  avatarUrl: '',
+  username: 'zenith_user_2024',
+  nickname: '',
+  gender: 'secret',
+  birthday: '',
+  bio: ''
+});
+
+const genders = [
+  { label: '男', value: 'male' },
+  { label: '女', value: 'female' },
+  { label: '保密', value: 'secret' }
+];
+
+const saveProfile = () => {
+  console.log('Saving profile:', form);
+  // Logic to be added
+};
+</script>
+
+<style scoped lang="scss">
+@import '@/styles/settings-theme.scss';
+
+.profile-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 3rem;
+
+  @media (min-width: 768px) {
+    flex-direction: row;
+    align-items: flex-start;
+  }
+}
+
+/* Avatar Column */
+.avatar-col {
+  display: flex;
+  justify-content: center;
+  
+  @media (min-width: 768px) {
+    flex: 0 0 12rem;
+    border-right: 1px solid var(--color-slate-100);
+    padding-right: 2rem;
+    justify-content: flex-start;
+  }
+}
+
+.avatar-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.avatar-image {
+  width: 8rem; /* w-32 */
+  height: 8rem;
+  border-radius: 9999px;
+  background-color: var(--color-slate-100);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-slate-300);
+  border: 4px solid white;
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+.upload-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background-color: white;
+  border: 1px solid var(--color-slate-200);
+  border-radius: 9999px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-slate-600);
+  cursor: pointer;
+  @include transition-all;
+
+  &:hover {
+    border-color: var(--color-blue-300);
+    color: var(--color-blue-600);
+  }
+}
+
+.avatar-tip {
+  font-size: 0.75rem;
+  color: var(--color-slate-400);
+  text-align: center;
+  line-height: 1.5;
+}
+
+/* Form Column */
+.form-col {
+  flex: 1;
+}
+
+.form-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-slate-700);
+}
+
+.input-wrapper {
+  position: relative;
+  
+  &.disabled {
+    opacity: 0.7;
+  }
+}
+
+.input-icon {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--color-slate-400);
+}
+
+.lock-icon {
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--color-slate-400);
+}
+
+.form-input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--color-slate-200);
+  border-radius: 0.75rem;
+  font-size: 0.875rem;
+  color: var(--color-slate-800);
+  background-color: var(--color-slate-50);
+  outline: none;
+  @include transition-all;
+
+  .input-wrapper & {
+    padding-left: 2.75rem; /* Space for icon */
+  }
+
+  &:focus:not([readonly]) {
+    background-color: white;
+    border-color: var(--color-blue-500);
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+  }
+}
+
+.form-textarea {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--color-slate-200);
+  border-radius: 0.75rem;
+  font-size: 0.875rem;
+  color: var(--color-slate-800);
+  background-color: var(--color-slate-50);
+  outline: none;
+  resize: vertical;
+  font-family: inherit;
+  @include transition-all;
+
+  &:focus {
+    background-color: white;
+    border-color: var(--color-blue-500);
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+  }
+}
+
+.char-count {
+  text-align: right;
+  font-size: 0.75rem;
+  color: var(--color-slate-400);
+}
+
+/* Gender Radio */
+.gender-options {
+  display: flex;
+  gap: 1rem;
+}
+
+.gender-radio {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem;
+  border: 1px solid var(--color-slate-200);
+  border-radius: 0.75rem;
+  cursor: pointer;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-slate-600);
+  background-color: white;
+  @include transition-all;
+
+  &:hover {
+    border-color: var(--color-blue-300);
+    background-color: var(--color-blue-50);
+  }
+
+  &.active {
+    border-color: var(--color-blue-500);
+    background-color: var(--color-blue-500);
+    color: white;
+    box-shadow: var(--shadow-md);
+  }
+}
+
+/* Actions */
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 1rem;
+}
+
+.save-btn {
+  padding: 0.75rem 2.5rem;
+  background-color: var(--color-blue-600);
+  color: white;
+  font-size: 0.875rem;
+  font-weight: 600;
+  border-radius: 0.75rem;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.25);
+  @include transition-all;
+
+  &:hover {
+    background-color: var(--color-blue-700);
+    transform: translateY(-1px);
+    box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.4);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+</style>

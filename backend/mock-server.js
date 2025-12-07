@@ -169,7 +169,29 @@ const mockData = {
         fontSize: 'medium',
         language: 'zh-CN'
       },
-      twoFactorEnabled: false
+      twoFactorEnabled: false,
+      isTwoFactorEnabled: false,
+      lastPasswordChange: new Date(Date.now() - 1000 * 60 * 60 * 24 * 30).toISOString(),
+      loginDevices: [
+        {
+          id: 'dev_current',
+          deviceName: 'Chrome on Windows',
+          browser: 'Chrome 120.0',
+          os: 'Windows 10',
+          lastActiveAt: new Date().toISOString(),
+          ipAddress: '192.168.1.101',
+          isCurrent: true
+        },
+        {
+          id: 'dev_mobile',
+          deviceName: 'Safari on iPhone',
+          browser: 'Safari 17',
+          os: 'iOS 17',
+          lastActiveAt: new Date(Date.now() - 86400000).toISOString(),
+          ipAddress: '10.0.0.5',
+          isCurrent: false
+        }
+      ]
     }
   ],
 
@@ -6701,6 +6723,20 @@ const routes = {
     })
   },
 
+  // 获取隐私设置
+  'GET:/api/users/privacy': (req, res) => {
+    const user = mockData.users[0] || {}
+    const defaults = {
+      onlineStatus: true,
+      allowMessages: true,
+      shareLocation: false,
+      profileVisibility: 'public'
+    }
+    const privacy = { ...defaults, ...(user.privacy || user.privacySettings || {}) }
+    mockData.users[0] = { ...user, privacy }
+    sendResponse(res, 200, privacy, '隐私设置获取成功')
+  },
+
   // 更新隐私设置
   'PUT:/api/users/privacy': (req, res) => {
     let body = ''
@@ -6716,6 +6752,23 @@ const routes = {
         sendResponse(res, 400, null, '请求数据格式错误')
       }
     })
+  },
+
+  // 获取通知设置
+  'GET:/api/users/notification': (req, res) => {
+    const user = mockData.users[0] || {}
+    const defaults = {
+      emailNotifications: false,
+      smsNotifications: false,
+      pushNotifications: true,
+      commentNotifications: true,
+      messageNotifications: true,
+      systemNotifications: true,
+      soundEnabled: true
+    }
+    const notification = { ...defaults, ...(user.notification || {}) }
+    mockData.users[0] = { ...user, notification }
+    sendResponse(res, 200, notification, '通知设置获取成功')
   },
 
   // 更新通知设置
@@ -6735,7 +6788,36 @@ const routes = {
     })
   },
 
+  // 获取安全信息
+  'GET:/api/users/security': (req, res) => {
+    const user = mockData.users[0] || {}
+    const security = {
+      phoneNumber: user.phone || '',
+      phoneVerified: !!user.phoneVerified,
+      email: user.email || '',
+      emailVerified: !!user.emailVerified,
+      isTwoFactorEnabled: !!(user.isTwoFactorEnabled ?? user.twoFactorEnabled),
+      lastPasswordChange: user.lastPasswordChange || new Date(Date.now() - 100000000).toISOString(),
+      loginDevices: user.loginDevices || []
+    }
+    mockData.users[0] = { ...user, isTwoFactorEnabled: security.isTwoFactorEnabled }
+    sendResponse(res, 200, security, '安全信息获取成功')
+  },
+
   // 更新界面设置
+  'GET:/api/users/preferences': (req, res) => {
+    const user = mockData.users[0] || {}
+    const basePreferences = {
+      theme: 'light',
+      accentColor: user.preferences?.accentColor || user.preferences?.primaryColor || '#409EFF',
+      fontSize: 'medium'
+    }
+    const preferences = { ...basePreferences, ...(user.preferences || {}) }
+    mockData.users[0] = { ...user, preferences }
+
+    sendResponse(res, 200, preferences, 'Preferences fetched successfully')
+  },
+
   'PUT:/api/users/preferences': (req, res) => {
     let body = ''
     req.on('data', chunk => { body += chunk.toString() })

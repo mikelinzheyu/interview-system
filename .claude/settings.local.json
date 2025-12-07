@@ -31,7 +31,14 @@
       "Bash(else echo \"⚠️  .env not found, will copy from .env.production\")",
       "Bash(fi)",
       "Bash(docker volume ls:*)",
-      "Bash(timeout 300 docker-compose:*)"
+      "Bash(timeout 300 docker-compose:*)",
+      "Bash(npm start)",
+      "Bash(timeout 5 sleep:*)",
+      "Bash(\"C:\\Program Files\\nodejs\\node.exe\" \"D:\\code7\\interview-system\\backend\\start-server.js\")",
+      "Bash(\"C:\\Program Files\\nodejs\\node.exe\" \"node_modules/vite/bin/vite.js\" --port 5174)",
+      "Bash(timeout 10 sleep:*)",
+      "Bash(git checkout:*)",
+      "Bash(find:*)"
     ],
     "deny": [],
     "ask": []

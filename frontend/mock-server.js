@@ -22,7 +22,41 @@ const mockData = {
       id: 1,
       username: 'testuser',
       email: 'test@example.com',
-      role: 'user'
+      phone: '13800138000',
+      phoneVerified: true,
+      role: 'user',
+      privacy: {
+        onlineStatus: true,
+        allowMessages: true,
+        shareLocation: false,
+        profileVisibility: 'public'
+      },
+      notification: {
+        emailNotifications: false,
+        smsNotifications: false,
+        pushNotifications: true,
+        commentNotifications: true,
+        messageNotifications: true,
+        systemNotifications: true,
+        soundEnabled: true
+      },
+      preferences: {
+        theme: 'light',
+        accentColor: 'blue',
+        fontSize: 'medium'
+      },
+      isTwoFactorEnabled: false,
+      loginDevices: [
+        {
+          id: 'dev_current',
+          deviceName: 'Chrome on Windows',
+          browser: 'Chrome 120.0',
+          os: 'Windows 10',
+          lastActiveAt: new Date().toISOString(),
+          ipAddress: '192.168.1.101',
+          isCurrent: true
+        }
+      ]
     }
   ],
 
@@ -329,6 +363,113 @@ const routes = {
   // 用户相关
   'GET:/api/users/me': (req, res) => {
     sendResponse(res, 200, mockData.users[0])
+  },
+
+  'GET:/api/users/preferences': (req, res) => {
+    const user = mockData.users[0] || {}
+    const basePreferences = {
+      theme: 'light',
+      accentColor: user.preferences?.accentColor || '#409EFF',
+      fontSize: 'medium'
+    }
+    const preferences = { ...basePreferences, ...(user.preferences || {}) }
+    mockData.users[0] = { ...user, preferences }
+
+    sendResponse(res, 200, preferences, 'Preferences fetched successfully')
+  },
+
+  'PUT:/api/users/preferences': (req, res) => {
+    let body = ''
+    req.on('data', chunk => { body += chunk.toString() })
+    req.on('end', () => {
+      try {
+        const preferences = JSON.parse(body)
+        const user = mockData.users[0] || {}
+        mockData.users[0] = {
+          ...user,
+          preferences: { ...(user.preferences || {}), ...preferences }
+        }
+        sendResponse(res, 200, mockData.users[0].preferences, 'Preferences updated successfully')
+      } catch (error) {
+        sendResponse(res, 400, null, 'Invalid preferences payload')
+      }
+    })
+  },
+
+  'GET:/api/users/privacy': (req, res) => {
+    const user = mockData.users[0] || {}
+    const defaults = {
+      onlineStatus: true,
+      allowMessages: true,
+      shareLocation: false,
+      profileVisibility: 'public'
+    }
+    const privacy = { ...defaults, ...(user.privacy || {}) }
+    mockData.users[0] = { ...user, privacy }
+    sendResponse(res, 200, privacy)
+  },
+
+  'PUT:/api/users/privacy': (req, res) => {
+    let body = ''
+    req.on('data', chunk => { body += chunk.toString() })
+    req.on('end', () => {
+      try {
+        const privacy = JSON.parse(body)
+        const user = mockData.users[0] || {}
+        const merged = { ...(user.privacy || {}), ...privacy }
+        mockData.users[0] = { ...user, privacy: merged }
+        sendResponse(res, 200, merged)
+      } catch (error) {
+        sendResponse(res, 400, null, 'Invalid privacy payload')
+      }
+    })
+  },
+
+  'GET:/api/users/notification': (req, res) => {
+    const user = mockData.users[0] || {}
+    const defaults = {
+      emailNotifications: false,
+      smsNotifications: false,
+      pushNotifications: true,
+      commentNotifications: true,
+      messageNotifications: true,
+      systemNotifications: true,
+      soundEnabled: true
+    }
+    const notification = { ...defaults, ...(user.notification || {}) }
+    mockData.users[0] = { ...user, notification }
+    sendResponse(res, 200, notification)
+  },
+
+  'PUT:/api/users/notification': (req, res) => {
+    let body = ''
+    req.on('data', chunk => { body += chunk.toString() })
+    req.on('end', () => {
+      try {
+        const payload = JSON.parse(body)
+        const user = mockData.users[0] || {}
+        const merged = { ...(user.notification || {}), ...payload }
+        mockData.users[0] = { ...user, notification: merged }
+        sendResponse(res, 200, merged)
+      } catch (error) {
+        sendResponse(res, 400, null, 'Invalid notification payload')
+      }
+    })
+  },
+
+  'GET:/api/users/security': (req, res) => {
+    const user = mockData.users[0] || {}
+    const security = {
+      phoneNumber: user.phone || '',
+      phoneVerified: !!user.phoneVerified,
+      email: user.email || '',
+      emailVerified: !!user.emailVerified,
+      isTwoFactorEnabled: !!(user.isTwoFactorEnabled),
+      lastPasswordChange: user.lastPasswordChange || new Date(Date.now() - 100000000).toISOString(),
+      loginDevices: user.loginDevices || []
+    }
+    mockData.users[0] = { ...user, isTwoFactorEnabled: security.isTwoFactorEnabled }
+    sendResponse(res, 200, security)
   },
 
   'POST:/api/auth/login': (req, res) => {

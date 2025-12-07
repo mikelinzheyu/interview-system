@@ -2,7 +2,7 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { ElMessage } from 'element-plus'
 import { api } from '@/api'
-import { mockWrongAnswers, mockWrongAnswerSessions, buildWrongAnswerStats, mockReviewLogs } from '@/data/mock-wrong-answers'
+import { mockWrongAnswers, buildWrongAnswerStats, mockReviewLogs } from '@/data/mock-wrong-answers'
 
 const USE_MOCK = import.meta.env.VITE_USE_MOCK_DATA !== 'false'
 

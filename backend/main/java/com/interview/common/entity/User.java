@@ -24,6 +24,14 @@ public class User {
     private Integer studyTime;
     private Integer interviewCount;
 
+    private String nickname;
+    private String gender;
+    private String birthday;
+    private Boolean twoFactorEnabled;
+    private String preferences;
+    private String notificationSettings;
+    private String privacySettings;
+
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'")
     private LocalDateTime createdAt;
 
@@ -42,6 +50,7 @@ public class User {
         this.accuracyRate = 0.0;
         this.studyTime = 0;
         this.interviewCount = 0;
+        this.twoFactorEnabled = false;
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
     }
@@ -156,6 +165,62 @@ public class User {
 
     public void setInterviewCount(Integer interviewCount) {
         this.interviewCount = interviewCount;
+    }
+
+    public String getNickname() {
+        return nickname;
+    }
+
+    public void setNickname(String nickname) {
+        this.nickname = nickname;
+    }
+
+    public String getGender() {
+        return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
+    }
+
+    public String getBirthday() {
+        return birthday;
+    }
+
+    public void setBirthday(String birthday) {
+        this.birthday = birthday;
+    }
+
+    public Boolean getTwoFactorEnabled() {
+        return twoFactorEnabled;
+    }
+
+    public void setTwoFactorEnabled(Boolean twoFactorEnabled) {
+        this.twoFactorEnabled = twoFactorEnabled;
+    }
+
+    public String getPreferences() {
+        return preferences;
+    }
+
+    public void setPreferences(String preferences) {
+        this.preferences = preferences;
+    }
+
+    public String getNotificationSettings() {
+        return notificationSettings;
+    }
+
+    public void setNotificationSettings(String notificationSettings) {
+        this.notificationSettings = notificationSettings;
+    }
+
+    public String getPrivacySettings() {
+        return privacySettings;
+    }
+
+    public void setPrivacySettings(String privacySettings) {
+        this.privacySettings = privacySettings;
     }
 
     public LocalDateTime getCreatedAt() {

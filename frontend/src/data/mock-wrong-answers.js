@@ -1,65 +1,142 @@
-// Mock data for wrong-answer features to keep UI working without backend
-const now = Date.now()
+import { MistakeType, SourceType } from '../views/chat/types'
 
-export const mockWrongAnswerSessions = [
-  { sessionId: 'ai-2024-10-001', jobTitle: '前端开发工程师面试（AI）' },
-  { sessionId: 'ai-2024-10-002', jobTitle: '全栈工程师面试（AI）' },
-  { sessionId: 'ai-2024-10-003', jobTitle: '后端工程师面试（AI）' }
-]
-
+// Mock data based on test12 - enhanced UI/UX
 export const mockWrongAnswers = [
   {
-    id: 'wa-001',
-    questionId: 101,
-    questionTitle: '什么是闭包？在实际项目中如何应用？',
-    questionContent: '请解释 JavaScript 闭包的概念，并给出两个常见使用场景。',
-    errorType: 'knowledge',
+    id: '1',
+    question: 'HTTP 缓存控制策略有哪些？',
+    snippet: '对比强缓存与协商缓存，说明适用场景与常见 Header。Expires 和 Cache-Control 的区别，以及 Last-Modified/If-Modified-Since 的运作机制...',
+    type: MistakeType.INCOMPLETE,
+    source: SourceType.FULLSTACK_INTERVIEW,
+    tags: ['HTTP', 'Network', 'Web Performance'],
+    mistakeCount: 5,
+    mastery: 15,
+    isFavorite: true,
+    isIgnored: true
+  },
+  {
+    id: '2',
+    question: '什么是闭包？在实际项目中如何应用？',
+    snippet: '请解释 JavaScript 闭包的概念，并给出两个常见使用场景。例如模块化封装私有变量，以及防抖节流函数中的应用...',
+    type: MistakeType.KNOWLEDGE_GAP,
+    source: SourceType.FRONTEND_INTERVIEW,
+    tags: ['JavaScript', 'Core Concept'],
+    mistakeCount: 3,
     mastery: 45,
-    wrongCount: 3,
-    correctCount: 1,
-    difficulty: 'medium',
-    reviewStatus: 'reviewing',
-    source: 'ai_interview',
-    sessionId: 'ai-2024-10-001',
-    lastWrongTime: new Date(now - 1000 * 60 * 60 * 20).toISOString(),
-    nextReviewTime: new Date(now + 1000 * 60 * 60 * 6).toISOString(),
-    updatedAt: new Date(now - 1000 * 60 * 60 * 3).toISOString()
+    lastReviewed: '20小时前',
+    isFavorite: false,
+    isIgnored: false
   },
   {
-    id: 'wa-002',
-    questionId: 202,
-    questionTitle: 'Vue3 的响应式原理是怎样的？',
-    questionContent: '基于 Proxy 的依赖收集与触发机制，简述核心流程。',
-    errorType: 'logic',
-    mastery: 62,
-    wrongCount: 2,
-    correctCount: 3,
-    difficulty: 'hard',
-    reviewStatus: 'unreviewed',
-    source: 'question_bank',
-    sessionId: null,
-    lastWrongTime: new Date(now - 1000 * 60 * 60 * 48).toISOString(),
-    nextReviewTime: new Date(now + 1000 * 60 * 60 * 24).toISOString(),
-    updatedAt: new Date(now - 1000 * 60 * 60 * 26).toISOString()
+    id: '3',
+    question: 'React Fiber 的工作原理是什么？',
+    snippet: '解释 React 16+ 的协调引擎如何通过链表结构实现任务分割与优先级调度。requestIdleCallback 的作用以及它在浏览器渲染帧中的位置...',
+    type: MistakeType.LOGIC_CONFUSION,
+    source: SourceType.FRONTEND_INTERVIEW,
+    tags: ['React', 'Fiber', 'Source Code'],
+    mistakeCount: 8,
+    mastery: 10,
+    lastReviewed: '1天前',
+    isFavorite: true,
+    isIgnored: false
   },
   {
-    id: 'wa-003',
-    questionId: 203,
-    questionTitle: 'HTTP 缓存控制策略有哪些？',
-    questionContent: '对比强缓存与协商缓存，说明适用场景与常见 Header。',
-    errorType: 'incomplete',
+    id: '4',
+    question: 'TCP 三次握手与四次挥手全过程',
+    snippet: '详细描述 SYN, ACK, FIN 标志位的变化以及序列号的传递。为什么需要三次握手而不是两次？TIME_WAIT 状态存在的意义是什么...',
+    type: MistakeType.KNOWLEDGE_GAP,
+    source: SourceType.BACKEND_INTERVIEW,
+    tags: ['Network', 'TCP/IP'],
+    mistakeCount: 2,
+    mastery: 80,
+    lastReviewed: '2天前',
+    isFavorite: false,
+    isIgnored: false
+  },
+  {
+    id: '5',
+    question: 'Vue 3 响应式原理与 Vue 2 的区别',
+    snippet: 'Proxy 与 Object.defineProperty 的性能差异，以及对数组和新增属性的支持情况。Reflect 在其中的作用...',
+    type: MistakeType.EXPRESSION,
+    source: SourceType.FRONTEND_INTERVIEW,
+    tags: ['Vue', 'Proxy', 'Reactive'],
+    mistakeCount: 4,
+    mastery: 55,
+    lastReviewed: '5小时前',
+    isFavorite: false,
+    isIgnored: false
+  },
+  {
+    id: '6',
+    question: 'Webpack Loader 和 Plugin 的区别',
+    snippet: 'Loader 负责转换源文件，Plugin 负责监听构建生命周期并注入功能。请手写一个简单的 Loader...',
+    type: MistakeType.INCOMPLETE,
+    source: SourceType.FULLSTACK_INTERVIEW,
+    tags: ['Webpack', 'Build Tools'],
+    mistakeCount: 1,
+    mastery: 90,
+    lastReviewed: '30分钟前',
+    isFavorite: false,
+    isIgnored: false
+  },
+  {
+    id: '7',
+    question: '二叉树的层序遍历',
+    snippet: '实现二叉树的层序遍历，要求输出二维数组。使用队列实现广度优先搜索 (BFS)...',
+    type: MistakeType.LOGIC_CONFUSION,
+    source: SourceType.QUESTION_BANK,
+    tags: ['Algorithm', 'Tree', 'BFS'],
+    mistakeCount: 6,
     mastery: 30,
-    wrongCount: 5,
-    correctCount: 0,
-    difficulty: 'medium',
-    reviewStatus: 'unreviewed',
-    source: 'ai_interview',
-    sessionId: 'ai-2024-10-002',
-    lastWrongTime: new Date(now - 1000 * 60 * 60 * 3).toISOString(),
-    nextReviewTime: new Date(now + 1000 * 60 * 60 * 2).toISOString(),
-    updatedAt: new Date(now - 1000 * 60 * 60 * 2).toISOString()
+    lastReviewed: '4小时前',
+    isFavorite: false,
+    isIgnored: false
+  },
+  {
+    id: '8',
+    question: '手写 Promise.allSettled',
+    snippet: 'Promise.allSettled 与 Promise.all 的区别。请手动实现一个 polyfill...',
+    type: MistakeType.INCOMPLETE,
+    source: SourceType.QUESTION_BANK,
+    tags: ['JavaScript', 'Promise', 'Polyfill'],
+    mistakeCount: 2,
+    mastery: 60,
+    lastReviewed: '1小时前',
+    isFavorite: true,
+    isIgnored: false
+  },
+  {
+    id: '9',
+    question: 'CSS 盒模型与 BFC',
+    snippet: '标准盒模型与 IE 盒模型的区别。BFC 的触发条件及其在布局中的应用（清除浮动、防止 margin 重叠）...',
+    type: MistakeType.KNOWLEDGE_GAP,
+    source: SourceType.MOCK_EXAM,
+    tags: ['CSS', 'Layout'],
+    mistakeCount: 1,
+    mastery: 85,
+    lastReviewed: '5天前',
+    isFavorite: false,
+    isIgnored: false
   }
 ]
+
+// Mock review batches for WrongAnswersPage "batches" tab
+export const mockReviewBatches = [
+  {
+    id: 'b1',
+    name: '网络协议专项',
+    mistakeIds: ['1', '4'],
+    createdAt: new Date().toISOString()
+  },
+  {
+    id: 'b2',
+    name: '前端核心考点',
+    mistakeIds: ['2', '3', '5'],
+    createdAt: new Date().toISOString()
+  }
+]
+
+const now = Date.now()
 
 export const mockReviewLogs = [
   { id: 'log-1', recordId: 'wa-001', result: 'fail', errorType: 'knowledge', createdAt: new Date(now - 1000 * 60 * 60 * 18).toISOString() },

@@ -23,14 +23,23 @@ api.interceptors.request.use(
 )
 
 // 响应拦截器：统一处理 code !== 200 的业务错误和 HTTP 错误
+// 同时对响应数据进行统一适配，确保所有调用方看到一致的结构
 api.interceptors.response.use(
   (response) => {
     const res = response.data
 
+    // 检查业务错误（code !== 200）
     if (res && typeof res.code !== 'undefined' && res.code !== 200) {
       const msg = res.message || '请求失败，请稍后重试'
       ElMessage.error(msg)
       return Promise.reject(new Error(msg))
+    }
+
+    // 统一适配响应结构
+    // 确保返回的对象始终是 { code, message, data } 的格式
+    // 新 API 调用可以安全地使用 response.data 获取业务数据
+    if (res && typeof res === 'object' && 'code' in res) {
+      return res
     }
 
     return res

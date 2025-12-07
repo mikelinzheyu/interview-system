@@ -1,1248 +1,1573 @@
-﻿<template>
-  <div class="wrong-answers-page">
-    <!-- NEW: Page Header Section -->
-    <section class="page-header">
+<template>
+  <div class="wa-page">
+    <!-- Header -->
+    <header class="wa-header">
       <div class="header-content">
-        <h1>错题诊断和复习</h1>
-        <p class="subtitle">系统化复习你的错误答案，针对性提升薄弱知识点</p>
+        <!-- Left: Logo & Title -->
+        <div class="header-left">
+          <div class="logo-box">
+            <el-icon><Notebook /></el-icon>
+          </div>
+          <div class="title-box">
+            <h1>错题本</h1>
+            <span>错题诊断与复习平台</span>
+          </div>
+          
+          <!-- Navigation Tabs -->
+          <nav class="nav-tabs hidden-sm-and-down">
+            <button
+              v-for="tab in tabs"
+              :key="tab.value"
+              class="nav-tab"
+              :class="{ active: activeTab === tab.value }"
+              @click="handleTabChange(tab.value)"
+            >
+              {{ tab.label }}
+            </button>
+          </nav>
+        </div>
 
-        <!-- 标签页：AI错题 / 题库错题 -->
-        <el-tabs v-model="activeTab" @change="applyFilters" class="header-tabs">
-          <el-tab-pane label="面试错题" name="ai">
-            <template #label>
-              <span><el-icon><ChatDotRound /></el-icon> 面试错题</span>
-            </template>
-          </el-tab-pane>
-          <el-tab-pane label="题库错题" name="bank">
-            <template #label>
-              <span><el-icon><Notebook /></el-icon> 题库错题</span>
-            </template>
-          </el-tab-pane>
-        </el-tabs>
+        <!-- Right: Actions -->
+        <div class="header-right">
+          <!-- View Toggle (Grid/List) -->
+          <div class="view-toggle hidden-md-and-down" v-if="activeTab !== 'batches'">
+            <button
+              :class="{ active: viewMode === 'grid' }"
+              @click="viewMode = 'grid'"
+              title="网格视图"
+            >
+              <el-icon><Grid /></el-icon>
+            </button>
+            <button
+              :class="{ active: viewMode === 'list' }"
+              @click="viewMode = 'list'"
+              title="列表视图"
+            >
+              <el-icon><List /></el-icon>
+            </button>
+          </div>
+
+          <div class="divider hidden-md-and-down"></div>
+
+          <el-button type="primary" class="start-review-btn" @click="startReview">
+            <el-icon><VideoPlay /></el-icon>
+            <span>开始复习</span>
+          </el-button>
+        </div>
       </div>
+    </header>
 
-      <!-- 右侧操作按钮 -->
-      <div class="header-actions">
-        <el-button-group class="view-toggle">
-          <el-button :type="viewMode==='card' ? 'primary' : 'default'" @click="viewMode='card'" :icon="Grid">卡片</el-button>
-          <el-button :type="viewMode==='table' ? 'primary' : 'default'" @click="viewMode='table'" :icon="List">列表</el-button>
-        </el-button-group>
-        <el-button type="primary" @click="generateReviewPlan" :loading="loadingPlan">
-          <el-icon><Notebook /></el-icon>开始复习
-        </el-button>
-      </div>
-    </section>
+    <!-- Main Layout -->
+    <div class="main-layout">
+      <!-- Sidebar (Left) -->
+      <WrongAnswerSidebar
+        v-if="activeTab !== 'batches'"
+        v-model:filters="filters"
+        :all-tags="allTags"
+        :counts="counts"
+        :available-sources="availableSources"
+      />
 
-    <!-- NEW: Main Content Container with Grid Layout -->
-    <div class="content-wrapper">
-      <!-- Sidebar filters -->
-      <aside class="filter-panel">
-        <!-- 过滤组1: 错题来源 -->
-        <div class="filter-section">
-          <div class="filter-header">
-            <h4>错题来源</h4>
-            <template v-if="activeTab === 'ai'">
-              <div class="filter-ops">
-                <el-link type="primary" size="small" :underline="false" @click="selectAllSessions">全选</el-link>
-                <span class="op-divider">·</span>
-                <el-link type="info" size="small" :underline="false" @click="clearSessions">清空</el-link>
-              </div>
-            </template>
-            <template v-else>
-              <div class="filter-ops">
-                <el-link type="primary" size="small" :underline="false" @click="selectAllSources">全选</el-link>
-                <span class="op-divider">·</span>
-                <el-link type="info" size="small" :underline="false" @click="clearSources">清空</el-link>
-              </div>
-            </template>
-          </div>
-          <div class="filter-body">
-            <!-- AI 会话列表 -->
-            <template v-if="activeTab === 'ai'">
-              <el-input v-model="sessionsSearch" placeholder="搜索会话" size="small" clearable style="margin-bottom: 12px;" />
-              <el-checkbox-group v-model="selectedSessions" class="checkbox-list">
-                <div v-for="s in shownSessions" :key="s.sessionId" class="checkbox-item">
-                  <el-badge :value="sessionCounts[s.sessionId] || 0">
-                    <el-checkbox :label="s.sessionId">{{ s.jobTitle || s.sessionId }}</el-checkbox>
-                  </el-badge>
-                </div>
-              </el-checkbox-group>
-              <div v-if="filteredSessions.length > sessionShowLimit" style="text-align: center; margin-top: 8px;">
-                <el-button link type="primary" size="small" @click="sessionsCollapsed = !sessionsCollapsed">
-                  {{ sessionsCollapsed ? '展开更多' : '收起' }}
-                </el-button>
-              </div>
-            </template>
-
-            <!-- 题库来源 -->
-            <template v-else>
-              <el-checkbox-group v-model="selectedSources" class="checkbox-list">
-                <div class="checkbox-item">
-                  <el-badge :value="sourceCounts.question_bank || 0">
-                    <el-checkbox label="question_bank">题库</el-checkbox>
-                  </el-badge>
-                </div>
-                <div class="checkbox-item">
-                  <el-badge :value="sourceCounts.mock_exam || 0">
-                    <el-checkbox label="mock_exam">模拟考试</el-checkbox>
-                  </el-badge>
-                </div>
-              </el-checkbox-group>
-            </template>
-          </div>
-        </div>
-
-        <!-- 过滤组2: 错误诊断 -->
-        <div class="filter-section">
-          <div class="filter-header">
-            <h4>错误诊断</h4>
-            <div class="filter-ops">
-              <el-link type="primary" size="small" :underline="false" @click="selectAllErrorTypes">全选</el-link>
-              <span class="op-divider">·</span>
-              <el-link type="info" size="small" :underline="false" @click="clearErrorTypes">清空</el-link>
+      <!-- Main Content (Right) -->
+      <main class="content-area" :class="{ 'bg-white': activeTab === 'batches' }">
+        
+        <!-- BATCHES VIEW -->
+        <div v-if="activeTab === 'batches'" class="batches-container animate-fade-in">
+          <div class="batches-header">
+            <div>
+              <h2>我的复习集</h2>
+              <p>创建针对性复习计划，提升薄弱环节</p>
             </div>
+            <el-button type="primary" class="dark-btn" @click="openBatchModal()">
+              <el-icon><Plus /></el-icon>
+              新建复习集
+            </el-button>
           </div>
-          <div class="filter-body">
-            <el-checkbox-group v-model="selectedErrorTypes" class="checkbox-list">
-              <div class="checkbox-item">
-                <el-checkbox label="knowledge">知识点错误</el-checkbox>
-              </div>
-              <div class="checkbox-item">
-                <el-checkbox label="logic">逻辑混乱</el-checkbox>
-              </div>
-              <div class="checkbox-item">
-                <el-checkbox label="incomplete">回答不完整</el-checkbox>
-              </div>
-              <div class="checkbox-item">
-                <el-checkbox label="expression">表达不流畅</el-checkbox>
-              </div>
-            </el-checkbox-group>
-          </div>
-        </div>
 
-        <!-- 过滤组3: 知识点标签 -->
-        <div class="filter-section">
-          <div class="filter-header">
-            <h4>知识点标签</h4>
-            <div class="filter-ops">
-              <el-link type="primary" size="small" :underline="false" @click="selectAllKnowledge">全选</el-link>
-              <span class="op-divider">·</span>
-              <el-link type="info" size="small" :underline="false" @click="clearKnowledge">清空</el-link>
-            </div>
-          </div>
-          <div class="filter-body">
-            <el-input v-model="knowledgeSearch" placeholder="搜索知识点" size="small" clearable style="margin-bottom: 12px;" />
-            <div class="tag-group">
-              <el-check-tag v-for="tag in filteredKnowledgeTags" :key="tag" :checked="selectedKnowledge.has(tag)" @change="() => toggleKnowledge(tag)" style="margin-bottom: 6px;">
-                {{ tag }}
-              </el-check-tag>
-            </div>
-          </div>
-        </div>
-
-        <!-- 过滤组4: 排序方式 -->
-        <div class="filter-section">
-          <div class="filter-header">
-            <h4>排序方式</h4>
-          </div>
-          <div class="filter-body">
-            <el-radio-group v-model="sortBy" @change="applyFilters" style="width: 100%;">
-              <el-radio-button label="recent">最近时间</el-radio-button>
-              <el-radio-button label="reviewed">答题次数</el-radio-button>
-              <el-radio-button label="nextReview">下次复习</el-radio-button>
-              <el-radio-button label="priority">优先级</el-radio-button>
-            </el-radio-group>
-          </div>
-        </div>
-      </aside>
-
-      <!-- Main list -->
-      <main class="list-panel">
-        <!-- 搜索工具栏 -->
-        <div class="list-toolbar">
-          <el-input v-model="keyword" placeholder="搜索错题描述、知识点等..." clearable style="flex: 1;" @keyup.enter="applyFilters">
-            <template #prefix><el-icon><Search /></el-icon></template>
-          </el-input>
-        </div>
-
-        <!-- 活跃筛选条件显示 (NEW!) -->
-        <div v-if="hasActiveFilters" class="active-filters">
-          <span class="label">已选条件：</span>
-
-          <!-- 来源标签 -->
-          <template v-if="activeTab === 'ai'">
-            <el-tag v-for="sessionId in selectedSessions" :key="`session-${sessionId}`" closable @close="removeSessions(sessionId)">
-              {{ getSessionLabel(sessionId) }}
-            </el-tag>
-          </template>
-          <template v-else>
-            <el-tag v-for="source in selectedSources" :key="`source-${source}`" closable @close="removeSources(source)">
-              {{ getSourceLabel(source) }}
-            </el-tag>
-          </template>
-
-          <!-- 错误类型标签 -->
-          <el-tag v-for="errorType in selectedErrorTypes" :key="`error-${errorType}`" closable @close="removeErrorType(errorType)">
-            {{ getErrorTypeLabel(errorType) }}
-          </el-tag>
-
-          <!-- 知识点标签 -->
-          <el-tag v-for="tag of selectedKnowledge" :key="`knowledge-${tag}`" closable @close="removeKnowledge(tag)">
-            {{ tag }}
-          </el-tag>
-
-          <!-- 清除所有按钮 -->
-          <el-button text size="small" @click="clearAllFilters">清除所有</el-button>
-        </div>
-
-        <!-- Card grid view - REDESIGNED -->
-        <div v-if="viewMode==='card'" style="display: flex; flex-direction: column; gap: 16px; flex: 1; min-height: 0;">
-          <div class="wa-grid">
-            <div v-for="item in redesignPaginated" :key="item.id" class="wa-card-redesigned" @click="navigateToDetail(item.id)">
-              <!-- Header: 诊断标签最突出 -->
-              <div class="wa-card-header">
-                <div class="wa-diagnosis-tags">
-                  <span
-                    v-for="errorType in (item.errorTypes || [item.errorType]).filter(Boolean)"
-                    :key="errorType"
-                    class="diagnosis-tag"
-                    :class="`diagnosis-${errorType}`"
-                  >
-                    {{ getErrorTypeLabel(errorType) }}
-                  </span>
+          <!-- Batches Grid -->
+          <div v-if="reviewBatches.length > 0" class="batches-grid">
+            <div v-for="batch in reviewBatches" :key="batch.id" class="batch-card group">
+              <div class="card-top">
+                <div class="icon-box">
+                  <el-icon><Folder /></el-icon>
                 </div>
-                <div class="wa-card-actions-header" @click.stop>
-                  <el-button type="text" size="small" @click="navigateToDetail(item.id)">详情</el-button>
-                  <el-button type="text" size="small" @click="startReview(item.id)">复习</el-button>
+                <div class="actions">
+                  <button class="icon-btn" @click.stop="openBatchModal(batch)">
+                    <el-icon><Edit /></el-icon>
+                  </button>
+                  <button class="icon-btn danger" @click.stop="deleteBatch(batch)">
+                    <el-icon><Delete /></el-icon>
+                  </button>
                 </div>
               </div>
+              
+              <h3>{{ batch.name }}</h3>
+              <p class="subtitle">{{ batch.mistakeIds.length }} 个题目待复习</p>
 
-              <!-- Body: 题目标题 -->
-              <div class="wa-card-body">
-                <h3 class="wa-question-title">{{ item.questionTitle }}</h3>
-                <p class="wa-question-preview">{{ item.questionContent?.slice(0, 100) }}...</p>
-              </div>
-
-              <!-- Source: 来源标签 -->
-              <div class="wa-card-source">
-                <el-tag v-if="activeTab==='ai' && item.sessionId" type="info" size="small">
-                  <el-icon class="wa-source-icon"><component :is="sourceIcon(item.source)" /></el-icon>
-                  {{ sessionLabel(item.sessionId) }}
-                </el-tag>
-                <el-tag v-else-if="activeTab==='bank'" type="info" size="small">
-                  {{ item.source === 'question_bank' ? '题库' : '模拟考试' }}
-                </el-tag>
-              </div>
-
-              <!-- Footer: 关键统计信息 -->
-              <div class="wa-card-footer">
-                <div class="wa-footer-stats">
-                  <span class="stat">
-                    错<strong>{{ item.wrongCount }}</strong>
-                  </span>
-                  <span class="stat">
-                    掌握度<strong>{{ item.mastery }}%</strong>
-                  </span>
-                  <span class="stat-secondary">
-                    最近答错<strong>{{ formatRelative(item.lastWrongTime) }}</strong>
-                  </span>
-                </div>
+              <div class="card-bottom">
+                <span class="date">
+                  <el-icon><Calendar /></el-icon>
+                  {{ formatDate(batch.createdAt) }}
+                </span>
+                <button class="start-btn">
+                  开始练习 <el-icon><ArrowRight /></el-icon>
+                </button>
               </div>
             </div>
           </div>
 
-          <div class="wa-pagination">
-            <el-pagination
-              v-model:current-page="currentPage"
-              v-model:page-size="pageSize"
-              :page-sizes="[10,20,50,100]"
-              :total="redesignFiltered.length"
-              layout="total, sizes, prev, pager, next, jumper"
-            />
+          <!-- Empty State -->
+          <div v-else class="empty-batches">
+            <div class="empty-icon">
+              <el-icon><FolderAdd /></el-icon>
+            </div>
+            <h3>暂无复习集</h3>
+            <p>将错题添加到复习集，进行专项训练</p>
+            <button class="text-btn" @click="openBatchModal()">立即创建</button>
           </div>
         </div>
 
-        <!-- Table view -->
-        <div v-else style="display: flex; flex-direction: column; gap: 16px; flex: 1; min-height: 0;">
-          <div class="wa-table-wrap">
-            <el-table :data="redesignPaginated" stripe>
-              <el-table-column prop="questionTitle" label="题目" min-width="280">
-                <template #default="{ row }">
-                  <a class="table-question" @click.stop="navigateToDetail(row.id)">{{ row.questionTitle }}</a>
-                </template>
-              </el-table-column>
-              <el-table-column label="来源" width="180">
-                <template #default="{ row }">
-                  <el-tag type="info" size="small">
-                    <el-icon class="wa-source-icon"><component :is="sourceIcon(row.source)" /></el-icon>
-                    {{ row.source==='ai_interview' ? sessionLabel(row.sessionId) : (row.source==='question_bank' ? '题库' : '模拟考试') }}
-                  </el-tag>
-                </template>
-              </el-table-column>
-              <el-table-column label="诊断" width="120">
-                <template #default="{ row }">
-                  <el-tag type="warning" size="small">{{ getErrorTypeLabel(row.errorType) }}</el-tag>
-                </template>
-              </el-table-column>
-              <el-table-column label="难度" width="100">
-                <template #default="{ row }">
-                  <el-tag :type="getDifficultyType(row.difficulty)" size="small">{{ row.difficulty }}</el-tag>
-                </template>
-              </el-table-column>
-              <el-table-column label="错误/正确" width="120">
-                <template #default="{ row }">
-                  ✗{{ row.wrongCount }} / ✓{{ row.correctCount }}
-                </template>
-              </el-table-column>
-              <el-table-column label="最近答错" width="140">
-                <template #default="{ row }">{{ formatRelative(row.lastWrongTime) }}</template>
-              </el-table-column>
-              <el-table-column label="下次复习" width="140">
-                <template #default="{ row }">{{ formatRelative(row.nextReviewTime) }}</template>
-              </el-table-column>
-              <el-table-column label="掌握度" width="140">
-                <template #default="{ row }">
-                  <el-progress :percentage="row.mastery" :format="p => `${p}%`" />
-                </template>
-              </el-table-column>
-              <el-table-column label="操作" width="180" fixed="right">
-                <template #default="{ row }">
-                  <el-button-group>
-                    <el-button text type="primary" @click.stop="navigateToDetail(row.id)">详情</el-button>
-                    <el-button text type="success" @click.stop="startReview(row.id)">复习</el-button>
-                  </el-button-group>
-                </template>
-              </el-table-column>
-            </el-table>
-          </div>
+        <!-- MISTAKES VIEW -->
+        <template v-else>
+          <MistakeDetail
+            v-if="viewingMistake"
+            :item="viewingMistake"
+            @back="viewingMistakeId = null"
+            @toggle-favorite="toggleFavorite"
+            @toggle-master="id => { toggleFavorite(id); /* Reusing toggle logic as placeholder */ }"
+            @ignore="toggleIgnore"
+          />
 
-          <div class="pagination-area">
-            <el-pagination
-              v-model:current-page="currentPage"
-              v-model:page-size="pageSize"
-              :page-sizes="[10,20,50,100]"
-              :total="redesignFiltered.length"
-              layout="total, sizes, prev, pager, next, jumper"
-            />
+          <div v-else class="mistakes-view-container">
+            <!-- Top Controls -->
+            <div class="top-controls">
+              <div class="search-bar">
+                <div class="search-input-wrapper">
+                  <el-icon class="search-icon"><Search /></el-icon>
+                  <input
+                    type="text"
+                    v-model="filters.search"
+                    placeholder="搜索知识点、题目描述..."
+                    class="search-input"
+                  />
+                </div>
+                <el-button type="primary" class="search-btn">搜索</el-button>
+              </div>
+  
+              <div class="control-actions">
+                <button
+                  v-if="hasActiveFilters"
+                  class="clear-filter-btn"
+                  @click="clearFilters"
+                >
+                  <el-icon><Filter /></el-icon>
+                  清除筛选
+                </button>
+  
+                <!-- Sort Dropdown -->
+                <el-dropdown trigger="click" @command="handleSortCommand">
+                  <button class="sort-btn">
+                    {{ getSortLabel(sortBy) }}
+                    <el-icon><ArrowDown /></el-icon>
+                  </button>
+                  <template #dropdown>
+                    <el-dropdown-menu class="sort-dropdown">
+                      <el-dropdown-item command="recent" :class="{ active: sortBy === 'recent' }">
+                        最近更新
+                      </el-dropdown-item>
+                      <el-dropdown-item command="mastery_asc" :class="{ active: sortBy === 'mastery_asc' }">
+                        掌握度 (低到高)
+                      </el-dropdown-item>
+                      <el-dropdown-item command="count_desc" :class="{ active: sortBy === 'count_desc' }">
+                        错误次数 (多到少)
+                      </el-dropdown-item>
+                    </el-dropdown-menu>
+                  </template>
+                </el-dropdown>
+              </div>
+            </div>
+  
+            <!-- Ignored Banner -->
+            <div v-if="filters.showIgnored" class="ignored-banner animate-fade-in">
+              <div class="banner-content">
+                <div class="icon-box">
+                  <el-icon><Hide /></el-icon>
+                </div>
+                <div class="text">
+                  <h3>回收站 / 已忽略</h3>
+                  <p>这里显示的是您选择隐藏的错题。您可以随时恢复它们。</p>
+                </div>
+              </div>
+              <button class="exit-btn" @click="filters.showIgnored = false">退出查看</button>
+            </div>
+  
+            <!-- List Header / Summary -->
+            <div class="list-summary">
+              <div class="count-info">
+                <el-icon class="icon-indigo"><Cpu /></el-icon>
+                <span>共筛选出 <strong>{{ sortedData.length }}</strong> 道需要复习的题目</span>
+              </div>
+              <div v-if="sortedData.length > 0" class="select-all-wrapper">
+                <label class="select-all-label">
+                  <div class="checkbox-box" :class="{ checked: isAllSelected }" @click="toggleSelectAll">
+                    <el-icon v-if="isAllSelected"><Check /></el-icon>
+                  </div>
+                  全选当前页
+                </label>
+              </div>
+            </div>
+  
+            <!-- Mistakes Grid/List -->
+            <div v-if="sortedData.length > 0" class="mistakes-container" :class="viewMode">
+              <MistakeCard
+                v-for="item in sortedData"
+                :key="item.id"
+                :item="item"
+                :is-selected="selectedIds.has(item.id)"
+                :selection-mode="selectedIds.size > 0"
+                :view-mode="viewMode"
+                @toggle-favorite="toggleFavorite"
+                @ignore="toggleIgnore"
+                @update="handleUpdateMistake"
+                @toggle-selection="toggleSelection"
+                @click="viewingMistakeId = item.id"
+              />
+            </div>
+  
+            <!-- Empty State -->
+            <div v-else class="empty-state">
+              <div class="empty-icon-wrapper">
+                <el-icon><Search /></el-icon>
+              </div>
+              <h3>未找到相关错题</h3>
+              <p>
+                {{ availableSources.length > 0 ? '当前分类下没有符合条件的题目。试着调整关键词或清除筛选条件。' : '请选择一个分类开始查看错题。' }}
+              </p>
+              <button class="reset-btn" @click="clearFilters">重置所有筛选</button>
+            </div>
           </div>
-        </div>
+        </template>
       </main>
     </div>
+
+    <!-- Floating Batch Action Bar -->
+    <div class="floating-bar" :class="{ visible: selectedIds.size > 0 }">
+      <div class="bar-content">
+        <div class="selection-info">
+          <span class="count-badge">{{ selectedIds.size }}</span>
+          <span class="label">已选择</span>
+          <button class="close-btn" @click="clearSelection">
+            <el-icon><Close /></el-icon>
+          </button>
+        </div>
+
+        <div class="actions">
+          <button class="action-btn" @click="openBatchModal()">
+            <el-icon class="icon-gray"><FolderAdd /></el-icon>
+            加入复习集
+          </button>
+          <button class="action-btn" @click="confirmBulkAction('master')">
+            <el-icon class="icon-emerald"><CircleCheck /></el-icon>
+            标记掌握
+          </button>
+          <div class="divider"></div>
+          
+          <template v-if="!filters.showIgnored">
+            <button class="action-btn" @click="confirmBulkAction('ignore')">
+              <el-icon class="icon-gray"><Hide /></el-icon>
+              忽略
+            </button>
+          </template>
+          <template v-else>
+            <button class="action-btn" @click="confirmBulkAction('restore')">
+              <el-icon class="icon-emerald"><View /></el-icon>
+              恢复
+            </button>
+          </template>
+
+          <button class="action-btn danger" @click="confirmBulkAction('delete')">
+            <el-icon class="icon-rose"><Delete /></el-icon>
+            删除
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Batch Modal -->
+    <el-dialog
+      v-model="batchModal.visible"
+      :title="batchModal.isEditing ? '编辑复习集' : '添加到复习集'"
+      width="450px"
+      class="custom-dialog"
+      destroy-on-close
+    >
+      <div class="batch-modal-content">
+        <!-- New Batch Input -->
+        <div v-if="!batchModal.isEditing" class="input-group">
+          <label>新建复习集</label>
+          <div class="input-wrapper" :class="{ error: batchModal.newName.length > 50 }">
+            <el-icon class="input-icon"><Plus /></el-icon>
+            <input
+              type="text"
+              v-model="batchModal.newName"
+              placeholder="例如：考前冲刺、React 专项..."
+              @input="batchModal.selectedId = null"
+            />
+            <span class="char-count" :class="{ error: batchModal.newName.length > 50 }">
+              {{ batchModal.newName.length }}/50
+            </span>
+          </div>
+          <p v-if="batchModal.newName.length > 50" class="error-msg">名称不能超过 50 个字符</p>
+        </div>
+
+        <div v-if="!batchModal.isEditing" class="divider-text">
+          <span>或选择已有</span>
+        </div>
+
+        <!-- Existing Batches -->
+        <div class="existing-batches">
+          <label>{{ batchModal.isEditing ? '复习集名称' : '已有复习集' }}</label>
+          
+          <!-- Edit Mode: Single Input -->
+          <div v-if="batchModal.isEditing" class="input-group">
+             <div class="input-wrapper">
+                <input
+                  type="text"
+                  v-model="batchModal.editName"
+                  placeholder="复习集名称"
+                />
+             </div>
+          </div>
+
+          <!-- Select Mode: List -->
+          <div v-else class="batches-list custom-scrollbar">
+            <div
+              v-for="batch in reviewBatches"
+              :key="batch.id"
+              class="batch-item"
+              :class="{ active: batchModal.selectedId === batch.id }"
+              @click="selectBatchForAdd(batch.id)"
+            >
+              <div class="batch-icon">
+                <el-icon><Folder /></el-icon>
+              </div>
+              <div class="batch-info">
+                <span class="name">{{ batch.name }}</span>
+                <span class="count">{{ batch.mistakeIds.length }} 个题目</span>
+              </div>
+              <el-icon v-if="batchModal.selectedId === batch.id" class="check-icon"><CircleCheckFilled /></el-icon>
+            </div>
+            <div v-if="reviewBatches.length === 0" class="empty-list">
+              暂无复习集，请新建一个吧！
+            </div>
+          </div>
+        </div>
+      </div>
+      <template #footer>
+        <div class="dialog-footer">
+          <el-button @click="batchModal.visible = false">取消</el-button>
+          <el-button
+            type="primary"
+            :disabled="isBatchSubmitDisabled"
+            @click="submitBatchModal"
+          >
+            {{ batchModal.isEditing ? '保存修改' : (batchModal.newName ? '创建并添加' : '确认添加') }}
+          </el-button>
+        </div>
+      </template>
+    </el-dialog>
+
   </div>
 </template>
 
-<script setup>
-import { ref, computed, onMounted, watch } from 'vue'
-import { useRouter } from 'vue-router'
-import { ElMessage } from 'element-plus'
-import { Search, Grid, List, ChatDotRound, Notebook, Timer, Tickets } from '@element-plus/icons-vue'
-import SpacedRepetitionService from '@/services/spacedRepetitionService'
-import { useWrongAnswersStore } from '@/stores/wrongAnswers'
-import { mockWrongAnswerSessions } from '@/data/mock-wrong-answers'
+<script setup lang="ts">
+import { ref, reactive, computed, onMounted, watch } from 'vue'
+import { ElMessage, ElMessageBox } from 'element-plus'
+import {
+  Notebook, Grid, List, VideoPlay, Search, Filter, ArrowDown,
+  Cpu, Check, Close, FolderAdd, CircleCheck, Hide, View, Delete,
+  Plus, Folder, Edit, Calendar, ArrowRight, FolderAdd as FolderAddIcon,
+  CircleCheckFilled, Aim, Clock
+} from '@element-plus/icons-vue'
+import WrongAnswerSidebar from './components/WrongAnswerSidebar.vue'
+import MistakeCard from './components/MistakeCard.vue'
+import MistakeDetail from './components/MistakeDetail.vue'
+import { MistakeType, SourceType, type MistakeItem, type FilterState, type ReviewBatch } from './types'
+import { mockWrongAnswers, mockReviewBatches } from '@/data/mock-wrong-answers'
 
-const USE_MOCK = import.meta.env.VITE_USE_MOCK_DATA !== 'false'
+// --- State ---
 
-const router = useRouter()
-const store = useWrongAnswersStore()
-
-// State
-const viewMode = ref('card')
-const loading = ref(false)
-const loadingPlan = ref(false)
-const activeTab = ref('ai')
-const sessions = ref([])
-const sessionMap = computed(() => Object.fromEntries(sessions.value.map(s => [s.sessionId, s])))
-const keyword = ref('')
-const knowledgeSearch = ref('') // NEW: 知识点搜索
-// Sessions sidebar controls
-const sessionsCollapsed = ref(true)
-const sessionsSearch = ref('')
-const sessionShowLimit = ref(8)
-
-const filteredSessions = computed(() => {
-  const q = sessionsSearch.value.trim().toLowerCase()
-  let list = [...sessions.value]
-  if (q) list = list.filter(s => (s.jobTitle||'').toLowerCase().includes(q) || (s.sessionId||'').toLowerCase().includes(q))
-  // sort by count desc then by title
-  return list.sort((a,b) => (sessionCounts.value[b.sessionId]||0) - (sessionCounts.value[a.sessionId]||0) || (a.jobTitle||'').localeCompare(b.jobTitle||''))
-})
-
-const shownSessions = computed(() => sessionsCollapsed.value ? filteredSessions.value.slice(0, sessionShowLimit.value) : filteredSessions.value)
-
-const allErrorTypes = ['knowledge','logic','incomplete','expression']
-const selectAllErrorTypes = () => { selectedErrorTypes.value = [...allErrorTypes] }
-const clearErrorTypes = () => { selectedErrorTypes.value = [] }
-const selectAllKnowledge = () => { selectedKnowledge.value = new Set(knowledgeTags.value) }
-const clearKnowledge = () => { selectedKnowledge.value = new Set() }
-
-// bulk selection actions
-const selectAllSessions = () => { selectedSessions.value = filteredSessions.value.map(s => s.sessionId) }
-const clearSessions = () => { selectedSessions.value = [] }
-const selectAllSources = () => { selectedSources.value = ['question_bank', 'mock_exam'] }
-const clearSources = () => { selectedSources.value = [] }
-
-// Filters
-const selectedSessions = ref([])
-const selectedSources = ref([])
-const selectedErrorTypes = ref([])
-const selectedKnowledge = ref(new Set())
-const sortBy = ref('recent')
-const sortByPriority = ref(false)
-
-// Pagination
-const currentPage = ref(1)
-const pageSize = ref(20)
+// Tabs
+const tabs = [
+  { label: '题库错题', value: 'bank' },
+  { label: '面试复盘', value: 'interview' },
+  { label: '复习集', value: 'batches' }
+]
+const activeTab = ref('bank')
+const viewMode = ref<'grid' | 'list'>('grid')
 
 // Data
-const wrongAnswers = ref([])
+const allData = ref<MistakeItem[]>([])
+const reviewBatches = ref<ReviewBatch[]>([])
+const viewingMistakeId = ref<string | null>(null)
 
-// Persist: localStorage keys and bootstrap
-const STORAGE = {
-  sessionShowLimit: 'wa.sessionShowLimit',
-  errorTypes: 'wa.selectedErrorTypes',
-  knowledge: 'wa.selectedKnowledge'
-}
+const viewingMistake = computed(() => {
+  return allData.value.find(i => i.id === viewingMistakeId.value)
+})
 
-// load saved settings
-try {
-  const savedLimit = Number(localStorage.getItem(STORAGE.sessionShowLimit))
-  if (!Number.isNaN(savedLimit) && savedLimit >= 3 && savedLimit <= 50) {
-    sessionShowLimit.value = savedLimit
-  }
-  const savedErr = localStorage.getItem(STORAGE.errorTypes)
-  if (savedErr) {
-    const arr = JSON.parse(savedErr)
-    if (Array.isArray(arr)) selectedErrorTypes.value = arr.filter(v => ['knowledge','logic','incomplete','expression'].includes(v))
-  }
-  const savedKnow = localStorage.getItem(STORAGE.knowledge)
-  if (savedKnow) {
-    const arr = JSON.parse(savedKnow)
-    if (Array.isArray(arr)) selectedKnowledge.value = new Set(arr)
-  }
-} catch {}
+// Filters
+const filters = reactive<FilterState>({
+  search: '',
+  selectedSources: [],
+  selectedTypes: [],
+  selectedTags: [],
+  showFavorites: false,
+  showIgnored: false
+})
 
-// Fetch
-async function fetchWrongAnswers() {
-  loading.value = true
-  try {
-    await store.fetchWrongAnswers()
-    wrongAnswers.value = store.wrongAnswers
-  } catch (e) {
-    ElMessage.error('加载错题失败')
-  } finally {
-    loading.value = false
-  }
-}
+// Selection
+const selectedIds = ref<Set<string>>(new Set())
 
-onMounted(async () => {
-  await fetchWrongAnswers()
-  try {
-    if (USE_MOCK) {
-      sessions.value = mockWrongAnswerSessions
-      return
-    }
-    const resp = await fetch('/api/sessions')
-    if (resp.ok) {
-      const payload = await resp.json()
-      const list = Array.isArray(payload) ? payload : payload?.data
-      if (Array.isArray(list)) sessions.value = list
-    }
-  } catch {
-    if (USE_MOCK) {
-      sessions.value = mockWrongAnswerSessions
-    }
+// Sorting
+const sortBy = ref<'recent' | 'mastery_asc' | 'count_desc'>('recent')
+
+// Batch Modal State
+const batchModal = reactive({
+  visible: false,
+  isEditing: false,
+  selectedId: null as string | null, // For selecting existing batch to add to
+  newName: '', // For creating new
+  editId: null as string | null, // For editing existing
+  editName: ''
+})
+
+// --- Computed ---
+
+const availableSources = computed(() => {
+  if (activeTab.value === 'interview') {
+    return [SourceType.FRONTEND_INTERVIEW, SourceType.BACKEND_INTERVIEW, SourceType.FULLSTACK_INTERVIEW]
+  } else if (activeTab.value === 'bank') {
+    return [SourceType.QUESTION_BANK, SourceType.MOCK_EXAM]
+  }
+  return []
+})
+
+const allTags = computed(() => {
+  const relevantItems = allData.value.filter(item => availableSources.value.includes(item.source))
+  return Array.from(new Set(relevantItems.flatMap(item => item.tags)))
+})
+
+const filteredData = computed(() => {
+  return allData.value.filter(item => {
+    // 1. Context Filter
+    if (!availableSources.value.includes(item.source)) return false
+
+    // 2. Sidebar Filters
+    const searchLower = filters.search.toLowerCase()
+    const matchSearch = !filters.search || 
+      item.question.toLowerCase().includes(searchLower) || 
+      item.tags.some(t => t.toLowerCase().includes(searchLower))
+    
+    const matchSource = filters.selectedSources.length === 0 || filters.selectedSources.includes(item.source)
+    const matchType = filters.selectedTypes.length === 0 || filters.selectedTypes.includes(item.type)
+    const matchTags = filters.selectedTags.length === 0 || filters.selectedTags.every(t => item.tags.includes(t))
+    const matchFavorite = filters.showFavorites ? item.isFavorite : true
+    const matchIgnored = filters.showIgnored ? item.isIgnored : !item.isIgnored
+
+    return matchSearch && matchSource && matchType && matchTags && matchFavorite && matchIgnored
+  })
+})
+
+const sortedData = computed(() => {
+  const data = [...filteredData.value]
+  
+  const getMinutes = (str: string) => {
+    const num = parseInt(str.match(/\d+/)?.[0] || '0')
+    if (str.includes('分钟')) return num
+    if (str.includes('小时')) return num * 60
+    if (str.includes('天')) return num * 1440
+    return 999999
+  }
+
+  switch (sortBy.value) {
+    case 'mastery_asc':
+      return data.sort((a, b) => a.mastery - b.mastery)
+    case 'count_desc':
+      return data.sort((a, b) => b.mistakeCount - a.mistakeCount)
+    case 'recent':
+    default:
+      return data.sort((a, b) => getMinutes(a.lastReviewed) - getMinutes(b.lastReviewed))
   }
 })
 
-// save on change
-watch(sessionShowLimit, v => localStorage.setItem(STORAGE.sessionShowLimit, String(v)))
-watch(selectedErrorTypes, v => localStorage.setItem(STORAGE.errorTypes, JSON.stringify(v)), { deep: true })
-watch(selectedKnowledge, v => localStorage.setItem(STORAGE.knowledge, JSON.stringify(Array.from(v))))
+const counts = computed(() => {
+  const sourceCounts: Record<string, number> = {}
+  const typeCounts: Record<string, number> = {}
+  const tagCounts: Record<string, number> = {}
 
-// UI helpers
-const setActiveTab = (tab) => { activeTab.value = tab; applyFilters() }
-const sessionLabel = (sid) => sessionMap.value[sid]?.jobTitle || sid || 'AI 面试'
-const toggleKnowledge = (tag) => {
-  const s = new Set(selectedKnowledge.value)
-  if (s.has(tag)) s.delete(tag); else s.add(tag)
-  selectedKnowledge.value = s
-}
+  // Base match for global filters (search, fav, ignored)
+  const matchesBase = (item: MistakeItem) => {
+    const matchContext = availableSources.value.includes(item.source)
+    const matchSearch = !filters.search || item.question.toLowerCase().includes(filters.search.toLowerCase())
+    const matchFav = !filters.showFavorites || item.isFavorite
+    const matchIgnored = filters.showIgnored ? item.isIgnored : !item.isIgnored
+    return matchContext && matchSearch && matchFav && matchIgnored
+  }
 
-// NEW: 活跃筛选相关的helper函数
+  allData.value.forEach(item => {
+    if (!matchesBase(item)) return
+
+    // Source counts (respect type & tag filters)
+    const matchType = filters.selectedTypes.length === 0 || filters.selectedTypes.includes(item.type)
+    const matchTags = filters.selectedTags.length === 0 || filters.selectedTags.every(t => item.tags.includes(t))
+    if (matchType && matchTags) {
+      sourceCounts[item.source] = (sourceCounts[item.source] || 0) + 1
+    }
+
+    // Type counts (respect source & tag filters)
+    const matchSource = filters.selectedSources.length === 0 || filters.selectedSources.includes(item.source)
+    if (matchSource && matchTags) {
+      typeCounts[item.type] = (typeCounts[item.type] || 0) + 1
+    }
+  })
+
+  // Tag counts (based on currently filtered data)
+  filteredData.value.forEach(item => {
+    item.tags.forEach(tag => {
+      tagCounts[tag] = (tagCounts[tag] || 0) + 1
+    })
+  })
+
+  return { sources: sourceCounts, types: typeCounts, tags: tagCounts }
+})
+
 const hasActiveFilters = computed(() => {
-  return selectedSessions.value.length > 0 ||
-         selectedSources.value.length > 0 ||
-         selectedErrorTypes.value.length > 0 ||
-         selectedKnowledge.value.size > 0 ||
-         keyword.value.trim() !== ''
+  return filters.selectedSources.length > 0 ||
+         filters.selectedTypes.length > 0 ||
+         filters.selectedTags.length > 0 ||
+         filters.search !== '' ||
+         filters.showFavorites ||
+         filters.showIgnored
 })
 
-const getSessionLabel = (sessionId) => {
-  const session = sessions.value.find(s => s.sessionId === sessionId)
-  return session?.jobTitle || sessionId
-}
+const isAllSelected = computed(() => {
+  return sortedData.value.length > 0 && selectedIds.value.size === sortedData.value.length
+})
 
-const getSourceLabel = (source) => {
-  const labels = {
-    'question_bank': '题库',
-    'mock_exam': '模拟考试'
+const isBatchSubmitDisabled = computed(() => {
+  if (batchModal.isEditing) {
+    return !batchModal.editName.trim() || batchModal.editName.length > 50
   }
-  return labels[source] || source
-}
+  const isNewNameInvalid = !batchModal.newName.trim() || batchModal.newName.length > 50
+  const isSelectionInvalid = !batchModal.selectedId
+  // Valid if: (New Name is valid) OR (Selection is valid AND New Name is empty)
+  return isNewNameInvalid && isSelectionInvalid
+})
 
-const removeSessions = (sessionId) => {
-  selectedSessions.value = selectedSessions.value.filter(s => s !== sessionId)
-  applyFilters()
-}
 
-const removeSources = (source) => {
-  selectedSources.value = selectedSources.value.filter(s => s !== source)
-  applyFilters()
-}
+// --- Methods ---
 
-const removeErrorType = (type) => {
-  selectedErrorTypes.value = selectedErrorTypes.value.filter(t => t !== type)
-  applyFilters()
-}
-
-const removeKnowledge = (tag) => {
-  const s = new Set(selectedKnowledge.value)
-  s.delete(tag)
-  selectedKnowledge.value = s
-  applyFilters()
-}
-
-const clearAllFilters = () => {
-  selectedSessions.value = []
-  selectedSources.value = []
-  selectedErrorTypes.value = []
-  selectedKnowledge.value.clear()
-  keyword.value = ''
-  applyFilters()
-}
-
-const getDifficultyType = (d) => ({ easy: 'success', medium: 'warning', hard: 'danger' }[d] || 'info')
-const getStatusType = (s) => ({ mastered: 'success', reviewing: 'warning', unreviewed: 'info' }[s] || 'info')
-const getErrorTypeLabel = (v) => ({ knowledge: '知识点错误', logic: '逻辑混乱', incomplete: '回答不完整', expression: '表达不流畅' }[v] || '诊断')
-// counts for sidebar badges
-const aiTotalCount = computed(() => wrongAnswers.value.filter(i => i.source === 'ai_interview').length)
-const bankTotalCount = computed(() => wrongAnswers.value.filter(i => i.source !== 'ai_interview').length)
-const sessionCounts = computed(() => {
-  const map = {}
-  for (const i of wrongAnswers.value) {
-    if (i.source === 'ai_interview') map[i.sessionId] = (map[i.sessionId] || 0) + 1
+onMounted(() => {
+  // Load initial data
+  // Convert mock data to match our Type Interfaces if needed, or use directly if matches
+  // Here assuming mockWrongAnswers matches MistakeItem structure or is compatible enough
+  if (mockWrongAnswers) {
+    // Mapping mock data to match strict types if necessary
+    // For now using JSON parse/stringify to detach ref
+    allData.value = JSON.parse(JSON.stringify(mockWrongAnswers)) as MistakeItem[]
   }
-  return map
-})
-const sourceCounts = computed(() => {
-  return wrongAnswers.value.reduce((acc, i) => {
-    acc[i.source] = (acc[i.source] || 0) + 1
-    return acc
-  }, {})
+  if (mockReviewBatches) {
+    reviewBatches.value = JSON.parse(JSON.stringify(mockReviewBatches))
+  }
 })
 
-// source icon map
-const sourceIcon = (s) => {
-  if (s === 'ai_interview') return ChatDotRound
-  if (s === 'question_bank') return Notebook
-  if (s === 'mock_exam') return Timer
-  return Tickets
+const handleTabChange = (val: string) => {
+  activeTab.value = val
+  selectedIds.value.clear()
+  // Reset filters slightly or keep them? Typically reset source filters as they might be invalid
+  filters.selectedSources = []
 }
 
-const formatRelative = (date) => {
-  if (!date) return '暂无'
-  const d = new Date(date).getTime(); const diff = Date.now() - d
-  const day = 86400000, hour = 3600000
-  if (diff >= day) return `${Math.floor(diff/day)}天前`
-  if (diff >= hour) return `${Math.floor(diff/hour)}小时前`
-  return '刚刚'
+const clearFilters = () => {
+  filters.search = ''
+  filters.selectedSources = []
+  filters.selectedTypes = []
+  filters.selectedTags = []
+  filters.showFavorites = false
+  filters.showIgnored = false
 }
 
-// Derived
-const knowledgeTags = computed(() => {
-  const set = new Set()
-  for (const i of wrongAnswers.value) {
-    (i.knowledgePoints || []).forEach(t => set.add(t))
+const getSortLabel = (val: string) => {
+  switch (val) {
+    case 'recent': return '最近更新'
+    case 'mastery_asc': return '掌握度 (低→高)'
+    case 'count_desc': return '错误次数 (多→少)'
+    default: return '排序'
   }
-  return Array.from(set)
-})
+}
 
-// NEW: 过滤知识点标签（支持搜索）
-const filteredKnowledgeTags = computed(() => {
-  const q = knowledgeSearch.value.trim().toLowerCase()
-  if (!q) return knowledgeTags.value
-  return knowledgeTags.value.filter(tag => tag.toLowerCase().includes(q))
-})
+const handleSortCommand = (command: string) => {
+  sortBy.value = command as any
+}
 
-// Filtering and sorting
-const filteredAnswers = computed(() => {
-  let list = [...wrongAnswers.value]
+// Item Actions
+const toggleFavorite = (id: string) => {
+  const item = allData.value.find(i => i.id === id)
+  if (item) item.isFavorite = !item.isFavorite
+}
 
-  if (keyword.value) {
-    const k = keyword.value.toLowerCase()
-    list = list.filter(i => (i.questionTitle||'').toLowerCase().includes(k) || (i.questionContent||'').toLowerCase().includes(k))
-  }
+const toggleIgnore = (id: string) => {
+  const item = allData.value.find(i => i.id === id)
+  if (item) {
+    item.isIgnored = !item.isIgnored
+    // Deselect if it disappears
+    if (selectedIds.value.has(id)) selectedIds.value.delete(id)
 
-  if (activeTab.value === 'ai') {
-    if (selectedSessions.value.length > 0) {
-      list = list.filter(i => selectedSessions.value.includes(i.sessionId))
+    // UX Enhancement: If an item is ignored, automatically switch to "show ignored" view
+    if (item.isIgnored && !filters.showIgnored) {
+      filters.showIgnored = true
+      ElMessage.info('已将题目移入回收站，自动切换到回收站视图。')
     }
-    list = list.filter(i => i.source === 'ai_interview')
+  }
+}
+
+const handleUpdateMistake = (updatedItem: MistakeItem) => {
+  const idx = allData.value.findIndex(i => i.id === updatedItem.id)
+  if (idx !== -1) {
+    allData.value[idx] = updatedItem
+    ElMessage.success('更新成功')
+  }
+}
+
+// Selection
+const toggleSelection = (id: string) => {
+  if (selectedIds.value.has(id)) {
+    selectedIds.value.delete(id)
   } else {
-    if (selectedSources.value.length > 0) {
-      list = list.filter(i => selectedSources.value.includes(i.source))
-    } else {
-      list = list.filter(i => i.source !== 'ai_interview')
-    }
+    selectedIds.value.add(id)
   }
+}
 
-  if (selectedErrorTypes.value.length > 0) {
-    list = list.filter(i => i.errorType && selectedErrorTypes.value.includes(i.errorType))
-  }
-
-  if (selectedKnowledge.value.size > 0) {
-    list = list.filter(i => (i.knowledgePoints||[]).some(t => selectedKnowledge.value.has(t)))
-  }
-
-  list = list.map(item => ({
-    ...item,
-    priority: SpacedRepetitionService.calculatePriority(item),
-    mastery: SpacedRepetitionService.calculateMasteryScore(item),
-    priorityLabel: SpacedRepetitionService.getPriorityLevel(SpacedRepetitionService.calculatePriority(item)),
-    priorityColor: '#409eff'
-  }))
-
-  if (sortByPriority.value) {
-    list.sort((a,b) => b.priority - a.priority)
+const toggleSelectAll = () => {
+  if (isAllSelected.value) {
+    selectedIds.value.clear()
   } else {
-    switch (sortBy.value) {
-      case 'reviewed':
-        list.sort((a,b) => (b.wrongCount+b.correctCount) - (a.wrongCount+a.correctCount)); break
-      case 'nextReview':
-        list.sort((a,b) => new Date(a.nextReviewTime) - new Date(b.nextReviewTime)); break
-      case 'priority':
-        list.sort((a,b) => b.priority - a.priority); break
-      case 'recent':
-      default:
-        list.sort((a,b) => new Date(b.updatedAt) - new Date(a.updatedAt))
-    }
+    sortedData.value.forEach(item => selectedIds.value.add(item.id))
+  }
+}
+
+const clearSelection = () => {
+  selectedIds.value.clear()
+}
+
+// Bulk Actions
+const confirmBulkAction = (type: 'master' | 'delete' | 'ignore' | 'restore') => {
+  const count = selectedIds.value.size
+  let title = ''
+  let message = ''
+  let confirmBtn = ''
+  let btnType = 'primary'
+
+  switch (type) {
+    case 'master':
+      title = '确认标记掌握？'
+      message = `这将把选中的 ${count} 个错题的掌握度设置为 100%。`
+      confirmBtn = '确认掌握'
+      btnType = 'success'
+      break
+    case 'delete':
+      title = '确认删除？'
+      message = `您即将永久删除选中的 ${count} 个错题，此操作无法撤销。`
+      confirmBtn = '确认删除'
+      btnType = 'danger'
+      break
+    case 'ignore':
+      title = '确认隐藏？'
+      message = `这将隐藏选中的 ${count} 个错题。它们将不再显示在列表中，但不会被删除。`
+      confirmBtn = '确认隐藏'
+      btnType = 'info'
+      break
+    case 'restore':
+      title = '确认恢复？'
+      message = `这将恢复选中的 ${count} 个错题到正常列表。`
+      confirmBtn = '确认恢复'
+      btnType = 'primary'
+      break
   }
 
-  return list
-})
-
-const redesignFiltered = filteredAnswers
-const redesignPaginated = computed(() => {
-  const start = (currentPage.value - 1) * pageSize.value
-  return redesignFiltered.value.slice(start, start + pageSize.value)
-})
-
-const applyFilters = () => { currentPage.value = 1 }
-
-// Navigation and actions
-const navigateToDetail = (recordId) => {
-  router.push({ name: 'WrongAnswerDetail', params: { recordId } })
+  ElMessageBox.confirm(message, title, {
+    confirmButtonText: confirmBtn,
+    cancelButtonText: '取消',
+    type: btnType as any,
+    confirmButtonClass: `el-button--${btnType}`
+  }).then(() => {
+    executeBulkAction(type)
+  }).catch(() => {})
 }
-const startReview = (recordId) => {
-  router.push({ name: 'WrongAnswerDetail', params: { recordId } })
+
+const executeBulkAction = (type: string) => {
+  if (type === 'master') {
+    allData.value.forEach(item => {
+      if (selectedIds.value.has(item.id)) item.mastery = 100
+    })
+    ElMessage.success('已批量标记为掌握')
+  } else if (type === 'delete') {
+    allData.value = allData.value.filter(item => !selectedIds.value.has(item.id))
+    ElMessage.success('已批量删除')
+  } else if (type === 'ignore') {
+    allData.value.forEach(item => {
+      if (selectedIds.value.has(item.id)) item.isIgnored = true
+    })
+    filters.showIgnored = true // Auto switch to ignored view
+    ElMessage.success('已批量忽略')
+  } else if (type === 'restore') {
+    allData.value.forEach(item => {
+      if (selectedIds.value.has(item.id)) item.isIgnored = false
+    })
+    filters.showIgnored = false // Auto switch out of ignored view
+    ElMessage.success('已批量恢复')
+  }
+  clearSelection()
 }
-const generateReviewPlan = async () => {
-  loadingPlan.value = true
-  try {
-    await store.generateReviewPlan()
-    ElMessage.success('已生成复习计划，正在跳转...')
-    setTimeout(() => router.push({ name: 'WrongAnswers' }), 600)
-  } catch { ElMessage.error('生成复习计划失败') } finally { loadingPlan.value = false }
+
+// Batch Management
+const openBatchModal = (batchToEdit?: ReviewBatch) => {
+  if (batchToEdit) {
+    batchModal.isEditing = true
+    batchModal.editId = batchToEdit.id
+    batchModal.editName = batchToEdit.name
+    batchModal.newName = ''
+    batchModal.selectedId = null
+  } else {
+    batchModal.isEditing = false
+    batchModal.editId = null
+    batchModal.editName = ''
+    batchModal.newName = ''
+    batchModal.selectedId = null
+  }
+  batchModal.visible = true
 }
+
+const selectBatchForAdd = (id: string) => {
+  batchModal.selectedId = id
+  batchModal.newName = '' // Clear new name if selecting existing
+}
+
+const submitBatchModal = () => {
+  if (batchModal.isEditing) {
+    // Update existing batch name
+    const batch = reviewBatches.value.find(b => b.id === batchModal.editId)
+    if (batch) {
+      batch.name = batchModal.editName
+      ElMessage.success('复习集已更新')
+    }
+  } else {
+    // Add to batch (New or Existing)
+    const idsToAdd = Array.from(selectedIds.value)
+    
+    if (batchModal.newName.trim()) {
+      // Create New
+      const newBatch: ReviewBatch = {
+        id: 'b' + Date.now(),
+        name: batchModal.newName.trim(),
+        mistakeIds: idsToAdd,
+        createdAt: new Date().toISOString()
+      }
+      reviewBatches.value.unshift(newBatch) // Add to top
+      ElMessage.success('复习集已创建')
+    } else if (batchModal.selectedId) {
+      // Add to Existing
+      const batch = reviewBatches.value.find(b => b.id === batchModal.selectedId)
+      if (batch) {
+        const newIds = idsToAdd.filter(id => !batch.mistakeIds.includes(id))
+        batch.mistakeIds.push(...newIds)
+        ElMessage.success(`已添加 ${newIds.length} 个题目到复习集`)
+      }
+    }
+    clearSelection()
+  }
+  batchModal.visible = false
+}
+
+const deleteBatch = (batch: ReviewBatch) => {
+  ElMessageBox.confirm(`确认删除复习集 "${batch.name}" 吗？`, '删除复习集', {
+    confirmButtonText: '删除',
+    cancelButtonText: '取消',
+    type: 'warning'
+  }).then(() => {
+    reviewBatches.value = reviewBatches.value.filter(b => b.id !== batch.id)
+    ElMessage.success('复习集已删除')
+  }).catch(() => {})
+}
+
+const startReview = () => {
+  // 顶部“开始复习”：切到“复习集”标签
+  if (activeTab.value !== 'batches') {
+    handleTabChange('batches')
+    ElMessage.info('已切换到复习集，请选择一个复习集开始练习')
+  } else {
+    ElMessage.info('请选择一个复习集开始练习')
+  }
+}
+
+const formatDate = (isoStr: string) => {
+  return new Date(isoStr).toLocaleDateString()
+}
+
 </script>
 
-<style scoped>
-* {
-  box-sizing: border-box;
-}
+<style scoped lang="scss">
+// --- Variables (Matching Tailwind palette approx) ---
+$bg-page: #f8fafc; // slate-50
+$bg-white: #ffffff;
+$border-color: #e2e8f0; // slate-200
+$text-main: #1e293b; // slate-800
+$text-sub: #64748b; // slate-500
+$primary: #4f46e5; // indigo-600
+$primary-hover: #4338ca;
+$primary-light: #eef2ff; // indigo-50
+$danger: #e11d48; // rose-600
+$success: #10b981; // emerald-500
 
-/* ========== Page Structure ========== */
-.wrong-answers-page {
+.wa-page {
   min-height: 100vh;
-  background: #f5f7fa;
-  padding: 20px;
+  background-color: $bg-page;
+  color: $text-main;
   display: flex;
   flex-direction: column;
-  box-sizing: border-box;
-
-  @media (max-width: 768px) {
-    padding: 12px;
-  }
-
-  @media (max-width: 480px) {
-    padding: 8px;
-  }
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
 }
 
-/* ========== Page Header ========== */
-.page-header {
-  background: white;
-  border-radius: 8px;
-  padding: 24px;
-  margin: 0 0 20px 0;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 24px;
-  flex-shrink: 0;
-  box-sizing: border-box;
-  width: 100%;
+// --- Header ---
+.wa-header {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid $border-color;
+  height: 64px;
 
-  @media (max-width: 768px) {
-    flex-direction: column;
+  .header-content {
+    max-width: 1920px;
+    margin: 0 auto;
+    padding: 0 24px;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .header-left {
+    display: flex;
+    align-items: center;
+    gap: 32px;
+
+    .logo-box {
+      width: 36px;
+      height: 36px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2);
+    }
+
+    .title-box {
+      display: flex;
+      flex-direction: column;
+      h1 {
+        font-size: 16px;
+        font-weight: 700;
+        margin: 0;
+        line-height: 1;
+      }
+      span {
+        font-size: 10px;
+        color: $text-sub;
+        margin-top: 2px;
+        font-weight: 500;
+        letter-spacing: 0.02em;
+      }
+    }
+
+    .nav-tabs {
+      display: flex;
+      gap: 4px;
+      background: rgba(241, 245, 249, 0.5);
+      padding: 4px;
+      border-radius: 8px;
+      border: 1px solid rgba(226, 232, 240, 0.5);
+
+      .nav-tab {
+        padding: 6px 16px;
+        font-size: 12px;
+        font-weight: 600;
+        border-radius: 6px;
+        border: none;
+        background: transparent;
+        color: $text-sub;
+        cursor: pointer;
+        transition: all 0.2s;
+
+        &:hover { color: $text-main; background: rgba(0,0,0,0.03); }
+        &.active {
+          background: white;
+          color: $primary;
+          box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+      }
+    }
+  }
+
+  .header-right {
+    display: flex;
+    align-items: center;
     gap: 16px;
-    padding: 16px;
-    margin: 0 0 16px 0;
-    width: 100%;
-  }
 
-  @media (max-width: 480px) {
-    padding: 12px;
-    margin: 0 0 12px 0;
-    width: 100%;
-  }
-}
+    .view-toggle {
+      display: flex;
+      background: rgba(241, 245, 249, 0.5);
+      padding: 4px;
+      border-radius: 8px;
+      border: 1px solid rgba(226, 232, 240, 0.5);
+      
+      button {
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: none;
+        background: transparent;
+        border-radius: 6px;
+        color: #94a3b8;
+        cursor: pointer;
+        transition: all 0.2s;
 
-.page-header h1 {
-  font-size: 28px;
-  font-weight: 600;
-  margin: 0 0 8px 0;
-  color: #1f2937;
-  line-height: 1.2;
-}
+        &:hover { color: $text-sub; }
+        &.active {
+          background: white;
+          color: $primary;
+          box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+      }
+    }
 
-.page-header .subtitle {
-  font-size: 14px;
-  color: #666;
-  margin: 0 0 16px 0;
-  line-height: 1.5;
-}
+    .divider { width: 1px; height: 24px; background: $border-color; }
 
-.header-content {
-  flex: 1;
-}
+    .start-review-btn {
+      border-radius: 8px;
+      font-weight: 600;
+      padding: 8px 20px;
+      background: $primary;
+      border-color: $primary;
+      box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2);
+      transition: all 0.2s;
 
-.header-tabs {
-  margin-top: 12px;
-}
-
-.header-actions {
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
-  flex-shrink: 0;
-  align-items: center;
-
-  @media (max-width: 768px) {
-    width: 100%;
-
-    button {
-      flex: 1;
+      &:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 6px 16px rgba(79, 70, 229, 0.25);
+      }
+      &:active { transform: translateY(0); }
+      
+      .el-icon { margin-right: 6px; }
     }
   }
 }
 
-.view-toggle {
+// --- Layout ---
+.main-layout {
   display: flex;
-  gap: 0;
-}
-
-/* ========== Content Wrapper (Grid Layout) ========== */
-.content-wrapper {
-  display: grid;
-  grid-template-columns: auto 1fr;
-  gap: 20px;
   flex: 1;
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+  max-width: 1920px;
+  margin: 0 auto;
   width: 100%;
-  max-width: none;
-
-  @media (max-width: 1024px) {
-    grid-template-columns: auto 1fr;
-    gap: 16px;
-  }
-
-  @media (max-width: 768px) {
-    grid-template-columns: 1fr;
-    gap: 16px;
-    margin: 0;
-    width: 100%;
-  }
-
-  @media (max-width: 480px) {
-    margin: 0;
-    width: 100%;
-    gap: 12px;
-  }
 }
 
-/* ========== Filter Panel ========== */
-.filter-panel {
-  background: white;
-  border-radius: 8px;
-  padding: 0;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  height: fit-content;
-  position: sticky;
-  top: 20px;
-  overflow: hidden;
-  box-sizing: border-box;
-  flex-shrink: 0;
-  min-width: 200px;
+.content-area {
+  flex: 1;
+  padding: 32px 40px;
+  overflow-y: auto;
+  padding-bottom: 128px; // Space for floating bar
 
-  @media (max-width: 768px) {
-    position: static;
-    margin-bottom: 0;
-    top: auto;
-    min-width: auto;
-  }
+  &.bg-white { background: white; }
 }
 
-.filter-section {
-  padding: 16px;
-  border-bottom: 1px solid #f0f0f0;
-
-  &:first-child {
-    padding-top: 16px;
-  }
-
-  &:last-child {
-    border-bottom: none;
-    padding-bottom: 16px;
-  }
-}
-
-.filter-header {
+// --- Top Controls ---
+.top-controls {
   display: flex;
+  align-items: center;
   justify-content: space-between;
-  align-items: center;
-  margin: 0 0 12px 0;
-  gap: 8px;
+  margin-bottom: 32px;
+  gap: 16px;
+  flex-wrap: wrap;
 
-  h4 {
-    margin: 0;
-    font-size: 14px;
-    font-weight: 600;
-    color: #1f2937;
-    flex-shrink: 0;
-  }
-}
-
-.filter-ops {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 12px;
-}
-
-.op-divider {
-  color: #d1d5db;
-}
-
-.filter-body {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-
-  :deep(.el-input) {
-    margin-bottom: 12px;
-  }
-
-  :deep(.el-radio-group) {
-    width: 100%;
+  .search-bar {
     display: flex;
-    flex-direction: column;
+    gap: 8px;
+    flex: 1;
+    max-width: 600px;
 
-    .el-radio-button {
+    .search-input-wrapper {
       flex: 1;
-      margin-bottom: 6px;
+      position: relative;
+      
+      .search-icon {
+        position: absolute;
+        left: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #94a3b8;
+      }
 
-      &:last-child {
-        margin-bottom: 0;
+      .search-input {
+        width: 100%;
+        padding: 10px 16px 10px 40px;
+        border: 1px solid $border-color;
+        border-radius: 12px;
+        font-size: 14px;
+        outline: none;
+        transition: all 0.2s;
+        background: white;
+
+        &:focus {
+          border-color: $primary;
+          box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+        &::placeholder { color: #cbd5e1; }
+      }
+    }
+
+    .search-btn {
+      border-radius: 12px;
+      padding: 0 24px;
+      font-weight: 600;
+    }
+  }
+
+  .control-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    .clear-filter-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: 8px;
+      background: #fff1f2; // rose-50
+      color: $danger;
+      border: none;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.2s;
+
+      &:hover { background: #ffe4e6; }
+    }
+
+    .sort-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      background: white;
+      border: 1px solid $border-color;
+      border-radius: 8px;
+      color: $text-sub;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      min-width: 160px;
+      justify-content: space-between;
+
+      &:hover { background: #f8fafc; border-color: #cbd5e1; }
+    }
+  }
+}
+
+// --- Ignored Banner ---
+.ignored-banner {
+  background: #f1f5f9; // slate-100
+  border: 1px solid $border-color;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  .banner-content {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    .icon-box {
+      width: 32px;
+      height: 32px;
+      background: white;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid $border-color;
+      color: $text-sub;
+    }
+
+    h3 { margin: 0; font-size: 14px; font-weight: 700; color: $text-main; }
+    p { margin: 0; font-size: 12px; color: $text-sub; }
+  }
+
+  .exit-btn {
+    padding: 6px 12px;
+    border-radius: 6px;
+    background: transparent;
+    border: 1px solid transparent;
+    color: $primary;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+
+    &:hover { background: $primary-light; }
+  }
+}
+
+// --- Summary ---
+.list-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+
+  .count-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    color: $text-sub;
+
+    .icon-indigo { color: $primary; }
+    strong { color: $text-main; font-weight: 700; }
+  }
+
+  .select-all-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    color: $text-sub;
+    user-select: none;
+
+    &:hover { color: $text-main; }
+
+    .checkbox-box {
+      width: 16px;
+      height: 16px;
+      border-radius: 4px;
+      border: 1px solid #cbd5e1;
+      background: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+
+      &.checked {
+        background: $primary;
+        border-color: $primary;
+        .el-icon { color: white; font-size: 10px; font-weight: bold; }
       }
     }
   }
 }
 
-.checkbox-list {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.checkbox-item {
-  display: flex;
-  align-items: center;
-
-  :deep(.el-badge) {
-    width: 100%;
-
-    .el-badge__content {
-      transform: translate(0, -8px);
-    }
+// --- Grids ---
+.mistakes-container {
+  &.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 24px;
   }
-}
-
-.tag-group {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-
-  :deep(.el-check-tag) {
-    font-size: 12px;
-    padding: 6px 12px;
-  }
-}
-
-/* ========== List Panel ========== */
-.list-panel {
-  background: white;
-  border-radius: 8px;
-  padding: 20px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  box-sizing: border-box;
-  flex: 1;
-  min-width: 0;
-}
-
-.list-toolbar {
-  display: flex;
-  gap: 12px;
-  margin: 0;
-  align-items: center;
-  flex-shrink: 0;
-  width: 100%;
-
-  @media (max-width: 768px) {
+  &.list {
+    display: flex;
     flex-direction: column;
-
-    :deep(.el-input) {
-      width: 100%;
-    }
-  }
-}
-
-/* ========== Active Filters Display (NEW!) ========== */
-.active-filters {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 8px;
-  padding: 12px 16px;
-  background-color: #f0f9ff;
-  border: 1px solid #bfdbfe;
-  border-radius: 6px;
-  margin: 0;
-  font-size: 14px;
-  flex-shrink: 0;
-  width: 100%;
-
-  .label {
-    color: #666;
-    font-weight: 500;
-    margin-right: 4px;
-    white-space: nowrap;
-  }
-
-  :deep(.el-tag) {
-    margin-right: 0;
-    margin-bottom: 4px;
-  }
-
-  :deep(.el-button) {
-    margin-left: 8px;
-  }
-}
-
-/* ========== Grid and Cards ========== */
-.wa-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 16px;
-  margin: 0;
-  flex: 1;
-
-  @media (max-width: 1400px) {
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 14px;
-  }
-
-  @media (max-width: 1024px) {
-    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-    gap: 14px;
-  }
-
-  @media (max-width: 768px) {
-    grid-template-columns: 1fr;
-    gap: 12px;
-  }
-}
-
-.wa-card-redesigned {
-  border: 1px solid #e8e8e8;
-  border-radius: 8px;
-  padding: 14px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  background: #fff;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  height: 100%;
-  box-sizing: border-box;
-  min-height: 240px;
-
-  &:hover {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    border-color: #409eff;
-    transform: translateY(-2px);
-  }
-}
-
-.wa-card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 12px;
-}
-
-.wa-diagnosis-tags {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-  flex: 1;
-}
-
-.diagnosis-tag {
-  font-size: 12px;
-  font-weight: 600;
-  padding: 4px 10px;
-  border-radius: 4px;
-  white-space: nowrap;
-  display: inline-block;
-}
-
-.diagnosis-knowledge {
-  background-color: #fee;
-  color: #c33;
-}
-
-.diagnosis-logic {
-  background-color: #fef5e6;
-  color: #d97706;
-}
-
-.diagnosis-incomplete {
-  background-color: #fef3f2;
-  color: #d32f2f;
-}
-
-.diagnosis-expression {
-  background-color: #f0f9ff;
-  color: #1976d2;
-}
-
-.wa-card-actions-header {
-  display: none;
-  gap: 4px;
-  flex-shrink: 0;
-}
-
-.wa-card-redesigned:hover .wa-card-actions-header {
-  display: flex;
-}
-
-.wa-card-body {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.wa-question-title {
-  font-size: 16px;
-  font-weight: 500;
-  margin: 0;
-  color: #333;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-.wa-question-preview {
-  font-size: 13px;
-  color: #666;
-  margin: 0;
-  line-height: 1.4;
-  display: -webkit-box;
-  -webkit-line-clamp: 1;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-.wa-card-source {
-  display: flex;
-  gap: 8px;
-}
-
-.wa-card-footer {
-  border-top: 1px solid #f0f0f0;
-  padding-top: 12px;
-  margin-top: auto;
-}
-
-.wa-footer-stats {
-  display: flex;
-  justify-content: space-between;
-  font-size: 12px;
-  color: #999;
-  gap: 8px;
-
-  @media (max-width: 480px) {
-    flex-direction: column;
-    gap: 4px;
-  }
-}
-
-.wa-footer-stats .stat,
-.wa-footer-stats .stat-secondary {
-  display: flex;
-  gap: 4px;
-  align-items: center;
-}
-
-.wa-footer-stats strong {
-  color: #333;
-  font-weight: 500;
-}
-
-.wa-footer-stats .stat-secondary {
-  margin-left: auto;
-
-  @media (max-width: 480px) {
-    margin-left: 0;
-  }
-}
-
-/* ========== Table View ========== */
-.wa-table-wrap {
-  background: #fff;
-  border: 1px solid #ebeef5;
-  border-radius: 8px;
-  margin: 0;
-  flex: 1;
-
-  :deep(.el-table) {
-    --el-table-bg-color: #fff;
-  }
-}
-
-.table-question {
-  cursor: pointer;
-  color: #409eff;
-
-  &:hover {
-    color: #66b1ff;
-    text-decoration: underline;
-  }
-}
-
-/* ========== Pagination ========== */
-.wa-pagination {
-  display: flex;
-  justify-content: center;
-  padding: 16px 0;
-  border-top: 1px solid #f0f0f0;
-  margin: 0;
-  flex-shrink: 0;
-}
-
-.pagination-area {
-  display: flex;
-  justify-content: center;
-  padding: 16px 0;
-  border-top: 1px solid #f0f0f0;
-  margin: 0;
-  flex-shrink: 0;
-}
-
-/* ========== Responsive Design ========== */
-@media (max-width: 768px) {
-  .wrong-answers-page {
-    padding: 12px 0;
-  }
-
-  .page-header {
-    padding: 16px;
-    margin: 0 12px 16px 12px;
-  }
-
-  .content-wrapper {
     gap: 16px;
-    margin: 0 12px;
-  }
-
-  .filter-panel {
-    padding: 0;
-  }
-
-  .list-panel {
-    padding: 16px;
-    gap: 14px;
   }
 }
 
-@media (max-width: 480px) {
-  .wrong-answers-page {
+// --- Batches View ---
+.batches-container {
+  max-width: 1200px;
+  margin: 0 auto;
+
+  .batches-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 40px;
+
+    h2 { font-size: 24px; font-weight: 700; margin: 0 0 4px 0; color: $text-main; }
+    p { margin: 0; color: $text-sub; }
+    
+    .dark-btn {
+      background: $text-main;
+      border-color: $text-main;
+      &:hover { background: #334155; border-color: #334155; }
+    }
+  }
+
+  .batches-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 24px;
+
+    .batch-card {
+      background: white;
+      border: 1px solid $border-color;
+      border-radius: 16px;
+      padding: 24px;
+      transition: all 0.3s;
+      position: relative;
+      cursor: pointer;
+
+      &:hover {
+        border-color: #c7d2fe;
+        box-shadow: 0 10px 40px -10px rgba(79, 70, 229, 0.15);
+        transform: translateY(-2px);
+      }
+
+      .card-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 24px;
+
+        .icon-box {
+          width: 48px;
+          height: 48px;
+          background: $primary-light;
+          color: $primary;
+          border-radius: 12px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 24px;
+        }
+
+        .actions {
+          display: flex;
+          gap: 4px;
+          opacity: 0;
+          transition: opacity 0.2s;
+
+          .icon-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            border: none;
+            background: transparent;
+            color: $text-sub;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            &:hover { background: #f1f5f9; color: $primary; }
+            &.danger:hover { background: #fff1f2; color: $danger; }
+          }
+        }
+      }
+      &:hover .card-top .actions { opacity: 1; }
+
+      h3 { font-size: 18px; font-weight: 700; margin: 0 0 4px 0; }
+      .subtitle { font-size: 14px; color: $text-sub; margin: 0; }
+
+      .card-bottom {
+        margin-top: 32px;
+        padding-top: 16px;
+        border-top: 1px solid #f1f5f9;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        .date {
+          font-size: 12px;
+          color: #94a3b8;
+          display: flex;
+          align-items: center;
+          gap: 6px;
+        }
+
+        .start-btn {
+          border: none;
+          background: transparent;
+          color: $primary;
+          font-weight: 600;
+          font-size: 14px;
+          display: flex;
+          align-items: center;
+          gap: 4px;
+          cursor: pointer;
+          transition: gap 0.2s;
+          &:hover { gap: 8px; }
+        }
+      }
+    }
+  }
+}
+
+// --- Empty States ---
+.empty-state, .empty-batches {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 0;
+  text-align: center;
+
+  .empty-icon-wrapper, .empty-icon {
+    width: 64px;
+    height: 64px;
+    background: #f8fafc;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    color: #cbd5e1;
+    margin-bottom: 16px;
+    
+    &.empty-icon { background: white; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+  }
+
+  h3 { font-size: 18px; font-weight: 700; margin: 0 0 8px 0; color: $text-main; }
+  p { font-size: 14px; color: $text-sub; max-width: 400px; margin: 0 0 24px 0; line-height: 1.5; }
+
+  .reset-btn, .text-btn {
+    padding: 10px 24px;
+    border-radius: 10px;
+    background: $primary-light;
+    color: $primary;
+    border: none;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+    &:hover { background: #e0e7ff; }
+  }
+  .text-btn { background: transparent; text-decoration: underline; &:hover { color: $primary-hover; } }
+}
+
+// --- Floating Bar ---
+.floating-bar {
+  position: fixed;
+  bottom: 32px;
+  left: 50%;
+  transform: translate(-50%, 100px);
+  opacity: 0;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: 50;
+  pointer-events: none;
+
+  &.visible {
+    transform: translate(-50%, 0);
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .bar-content {
+    background: white;
+    border: 1px solid $border-color;
+    box-shadow: 0 20px 40px -4px rgba(0, 0, 0, 0.15);
+    border-radius: 16px;
+    padding: 12px 24px;
+    display: flex;
+    align-items: center;
+    gap: 24px;
+
+    .selection-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding-right: 24px;
+      border-right: 1px solid $border-color;
+
+      .count-badge {
+        background: $primary;
+        color: white;
+        font-size: 12px;
+        font-weight: 700;
+        padding: 2px 8px;
+        border-radius: 6px;
+      }
+      .label { font-size: 14px; font-weight: 600; color: $text-main; }
+      .close-btn {
+        border: none;
+        background: transparent;
+        color: #94a3b8;
+        cursor: pointer;
+        padding: 4px;
+        border-radius: 4px;
+        display: flex;
+        &:hover { background: #f1f5f9; color: $text-sub; }
+      }
+    }
+
+    .actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+
+      .action-btn {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 16px;
+        border-radius: 8px;
+        border: none;
+        background: transparent;
+        color: $text-main;
+        font-weight: 500;
+        font-size: 14px;
+        cursor: pointer;
+        transition: all 0.2s;
+
+        .icon-gray { color: $text-sub; }
+        .icon-emerald { color: $success; }
+        .icon-rose { color: $danger; }
+
+        &:hover { background: #f8fafc; }
+        &.danger { color: $danger; &:hover { background: #fff1f2; } }
+        &.disabled { opacity: 0.5; cursor: not-allowed; }
+      }
+
+      .divider { width: 1px; height: 16px; background: $border-color; margin: 0 4px; }
+    }
+  }
+}
+
+// --- Dialog Custom ---
+.custom-dialog {
+  border-radius: 16px;
+  overflow: hidden;
+
+  .batch-modal-content {
     padding: 8px 0;
-  }
 
-  .page-header {
-    padding: 12px;
-    margin: 0 8px 12px 8px;
-  }
+    .input-group {
+      margin-bottom: 24px;
+      label { display: block; font-size: 14px; font-weight: 600; margin-bottom: 8px; color: $text-main; }
+      
+      .input-wrapper {
+        position: relative;
+        .input-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #94a3b8; }
+        input {
+          width: 100%;
+          padding: 10px 48px 10px 36px;
+          border: 1px solid $border-color;
+          border-radius: 10px;
+          outline: none;
+          transition: all 0.2s;
+          &:focus { border-color: $primary; box-shadow: 0 0 0 2px $primary-light; }
+        }
+        .char-count {
+          position: absolute;
+          right: 12px;
+          top: 50%;
+          transform: translateY(-50%);
+          font-size: 12px;
+          color: #94a3b8;
+          &.error { color: $danger; }
+        }
+        &.error input { border-color: $danger; }
+      }
+      .error-msg { font-size: 12px; color: $danger; margin-top: 4px; }
+    }
 
-  .page-header h1 {
-    font-size: 20px;
-  }
+    .divider-text {
+      position: relative;
+      text-align: center;
+      margin-bottom: 24px;
+      &::before { content: ''; position: absolute; left: 0; top: 50%; width: 100%; height: 1px; background: $border-color; }
+      span { position: relative; background: white; padding: 0 12px; font-size: 12px; color: $text-sub; font-weight: 500; text-transform: uppercase; }
+    }
 
-  .page-header .subtitle {
-    font-size: 12px;
-  }
+    .existing-batches {
+      label { display: block; font-size: 14px; font-weight: 600; margin-bottom: 8px; color: $text-main; }
+      
+      .batches-list {
+        max-height: 240px;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
 
-  .content-wrapper {
-    margin: 0 8px;
-    gap: 12px;
-  }
+        .batch-item {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          padding: 12px;
+          border: 1px solid $border-color;
+          border-radius: 10px;
+          cursor: pointer;
+          transition: all 0.2s;
 
-  .wa-card-redesigned {
-    padding: 12px;
-    gap: 10px;
-    min-height: 240px;
-  }
+          .batch-icon {
+            width: 32px;
+            height: 32px;
+            background: #f1f5f9;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: $text-sub;
+          }
 
-  .wa-question-title {
-    font-size: 14px;
-  }
+          .batch-info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            .name { font-size: 14px; font-weight: 600; color: $text-main; }
+            .count { font-size: 12px; color: $text-sub; }
+          }
 
-  .list-panel {
-    padding: 12px;
-    gap: 12px;
-  }
+          .check-icon { color: $primary; font-size: 18px; }
 
-  .wa-grid {
-    gap: 10px;
+          &:hover { border-color: #c7d2fe; background: #f8fafc; }
+          &.active {
+            border-color: $primary;
+            background: $primary-light;
+            .batch-icon { background: #c7d2fe; color: $primary; }
+            .name { color: $primary; }
+          }
+        }
+      }
+    }
   }
+}
+
+// Media Queries
+@media (max-width: 768px) {
+  .hidden-md-and-down { display: none !important; }
+  .wa-header .header-content { padding: 0 16px; }
+  .content-area { padding: 20px; }
+  .top-controls { flex-direction: column; align-items: stretch; }
+}
+@media (max-width: 640px) {
+  .hidden-sm-and-down { display: none !important; }
+}
+
+// Animations
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out;
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 </style>

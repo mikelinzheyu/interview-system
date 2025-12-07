@@ -31,9 +31,14 @@ const threadSubscriptions = new Map()
 function initializeWebSocket(httpServer, mockData) {
   const io = new Server(httpServer, {
     cors: {
-      origin: '*',
+      origin: ['http://localhost:5174', 'http://localhost:5173', 'http://localhost:3000', '*'],
+      credentials: true,
       methods: ['GET', 'POST']
-    }
+    },
+    transports: ['websocket', 'polling'],
+    allowEIO3: true,
+    pingInterval: 25000,
+    pingTimeout: 20000
   })
 
   // JWT 鉴权中间件（简化版）

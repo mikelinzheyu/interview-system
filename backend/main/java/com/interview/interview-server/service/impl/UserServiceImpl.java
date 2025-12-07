@@ -88,10 +88,18 @@ public class UserServiceImpl implements UserService {
     public User updateUserProfile(Long userId, User user) {
         User existingUser = getUserById(userId);
 
-        existingUser.setRealName(user.getRealName());
-        existingUser.setBio(user.getBio());
-        existingUser.setPhone(user.getPhone());
-        existingUser.setAvatar(user.getAvatar());
+        if (user.getRealName() != null) existingUser.setRealName(user.getRealName());
+        if (user.getNickname() != null) existingUser.setNickname(user.getNickname());
+        if (user.getGender() != null) existingUser.setGender(user.getGender());
+        if (user.getBirthday() != null) existingUser.setBirthday(user.getBirthday());
+        if (user.getBio() != null) existingUser.setBio(user.getBio());
+        if (user.getPhone() != null) existingUser.setPhone(user.getPhone());
+        if (user.getAvatar() != null) existingUser.setAvatar(user.getAvatar());
+        
+        if (user.getTwoFactorEnabled() != null) existingUser.setTwoFactorEnabled(user.getTwoFactorEnabled());
+        if (user.getPreferences() != null) existingUser.setPreferences(user.getPreferences());
+        if (user.getNotificationSettings() != null) existingUser.setNotificationSettings(user.getNotificationSettings());
+        if (user.getPrivacySettings() != null) existingUser.setPrivacySettings(user.getPrivacySettings());
 
         userMapper.updateById(existingUser);
         return existingUser;

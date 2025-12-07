@@ -20,6 +20,8 @@ const messagesRouter = require('./messages')
 const contributionsRouter = require('./contributions')
 const wrongAnswersRouter = require('./wrongAnswers')
 const recommendationsRouter = require('./recommendations')
+const userSettingsRouter = require('./user-settings') // <-- ADDED
+
 const hierarchicalDomains = require('../data/mock-domains-hierarchical.json')
 const contributionsData = require('../data/contributions-data.json')
 
@@ -884,6 +886,10 @@ router.get('/messages/:messageId/read-receipts', auth, (req, res) => {
 
 // ==================== 用户 API ====================
 
+// Mount user settings routes (must be before /users/:userId to prevent conflicts)
+// 使用标准的 Express 中间件链式应用方式
+router.use('/users', auth, userSettingsRouter)
+
 /**
  * GET /users/:userId - 获取用户信息
  */
@@ -898,12 +904,22 @@ router.get('/users/me', auth, async (req, res) => {
       user = await getUserById(userId)
     } catch (dbError) {
       console.error('[GET /users/me] DB error:', dbError.message)
+      // 不直接抛出错误，继续尝试从内存读取
     }
 
     // 2. 如果数据库中不存在该用户，则回退到内存 mock 用户
     if (!user) {
       const controllers = getControllers()
       user = controllers.user.getUser(userId)
+    }
+
+    // 3. 如果都没有，返回错误
+    if (!user) {
+      return res.status(404).json({
+        code: 404,
+        message: 'User not found',
+        data: null
+      })
     }
 
     res.json({

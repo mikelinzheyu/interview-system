@@ -87,7 +87,16 @@ class SocketService {
       transports: ['websocket', 'polling'],
       reconnection: true,
       reconnectionAttempts: this.maxReconnectAttempts,
-      reconnectionDelay: this.reconnectDelay
+      reconnectionDelay: this.reconnectDelay,
+      reconnectionDelayMax: 10000,
+      timeout: 20000,
+      autoConnect: true,
+      forceNew: false,
+      withCredentials: false,
+      protocols: ['websocket'],
+      query: {
+        token: token || '1'
+      }
     })
 
     // 连接成功

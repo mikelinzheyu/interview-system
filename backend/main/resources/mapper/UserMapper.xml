@@ -8,10 +8,17 @@
         <result column="email" property="email"/>
         <result column="password" property="password"/>
         <result column="real_name" property="realName"/>
+        <result column="nickname" property="nickname"/>
+        <result column="gender" property="gender"/>
+        <result column="birthday" property="birthday"/>
         <result column="avatar" property="avatar"/>
         <result column="bio" property="bio"/>
         <result column="phone" property="phone"/>
         <result column="status" property="status"/>
+        <result column="two_factor_enabled" property="twoFactorEnabled"/>
+        <result column="preferences" property="preferences"/>
+        <result column="notification_settings" property="notificationSettings"/>
+        <result column="privacy_settings" property="privacySettings"/>
         <result column="total_answered" property="totalAnswered"/>
         <result column="correct_answered" property="correctAnswered"/>
         <result column="accuracy_rate" property="accuracyRate"/>
@@ -22,7 +29,8 @@
     </resultMap>
 
     <sql id="Base_Column_List">
-        id, username, email, password, real_name, avatar, bio, phone, status,
+        id, username, email, password, real_name, nickname, gender, birthday, avatar, bio, phone, status,
+        two_factor_enabled, preferences, notification_settings, privacy_settings,
         total_answered, correct_answered, accuracy_rate, study_time, interview_count,
         created_at, updated_at
     </sql>
@@ -53,11 +61,13 @@
 
     <insert id="insert" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO users (
-            username, email, password, real_name, phone, status,
+            username, email, password, real_name, nickname, gender, birthday, phone, status,
+            two_factor_enabled, preferences, notification_settings, privacy_settings,
             total_answered, correct_answered, accuracy_rate, study_time, interview_count,
             created_at, updated_at
         ) VALUES (
-            #{username}, #{email}, #{password}, #{realName}, #{phone}, #{status},
+            #{username}, #{email}, #{password}, #{realName}, #{nickname}, #{gender}, #{birthday}, #{phone}, #{status},
+            #{twoFactorEnabled}, #{preferences}, #{notificationSettings}, #{privacySettings},
             #{totalAnswered}, #{correctAnswered}, #{accuracyRate}, #{studyTime}, #{interviewCount},
             #{createdAt}, #{updatedAt}
         )
@@ -67,9 +77,16 @@
         UPDATE users
         SET
             real_name = #{realName},
+            nickname = #{nickname},
+            gender = #{gender},
+            birthday = #{birthday},
             avatar = #{avatar},
             bio = #{bio},
             phone = #{phone},
+            two_factor_enabled = #{twoFactorEnabled},
+            preferences = #{preferences},
+            notification_settings = #{notificationSettings},
+            privacy_settings = #{privacySettings},
             updated_at = NOW()
         WHERE id = #{id}
     </update>

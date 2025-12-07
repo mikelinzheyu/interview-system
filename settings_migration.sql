@@ -1,0 +1,8 @@
+-- Add columns for User Settings
+ALTER TABLE users ADD COLUMN nickname VARCHAR(100) DEFAULT NULL;
+ALTER TABLE users ADD COLUMN gender VARCHAR(20) DEFAULT 'secret';
+ALTER TABLE users ADD COLUMN birthday VARCHAR(50) DEFAULT NULL;
+ALTER TABLE users ADD COLUMN two_factor_enabled TINYINT(1) DEFAULT 0;
+ALTER TABLE users ADD COLUMN preferences TEXT DEFAULT NULL;
+ALTER TABLE users ADD COLUMN notification_settings TEXT DEFAULT NULL;
+ALTER TABLE users ADD COLUMN privacy_settings TEXT DEFAULT NULL;
