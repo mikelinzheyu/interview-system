@@ -36,6 +36,11 @@ frontend/nul
 # 构建输出
 dist/
 node_modules/
+target/
+*.class
+*.jar
+*.war
+*.ear
 *.so
 *.dylib
 

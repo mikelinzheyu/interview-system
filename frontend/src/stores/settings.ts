@@ -260,24 +260,31 @@ export const useSettingsStore = defineStore('settings', () => {
 
   // 乐观更新：2FA 开关立即响应，失败则回滚
   async function toggleTwoFactor(enable: boolean) {
-    const previousValue = security.value?.twoFactorEnabled ?? false
+    const previousValue = security.value?.isTwoFactorEnabled ?? false
 
     // 立即更新 UI (乐观更新)
     if (security.value) {
-      security.value.twoFactorEnabled = enable
+      security.value.isTwoFactorEnabled = enable
     }
 
     try {
+      let response
       if (enable) {
-        await userAPI.enableTwoFactor()
+        response = await userAPI.enableTwoFactor()
       } else {
-        await userAPI.disableTwoFactor()
+        response = await userAPI.disableTwoFactor()
       }
+
+      // 用后端返回的完整 security 数据更新 store
+      if (response?.data && typeof response.data === 'object') {
+        security.value = response.data
+      }
+
       success.value.security = true
     } catch (error: any) {
       // 失败时回滚
       if (security.value) {
-        security.value.twoFactorEnabled = previousValue
+        security.value.isTwoFactorEnabled = previousValue
       }
       errors.value.security = error.message || '设置双因素认证失败'
       throw error

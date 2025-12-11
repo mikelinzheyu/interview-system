@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <SettingsCard>
     <div class="security-stack">
       
@@ -47,7 +47,7 @@
         <SectionLabel 
           :icon="Shield" 
           title="两步验证" 
-          subtitle="在登录时要求输入额外的验证码，提高账户安全性" 
+          subtitle="在登录时要求输入额外的验证码，提高账号安全性" 
         />
         <div class="action-wrapper">
           <CustomToggle 
@@ -130,19 +130,23 @@ onMounted(() => {
   fetchSecurityInfo();
 });
 
-watch(security, (val) => syncSecurity(val));
+// 移除自动同步的watch，避免循环触发
+// watch(security, (val) => syncSecurity(val));
 
-watch(twoFactorEnabled, async (newVal) => {
-  if (newVal !== securityInfo.isTwoFactorEnabled) {
-    try {
-      await settingsStore.toggleTwoFactor(newVal);
-      securityInfo.isTwoFactorEnabled = newVal;
-      ElMessage.success(newVal ? '两步验证已开启' : '两步验证已关闭');
-    } catch (error) {
-      console.error('Failed to toggle 2FA:', error);
-      ElMessage.error('操作失败，请稍后再试');
-      twoFactorEnabled.value = !newVal; // Revert toggle state on error
-    }
+watch(twoFactorEnabled, async (newVal, oldVal) => {
+  // 当当前状态相同时不发请求
+  if (newVal === securityInfo.isTwoFactorEnabled) return;
+
+  try {
+    await settingsStore.toggleTwoFactor(newVal);
+    // 保持全局/本地状态一致
+    syncSecurity(security.value);
+    ElMessage.success(newVal ? '两步验证已开启' : '两步验证已关闭');
+  } catch (error) {
+    console.error('Failed to toggle 2FA:', error);
+    ElMessage.error('操作失败，请稍后再试');
+    // 失败回退
+    twoFactorEnabled.value = oldVal;
   }
 });
 
@@ -182,11 +186,11 @@ const handleChangePassword = async () => {
 
 const handleBindPhone = async () => {
   try {
-    const { value: phone } = await ElMessageBox.prompt('请输入手机号码', '绑定手机', {
+    const { value: phone } = await ElMessageBox.prompt('请输入手机号', '绑定手机', {
       confirmButtonText: '发送验证码',
       cancelButtonText: '取消',
       inputPattern: /^1[3-9]\d{9}$/,
-      inputErrorMessage: '请输入有效的手机号码'
+      inputErrorMessage: '请输入有效的手机号'
     });
     if (phone === null) return;
 
@@ -203,7 +207,7 @@ const handleBindPhone = async () => {
 
     await userAPI.bindPhone({ phone, code });
     ElMessage.success('手机绑定成功');
-    fetchSecurityInfo(); // Refresh info
+    fetchSecurityInfo();
   } catch (error) {
     if (error === 'cancel') return;
     console.error('Failed to bind phone:', error);
@@ -216,7 +220,7 @@ const handleBindEmail = async () => {
     const { value: email } = await ElMessageBox.prompt('请输入邮箱地址', '绑定邮箱', {
       confirmButtonText: '发送验证码',
       cancelButtonText: '取消',
-      inputPattern: /^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/,
+      inputPattern: /^\w+([-+.]*\w+)*@\w+([-.]*\w+)*\.\w+([-.]*\w+)*$/, 
       inputErrorMessage: '请输入有效的邮箱地址'
     });
     if (email === null) return;
@@ -234,7 +238,7 @@ const handleBindEmail = async () => {
 
     await userAPI.bindEmail({ email, code });
     ElMessage.success('邮箱绑定成功');
-    fetchSecurityInfo(); // Refresh info
+    fetchSecurityInfo();
   } catch (error) {
     if (error === 'cancel') return;
     console.error('Failed to bind email:', error);
@@ -243,8 +247,7 @@ const handleBindEmail = async () => {
 };
 
 const handleManageDevices = async () => {
-  // This might involve navigating to a dedicated page or a more complex dialog
-  ElMessage.info('设备管理功能待完善，目前仅为演示');
+  ElMessage.info('设备管理功能待完善，当前仅为演示');
   try {
     const response = await userAPI.getLoginDevices();
     if (response.code === 200 && response.data) {

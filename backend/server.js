@@ -111,8 +111,13 @@ function createBackendServer(PORT = 3001) {
   sequelize.sync({ alter: true })
     .then(() => {
       console.log('✅ 数据库表同步成功')
-
-      // 启动服务器
+    })
+    .catch((err) => {
+      console.error('❌ 数据库同步失败:', err.message)
+      console.warn('⚠️  将使用 Mock 数据模式运行')
+    })
+    .finally(() => {
+      // 启动服务器（无论数据库是否连接成功）
       server.listen(PORT, () => {
     console.log(`
 ╔════════════════════════════════════════════════════════════╗
@@ -137,11 +142,6 @@ function createBackendServer(PORT = 3001) {
 ╚════════════════════════════════════════════════════════════╝
       `)
       })
-    })
-    .catch((err) => {
-      console.error('❌ 数据库同步失败:', err.message)
-      console.error(err)
-      process.exit(1)
     })
 
   return { server, io, eventBridge }

@@ -85,21 +85,59 @@ router.post('/email/bind', (req, res) => {
 })
 
 // POST /users/2fa/enable
-router.post('/2fa/enable', (req, res) => {
+router.post('/2fa/enable', async (req, res) => {
   const controllers = getControllers()
   const user = controllers.user.getUser(req.user.id)
   if (user) user.isTwoFactorEnabled = true
-  
-  res.json({ code: 200, message: '2FA enabled' })
+
+  // 持久化到数据库
+  try {
+    await updateUserProfile(req.user.id, { isTwoFactorEnabled: true })
+  } catch (dbError) {
+    console.error('[2FA Enable] DB persist error:', dbError.message)
+    // 不影响响应，但记录日志
+  }
+
+  // 返回完整的 security 信息
+  const security = {
+    isTwoFactorEnabled: user?.isTwoFactorEnabled ?? false,
+    phoneNumber: user?.phone || '',
+    phoneVerified: !!user?.phoneVerified,
+    email: user?.email || '',
+    emailVerified: !!user?.emailVerified,
+    lastPasswordChange: new Date(Date.now() - 100000000).toISOString(),
+    loginDevices: []
+  }
+
+  res.json({ code: 200, data: security })
 })
 
 // POST /users/2fa/disable
-router.post('/2fa/disable', (req, res) => {
+router.post('/2fa/disable', async (req, res) => {
   const controllers = getControllers()
   const user = controllers.user.getUser(req.user.id)
   if (user) user.isTwoFactorEnabled = false
-  
-  res.json({ code: 200, message: '2FA disabled' })
+
+  // 持久化到数据库
+  try {
+    await updateUserProfile(req.user.id, { isTwoFactorEnabled: false })
+  } catch (dbError) {
+    console.error('[2FA Disable] DB persist error:', dbError.message)
+    // 不影响响应，但记录日志
+  }
+
+  // 返回完整的 security 信息
+  const security = {
+    isTwoFactorEnabled: user?.isTwoFactorEnabled ?? false,
+    phoneNumber: user?.phone || '',
+    phoneVerified: !!user?.phoneVerified,
+    email: user?.email || '',
+    emailVerified: !!user?.emailVerified,
+    lastPasswordChange: new Date(Date.now() - 100000000).toISOString(),
+    loginDevices: []
+  }
+
+  res.json({ code: 200, data: security })
 })
 
 // GET /users/devices
