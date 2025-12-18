@@ -1030,33 +1030,33 @@ const mockData = {
         {
           domainId: 1,
           domainName: '计算机科学',
-          contributionCount: 15,
+          submissionCount: 15,
           approvalRate: 0.80,
           level: 'expert'  // beginner | intermediate | advanced | expert
         },
         {
           domainId: 2,
           domainName: '金融学',
-          contributionCount: 10,
+          submissionCount: 10,
           approvalRate: 0.60,
           level: 'intermediate'
         }
       ],
 
       // 最近活动
-      recentActivity: [
+      activityLog: [
         {
-          type: 'submit',
+          action: 'submitted',
           submissionId: 1,
           timestamp: '2024-09-20T10:30:00Z',
-          title: '实现一个LRU缓存'
+          description: '提交了题目 "实现一个LRU缓存"'
         },
         {
-          type: 'approved',
+          action: 'approved',
           submissionId: 2,
           questionId: 102,
           timestamp: '2024-09-19T09:15:00Z',
-          title: '股票估值方法对比'
+          description: '题目 "股票估值方法对比" 通过审核'
         }
       ]
     },
@@ -1084,7 +1084,7 @@ const mockData = {
         {
           domainId: 1,
           domainName: '计算机科学',
-          contributionCount: 8,
+          submissionCount: 8,
           approvalRate: 0.625,
           level: 'intermediate'
         }
@@ -2138,7 +2138,7 @@ function formatTime(seconds) {
  */
 function sendResponse(res, statusCode, data, message = 'Success') {
   res.writeHead(statusCode, {
-    'Content-Type': 'application/json',
+    'Content-Type': 'application/json; charset=utf-8',
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
     'Access-Control-Allow-Headers': 'Content-Type, Authorization, x-user-id'
@@ -2179,7 +2179,7 @@ function parseJSONBody(req) {
     let body = ''
 
     req.on('data', chunk => {
-      body += chunk.toString()
+      body += chunk.toString('utf8')
       if (body.length > 1024 * 1024) {
         req.destroy()
         reject(new Error('REQUEST_BODY_TOO_LARGE'))
@@ -7997,6 +7997,26 @@ const routes = {
     } catch (error) {
       sendResponse(res, 400, null, '请求数据格式错误')
     }
+  },
+
+  // 获取帖子评论列表
+  'GET:/api/community/posts/:id/comments': (req, res) => {
+    const parsedUrl = url.parse(req.url, true)
+    const postParam = parsedUrl.pathname.split('/')[4]
+
+    const post = findPostByIdentifier(postParam)
+    if (!post) {
+      sendResponse(res, 404, null, '帖子不存在')
+      return
+    }
+
+    const postId = Number(post.id)
+    const comments = mockData.comments.filter(c => c.postId === postId)
+
+    sendResponse(res, 200, {
+      comments,
+      total: comments.length
+    }, '获取评论列表成功')
   },
 
   // 发表评论

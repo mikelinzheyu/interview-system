@@ -1,24 +1,16 @@
 <template>
   <div class="learning-hub-dashboard">
+    <!-- 顶部导航栏 -->
     <header class="hub-header">
-      <div class="header-content">
-        <div class="logo-section">
-          <span class="logo-icon">🎓</span>
-          <h1 class="logo-text">{{ t('learning.hubTitle') }}</h1>
+      <div class="header-inner">
+        <div class="header-left">
+          <div class="brand">
+            <span class="brand-icon">🎓</span>
+            <h1 class="brand-text">{{ t('learning.hubTitle') }}</h1>
+          </div>
         </div>
 
-        <CommandPalette
-          v-show="false"
-          :domains="domainStore.domains"
-          :categories="hierarchicalCategories"
-          :questions="questionStore.list"
-          @search="handleSearch"
-          @navigate="handleNavigate"
-          @filter="handleAdvancedFilter"
-        />
-
-        <!-- 居中头部搜索框：放在"学习中心"和"更多功能"之间 -->
-        <div class="header-search">
+        <div class="header-center">
           <EnhancedSearchInput
             :domains="domainStore.domains"
             :categories="hierarchicalCategories"
@@ -26,37 +18,70 @@
             @search="handleSearch"
             @select="handleSearchSelect"
             @navigate="handleNavigate"
+            class="main-search-bar"
           />
         </div>
 
-        <div class="header-actions">
-          <el-dropdown @command="handleNavigationCommand">
-            <el-button text>
-              {{ t('learning.moreActions') }}
-              <el-icon class="el-icon--right"><ArrowDown /></el-icon>
+        <div class="header-right">
+          <el-tooltip content="我的进度" placement="bottom">
+            <el-button circle class="icon-btn" @click="showMyProgress = true">
+              <el-icon><DataLine /></el-icon>
+            </el-button>
+          </el-tooltip>
+          
+          <el-tooltip content="我的收藏" placement="bottom">
+            <el-button circle class="icon-btn" @click="showFavorites = true">
+              <el-icon><Star /></el-icon>
+            </el-button>
+          </el-tooltip>
+
+          <el-dropdown trigger="click" @command="handleNavigationCommand">
+            <el-button circle class="icon-btn">
+              <el-icon><Grid /></el-icon>
             </el-button>
             <template #dropdown>
-              <el-dropdown-menu>
-                <el-dropdown-item command="learning-paths">📚 {{ t('learning.paths') }}</el-dropdown-item>
-                <el-dropdown-item command="learning-hub">🏠 {{ t('learning.home') }}</el-dropdown-item>
-                <el-dropdown-item v-if="userStore.isAdmin" divided command="admin-create">➕ {{ t('learning.createQuestion') }}</el-dropdown-item>
-                <el-dropdown-item v-if="userStore.isAdmin" command="admin-manage">📝 {{ t('learning.manageQuestions') }}</el-dropdown-item>
+              <el-dropdown-menu class="custom-dropdown">
+                <el-dropdown-item command="learning-paths">
+                  <el-icon><Reading /></el-icon> {{ t('learning.paths') }}
+                </el-dropdown-item>
+                <el-dropdown-item command="recommendations">
+                  <el-icon><Compass /></el-icon> 推荐探索
+                </el-dropdown-item>
+                <el-dropdown-item v-if="userStore.isAdmin" divided command="admin-create">
+                  <el-icon><Plus /></el-icon> {{ t('learning.createQuestion') }}
+                </el-dropdown-item>
               </el-dropdown-menu>
             </template>
           </el-dropdown>
-
-          <el-button text :icon="CircleCheck" @click="showMyProgress = true">
-            <span>{{ t('learning.progress') }}</span>
-          </el-button>
-          <el-button text :icon="Star" @click="showFavorites = true">
-            <span>{{ t('learning.favorites') }}</span>
-          </el-button>
         </div>
       </div>
     </header>
 
     <main class="hub-main">
-      <section v-if="!currentDomain && showRecommendation" class="hub-section hub-section--critical">
+      <!-- 欢迎区域 -->
+      <section class="welcome-section" v-if="!currentDomain">
+        <div class="welcome-text">
+          <h2>{{ getGreeting() }}, {{ userStore.user?.nickname || userStore.user?.username || '同学' }} 👋</h2>
+          <p>准备好开始今天的学习了吗？</p>
+        </div>
+        <div class="quick-stats" v-if="progressSummary">
+          <div class="stat-item">
+            <span class="stat-value">{{ progressSummary.todayCount || 0 }}</span>
+            <span class="stat-label">今日刷题</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-value">{{ progressSummary.totalDays || 0 }}</span>
+            <span class="stat-label">坚持天数</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-value">{{ progressSummary.accuracy || 0 }}%</span>
+            <span class="stat-label">正确率</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- 推荐与继续学习区域 -->
+      <section v-if="!currentDomain && showRecommendation" class="content-section">
         <RecommendedForYouSection
           :recommended-domains="recommendedDomains"
           :continue-card="continueStudyCard"
@@ -66,7 +91,8 @@
         />
       </section>
 
-      <section v-if="!currentDomain && showDisciplineExplorer" class="hub-section">
+      <!-- 学科探索区域 -->
+      <section v-if="!currentDomain && showDisciplineExplorer" class="content-section">
         <DisciplineExplorerSection
           :categories="hierarchicalCategories"
           :loading="hierarchicalLoading"
@@ -75,7 +101,8 @@
         />
       </section>
 
-      <section v-if="currentDomain" class="hub-section">
+      <!-- 特定领域详情 -->
+      <section v-if="currentDomain" class="content-section domain-view">
         <DomainDetailSection
           :domain="currentDomain"
           :progress="domainProgress"
@@ -88,7 +115,13 @@
       </section>
     </main>
 
-    <el-drawer v-model="showMyProgress" :title="t('learning.progress')" size="40%">
+    <!-- 侧边抽屉 -->
+    <el-drawer 
+      v-model="showMyProgress" 
+      :title="t('learning.progress')" 
+      size="400px"
+      class="custom-drawer"
+    >
       <MyProgressPanel
         :loading="analyticsLoading"
         :summary="progressSummary"
@@ -97,7 +130,12 @@
       />
     </el-drawer>
 
-    <el-drawer v-model="showFavorites" :title="t('learning.favorites')" size="40%">
+    <el-drawer 
+      v-model="showFavorites" 
+      :title="t('learning.favorites')" 
+      size="400px"
+      class="custom-drawer"
+    >
       <MyFavoritesPanel
         :items="favoriteItems"
         :loading="favoritesLoading"
@@ -110,14 +148,13 @@
 </template>
 
 <script setup>
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
 import { ElMessage } from 'element-plus'
-import { CircleCheck, Star, ArrowDown } from '@element-plus/icons-vue'
+import { DataLine, Star, Grid, Reading, Plus, Compass } from '@element-plus/icons-vue'
 import { useI18n } from '@/i18n'
 
-import CommandPalette from '@/views/questions/components/CommandPalette.vue'
 import RecommendedForYouSection from '@/views/questions/components/RecommendedForYouSection.vue'
 import DisciplineExplorerSection from '@/views/questions/components/DisciplineExplorerSection.vue'
 import DomainDetailSection from '@/views/questions/components/DomainDetailSection.vue'
@@ -160,7 +197,6 @@ const domainProgress = computed(() => {
 
 const domainPreviewQuestions = computed(() => {
   if (!currentDomain.value) return []
-  // questionStore.list 已经被按 domainId 过滤，只需取前4个
   return questionStore.list.slice(0, 4)
 })
 
@@ -218,14 +254,13 @@ const progressSummary = computed(() => summary.value || {})
 const learningGoalsList = computed(() => {
   const goals = learningGoals.value || {}
   const stats = summary.value || {}
-
   const items = []
 
   if (goals.domainsToComplete) {
     items.push({
       id: 'domains',
-      name: '完成学科数量',
-      description: '计划完成的学科总数',
+      name: '完成学科',
+      description: '目标学科数',
       completed: stats.completedDomains || stats.domainsTracked || 0,
       total: goals.domainsToComplete
     })
@@ -234,29 +269,19 @@ const learningGoalsList = computed(() => {
   if (goals.targetAccuracy) {
     items.push({
       id: 'accuracy',
-      name: '总体正确率',
+      name: '正确率',
       description: '目标正确率',
       completed: stats.accuracy || stats.overallAccuracy || 0,
       total: goals.targetAccuracy
     })
   }
-
-  if (goals.dailyHours) {
-    items.push({
-      id: 'dailyHours',
-      name: '每日学习时长',
-      description: '目标每日学习时长（小时）',
-      completed: stats.dailyHours || 0,
-      total: goals.dailyHours
-    })
-  }
-
   return items
 })
 
 onMounted(async () => {
   loading.value = true
   try {
+    await userStore.fetchUserInfo()
     await domainStore.loadDomains({ selectFirst: false })
     await domainStore.loadRecommendedDomains()
     if (!questionStore.list.length) await questionStore.initialize()
@@ -283,6 +308,15 @@ async function loadHierarchicalDomains() {
   } finally {
     hierarchicalLoading.value = false
   }
+}
+
+function getGreeting() {
+  const hour = new Date().getHours()
+  if (hour < 6) return '夜深了'
+  if (hour < 12) return '早上好'
+  if (hour < 14) return '中午好'
+  if (hour < 18) return '下午好'
+  return '晚上好'
 }
 
 function buildContinueCard(domain) {
@@ -318,15 +352,14 @@ function formatActivityTimestamp(value) {
 
 function handleSelectDomain(domain) {
   currentDomain.value = domain
-  // 加载该领域的题目
   loadQuestionsForDomain(domain)
+  window.scrollTo({ top: 0, behavior: 'smooth' })
 }
 
 async function loadQuestionsForDomain(domain) {
   if (!domain) return
   const domainId = domain.id || domain.slug
   if (!domainId) return
-
   detailLoading.value = true
   try {
     questionStore.setDomain(domainId)
@@ -341,7 +374,6 @@ async function loadQuestionsForDomain(domain) {
 
 function backToDisciplines() {
   currentDomain.value = null
-  // 重置题目过滤
   questionStore.setDomain(null)
 }
 
@@ -403,10 +435,8 @@ function resolveDomainSlugFromQuestion(q) {
 function handleSearchSelect(payload) {
   if (!payload) return
   const { type, payload: data } = payload
-
   switch (type) {
     case 'question':
-      // 导航到题目详情
       router.push({
         name: 'QuestionBankPage',
         params: { domainSlug: resolveDomainSlugFromQuestion(data) },
@@ -414,16 +444,13 @@ function handleSearchSelect(payload) {
       })
       break
     case 'domain':
-      // 选择领域
       handleSelectDomain(data)
       continueLearning(data)
       break
     case 'category':
-      // 选择分类
       handleSelectCategory(data)
       break
     case 'tag':
-      // 应用标签筛选
       try {
         if (questionStore.resetFilters) questionStore.resetFilters()
         if (questionStore.toggleFilterValue) {
@@ -438,26 +465,7 @@ function handleSearchSelect(payload) {
       }
       router.push({ name: 'QuestionBankPage', params: { domainSlug: currentDomain.value?.slug || 'all' } })
       break
-    default:
-      break
   }
-}
-
-function handleAdvancedFilter(filters) {
-  // 应用高级过滤条件
-  if (filters.difficulty && filters.difficulty.length) {
-    questionStore.filters.difficulty = filters.difficulty
-  }
-  if (filters.type && filters.type.length) {
-    questionStore.filters.type = filters.type
-  }
-  if (filters.tags && filters.tags.length) {
-    questionStore.filters.tags = filters.tags
-  }
-  // 应用并导航到题库页面
-  questionStore.applyFilters({ resetPage: true }).then(() => {
-    router.push({ name: 'QuestionBankPage', params: { domainSlug: currentDomain.value?.slug || 'all' } })
-  })
 }
 
 function handleNavigate(payload) {
@@ -470,41 +478,11 @@ function handleNavigate(payload) {
     continueLearning(payload.payload)
   } else if (payload.type === 'question') {
     const q = payload.payload || {}
-    // 搜索到题目后，导航到题库页面并显示该题目详情
     router.push({
       name: 'QuestionBankPage',
       params: { domainSlug: resolveDomainSlugFromQuestion(q) },
       query: { questionId: q.id || q.questionId || q.uid }
     })
-  } else if (payload.type === 'tag') {
-    try {
-      if (questionStore.resetFilters) questionStore.resetFilters()
-      if (questionStore.toggleFilterValue) {
-        questionStore.toggleFilterValue('tags', payload.id)
-      } else if (questionStore.filters?.tags) {
-        const k = payload.id
-        if (!questionStore.filters.tags.includes(k)) questionStore.filters.tags.push(k)
-      }
-      questionStore.applyFilters?.({ resetPage: true })
-    } catch {}
-    router.push({ name: 'QuestionBankPage', params: { domainSlug: currentDomain.value?.slug || 'all' } })
-  } else if (payload.type === 'command') {
-    switch (payload.id) {
-      case 'hot':
-        window.scrollTo({ top: 0, behavior: 'smooth' })
-        break
-      case 'favorites':
-        showFavorites.value = true
-        break
-      case 'progress':
-        showMyProgress.value = true
-        break
-      case 'create':
-        router.push({ name: 'QuestionCreate' })
-        break
-      default:
-        break
-    }
   } else if (payload.type === 'recommend') {
     const title = payload.title || ''
     if (title) {
@@ -526,17 +504,12 @@ function handleNavigationCommand(command) {
     case 'learning-paths':
       router.push({ name: 'LearningPathList' })
       break
-    case 'learning-hub':
-      router.push({ name: 'LearningHub' })
+    case 'recommendations':
+      router.push({ name: 'RecommendationHub' })
       break
     case 'admin-create':
       router.push({ name: 'QuestionCreate' })
       break
-    case 'admin-manage':
-      router.push({ name: 'QuestionCreate' })
-      break
-    default:
-      ElMessage.info(t('learning.moreActions'))
   }
 }
 </script>
@@ -544,92 +517,162 @@ function handleNavigationCommand(command) {
 <style scoped lang="scss">
 .learning-hub-dashboard {
   min-height: 100vh;
-  background: linear-gradient(135deg, #f5f7fa 0%, #e1f5ff 100%);
+  background-color: #f9fafb;
+  color: #1f2937;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 
+/* Header Styles */
 .hub-header {
   position: sticky;
   top: 0;
-  z-index: 100;
-  background: white;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  z-index: 50;
+  background-color: #ffffff;
   border-bottom: 1px solid #e5e7eb;
+  height: 64px;
+  display: flex;
+  align-items: center;
 
-  .header-content {
-    max-width: 1500px;
+  .header-inner {
+    width: 100%;
+    max-width: 1280px;
     margin: 0 auto;
-    padding: 12px 24px;
-    display: grid;
-    grid-template-columns: auto 1fr auto;
+    padding: 0 24px;
+    display: flex;
+    justify-content: space-between;
     align-items: center;
     gap: 24px;
   }
 }
 
-.logo-section {
+.brand {
   display: flex;
   align-items: center;
-  gap: 8px;
-  flex-shrink: 0;
+  gap: 10px;
+  cursor: pointer;
 
-  .logo-icon {
-    font-size: 28px;
+  .brand-icon {
+    font-size: 24px;
   }
-
-  .logo-text {
+  .brand-text {
     font-size: 18px;
     font-weight: 700;
-    color: #1f2937;
+    color: #111827;
     margin: 0;
     white-space: nowrap;
   }
 }
 
-.header-actions {
-  display: flex;
-  gap: 8px;
-  flex-shrink: 0;
-}
-
-.header-search {
+.header-center {
+  flex: 1;
   display: flex;
   justify-content: center;
-  align-items: center;
-  flex: 1;
-  max-width: 1500px;
+  max-width: 600px;
 }
 
+.main-search-bar {
+  width: 100%;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  .icon-btn {
+    border: none;
+    background-color: #f3f4f6;
+    color: #4b5563;
+    transition: all 0.2s;
+    font-size: 16px;
+    width: 36px;
+    height: 36px;
+
+    &:hover {
+      background-color: #e5e7eb;
+      color: #111827;
+    }
+  }
+}
+
+/* Main Content Styles */
 .hub-main {
-  max-width: 1400px;
+  max-width: 1280px;
   margin: 0 auto;
-  padding: 40px 24px;
+  padding: 32px 24px;
   display: flex;
   flex-direction: column;
+  gap: 40px;
+}
+
+.welcome-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 8px;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+}
+
+.welcome-text {
+  h2 {
+    font-size: 28px;
+    font-weight: 700;
+    color: #111827;
+    margin: 0 0 8px 0;
+  }
+  p {
+    color: #6b7280;
+    margin: 0;
+    font-size: 16px;
+  }
+}
+
+.quick-stats {
+  display: flex;
   gap: 32px;
+  background: white;
+  padding: 16px 24px;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+
+  .stat-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .stat-value {
+    font-size: 20px;
+    font-weight: 700;
+    color: #2563eb;
+  }
+
+  .stat-label {
+    font-size: 12px;
+    color: #6b7280;
+  }
 }
 
-.hub-section {
-  background: #ffffff;
-  border-radius: 20px;
-  padding: 32px;
-  box-shadow: 0 28px 60px rgba(15, 23, 42, 0.12);
+.content-section {
+  animation: fadeIn 0.5s ease-out;
 }
 
-.hub-section--critical {
-  animation: fadeInUp 0.3s ease-out;
-}
-
-@keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(12px); }
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
-.learning-hub-dashboard :deep(.el-drawer) {
-  animation: slideInRight 0.3s ease-out;
-}
-
-@keyframes slideInRight {
-  from { opacity: 0; transform: translateX(100%); }
-  to { opacity: 1; transform: translateX(0); }
+/* Domain View Specifics */
+.domain-view {
+  background: white;
+  border-radius: 16px;
+  padding: 32px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
 }
 </style>

@@ -1961,6 +1961,10 @@
   "profiles": [
     {
       "userId": 1,
+      "username": "技术达人",
+      "avatar": "https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png",
+      "bio": "专注前端工程和AI安全领域，热爱分享技术经验",
+      "joinDate": "2024-08-01",
       "stats": {
         "totalSubmissions": 18,
         "approvedCount": 14,
@@ -1974,6 +1978,13 @@
           "description": "累计 10 道题通过审核",
           "icon": "🎓",
           "earnedAt": "2025-10-30T09:00:00Z"
+        },
+        {
+          "id": "badge-researcher",
+          "name": "领域研究者",
+          "description": "覆盖 5 个不同领域的高质量题目",
+          "icon": "📚",
+          "earnedAt": "2025-11-05T14:20:00Z"
         }
       ],
       "expertise": [
@@ -1988,6 +1999,18 @@
           "domainName": "AI 安全",
           "level": "intermediate",
           "submissionCount": 5
+        },
+        {
+          "domainId": "backend",
+          "domainName": "后端开发",
+          "level": "intermediate",
+          "submissionCount": 3
+        },
+        {
+          "domainId": "database",
+          "domainName": "数据库",
+          "level": "beginner",
+          "submissionCount": 2
         }
       ],
       "activityLog": [
@@ -2000,6 +2023,21 @@
           "action": "approved",
           "description": "《可视化埋点排查》通过审核",
           "timestamp": "2025-11-10T08:30:00Z"
+        },
+        {
+          "action": "badge_earned",
+          "description": "获得了「领域研究者」徽章",
+          "timestamp": "2025-11-05T14:20:00Z"
+        },
+        {
+          "action": "submitted",
+          "description": "提交了《Vue3 响应式原理详解》",
+          "timestamp": "2025-11-01T16:45:00Z"
+        },
+        {
+          "action": "approved",
+          "description": "《React Hooks 最佳实践》通过审核",
+          "timestamp": "2025-10-28T11:20:00Z"
         }
       ]
     }

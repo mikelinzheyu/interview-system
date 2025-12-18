@@ -1,0 +1,287 @@
+/* 打印样式优化 */
+
+@media print {
+  /* 隐藏不需要打印的元素 */
+  .el-header,
+  .el-aside,
+  .left-sidebar,
+  .right-sidebar,
+  .toc-card-enhanced,
+  .article-actions-enhanced,
+  .fixed-action-bar,
+  .floating-btns,
+  .breadcrumb-nav,
+  .reading-progress-bar,
+  .interaction-bar,
+  .comments-section,
+  .enhanced-comment-form,
+  nav,
+  footer,
+  .el-page-header,
+  .scroll-top,
+  .share-btn,
+  .more-btn,
+  button,
+  .el-button {
+    display: none !important;
+  }
+
+  /* 调整页面布局 */
+  * {
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+
+  body {
+    margin: 0;
+    padding: 0;
+    background: white !important;
+    color: #000 !important;
+  }
+
+  .post-detail-page,
+  .main-content-container,
+  .post-wrapper {
+    box-shadow: none !important;
+    padding: 0 !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    background: white !important;
+  }
+
+  /* 优化文章标题 */
+  .article-title {
+    font-size: 24pt !important;
+    margin-top: 0 !important;
+    margin-bottom: 12pt !important;
+    page-break-after: avoid;
+    color: #000 !important;
+  }
+
+  /* 文章元信息 */
+  .article-meta {
+    font-size: 10pt;
+    color: #666 !important;
+    margin-bottom: 12pt;
+    padding-bottom: 6pt;
+    border-bottom: 1px solid #ddd !important;
+    page-break-after: avoid;
+
+    .author-info {
+      display: inline-block;
+    }
+  }
+
+  /* 文章正文 */
+  .article-body,
+  .markdown-body-enhanced {
+    font-size: 11pt !important;
+    line-height: 1.6 !important;
+    color: #000 !important;
+  }
+
+  /* 标题样式 */
+  h1, h2, h3, h4, h5, h6 {
+    page-break-after: avoid;
+    page-break-inside: avoid;
+    color: #000 !important;
+    margin-top: 12pt;
+    margin-bottom: 6pt;
+  }
+
+  h1 { font-size: 20pt !important; }
+  h2 { font-size: 16pt !important; }
+  h3 { font-size: 14pt !important; }
+  h4 { font-size: 12pt !important; }
+  h5, h6 { font-size: 11pt !important; }
+
+  /* 段落 */
+  p {
+    margin: 6pt 0;
+    orphans: 3;
+    widows: 3;
+  }
+
+  /* 列表 */
+  ul, ol {
+    margin: 6pt 0;
+    padding-left: 20pt;
+  }
+
+  li {
+    page-break-inside: avoid;
+  }
+
+  /* 引用块 */
+  blockquote {
+    page-break-inside: avoid;
+    border-left: 3pt solid #ddd !important;
+    padding-left: 12pt;
+    margin: 12pt 0;
+    color: #666 !important;
+  }
+
+  /* 代码块 */
+  pre,
+  .hljs-code-block {
+    page-break-inside: avoid;
+    border: 1pt solid #ddd !important;
+    padding: 8pt !important;
+    margin: 6pt 0;
+    background: #f5f5f5 !important;
+    font-size: 9pt !important;
+    line-height: 1.4 !important;
+    overflow: visible !important;
+    white-space: pre-wrap !important;
+    word-wrap: break-word !important;
+
+    .code-header {
+      display: none !important;
+    }
+
+    code {
+      background: transparent !important;
+      color: #000 !important;
+      padding: 0 !important;
+    }
+  }
+
+  code {
+    background: #f5f5f5 !important;
+    color: #000 !important;
+    padding: 2pt 4pt;
+    border-radius: 2pt;
+    font-size: 9pt;
+  }
+
+  /* 表格 */
+  table {
+    page-break-inside: avoid;
+    border-collapse: collapse !important;
+    width: 100%;
+    margin: 12pt 0;
+    font-size: 10pt;
+  }
+
+  table th,
+  table td {
+    border: 1pt solid #ddd !important;
+    padding: 4pt 8pt;
+    text-align: left;
+  }
+
+  table th {
+    background: #f5f5f5 !important;
+    font-weight: bold;
+  }
+
+  /* 图片 */
+  img {
+    max-width: 100% !important;
+    height: auto !important;
+    page-break-inside: avoid;
+    display: block;
+    margin: 12pt auto;
+  }
+
+  /* 链接 */
+  a {
+    color: #000 !important;
+    text-decoration: underline;
+  }
+
+  /* 显示链接地址 */
+  a[href^="http"]:after {
+    content: " (" attr(href) ")";
+    font-size: 8pt;
+    color: #666 !important;
+    word-break: break-all;
+  }
+
+  /* 不显示内部锚点链接的地址 */
+  a[href^="#"]:after {
+    content: none !important;
+  }
+
+  /* 水平线 */
+  hr {
+    border: none;
+    border-top: 1pt solid #ddd !important;
+    margin: 12pt 0;
+  }
+
+  /* 页眉页脚 */
+  @page {
+    margin: 2cm;
+
+    @top-right {
+      content: counter(page);
+      font-size: 9pt;
+      color: #666;
+    }
+  }
+
+  /* 标签 */
+  .article-tags {
+    margin: 12pt 0;
+    page-break-after: avoid;
+
+    .el-tag {
+      border: 1pt solid #ddd !important;
+      background: #f5f5f5 !important;
+      color: #000 !important;
+      padding: 2pt 6pt;
+      margin-right: 4pt;
+      display: inline-block;
+    }
+  }
+
+  /* 分隔线 */
+  .el-divider {
+    margin: 12pt 0;
+    border-top: 1pt solid #ddd !important;
+  }
+
+  /* 作者签名区 */
+  .author-signature {
+    page-break-inside: avoid;
+    border: 1pt solid #ddd !important;
+    padding: 12pt;
+    margin: 12pt 0;
+    background: #f9f9f9 !important;
+
+    .el-avatar {
+      display: none;
+    }
+  }
+
+  /* 确保正文部分完整打印 */
+  .article-header,
+  .article-body {
+    page-break-inside: avoid;
+  }
+}
+
+/* A4 纸张优化 */
+@media print and (min-width: 210mm) {
+  @page {
+    size: A4;
+    margin: 2cm 1.5cm;
+  }
+
+  body {
+    width: 210mm;
+  }
+
+  .article-body {
+    column-count: 1;
+  }
+}
+
+/* Letter 纸张优化 */
+@media print and (min-width: 8.5in) {
+  @page {
+    size: letter;
+    margin: 1in 0.75in;
+  }
+}

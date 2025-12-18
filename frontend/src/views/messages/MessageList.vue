@@ -50,8 +50,9 @@
         <ChatWindow
           v-else
           :key="selectedConversation.id"
-          :conversation-id="selectedConversation.id"
+          :conversation="selectedConversation"
           @close="selectedConversation = null"
+          @conversation-created="handleConversationCreated"
         />
       </el-main>
     </el-container>
@@ -59,12 +60,16 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { Search } from '@element-plus/icons-vue'
+import { ElMessage } from 'element-plus'
 import { useMessagingStore } from '@/stores/messagingStore'
 import ChatWindow from '@/components/messaging/ChatWindow.vue'
 import ConversationItem from '@/components/messaging/ConversationItem.vue'
 
+const route = useRoute()
+const router = useRouter()
 const messagingStore = useMessagingStore()
 const searchText = ref('')
 const selectedConversation = ref(null)
@@ -87,9 +92,25 @@ const filteredConversations = computed(() => {
 })
 
 // 初始化加载对话列表
-onMounted(() => {
-  loadConversations()
+onMounted(async () => {
+  await loadConversations()
+
+  // 处理 targetUserId 查询参数
+  const targetUserId = route.query.targetUserId
+  if (targetUserId) {
+    await handleTargetUser(targetUserId)
+  }
 })
+
+// 监听 targetUserId 变化
+watch(
+  () => route.query.targetUserId,
+  async (targetUserId) => {
+    if (targetUserId) {
+      await handleTargetUser(targetUserId)
+    }
+  }
+)
 
 const loadConversations = async () => {
   try {
@@ -99,8 +120,76 @@ const loadConversations = async () => {
   }
 }
 
+// 处理目标用户
+const handleTargetUser = async (userId) => {
+  try {
+    // 先在现有对话列表中查找
+    const existingConv = conversations.value.find(
+      conv => String(conv.otherUser?.id) === String(userId)
+    )
+
+    if (existingConv) {
+      // 如果已存在对话，直接选中
+      console.log('[MessageList] Found existing conversation:', existingConv)
+      selectedConversation.value = existingConv
+    } else {
+      // 如果不存在，创建新对话
+      console.log('[MessageList] Creating new conversation with user:', userId)
+      await createNewConversation(userId)
+    }
+  } catch (error) {
+    console.error('[MessageList] Handle target user error:', error)
+    ElMessage.error('无法打开对话')
+  }
+}
+
+// 创建新对话
+const createNewConversation = async (userId) => {
+  try {
+    // 获取目标用户信息
+    const userInfo = await messagingStore.getUserInfo(userId)
+
+    if (!userInfo) {
+      throw new Error('用户不存在')
+    }
+
+    // 创建新的对话对象（临时）
+    const newConversation = {
+      id: `new_${userId}`,
+      otherUser: userInfo,
+      lastMessage: '',
+      unreadCount: 0,
+      updatedAt: new Date(),
+      isNew: true // 标记为新对话
+    }
+
+    console.log('[MessageList] Created new conversation:', newConversation)
+    selectedConversation.value = newConversation
+  } catch (error) {
+    console.error('[MessageList] Create new conversation error:', error)
+    ElMessage.error(error.message || '无法加载用户信息')
+  }
+}
+
 const selectConversation = (conversation) => {
   selectedConversation.value = conversation
+
+  // 更新 URL 查询参数
+  router.push({
+    path: '/messages',
+    query: { targetUserId: conversation.otherUser?.id }
+  })
+}
+
+// 处理对话创建完成
+const handleConversationCreated = (newConv) => {
+  console.log('[MessageList] Conversation created:', newConv)
+
+  // 更新选中的对话为真实的对话
+  selectedConversation.value = newConv
+
+  // 重新加载对话列表
+  loadConversations()
 }
 </script>
 

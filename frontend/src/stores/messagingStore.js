@@ -334,6 +334,87 @@ export const useMessagingStore = defineStore('messaging', () => {
     error.value = null
   }
 
+  /**
+   * 获取用户信息
+   */
+  const getUserInfo = async (userId) => {
+    try {
+      const response = await messagingAPI.getUserInfo(userId)
+      return response.data.data || response.data
+    } catch (err) {
+      console.error('[MessagingStore] getUserInfo error:', err)
+      throw new Error('无法获取用户信息')
+    }
+  }
+
+  /**
+   * 创建新对话（发送第一条消息）
+   */
+  const createConversation = async ({ recipientId, content }) => {
+    loading.value = true
+    error.value = null
+
+    if (!content || !content.trim()) {
+      throw new Error('消息内容不能为空')
+    }
+
+    if (content.length > 500) {
+      throw new Error('消息长度不能超过 500 字符')
+    }
+
+    try {
+      // 调用 API 创建对话并发送第一条消息
+      const response = await messagingAPI.createConversation({
+        recipientId,
+        content: content.trim(),
+        type: 'text'
+      })
+
+      const newConversation = response.data.data
+
+      // 更新当前对话
+      currentConversation.value = newConversation
+
+      // 如果返回了消息，添加到消息列表
+      if (newConversation.messages && newConversation.messages.length > 0) {
+        messages.value = newConversation.messages
+      } else if (newConversation.lastMessage) {
+        // 如果没有消息列表，至少添加最后一条消息
+        messages.value = [{
+          id: Date.now(),
+          content: newConversation.lastMessage,
+          senderId: useUserStore().user?.id,
+          createdAt: new Date()
+        }]
+      }
+
+      // 将新对话添加到对话列表顶部
+      conversations.value.unshift(newConversation)
+
+      console.log('[MessagingStore] New conversation created:', newConversation)
+      return newConversation
+    } catch (err) {
+      error.value = err.message || '创建对话失败'
+      console.error('[MessagingStore] createConversation error:', err)
+      throw err
+    } finally {
+      loading.value = false
+    }
+  }
+
+  /**
+   * 获取更多历史消息
+   */
+  const getMessages = async (conversationId, page = 1) => {
+    try {
+      const response = await messagingAPI.getMessages(conversationId, page)
+      return response.data
+    } catch (err) {
+      console.error('[MessagingStore] getMessages error:', err)
+      throw err
+    }
+  }
+
   return {
     // 状态
     conversations,
@@ -359,6 +440,9 @@ export const useMessagingStore = defineStore('messaging', () => {
     deleteConversation,
     searchMessages,
     closeConversation,
-    clearError
+    clearError,
+    getUserInfo,
+    createConversation,
+    getMessages
   }
 })

@@ -147,6 +147,27 @@
         </div>
       </div>
 
+      <!-- 版权声明和 AI 评分 -->
+      <PostCopyright
+        :author="post.author"
+        :post-id="post.id"
+        :ai-score="{
+          overall: (post.aiReviewScore || 0) * 10,
+          contentQuality: 9,
+          technicalDepth: 8,
+          readability: 9,
+          practicality: 8,
+          comment: '这是一篇高质量的技术文章，内容详实，技术深度适中，可读性强，实用性高。'
+        }"
+      />
+
+      <!-- 相关推荐 -->
+      <RelatedPosts
+        :post-id="post.id"
+        :tags="post.tags"
+        :category="post.category"
+      />
+
       <!-- 评论区 -->
       <CommentsSection ref="commentsRef" :post-id="post.id" :initial-comments="post.comments || []" />
     </div>
@@ -169,6 +190,8 @@ import {
 } from '@element-plus/icons-vue'
 import MarkdownRenderer from './MarkdownRenderer.vue'
 import CommentsSection from './CommentsSection.vue'
+import PostCopyright from '../components/PostCopyright.vue'
+import RelatedPosts from '../components/RelatedPosts.vue'
 
 const props = defineProps({
   postId: {

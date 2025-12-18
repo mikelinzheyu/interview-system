@@ -703,6 +703,7 @@ class CommunityController {
           id: 1,
           title: '欢迎来到社区',
           content: '这是一个很好的开始！',
+          coverImage: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=2070&auto=format&fit=crop',
           category: 'general',
           tags: ['欢迎', '入门'],
           authorId: 1,
@@ -717,6 +718,7 @@ class CommunityController {
           id: 2,
           title: '学习技术的最佳方式',
           content: '通过实践和不断学习来提高技能',
+          coverImage: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?q=80&w=2070&auto=format&fit=crop',
           category: 'tech',
           tags: ['学习', '技术', '提升'],
           authorId: 2,
@@ -725,6 +727,67 @@ class CommunityController {
           updatedAt: '2025-11-11T10:00:00Z',
           views: 25,
           likes: 5,
+          comments: []
+        },
+        {
+          id: 9,
+          title: '2024年后端架构演进趋势：微服务与Serverless的融合',
+          content: `# 2024年后端架构演进趋势：微服务与Serverless的融合
+
+## 引言
+
+随着云计算技术的不断成熟，后端架构正在经历一场深刻的变革。微服务架构（Microservices）和无服务器架构（Serverless）作为当前最主流的两种架构模式，正在从“各自为战”走向“深度融合”。
+
+## 1. 微服务的痛点与Serverless的机遇
+
+微服务架构虽然解决了单体应用的扩展性问题，但也带来了运维复杂度的指数级上升。Kubernetes 虽然成为了容器编排的标准，但其学习曲线依然陡峭。
+
+Serverless 的出现，恰好解决了这一痛点。它让开发者不再关心底层基础设施，只需关注业务逻辑。
+
+### Serverless 的优势：
+*   **按需付费**：不再需要为空闲资源买单。
+*   **自动扩缩容**：轻松应对流量洪峰。
+*   **运维免除**：云厂商接管底层运维。
+
+## 2. 融合模式：Serverless Container
+
+Serverless Container（如 AWS Fargate, Google Cloud Run, 阿里云 ASK）是当前最热门的融合方向。它结合了容器的灵活性和 Serverless 的免运维特性。
+
+\`\`\`yaml
+# 示例：Knative Service 定义
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: helloworld-go
+  namespace: default
+spec:
+  template:
+    spec:
+      containers:
+        - image: gcr.io/knative-samples/helloworld-go
+          env:
+            - name: TARGET
+              value: "Go Sample v1"
+\`\`\`
+
+## 3. 下一代架构展望
+
+未来的后端架构将是 **“以应用为中心”** 的。基础设施将进一步抽象化，Mesh 层将处理所有的网络通信，Dapr 等运行时将处理所有的分布式能力。
+
+> "The future of cloud is serverless."
+
+## 结语
+
+技术架构的演进永无止境。作为后端工程师，我们需要保持对新技术的敏锐度，同时也要根据业务场景选择最合适的架构。`,
+          coverImage: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=2072&auto=format&fit=crop',
+          category: 'backend',
+          tags: ['架构', '微服务', 'Serverless', '趋势'],
+          authorId: 1,
+          authorName: 'user_1',
+          createdAt: '2025-12-14T09:00:00Z',
+          updatedAt: '2025-12-14T09:00:00Z',
+          views: 3500,
+          likes: 128,
           comments: []
         },
         {
@@ -834,7 +897,8 @@ Composition API 提供了更强大和灵活的方式来组织组件逻辑。掌�
           updatedAt: '2025-11-12T10:00:00Z',
           views: 1200,
           likes: 85,
-          comments: []
+          comments: [],
+          coverImage: 'https://images.unsplash.com/photo-1555099962-4199c345e5dd?q=80&w=2070&auto=format&fit=crop'
         },
         {
           id: 20,
@@ -889,7 +953,8 @@ john hash.txt
           updatedAt: '2025-11-09T10:00:00Z',
           views: 2400,
           likes: 33,
-          comments: []
+          comments: [],
+          coverImage: 'https://images.unsplash.com/photo-1629654297299-c8506221ca97?q=80&w=2074&auto=format&fit=crop'
         }
       ]
       this.mockData.postIdCounter = 21

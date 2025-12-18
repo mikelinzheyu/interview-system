@@ -3,13 +3,10 @@
     <!-- AI 助手 -->
     <AIAssistant :article-content="articleContent" :post-id="postId" />
 
-    <!-- 相关推荐 -->
-    <RelatedArticles :tags="tags" :category="category" />
-
     <!-- 热门话题 -->
     <div class="trending-topics">
       <div class="section-header">
-        <h4>热门话题</h4>
+        <h4>🔥 热门话题</h4>
       </div>
       <div class="topics-list">
         <el-tag v-for="topic in trendingTopics" :key="topic" @click="handleTagClick(topic)">
@@ -23,8 +20,7 @@
 <script setup>
 import { defineProps } from 'vue'
 import { useRouter } from 'vue-router'
-import AIAssistant from './AIAssistant.vue'
-import RelatedArticles from './RelatedArticles.vue'
+import AIAssistant from '../components/AIAssistant.vue'
 
 const props = defineProps({
   articleContent: {
@@ -46,6 +42,22 @@ const props = defineProps({
 })
 
 const router = useRouter()
+
+const trendingTopics = [
+  'Vue 3',
+  'JavaScript',
+  '性能优化',
+  '前端',
+  'React',
+  'TypeScript',
+  '响应式设计',
+  'Web 开发',
+]
+
+const handleTagClick = (tag) => {
+  router.push(`/community/posts?tag=${encodeURIComponent(tag)}`)
+}
+</script>
 
 const trendingTopics = [
   'Vue 3',

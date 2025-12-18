@@ -1,6 +1,7 @@
 const express = require('express')
 const router = express.Router()
 const contributionsData = require('../data/contributions-data.json')
+const ContributorController = require('../controllers/ContributorController')
 
 const questions = contributionsData.questions || []
 const submissions = contributionsData.submissions || []
@@ -525,23 +526,17 @@ router.delete('/users/:userId/follow', (req, res) => {
 })
 
 // ===== Profiles / badges =====
-router.get('/profile/:userId', (req, res) => {
-  const profile = contributorProfiles.find(
-    (item) => String(item.userId) === String(req.params.userId)
-  )
-  if (!profile) {
-    return res.status(404).json({
-      code: 404,
-      message: 'Contributor profile not found'
-    })
-  }
+// 获取贡献者详细资料
+router.get('/profile/:userId', ContributorController.getProfile.bind(ContributorController))
 
-  res.json({
-    code: 200,
-    message: 'Profile loaded',
-    data: profile
-  })
-})
+// 更新用户资料
+router.put('/profile/:userId', ContributorController.updateProfile.bind(ContributorController))
+
+// 获取贡献热力图数据
+router.get('/profile/:userId/heatmap', ContributorController.getContributionHeatmap.bind(ContributorController))
+
+// 获取用户统计摘要
+router.get('/profile/:userId/stats', ContributorController.getProfileStats.bind(ContributorController))
 
 router.get('/leaderboard', (req, res) => {
   respondList(res, {

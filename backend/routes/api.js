@@ -21,6 +21,7 @@ const contributionsRouter = require('./contributions')
 const wrongAnswersRouter = require('./wrongAnswers')
 const recommendationsRouter = require('./recommendations')
 const userSettingsRouter = require('./user-settings') // <-- ADDED
+const followRouter = require('./follow')
 
 const hierarchicalDomains = require('../data/mock-domains-hierarchical.json')
 const contributionsData = require('../data/contributions-data.json')
@@ -889,6 +890,9 @@ router.get('/messages/:messageId/read-receipts', auth, (req, res) => {
 // Mount user settings routes (must be before /users/:userId to prevent conflicts)
 // 使用标准的 Express 中间件链式应用方式
 router.use('/users', auth, userSettingsRouter)
+
+// Mount follow/followers routes
+router.use('/users', followRouter)
 
 /**
  * GET /users/:userId - 获取用户信息

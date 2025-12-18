@@ -158,6 +158,32 @@ const messagingAPI = {
         }
       }
     )
+  },
+
+  /**
+   * 获取用户信息
+   */
+  getUserInfo(userId) {
+    return axios.get(`${baseURL}/users/${userId}`, {
+      headers: {
+        'x-user-id': getCurrentUserId()
+      }
+    })
+  },
+
+  /**
+   * 创建新对话并发送第一条消息
+   */
+  createConversation({ recipientId, content, type = 'text' }) {
+    return axios.post(
+      `${baseURL}/messages/conversations/create`,
+      { recipientId, content, type },
+      {
+        headers: {
+          'x-user-id': getCurrentUserId()
+        }
+      }
+    )
   }
 }
 

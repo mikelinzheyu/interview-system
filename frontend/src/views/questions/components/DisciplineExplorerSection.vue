@@ -8,28 +8,6 @@
       <p class="section-subtitle">4层递进式学习: 学科 → 专业类 → 专业 → 细分方向</p>
     </div>
 
-    <!-- 调试信息面板（开发环境） -->
-    <div v-if="true" class="debug-panel">
-      <div class="debug-item">
-        <span>当前层级:</span>
-        <span class="debug-value">{{ currentLevel }}</span>
-      </div>
-      <div class="debug-item">
-        <span>当前学科:</span>
-        <span class="debug-value">{{ disciplinesStore.currentDiscipline?.name || '无' }}</span>
-      </div>
-      <div class="debug-item">
-        <span>当前专业类:</span>
-        <span class="debug-value">{{ disciplinesStore.currentMajorGroup?.name || '无' }}</span>
-      </div>
-      <div class="debug-item">
-        <span>已加载专业类数:</span>
-        <span class="debug-value">
-          {{ disciplinesStore.currentDiscipline ? (disciplinesStore.majorGroupsCache[disciplinesStore.currentDiscipline.id]?.length || 0) : 0 }}
-        </span>
-      </div>
-    </div>
-
     <!-- 面包屑导航 -->
     <BreadcrumbNavigation
       v-if="currentLevel !== 'root'"
@@ -125,7 +103,9 @@
 
 <script setup>
 import { computed, onMounted, ref } from 'vue'
+import { useRouter } from 'vue-router'
 import { useDisciplinesStore } from '@/stores/disciplines'
+import { useDomainStore } from '@/stores/domain'
 import MajorGroupSelector from './MajorGroupSelector.vue'
 import MajorsGrid from './MajorsGrid.vue'
 import MajorDetailPanel from './MajorDetailPanel.vue'
@@ -134,6 +114,8 @@ import BreadcrumbNavigation from './BreadcrumbNavigation.vue'
 import DisciplineSearchFilter from './DisciplineSearchFilter.vue'
 
 const emit = defineEmits(['select-domain'])
+const router = useRouter()
+const domainStore = useDomainStore()
 
 const disciplinesStore = useDisciplinesStore()
 
@@ -148,7 +130,13 @@ const filterOptions = ref({
 // 加载学科数据
 onMounted(async () => {
   try {
+    // 加载学科数据
     await disciplinesStore.loadDisciplines()
+
+    // 预加载领域数据，用于映射
+    if (!domainStore.domains || domainStore.domains.length === 0) {
+      await domainStore.loadDomains({ selectFirst: false })
+    }
   } catch (err) {
     console.error('Failed to load disciplines:', err)
   }
@@ -226,20 +214,109 @@ function handleBreadcrumbNavigation(event) {
   console.log('Navigate to level:', event)
 }
 
+// 学科/专业到 domain slug 的映射
+function getDomainSlugFromDiscipline(discipline) {
+  // 学科ID或名称到 domain slug 的映射表
+  const mappings = {
+    // 学科门类映射
+    '08': 'computer-science', // 工学 -> 计算机科学与技术
+    '工学': 'computer-science',
+    '02': 'data-science', // 经济学 -> 数据科学
+    '经济学': 'data-science',
+    '07': 'data-science', // 理学 -> 数据科学
+    '理学': 'data-science',
+
+    // 专业类映射
+    '0809': 'computer-science', // 计算机类
+    '计算机类': 'computer-science',
+
+    // 专业映射
+    '080901': 'computer-science', // 计算机科学与技术
+    '计算机科学与技术': 'computer-science',
+    '080902': 'computer-science', // 软件工程
+    '软件工程': 'computer-science',
+    '080903': 'computer-science', // 网络工程
+    '网络工程': 'computer-science',
+    '080904': 'computer-science', // 信息安全
+    '信息安全': 'computer-science',
+    '080905': 'computer-science', // 物联网工程
+    '物联网工程': 'computer-science',
+    '080906': 'artificial-intelligence', // 数字媒体技术
+    '数字媒体技术': 'artificial-intelligence',
+    '080907': 'artificial-intelligence', // 智能科学与技术
+    '智能科学与技术': 'artificial-intelligence',
+    '080910': 'data-science', // 数据科学与大数据技术
+    '数据科学与大数据技术': 'data-science',
+
+    // 前端相关专业
+    '前端': 'frontend-engineering',
+    '前端工程': 'frontend-engineering',
+    '前端开发': 'frontend-engineering',
+
+    // 后端相关专业
+    '后端': 'backend-engineering',
+    '后端工程': 'backend-engineering',
+    '后端开发': 'backend-engineering',
+
+    // 云计算相关
+    '云计算': 'cloud-native',
+    '云原生': 'cloud-native',
+
+    // AI相关
+    '人工智能': 'artificial-intelligence',
+    '机器学习': 'artificial-intelligence',
+    '深度学习': 'artificial-intelligence',
+  }
+
+  // 优先使用映射表
+  if (mappings[discipline.id]) {
+    return mappings[discipline.id]
+  }
+  if (mappings[discipline.code]) {
+    return mappings[discipline.code]
+  }
+  if (mappings[discipline.name]) {
+    return mappings[discipline.name]
+  }
+
+  // 如果没有映射，使用学科ID
+  return discipline.id || discipline.code || 'all'
+}
+
+// 获取领域的第一道题目ID
+async function getFirstQuestionId(domainSlug) {
+  try {
+    // 尝试从 domainStore 获取领域信息
+    const domain = domainStore.findDomainBySlug?.(domainSlug)
+    if (domain && domain.id) {
+      // 这里可以调用 API 获取第一道题目，暂时返回 null
+      // 让页面显示题目列表而不是打开具体题目
+      return null
+    }
+    return null
+  } catch (err) {
+    console.error('获取题目ID失败:', err)
+    return null
+  }
+}
+
 // 选择学科处理
 async function selectDisciplineHandler(discipline) {
   console.log('[DisciplineExplorer] 选择学科点击事件:', discipline.name)
   try {
-    console.log('[DisciplineExplorer] 调用 selectDiscipline')
-    disciplinesStore.selectDiscipline(discipline)
+    // 获取对应的 domain slug
+    const domainSlug = getDomainSlugFromDiscipline(discipline)
+    console.log('[DisciplineExplorer] 映射到 domainSlug:', domainSlug)
 
-    console.log('[DisciplineExplorer] 加载专业类...')
-    // 预加载专业类
-    await disciplinesStore.loadMajorGroups(discipline.id)
+    // 获取第一道题目ID（可选）
+    const questionId = await getFirstQuestionId(domainSlug)
 
-    console.log('[DisciplineExplorer] 专业类加载完成，当前状态:', {
-      currentDiscipline: disciplinesStore.currentDiscipline?.name,
-      majorGroups: disciplinesStore.majorGroupsCache[discipline.id]?.length || 0
+    // 跳转到题库页面
+    const query = questionId ? { questionId } : {}
+    router.push({
+      name: 'QuestionBankPage',
+      params: { domainSlug },
+      query
     })
   } catch (err) {
     console.error('[DisciplineExplorer] 选择学科出错:', err)
@@ -249,7 +326,15 @@ async function selectDisciplineHandler(discipline) {
 // 选择专业类处理
 async function selectMajorGroupHandler(majorGroup) {
   try {
-    disciplinesStore.selectMajorGroup(majorGroup)
+    // 获取对应的 domain slug
+    const domainSlug = getDomainSlugFromDiscipline(majorGroup)
+    console.log('[DisciplineExplorer] 专业类映射到 domainSlug:', domainSlug)
+
+    // 跳转到题库页面
+    router.push({
+      name: 'QuestionBankPage',
+      params: { domainSlug }
+    })
   } catch (err) {
     console.error('Failed to select major group:', err)
   }
@@ -258,9 +343,15 @@ async function selectMajorGroupHandler(majorGroup) {
 // 选择专业处理
 async function selectMajorHandler(major) {
   try {
-    await disciplinesStore.selectMajor(major)
-    // 加载专业详情
-    await disciplinesStore.loadMajorDetails(major.id)
+    // 获取对应的 domain slug
+    const domainSlug = getDomainSlugFromDiscipline(major)
+    console.log('[DisciplineExplorer] 专业映射到 domainSlug:', domainSlug)
+
+    // 跳转到题库页面
+    router.push({
+      name: 'QuestionBankPage',
+      params: { domainSlug }
+    })
   } catch (err) {
     console.error('Failed to select major:', err)
   }
@@ -269,9 +360,15 @@ async function selectMajorHandler(major) {
 // 选择细分方向处理
 async function selectSpecializationHandler(spec) {
   try {
-    await disciplinesStore.selectSpecialization(spec)
-    // 加载细分方向详情
-    await disciplinesStore.loadSpecializationDetails(spec.id)
+    // 获取对应的 domain slug
+    const domainSlug = getDomainSlugFromDiscipline(spec)
+    console.log('[DisciplineExplorer] 细分方向映射到 domainSlug:', domainSlug)
+
+    // 跳转到题库页面
+    router.push({
+      name: 'QuestionBankPage',
+      params: { domainSlug }
+    })
   } catch (err) {
     console.error('Failed to select specialization:', err)
   }
@@ -419,11 +516,11 @@ function getDisciplineColor(index) {
   position: relative;
   border-radius: 16px;
   background: #ffffff;
-  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
   padding: 24px;
   cursor: pointer;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  border: 2px solid transparent;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  border: 1px solid #f3f4f6;
   animation: slideInUp 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
   animation-delay: var(--delay, 0s);
   overflow: hidden;
@@ -438,14 +535,15 @@ function getDisciplineColor(index) {
     top: 0;
     left: 0;
     right: 0;
-    height: 4px;
+    height: 3px;
     background: #667eea;
+    opacity: 0.8;
   }
 
   &:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 16px 32px rgba(15, 23, 42, 0.15);
-    border-color: rgba(102, 126, 234, 0.2);
+    transform: translateY(-4px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.04);
+    border-color: rgba(102, 126, 234, 0.3);
   }
 
   &:active {

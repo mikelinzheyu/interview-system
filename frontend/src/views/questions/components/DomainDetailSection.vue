@@ -57,16 +57,6 @@
 
         <div class="panel">
           <div class="panel-bar">
-            <h3>学习路径可视化</h3>
-          </div>
-          <LearningPathVisualization
-            :stages="learningPathStages"
-            :loading="loading"
-          />
-        </div>
-
-        <div class="panel">
-          <div class="panel-bar">
             <h3>题库预览</h3>
             <el-button link type="primary" @click="viewAllQuestions">
               查看全部
@@ -181,7 +171,6 @@
 import { computed, ref, watch } from 'vue'
 import { ElMessage } from 'element-plus'
 import { ArrowLeft, ArrowRight, VideoPlay, Star, Download, Share } from '@element-plus/icons-vue'
-import LearningPathVisualization from './LearningPathVisualization.vue'
 
 const props = defineProps({
   domain: {
@@ -260,19 +249,6 @@ const progressColor = computed(() => {
   if (completion >= 80) return '#22c55e'
   if (completion >= 50) return '#f59e0b'
   return '#ef4444'
-})
-
-const learningPathStages = computed(() => {
-  if (Array.isArray(props.domain?.learningPath?.stages)) {
-    return props.domain.learningPath.stages
-  }
-  if (Array.isArray(props.domain?.curriculum)) {
-    return props.domain.curriculum
-  }
-  if (Array.isArray(props.domain?.modules)) {
-    return props.domain.modules
-  }
-  return []
 })
 
 const previewQuestionsComputed = computed(() =>

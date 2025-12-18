@@ -62,6 +62,7 @@
 
 <script setup>
 import { ref, computed, nextTick, watch, onMounted, onUnmounted } from 'vue'
+import { ElMessage } from 'element-plus'
 import { useMessagingStore } from '@/stores/messagingStore'
 import { useWebSocket } from '@/composables/useWebSocket'
 import ChatBubble from './ChatBubble.vue'
@@ -69,13 +70,13 @@ import ChatInput from './ChatInput.vue'
 import MessageHeader from './MessageHeader.vue'
 
 const props = defineProps({
-  conversationId: {
-    type: String,
+  conversation: {
+    type: Object,
     required: true
   }
 })
 
-const emit = defineEmits(['close'])
+const emit = defineEmits(['close', 'conversation-created'])
 
 const messagingStore = useMessagingStore()
 const { joinConversation, leaveConversation } = useWebSocket()
@@ -86,8 +87,13 @@ const hasMore = ref(false)
 
 const loading = computed(() => messagingStore.loading)
 const messages = computed(() => messagingStore.messages)
-const currentConversation = computed(() => messagingStore.currentConversation)
+const currentConversation = computed(() => props.conversation)
 const error = computed(() => messagingStore.error)
+
+// 检测是否为新对话
+const isNewConversation = computed(() => {
+  return props.conversation?.isNew === true
+})
 
 // 监听消息变化，自动滚动到底部
 watch(
@@ -101,19 +107,32 @@ watch(
 
 // 初始化加载对话
 onMounted(async () => {
+  // 如果是新对话，不需要加载历史消息
+  if (isNewConversation.value) {
+    console.log('[ChatWindow] New conversation, skip loading messages')
+    messagingStore.messages = []
+    return
+  }
+
+  // 加载现有对话
   await loadConversation()
+
   // 加入 WebSocket 对话房间
-  joinConversation(props.conversationId)
+  if (props.conversation.id) {
+    joinConversation(props.conversation.id)
+  }
 })
 
 // 卸载时离开对话房间
 onUnmounted(() => {
-  leaveConversation(props.conversationId)
+  if (props.conversation.id && !isNewConversation.value) {
+    leaveConversation(props.conversation.id)
+  }
 })
 
 const loadConversation = async () => {
   try {
-    const data = await messagingStore.openConversation(props.conversationId)
+    const data = await messagingStore.openConversation(props.conversation.id)
     hasMore.value = data.pagination?.hasMore || false
     currentPage.value = 1
   } catch (error) {
@@ -123,9 +142,30 @@ const loadConversation = async () => {
 
 const handleSendMessage = async (data) => {
   try {
-    await messagingStore.sendMessage(data.content)
+    // 如果是新对话，发送第一条消息时创建对话
+    if (isNewConversation.value) {
+      console.log('[ChatWindow] Creating new conversation with first message')
+      const newConv = await messagingStore.createConversation({
+        recipientId: props.conversation.otherUser.id,
+        content: data.content
+      })
+
+      // 通知父组件对话已创建
+      emit('conversation-created', newConv)
+
+      // 加入 WebSocket 房间
+      if (newConv.id) {
+        joinConversation(newConv.id)
+      }
+
+      ElMessage.success('对话已创建')
+    } else {
+      // 普通发送消息
+      await messagingStore.sendMessage(data.content)
+    }
   } catch (error) {
     console.error('[ChatWindow] Send message error:', error)
+    ElMessage.error('发送失败: ' + (error.message || '未知错误'))
   }
 }
 
@@ -134,7 +174,7 @@ const loadMoreMessages = async () => {
   try {
     currentPage.value++
     const response = await messagingStore.getMessages(
-      props.conversationId,
+      props.conversation.id,
       currentPage.value
     )
     // 在消息列表最前面添加新消息
@@ -146,6 +186,10 @@ const loadMoreMessages = async () => {
   } finally {
     loadingMore.value = false
   }
+}
+
+const handleBack = () => {
+  emit('close')
 }
 
 const handleMessageClear = () => {

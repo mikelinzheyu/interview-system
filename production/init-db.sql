@@ -116,7 +116,7 @@ SET FOREIGN_KEY_CHECKS = 1;
 
 -- 索引优化：为题库添加 FULLTEXT 索引以提升搜索性能
 -- 注意：InnoDB 引擎下 MySQL 8.0 支持 FULLTEXT
-DROP INDEX IF EXISTS idx_questions_fulltext ON `questions`;
+-- ALTER TABLE `questions` DROP INDEX IF EXISTS idx_questions_fulltext;
 CREATE FULLTEXT INDEX idx_questions_fulltext ON `questions` (`title`, `content`);
 
 -- 规范化标签表与关联表

@@ -38,7 +38,7 @@ function initializeWebSocket(httpServer, mockData) {
     transports: ['websocket', 'polling'],
     allowEIO3: true,
     pingInterval: 25000,
-    pingTimeout: 20000
+    pingTimeout: 60000  // 修复：pingTimeout 必须大于 pingInterval
   })
 
   // JWT 鉴权中间件（简化版）

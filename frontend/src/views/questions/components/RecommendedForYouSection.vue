@@ -374,20 +374,20 @@ const progressColor = computed(() => {
   position: relative;
   border-radius: 16px;
   background: #ffffff;
-  box-shadow: 0 10px 25px rgba(15, 23, 42, 0.08);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
   padding: 24px 20px;
   display: flex;
   flex-direction: column;
   gap: 16px;
   cursor: pointer;
   transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
-  border: 2px solid transparent;
+  border: 1px solid #f3f4f6;
   animation: scaleIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
 
   &:hover {
     transform: translateY(-4px);
-    box-shadow: 0 18px 32px rgba(15, 23, 42, 0.12);
-    border-color: rgba(59, 130, 246, 0.2);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.04);
+    border-color: rgba(59, 130, 246, 0.3);
   }
 
   &:active {

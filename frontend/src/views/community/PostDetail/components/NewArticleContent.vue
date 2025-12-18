@@ -9,6 +9,11 @@
     <div v-else-if="post" class="article-wrapper">
       <!-- 文章头部 -->
       <header class="article-header">
+        <!-- 封面图 -->
+        <div v-if="post.coverImage" class="article-cover">
+          <img :src="post.coverImage" :alt="post.title" />
+        </div>
+
         <h1 class="article-title">{{ post.title }}</h1>
 
         <!--元信息 -->
@@ -230,12 +235,33 @@ watch(() => props.postId, () => {
   .article-header {
     margin-bottom: var(--spacing-3xl);
 
+    .article-cover {
+      margin-bottom: var(--spacing-xl);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+
+      img {
+        width: 100%;
+        height: auto;
+        max-height: 480px;
+        object-fit: cover;
+        display: block;
+        transition: transform 0.3s ease;
+
+        &:hover {
+          transform: scale(1.02);
+        }
+      }
+    }
+
     .article-title {
       margin: 0 0 var(--spacing-xl) 0;
-      font-size: var(--font-size-3xl);
-      font-weight: var(--font-weight-bold);
+      font-size: 2.5rem; /* 更大的标题 */
+      font-weight: 700;
       line-height: 1.3;
       color: var(--color-text-primary);
+      letter-spacing: -0.02em;
     }
 
     .article-meta {
@@ -267,9 +293,10 @@ watch(() => props.postId, () => {
   .article-body {
     min-height: 400px;
     margin-bottom: var(--spacing-4xl);
-    font-size: var(--font-size-base);
-    line-height: var(--line-height-relaxed);
+    font-size: 18px; /* 提升正文阅读体验 */
+    line-height: 1.8;
     color: var(--color-text-primary);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
   }
 
   /* 文章底部 */
