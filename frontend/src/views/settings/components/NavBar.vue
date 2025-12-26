@@ -94,9 +94,9 @@ const getIcon = (id) => {
 
 .nav-bar-sticky {
   width: 100%;
-  background-color: rgba(255, 255, 255, 0.8);
+  background-color: var(--color-bg-secondary, #fff);
   backdrop-filter: blur(12px);
-  border-bottom: 1px solid var(--color-slate-200);
+  border-bottom: 1px solid var(--color-border, var(--color-slate-200));
   position: sticky;
   top: 0;
   z-index: 50;
@@ -129,7 +129,7 @@ const getIcon = (id) => {
 .nav-button {
   position: relative;
   padding: 0.75rem 1.25rem;
-  font-size: 0.875rem; /* text-sm */
+  font-size: var(--font-size-sm);
   font-weight: 500;
   border-radius: 0.5rem;
   white-space: nowrap;
@@ -143,16 +143,16 @@ const getIcon = (id) => {
   @include transition-all;
 
   &.active {
-    color: var(--color-blue-600);
-    background-color: rgba(239, 246, 255, 0.5); /* blue-50/50 */
+    color: var(--color-primary, var(--color-blue-600));
+    background-color: var(--color-bg-tertiary, rgba(239, 246, 255, 0.5));
   }
 
   &.inactive {
-    color: var(--color-slate-500);
+    color: var(--color-text-secondary, var(--color-slate-500));
     
     &:hover {
-      color: var(--color-slate-800);
-      background-color: var(--color-slate-50);
+      color: var(--color-text, var(--color-slate-800));
+      background-color: var(--color-bg-tertiary, var(--color-slate-50));
     }
   }
 }
@@ -167,7 +167,7 @@ const getIcon = (id) => {
   left: 0;
   width: 100%;
   height: 2px;
-  background-color: var(--color-blue-600);
+  background-color: var(--color-primary, var(--color-blue-600));
   border-top-left-radius: 9999px;
   border-top-right-radius: 9999px;
   box-shadow: 0 -2px 6px rgba(37, 99, 235, 0.3);

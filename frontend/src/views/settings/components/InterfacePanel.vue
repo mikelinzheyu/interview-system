@@ -137,9 +137,9 @@ const fontSizes = [
 }
 
 .section-header {
-  font-size: 0.875rem; /* text-sm */
+  font-size: var(--font-size-sm);
   font-weight: 600;
-  color: var(--color-slate-800);
+  color: var(--color-text, var(--color-slate-800));
   margin-bottom: 1rem;
   display: flex;
   align-items: center;
@@ -152,7 +152,7 @@ const fontSizes = [
 
 .divider {
   height: 1px;
-  background-color: var(--color-slate-100);
+  background-color: var(--color-border, var(--color-slate-100));
 }
 
 /* Theme Cards */
@@ -169,21 +169,21 @@ const fontSizes = [
   gap: 0.75rem;
   padding: 1rem;
   border-radius: 1rem; /* rounded-2xl */
-  border: 2px solid var(--color-slate-100);
-  background-color: white;
-  color: var(--color-slate-500);
+  border: 2px solid var(--color-border, var(--color-slate-100));
+  background-color: var(--color-bg-secondary, #fff);
+  color: var(--color-text-secondary, var(--color-slate-500));
   cursor: pointer;
   @include transition-all;
 
   &:hover {
-    border-color: var(--color-slate-200);
-    background-color: var(--color-slate-50);
+    border-color: var(--color-border, var(--color-slate-200));
+    background-color: var(--color-bg-tertiary, var(--color-slate-50));
   }
 
   &.active {
-    border-color: var(--color-blue-500);
-    background-color: rgba(239, 246, 255, 0.5);
-    color: var(--color-blue-700);
+    border-color: var(--color-primary, var(--color-blue-500));
+    background-color: var(--color-bg-tertiary, rgba(239, 246, 255, 0.5));
+    color: var(--color-primary, var(--color-blue-700));
     box-shadow: var(--shadow-md);
   }
 }
@@ -195,18 +195,18 @@ const fontSizes = [
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: var(--color-slate-100);
-  color: var(--color-slate-400);
+  background-color: var(--color-bg-tertiary, var(--color-slate-100));
+  color: var(--color-text-secondary, var(--color-slate-400));
   transition: color 0.2s, background-color 0.2s;
 
   &.active {
-    background-color: var(--color-blue-100);
-    color: var(--color-blue-600);
+    background-color: var(--color-primary, var(--color-blue-100));
+    color: var(--color-text, var(--color-blue-600));
   }
 }
 
 .theme-label {
-  font-size: 0.875rem;
+  font-size: var(--font-size-sm);
   font-weight: 500;
 }
 
@@ -215,7 +215,7 @@ const fontSizes = [
   width: 1rem;
   height: 1rem;
   border-radius: 9999px;
-  background: linear-gradient(to top right, var(--color-blue-500), #a855f7);
+  background: linear-gradient(to top right, var(--color-primary, var(--color-blue-500)), #a855f7);
 }
 
 .color-grid {
@@ -260,7 +260,7 @@ const fontSizes = [
 }
 
 .font-control-bar {
-  background-color: var(--color-slate-50);
+  background-color: var(--color-bg-tertiary, var(--color-slate-50));
   padding: 0.25rem;
   border-radius: 0.75rem; /* rounded-xl */
   display: flex;
@@ -270,21 +270,21 @@ const fontSizes = [
   flex: 1;
   padding: 0.5rem;
   border-radius: 0.5rem;
-  font-size: 0.875rem;
+  font-size: var(--font-size-sm);
   font-weight: 500;
-  color: var(--color-slate-500);
+  color: var(--color-text-secondary, var(--color-slate-500));
   background: transparent;
   border: none;
   cursor: pointer;
   transition: all 0.2s;
 
   &:hover {
-    color: var(--color-slate-700);
+    color: var(--color-text, var(--color-slate-700));
   }
 
   &.active {
-    background-color: white;
-    color: var(--color-blue-600);
+    background-color: var(--color-bg-secondary, #fff);
+    color: var(--color-primary, var(--color-blue-600));
     box-shadow: var(--shadow-sm);
   }
 }

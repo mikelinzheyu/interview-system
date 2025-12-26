@@ -7,21 +7,21 @@ import 'element-plus/dist/index.css'
 import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 import './styles/design-tokens.scss'
 import './styles/global.css'
+import { useThemeStore } from './stores/theme'
 
 const app = createApp(App)
+const pinia = createPinia()
 
 // 注册Element Plus图标
 for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
   app.component(key, component)
 }
 
-app.use(createPinia())
+app.use(pinia)
 app.use(router)
 app.use(ElementPlus)
 
-// 初始化主题系统
-import { useThemeStore } from './stores/theme'
-const themeStore = useThemeStore(app._context.provides.pinia)
+const themeStore = useThemeStore(pinia)
 themeStore.initTheme()
 
 app.mount('#app')

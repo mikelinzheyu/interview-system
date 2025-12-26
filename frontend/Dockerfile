@@ -51,7 +51,7 @@ EXPOSE 80 443
 
 # 健康检查
 HEALTHCHECK --interval=30s --timeout=10s --retries=5 --start-period=10s \
-    CMD curl -f http://localhost || exit 1
+    CMD curl -f http://127.0.0.1/health || exit 1
 
 # 启动Nginx
 CMD ["nginx", "-g", "daemon off;"]

@@ -10,6 +10,7 @@ import type {
 } from '@/types/user'
 import { userAPI } from '@/api/user'
 import { useUserStore } from '@/stores/user'
+import { useThemeStore } from '@/stores/theme'
 
 // Tailwind Color Palettes (Hex values)
 const COLOR_PALETTES: Record<string, Record<number, string>> = {
@@ -37,6 +38,13 @@ const COLOR_PALETTES: Record<string, Record<number, string>> = {
     50: '#ecfeff', 100: '#cffafe', 200: '#a5f3fc', 300: '#67e8f9', 400: '#22d3ee',
     500: '#06b6d4', 600: '#0891b2', 700: '#0e7490', 800: '#155e75', 900: '#164e63'
   }
+}
+
+const FONT_SIZE_MAP: Record<string, string> = {
+  sm: '13px',
+  base: '14px',
+  lg: '16px',
+  xl: '18px'
 }
 
 export const useSettingsStore = defineStore('settings', () => {
@@ -97,13 +105,12 @@ export const useSettingsStore = defineStore('settings', () => {
   }
 
   function applyTheme(theme: string) {
-    document.documentElement.setAttribute('data-theme', theme)
-    localStorage.setItem('theme', theme)
-
-    if (theme === 'dark' || (theme === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-      document.documentElement.classList.add('dark')
+    const themeStore = useThemeStore()
+    if (theme === 'auto') {
+      themeStore.setAutoMode(true)
     } else {
-      document.documentElement.classList.remove('dark')
+      themeStore.setAutoMode(false)
+      themeStore.setTheme(theme)
     }
   }
 
@@ -118,6 +125,16 @@ export const useSettingsStore = defineStore('settings', () => {
     })
 
     localStorage.setItem('accentColor', color)
+  }
+
+  function applyFontSize(size: string) {
+    const px = FONT_SIZE_MAP[size] || FONT_SIZE_MAP.base
+    const root = document.documentElement
+    root.style.setProperty('--font-size-base', px)
+    root.style.setProperty('--font-size-sm', `calc(${px} - 1px)`)
+    root.style.setProperty('--font-size-lg', `calc(${px} + 2px)`)
+    root.style.setProperty('--font-size-xl', `calc(${px} + 4px)`)
+    localStorage.setItem('font-size', size)
   }
 
   // ========== Profile Actions ==========
@@ -413,9 +430,10 @@ export const useSettingsStore = defineStore('settings', () => {
       preferences.value = data as UserPreferences
       loaded.value.preferences = true
 
-      // 应用保存的主题和颜色
+      // 应用保存的主题和颜色、字体
       if (data.theme) applyTheme(data.theme)
       if (data.accentColor) applyAccentColor(data.accentColor)
+      if (data.fontSize) applyFontSize(data.fontSize)
     } catch (error: any) {
       errors.value.preferences = error.message || '加载界面设置失败'
     } finally {
@@ -431,6 +449,7 @@ export const useSettingsStore = defineStore('settings', () => {
     // 立即应用 (Optimistic)
     if (data.theme) applyTheme(data.theme)
     if (data.accentColor) applyAccentColor(data.accentColor)
+    if (data.fontSize) applyFontSize(data.fontSize)
 
     // Update local state
     if (preferences.value) {

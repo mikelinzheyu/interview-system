@@ -192,3 +192,14 @@ body {
     background: var(--color-text-tertiary);
   }
 }
+
+/* ========== Element Plus Font Size Bridge ========== */
+/* 让 Element Plus 组件字号跟随全局 --font-size-base 变量，便于用户设置控制 */
+:root {
+  --el-font-size-extra-small: var(--font-size-sm);
+  --el-font-size-small: calc(var(--font-size-base) - 2px);
+  --el-font-size-base: var(--font-size-base);
+  --el-font-size-medium: calc(var(--font-size-base) + 2px);
+  --el-font-size-large: calc(var(--font-size-base) + 4px);
+  --el-font-size-larger: calc(var(--font-size-base) + 6px);
+}

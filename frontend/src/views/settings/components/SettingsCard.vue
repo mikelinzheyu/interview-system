@@ -23,10 +23,7 @@ defineProps({
 @import '@/styles/settings-theme.scss';
 
 .panel-container {
-  background-color: white;
-  border-radius: 1rem; /* rounded-2xl */
-  box-shadow: var(--shadow-card);
-  border: 1px solid var(--color-slate-100);
+  @extend .settings-card;
   overflow: hidden;
   @include transition-all;
   
@@ -35,7 +32,7 @@ defineProps({
 
   &:hover {
     box-shadow: var(--shadow-card-hover);
-    border-color: rgba(239, 246, 255, 0.5); /* blue-50/50 */
+    border-color: var(--color-border, rgba(239, 246, 255, 0.5));
   }
 }
 
@@ -48,22 +45,22 @@ defineProps({
 }
 
 .panel-header {
-  border-bottom: 1px solid var(--color-slate-100);
+  border-bottom: 1px solid var(--color-border, var(--color-slate-100));
   padding-bottom: 1.5rem;
   margin-bottom: 2rem; /* Space after header */
 }
 
 .panel-title {
-  font-size: 1.25rem; /* text-xl */
+  font-size: var(--font-size-xl);
   font-weight: 700;
-  color: var(--color-slate-800);
+  color: var(--color-text, var(--color-slate-800));
   letter-spacing: -0.025em; /* tracking-tight */
   margin: 0;
 }
 
 .panel-desc {
-  color: var(--color-slate-500);
-  font-size: 0.875rem; /* text-sm */
+  color: var(--color-text-secondary, var(--color-slate-500));
+  font-size: var(--font-size-sm);
   margin-top: 0.375rem;
   font-weight: 500;
 }
