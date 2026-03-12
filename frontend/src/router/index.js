@@ -157,7 +157,19 @@ const routes = [
   {
     path: '/interview/ai',
     name: 'AIInterview',
-    component: () => import('@/views/interview/AIInterviewSession.vue'),
+    component: () => import('@/views/interview/AIInterviewV2.vue'),
+    meta: { requiresAuth: false }
+  },
+  {
+    path: '/interview/report',
+    name: 'InterviewReport',
+    component: () => import('@/views/interview/InterviewReport.vue'),
+    meta: { requiresAuth: false }
+  },
+  {
+    path: '/interview/report-v2',
+    name: 'InterviewReportV2',
+    component: () => import('@/views/interview/InterviewReportV2.vue'),
     meta: { requiresAuth: false }
   },
   {

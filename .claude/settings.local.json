@@ -69,7 +69,19 @@
       "Bash(\"C:\\\\Program Files\\\\nodejs\\\\node.exe\" -e \"const data=require\\(''fs''\\).readFileSync\\(0,''utf8''\\); const json=JSON.parse\\(data\\); console.log\\(''Status:'', json.success ? ''✅ 成功'' : ''❌ 失败''\\); console.log\\(''Posts数量:'', json.data?.posts?.length || 0\\); if\\(json.data?.posts?.[0]\\) console.log\\(''示例帖子:'', json.data.posts[0].title\\);\")",
       "Bash(\"C:\\\\Program Files\\\\nodejs\\\\node.exe\" -e \"const data=JSON.parse\\(require\\(''fs''\\).readFileSync\\(0,''utf8''\\)\\); console.log\\(''Status:'', data.code === 200 ? ''✅'' : ''❌''\\); console.log\\(''Questions数量:'', data.data?.questions?.length || data.data?.items?.length || 0\\);\")",
       "Bash(\"C:\\\\Program Files\\\\nodejs\\\\node.exe\" -e \"const data=JSON.parse\\(require\\(''fs''\\).readFileSync\\(0,''utf8''\\)\\); console.log\\(''Status:'', data.code === 200 ? ''✅'' : ''❌''\\); console.log\\(''Domains数量:'', data.data?.length || 0\\);\")",
-      "Bash(\"C:\\\\Program Files\\\\nodejs\\\\node.exe\" -e \"const data=JSON.parse\\(require\\(''fs''\\).readFileSync\\(0,''utf8''\\)\\); console.log\\(''Status:'', data.code === 200 ? ''✅'' : ''❌''\\); console.log\\(''Paths数量:'', data.data?.length || 0\\);\")"
+      "Bash(\"C:\\\\Program Files\\\\nodejs\\\\node.exe\" -e \"const data=JSON.parse\\(require\\(''fs''\\).readFileSync\\(0,''utf8''\\)\\); console.log\\(''Status:'', data.code === 200 ? ''✅'' : ''❌''\\); console.log\\(''Paths数量:'', data.data?.length || 0\\);\")",
+      "Bash(ls:*)",
+      "Bash(start:*)",
+      "Bash(powershell:*)",
+      "Bash(node:*)",
+      "Bash(__NEW_LINE_7fb8dc7c0aa05eb0__ echo:*)",
+      "Bash(for i:*)",
+      "Bash(find /d/code7/interview-system/frontend/src -type f -name \"*.vue\" -exec grep -l \"class.*footer\\\\|<footer\" {} \\\\; 2>/dev/null | grep -v node_modules)",
+      "Bash(powershell.exe -Command \"Start-Process 'C:\\\\Program Files\\\\Docker\\\\Docker\\\\Docker Desktop.exe'\")",
+      "Bash(cd D:/code7/interview-system/production && cp .env.production .env)",
+      "Bash(powershell.exe -Command \"Stop-Process -Name 'Docker Desktop' -Force -ErrorAction SilentlyContinue; Start-Sleep -Seconds 5; Start-Process 'C:\\\\Program Files\\\\Docker\\\\Docker\\\\Docker Desktop.exe'\")",
+      "Bash(tasklist | grep 30556)",
+      "Bash(powershell.exe -Command \"Stop-Process -Id 30556 -Force\")"
     ],
     "deny": [],
     "ask": []

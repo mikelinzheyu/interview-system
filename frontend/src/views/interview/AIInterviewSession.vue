@@ -375,6 +375,7 @@
 
 <script>
 import { ref, reactive, computed, onMounted, onBeforeUnmount } from 'vue'
+import { useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import {
   VideoPlay,
@@ -393,8 +394,7 @@ import {
 } from '@element-plus/icons-vue'
 import MediaUtils from '@/utils/mediaUtils'
 import SpeechUtils from '@/utils/speechUtils'
-import aiAnalysisService from '@/services/aiAnalysisService'
-import difyService from '@/services/difyService'
+import interviewAIService from '@/services/interviewAIService'
 import LoadingSpinner from '@/components/common/LoadingSpinner.vue'
 import ErrorBoundary from '@/components/common/ErrorBoundary.vue'
 
@@ -410,6 +410,8 @@ export default {
     ErrorBoundary
   },
   setup() {
+    const router = useRouter()
+
     // 基础状态
     const cameraEnabled = ref(false)
     const isListening = ref(false)
@@ -422,7 +424,7 @@ export default {
     // 专业搜索相关数据
     const selectedProfession = ref('')
     const selectedDifficulty = ref('中级')
-    const recommendedProfessions = ref(difyService.getRecommendedProfessions())
+    const recommendedProfessions = ref([])
 
     // 常用专业（用于快速选择）
     const popularProfessions = ref([
@@ -653,7 +655,7 @@ export default {
         },
         onError: (error) => {
           isListening.value = false
-          ElMessage.error(`语音输入未捕获: ${error.message}`)
+          ElMessage.error(error.message)
         },
         onEnd: () => {
           isListening.value = false
@@ -688,124 +690,64 @@ export default {
       return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`
     }
 
-    // 生成新问题（获取一批5道题目）
+    // 生成新问题（获取一批题目）
     const generateNewQuestion = async () => {
       questionLoading.value = true
       hasError.value = false
 
       try {
-        // 构建智能问题生成请求参数
-        const requestParams = {
-          position: getUserPosition(), // 获取用户职位偏好
-          level: getUserLevel(),       // 获取用户技术水平
-          skills: getUserSkills(),     // 获取用户技能列表
-          previousQuestions: interviewSession.questions.map(q => q.id),
-          includeMetadata: true,
-          includeDifficulty: true
+        const result = await interviewAIService.generateQuestions({
+          profession: selectedProfession.value || getUserPosition(),
+          difficulty: selectedDifficulty.value || getUserLevel(),
+          count: 5,
+          exclude: interviewSession.questions.map(q => q.id)
+        })
+
+        if (result.warning) {
+          ElMessage.warning(result.warning)
         }
 
-        console.log('发起智能问题生成请求:', requestParams)
+        const questions = result.questions
+        if (!questions?.length) throw new Error('未获取到题目')
 
-        // 优先使用智能问题生成API，失败则降级
-        let result
-        try {
-          result = await aiAnalysisService.generateQuestionSmart(requestParams)
-        } catch (smartError) {
-          console.warn('智能问题生成失败，降级到传统方法:', smartError)
-          result = await aiAnalysisService.generateQuestion(requestParams)
+        // 更新会话信息
+        interviewSession.sessionId = `session-${Date.now()}`
+        interviewSession.jobTitle = selectedProfession.value || getUserPosition()
+
+        // 填充题目队列
+        questionQueue.value = questions
+        currentQuestionIndex.value = 0
+        currentQuestion.value = questionQueue.value[0]
+
+        // 添加到会话 questions（去重）
+        questions.forEach(q => {
+          if (!interviewSession.questions.find(item => item.id === q.id)) {
+            interviewSession.questions.push(q)
+          }
+        })
+
+        if (interviewSession.status !== 'active') {
+          startTimer()
+          interviewSession.startTime = new Date()
+          interviewSession.status = 'active'
         }
 
-        if (result.success && result.data) {
-          const questionData = result.data
+        const time = result.metadata?.processingTime || 0
+        ElMessage.success({
+          message: `获取 ${questions.length} 道题目成功${time ? `（${time}ms）` : ''}`,
+          duration: 3000
+        })
 
-          // 验证必需字段
-          if (!questionData.question) {
-            throw new Error('后端返回的题目文本为空')
-          }
-
-          // 更新会话信息
-          interviewSession.sessionId = questionData.sessionId || `session-${Date.now()}`
-          interviewSession.jobTitle = questionData.jobTitle || selectedProfession.value
-
-          // 处理题目队列：如果有allQuestions就用，否则只用当前题目
-          let questionsToUse = []
-
-          if (questionData.allQuestions && Array.isArray(questionData.allQuestions) && questionData.allQuestions.length > 0) {
-            // Dify工作流返回的5道题目
-            questionsToUse = questionData.allQuestions
-            interviewSession.allQuestions = questionData.allQuestions
-            console.log(`✅ 从Dify工作流获取${questionData.allQuestions.length}道题目`)
-          } else {
-            // 只有当前题目
-            questionsToUse = [questionData]
-          }
-
-          // 清空题目队列并重新填充
-          questionQueue.value = questionsToUse.map((q, index) => {
-            return {
-              id: q.questionId || q.id || `q_${index}_${Date.now()}`,
-              question: q.question,
-              expectedAnswer: q.expectedAnswer || q.answer || '',
-              keywords: q.keywords || q.tags || [],
-              category: q.category || q.categoryId || selectedProfession.value,
-              difficulty: q.difficulty || selectedDifficulty.value,
-              generatedBy: q.generatedBy || 'dify_workflow',
-              confidenceScore: q.confidenceScore || 0.9,
-              smartGeneration: true,
-              profession: selectedProfession.value,
-              searchSource: q.searchSource || 'dify_rag',
-              sourceUrls: q.sourceUrls || [],
-              workflowId: result.metadata?.workflowRunId,
-              sessionId: questionData.sessionId || interviewSession.sessionId,
-              hasAnswer: q.hasAnswer !== undefined ? q.hasAnswer : true,
-              explanation: q.explanation,
-              estimatedTime: q.estimatedTime
-            }
-          })
-
-          // 重置索引到第一题
-          currentQuestionIndex.value = 0
-          currentQuestion.value = questionQueue.value[0]
-
-          // 添加到会话questions（用于回答记录）
-          questionQueue.value.forEach(q => {
-            const exists = interviewSession.questions.find(item => item.id === q.id)
-            if (!exists) {
-              interviewSession.questions.push(q)
-            }
-          })
-
-          if (interviewSession.questions.length > 0 && interviewSession.status !== 'active') {
-            startTimer()
-            interviewSession.startTime = new Date()
-            interviewSession.status = 'active'
-          }
-
-          const processingTime = result.metadata?.processingTime || 0
-          ElMessage.success({
-            message: `🎉 获取${questionQueue.value.length}道题目成功! (处理时间: ${processingTime}ms)`,
-            duration: 3000
-          })
-
-          console.log('题目队列初始化:', {
-            count: questionQueue.value.length,
-            current: currentQuestion.value
-          })
-
-        } else {
-          throw new Error(result.message || result.error || '生成问题失败')
-        }
       } catch (err) {
         error.value = err.message || '生成问题失败'
         hasError.value = true
 
-        // 如果所有方法都失败，使用默认问题
         if (questionQueue.value.length === 0) {
           const defaultQ = getDefaultQuestion()
           questionQueue.value = [defaultQ]
           currentQuestionIndex.value = 0
           currentQuestion.value = defaultQ
-          ElMessage.warning('使用默认问题，请检查网络连接')
+          ElMessage.warning('已切换为默认问题，请检查网络连接')
         } else {
           ElMessage.error(error.value)
         }
@@ -889,9 +831,9 @@ export default {
       }
     }
 
-    // 智能生成专业题目
+    // 智能生成专业题目（按专业搜索框触发）
     const generateSmartQuestion = async () => {
-      if (!selectedProfession.value) {
+      if (!selectedProfession.value?.trim()) {
         ElMessage.warning('请先选择专业领域')
         return
       }
@@ -900,75 +842,41 @@ export default {
       hasError.value = false
 
       try {
-        ElMessage.info(`🔍 正在为${selectedProfession.value}专业智能生成${selectedDifficulty.value}难度题目...`)
+        ElMessage.info(`正在为「${selectedProfession.value}」生成 ${selectedDifficulty.value} 难度题目...`)
 
-        // 调用Dify工作流生成题目
-        const result = await difyService.generateQuestionByProfession(
-          selectedProfession.value,
-          {
-            level: selectedDifficulty.value,
-            count: 1,
-            excludeQuestions: interviewSession.questions.map(q => q.id)
+        const result = await interviewAIService.generateQuestions({
+          profession: selectedProfession.value,
+          difficulty: selectedDifficulty.value,
+          count: 5,
+          exclude: interviewSession.questions.map(q => q.id)
+        })
+
+        if (result.warning) ElMessage.warning(result.warning)
+
+        const questions = result.questions
+        if (!questions?.length) throw new Error('未获取到题目')
+
+        questionQueue.value = questions
+        currentQuestionIndex.value = 0
+        currentQuestion.value = questions[0]
+
+        questions.forEach(q => {
+          if (!interviewSession.questions.find(item => item.id === q.id)) {
+            interviewSession.questions.push(q)
           }
-        )
+        })
 
-        if (result.success && result.data) {
-          const questionData = result.data
-
-          currentQuestion.value = {
-            id: Date.now(),
-            question: questionData.question,
-            expectedAnswer: questionData.expectedAnswer,
-            keywords: questionData.keywords || [],
-            category: questionData.category || selectedProfession.value,
-            difficulty: questionData.difficulty || selectedDifficulty.value,
-            // Dify特有字段
-            generatedBy: 'dify_workflow',
-            confidenceScore: questionData.confidenceScore || 0.9,
-            smartGeneration: true,
-            profession: selectedProfession.value,
-            searchSource: questionData.searchSource,
-            sourceUrls: questionData.sourceUrls || [],
-            workflowId: result.metadata?.workflowId
-          }
-
-          interviewSession.questions.push(currentQuestion.value)
-
-          // 如果是第一题，开始计时
-          if (interviewSession.questions.length === 1) {
-            startTimer()
-            interviewSession.startTime = new Date()
-            interviewSession.status = 'active'
-          }
-
-          const processingTime = result.metadata?.processingTime || 0
-          ElMessage.success({
-            message: `🎉 智能题目生成成功！(处理时间: ${processingTime}ms)`,
-            duration: 3000
-          })
-
-          console.log('Dify智能生成题目成功:', currentQuestion.value)
-
-        } else {
-          // Dify失败，使用降级方案
-          console.warn('Dify题目生成失败，使用传统生成方法:', result.error)
-
-          ElMessage.warning('智能生成失败，使用传统方法生成题目')
-          await generateNewQuestion()
+        if (interviewSession.status !== 'active') {
+          startTimer()
+          interviewSession.startTime = new Date()
+          interviewSession.status = 'active'
         }
 
-      } catch (error) {
-        console.error('智能题目生成错误:', error)
-        ElMessage.error('智能题目生成失败: ' + (error.message || error))
+        ElMessage.success(`生成 ${questions.length} 道题目成功`)
 
-        // 降级到传统生成方法
-        try {
-          await generateNewQuestion()
-        } catch (fallbackError) {
-          // 如果传统方法也失败，使用默认问题
-          currentQuestion.value = getDefaultQuestion()
-          ElMessage.warning('使用默认问题，请检查网络连接')
-        }
+      } catch (err) {
+        console.error('智能题目生成错误:', err)
+        ElMessage.error('题目生成失败: ' + (err.message || err))
       } finally {
         smartQuestionLoading.value = false
       }
@@ -1254,7 +1162,7 @@ export default {
       }
     }
 
-    // 分析回答 (使用Dify工作流)
+    // 分析回答（统一使用 interviewAIService）
     const analyzeAnswer = async () => {
       if (!currentQuestion.value || !finalTranscript.value) {
         ElMessage.warning('请先选择问题并完成录音')
@@ -1263,63 +1171,27 @@ export default {
 
       analysisLoading.value = true
       try {
-        ElMessage.info('🤖 AI正在分析您的回答...')
+        ElMessage.info('AI正在分析您的回答...')
 
-        // 构建Dify分析请求
-        const analysisRequest = {
+        const result = await interviewAIService.analyzeAnswer({
           question: currentQuestion.value.question,
           questionId: currentQuestion.value.id,
           answer: finalTranscript.value,
-          profession: selectedProfession.value || currentQuestion.value.profession || '??',
+          profession: selectedProfession.value || currentQuestion.value.profession || '',
           sessionId: interviewSession.sessionId
-        }
+        })
 
-        console.log('开始Dify工作流分析:', analysisRequest)
-
-        // 优先使用Dify工作流分析
-        let result
-        try {
-          result = await difyService.analyzeAnswerWithDify(analysisRequest)
-
-          if (result.success) {
-            ElMessage.success(`🎉 AI分析完成 (处理时间: ${result.processingTime || 0}ms)`)
-          }
-        } catch (difyError) {
-          console.warn('Dify分析失败，使用传统分析:', difyError)
-
-          // 降级到传统分析
-          result = await aiAnalysisService.analyzeAnswer({
-            question: currentQuestion.value.question,
-            answer: finalTranscript.value,
-            interviewId: interviewSession.id
-          })
-
-          if (result.success) {
-            ElMessage.success('✅ 回答分析完成（传统模式）')
-          }
+        if (result.warning) {
+          ElMessage.warning(result.warning)
         }
 
         if (result.success) {
-          // 设置分析结果（简化版，移除五维度）
+          const d = result.data
           analysisResult.value = {
-            // 核心评分
-            overallScore: result.data?.overallScore || result.overallScore || 75,
-            summary: result.data?.summary || result.summary || '回答基本符合要求',
-            suggestions: result.data?.suggestions || result.suggestions || [],
-
-            // 简化的能力评估
-            technicalScore: result.data?.technicalAccuracy || Math.floor((result.data?.overallScore || 75) * 0.9),
-            communicationScore: result.data?.fluency || Math.floor((result.data?.overallScore || 75) * 1.05),
-            logicalScore: result.data?.logicClarity || Math.floor((result.data?.overallScore || 75) * 1.1),
-
-            // 元数据
-            analysisEngine: result.source || 'dify_workflow',
-            processingTime: result.processingTime || 0,
+            ...d,
             difyAnalysis: result.source === 'dify_workflow',
-            standardAnswer: result.data?.standardAnswer || '',
-            sessionId: result.data?.sessionId || interviewSession.sessionId,
-            strengths: result.data?.strengths || ['回答较为完整'],
-            weaknesses: result.data?.weaknesses || ['可以更加深入']
+            processingTime: result.processingTime || 0,
+            analysisEngine: result.source
           }
 
           // 保存回答记录
@@ -1327,44 +1199,22 @@ export default {
             questionId: currentQuestion.value.id,
             answer: finalTranscript.value,
             analysis: analysisResult.value,
-            standardAnswer: analysisResult.value.standardAnswer || '',
             timestamp: Date.now(),
-            analysisType: result.source === 'dify_workflow' ? 'dify' : 'traditional',
             profession: selectedProfession.value
           })
 
-          console.log('简化分析结果:', analysisResult.value)
+          const time = result.processingTime || 0
+          ElMessage.success(`AI分析完成${time ? `（${time}ms）` : ''}`)
 
-          // 如果是面试流程的最后一步，自动进入分析结果步骤
-          if (flowState.currentStep === 2) { // interview step
+          if (flowState.currentStep === 2) {
             completeCurrentStep()
           }
-
         } else {
-          // 处理分析失败的详细错误信息
-          const errorInfo = result.error || {}
-          console.error('分析回答详细错误:', errorInfo)
-
-          let userMessage = '分析回答失败'
-          if (errorInfo.code === 'DIFY_AUTH_ERROR') {
-            userMessage = 'Dify API认证失败，请检查配置'
-          } else if (errorInfo.code === 'DIFY_NETWORK_ERROR') {
-            userMessage = '网络连接失败，请检查网络状态'
-          } else if (errorInfo.code === 'DIFY_RATE_LIMIT') {
-            userMessage = '请求过于频繁，请稍后再试'
-          } else if (errorInfo.message) {
-            userMessage = errorInfo.message
-          }
-
-          throw new Error(userMessage)
+          throw new Error('分析失败')
         }
-      } catch (error) {
-        ElMessage.error(error.message || '分析回答失败')
-        console.error('分析回答失败详情:', {
-          error: error.message,
-          stack: error.stack,
-          timestamp: new Date().toISOString()
-        })
+      } catch (err) {
+        ElMessage.error(err.message || '分析回答失败')
+        console.error('分析回答失败:', err)
       } finally {
         analysisLoading.value = false
       }
@@ -1400,8 +1250,28 @@ export default {
         cameraEnabled.value = false
         isListening.value = false
 
-        ElMessage.success('面试已结束')
-        // 可以导航到结果页面或保存面试数据
+        ElMessage.success('面试已结束，正在生成报告...')
+
+        // 整理会话数据（附带每题的 question 文本到 answers 里）
+        const answersWithQuestion = interviewSession.answers.map(a => {
+          const q = interviewSession.questions.find(q => q.id === a.questionId)
+          return { ...a, question: q?.question || '' }
+        })
+
+        // 跳转到报告页，通过 history state 传递数据
+        router.push({
+          name: 'InterviewReport',
+          state: {
+            sessionData: {
+              jobTitle: interviewSession.jobTitle,
+              profession: selectedProfession.value,
+              difficulty: selectedDifficulty.value,
+              duration: interviewTimer.value,
+              endTime: new Date().toISOString(),
+              answers: answersWithQuestion
+            }
+          }
+        })
       } catch {
         // 用户取消操作
       }
@@ -1565,7 +1435,7 @@ export default {
       // 元素引用
       videoElement,
 
-      // 语音识别
+      // 语音识别 & 输入模式
       finalTranscript,
       interimTranscript,
 

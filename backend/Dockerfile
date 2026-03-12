@@ -26,6 +26,9 @@ COPY routes/ ./routes/
 COPY models/ ./models/
 COPY middleware/ ./middleware/
 COPY config/ ./config/
+COPY controllers/ ./controllers/
+COPY utils/ ./utils/
+COPY data/ ./data/
 
 # 安装依赖
 RUN npm config set registry https://registry.npmmirror.com && \
@@ -47,4 +50,4 @@ HEALTHCHECK --interval=30s --timeout=10s --retries=5 --start-period=30s \
 EXPOSE 3001
 
 # 启动命令
-CMD ["node", "mock-server.js"]
+CMD ["node", "server.js"]

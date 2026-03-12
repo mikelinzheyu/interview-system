@@ -22,6 +22,7 @@ const wrongAnswersRouter = require('./wrongAnswers')
 const recommendationsRouter = require('./recommendations')
 const userSettingsRouter = require('./user-settings') // <-- ADDED
 const followRouter = require('./follow')
+const interviewAIRouter = require('./interviewAI')
 
 const hierarchicalDomains = require('../data/mock-domains-hierarchical.json')
 const contributionsData = require('../data/contributions-data.json')
@@ -1731,6 +1732,12 @@ router.use('/messages', messagesRouter)
  * 提供 Dify 集成的 AI 功能：摘要、关键点、SEO关键词、流式对话
  */
 router.use('/ai', aiRouter)
+
+/**
+ * 挂载 AI 面试路由
+ * 提供面试初始化、流式对话、裁决功能
+ */
+router.use('/interview-ai', interviewAIRouter)
 
 /**
  * 挂载 AI 历史路由

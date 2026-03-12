@@ -150,3 +150,10 @@ function createBackendServer(PORT = 3001) {
 module.exports = {
   createBackendServer
 }
+
+// 如果直接运行此文件，启动服务器
+if (require.main === module) {
+  const PORT = process.env.PORT || 3001
+  createBackendServer(PORT)
+}
+

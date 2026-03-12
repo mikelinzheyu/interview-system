@@ -150,11 +150,11 @@ export class SpeechUtils {
    */
   handleSpeechError(error) {
     const errorMessages = {
-      'no-speech': '系统未能检测到您的语音输入，请确认麦克风已正确连接、音量适中',
+      'no-speech': '未检测到语音，请确认麦克风已连接且音量适中',
       'aborted': '语音识别被中止',
-      'audio-capture': '音频捕获失败',
-      'network': '网络错误',
-      'not-allowed': '麦克风权限被拒绝',
+      'audio-capture': '音频捕获失败，请检查麦克风权限',
+      'network': '语音识别需要连接 Google 服务器，在中国大陆网络下无法使用。请切换到「文字输入」模式',
+      'not-allowed': '麦克风权限被拒绝，请在浏览器设置中允许麦克风访问',
       'service-not-allowed': '语音识别服务不可用',
       'bad-grammar': '语法错误',
       'language-not-supported': '不支持的语言'
@@ -162,7 +162,8 @@ export class SpeechUtils {
 
     return {
       code: error,
-      message: errorMessages[error] || '未知语音识别错误'
+      message: errorMessages[error] || '未知语音识别错误',
+      isNetworkError: error === 'network'
     }
   }
 

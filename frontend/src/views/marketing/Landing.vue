@@ -26,6 +26,14 @@
       <FooterCTA id="about" :content="footerCtaData" />
     </main>
 
+    <footer class="site-footer">
+      <a
+        href="https://beian.miit.gov.cn/"
+        target="_blank"
+        rel="noopener noreferrer"
+      >粤ICP备2025502992号-1</a>
+    </footer>
+
     <ContactRail :options="contactOptionsData" />
   </div>
 </template>
@@ -92,6 +100,23 @@ main {
   main {
     gap: 72px;
   }
+}
+
+.site-footer {
+  background: #0f1a2e;
+  text-align: center;
+  padding: 16px 0;
+  font-size: 13px;
+}
+
+.site-footer a {
+  color: rgba(255, 255, 255, 0.5);
+  text-decoration: none;
+}
+
+.site-footer a:hover {
+  color: rgba(255, 255, 255, 0.85);
+  text-decoration: underline;
 }
 </style>
 
