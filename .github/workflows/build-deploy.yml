@@ -113,6 +113,10 @@ jobs:
 
           echo "📦 正在上传部署文件到服务器..."
 
+          # 提前在服务器上创建所需的目录
+          ssh -o StrictHostKeyChecking=no -o ConnectTimeout=10 -i ~/.ssh/id_rsa -p $PORT \
+            ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} "mkdir -p ${{ secrets.DEPLOY_PATH }}/nginx ${{ secrets.DEPLOY_PATH }}/scripts"
+
           # 上传 docker-compose.prod.yml
           scp -o StrictHostKeyChecking=no -o ConnectTimeout=10 -i ~/.ssh/id_rsa -P $PORT \
             docker-compose.prod.yml ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}:${{ secrets.DEPLOY_PATH }}/
