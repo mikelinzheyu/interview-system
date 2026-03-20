@@ -91,7 +91,7 @@ jobs:
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H ${{ secrets.DEPLOY_HOST }} >> ~/.ssh/known_hosts 2>/dev/null || true
 
-      - name: Deploy to Production Server
+      - name: Upload deployment files to server
         run: |
           # 检查所有必需的 Secrets
           if [ -z "${{ secrets.DEPLOY_HOST }}" ]; then
@@ -111,9 +111,40 @@ jobs:
           PORT=${{ secrets.DEPLOY_PORT }}
           PORT=${PORT:-22}
 
+          echo "📦 正在上传部署文件到服务器..."
+
+          # 上传 docker-compose.prod.yml
+          scp -o StrictHostKeyChecking=no -o ConnectTimeout=10 -i ~/.ssh/id_rsa -P $PORT \
+            docker-compose.prod.yml ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}:${{ secrets.DEPLOY_PATH }}/
+
+          # 上传 nginx 配置（如果存在）
+          if [ -d "nginx" ]; then
+            scp -o StrictHostKeyChecking=no -o ConnectTimeout=10 -i ~/.ssh/id_rsa -P $PORT -r \
+              nginx ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}:${{ secrets.DEPLOY_PATH }}/
+          fi
+
+          # 上传 scripts（如果存在）
+          if [ -d "scripts" ]; then
+            scp -o StrictHostKeyChecking=no -o ConnectTimeout=10 -i ~/.ssh/id_rsa -P $PORT -r \
+              scripts ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}:${{ secrets.DEPLOY_PATH }}/
+          fi
+
+          echo "✅ 部署文件上传完成"
+
+      - name: Deploy to Production Server
+        run: |
+          # 设置 SSH 端口，如果未指定则使用默认值 22
+          PORT=${{ secrets.DEPLOY_PORT }}
+          PORT=${PORT:-22}
+
           echo "正在连接到: ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}:$PORT"
 
-          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -p $PORT ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} << EOF
+          # 使用增强的 SSH 参数，防止长连接超时
+          ssh -o StrictHostKeyChecking=no \
+              -o ConnectTimeout=10 \
+              -o ServerAliveInterval=30 \
+              -o ServerAliveCountMax=6 \
+              -i ~/.ssh/id_rsa -p $PORT ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} << EOF
           set -e
 
           echo "========== 开始部署 =========="
@@ -122,28 +153,10 @@ jobs:
           mkdir -p ${{ secrets.DEPLOY_PATH }}
           cd ${{ secrets.DEPLOY_PATH }}
 
-          # ===== 从 GitHub 同步最新配置文件（关键步骤）=====
-          echo "正在从 GitHub 同步配置文件..."
-
-          # 如果存在上次克隆失败残留的空 .git 目录，先清理掉
-          if [ -d .git ] && [ -z "$(git status --porcelain 2>/dev/null)" ]; then
-            rm -rf .git
-          fi
-
-          if [ ! -d .git ]; then
-            echo "首次部署，使用加速镜像克隆仓库..."
-            # 使用 ghproxy 加速节点
-            git clone https://ghproxy.cn/https://github.com/mikelinzheyu/interview-system.git .
-          else
-            echo "后续部署，拉取最新更新..."
-            # 确保后续拉取也使用加速节点
-            git remote set-url origin https://ghproxy.cn/https://github.com/mikelinzheyu/interview-system.git
-            git fetch origin
-            git reset --hard origin/main
-          fi
-          echo "✅ 配置文件同步完成"
+          echo "✅ 配置文件已从 GitHub Actions 上传完成"
 
           # 登录阿里云
+          echo "正在登录阿里云仓库..."
           docker login -u ${{ secrets.ALIYUN_REGISTRY_USERNAME }} -p ${{ secrets.ALIYUN_REGISTRY_PASSWORD }} ${{ env.REGISTRY }}
 
           # 拉取最新镜像
