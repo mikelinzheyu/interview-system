@@ -1,16 +1,14 @@
 # AI面试系统 - 完整生产环境 Docker Compose 配置
 # ================================================
 # 使用此文件部署到生产环境
-# 命令: docker-compose -f docker-compose.prod.yml up -d
-
-version: '3.8'
+# 命令: docker compose -f docker-compose.prod.yml up -d
 
 services:
   # ============================================
   # PostgreSQL 数据库服务 (生产环境推荐)
   # ============================================
   db:
-    image: postgres:15-alpine
+    image: crpi-ez54q3vldx3th6xj.cn-hongkong.personal.cr.aliyuncs.com/ai_interview/postgres:15-alpine
     container_name: interview-db
     restart: always
     environment:
@@ -33,7 +31,7 @@ services:
   # Redis 缓存服务 (已优化)
   # ============================================
   redis:
-    image: redis:7-alpine
+    image: crpi-ez54q3vldx3th6xj.cn-hongkong.personal.cr.aliyuncs.com/ai_interview/redis:7-alpine
     container_name: interview-redis
     restart: always
     environment:
@@ -96,7 +94,7 @@ services:
   # Nginx 反向代理和路由
   # ============================================
   nginx-proxy:
-    image: nginx:1.27-alpine
+    image: crpi-ez54q3vldx3th6xj.cn-hongkong.personal.cr.aliyuncs.com/ai_interview/nginx:1.27-alpine
     container_name: interview-nginx
     restart: always
     ports:
