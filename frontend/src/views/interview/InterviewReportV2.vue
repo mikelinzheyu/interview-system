@@ -208,6 +208,24 @@ const exportPDF = async () => {
       useCORS: true,
       allowTaint: true,
       backgroundColor: '#f0f2f5',
+      logging: false,
+      onclone: (clonedDocument) => {
+        // 清理不兼容的 CSS 颜色函数
+        const allElements = clonedDocument.querySelectorAll('*')
+        allElements.forEach((el) => {
+          const style = window.getComputedStyle(el)
+          // 移除可能包含 color() 函数的样式
+          if (el.style.color && el.style.color.includes('color(')) {
+            el.style.color = ''
+          }
+          if (el.style.backgroundColor && el.style.backgroundColor.includes('color(')) {
+            el.style.backgroundColor = ''
+          }
+          if (el.style.borderColor && el.style.borderColor.includes('color(')) {
+            el.style.borderColor = ''
+          }
+        })
+      }
     })
 
     const imgData = canvas.toDataURL('image/jpeg', 0.95)
