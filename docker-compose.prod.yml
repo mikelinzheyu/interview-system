@@ -102,7 +102,7 @@ services:
       - "443:443"
     volumes:
       # 使用相对路径，确保与 docker-compose.prod.yml 同目录
-      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
       - /etc/letsencrypt:/etc/letsencrypt:ro
       - /var/www/certbot:/var/www/certbot:ro
       - nginx_cache:/var/cache/nginx
