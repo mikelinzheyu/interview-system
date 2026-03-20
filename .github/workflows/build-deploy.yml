@@ -124,11 +124,20 @@ jobs:
 
           # ===== 从 GitHub 同步最新配置文件（关键步骤）=====
           echo "正在从 GitHub 同步配置文件..."
+
+          # 如果存在上次克隆失败残留的空 .git 目录，先清理掉
+          if [ -d .git ] && [ -z "$(git status --porcelain 2>/dev/null)" ]; then
+            rm -rf .git
+          fi
+
           if [ ! -d .git ]; then
-            echo "首次部署，克隆仓库..."
-            git clone https://github.com/mikelinzheyu/interview-system.git .
+            echo "首次部署，使用加速镜像克隆仓库..."
+            # 使用 ghproxy 加速节点
+            git clone https://ghproxy.cn/https://github.com/mikelinzheyu/interview-system.git .
           else
             echo "后续部署，拉取最新更新..."
+            # 确保后续拉取也使用加速节点
+            git remote set-url origin https://ghproxy.cn/https://github.com/mikelinzheyu/interview-system.git
             git fetch origin
             git reset --hard origin/main
           fi
