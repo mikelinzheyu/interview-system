@@ -113,9 +113,10 @@ jobs:
 
           echo "📦 正在上传部署文件到服务器..."
 
-          # 提前在服务器上创建所需的目录
+          # 清理 Docker 创建的错误目录，然后重新创建目录
+          # （Docker Compose 如果找不到挂载的文件，会自动把它当目录创建，导致 SCP 无法覆盖）
           ssh -o StrictHostKeyChecking=no -o ConnectTimeout=10 -i ~/.ssh/id_rsa -p $PORT \
-            ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} "mkdir -p ${{ secrets.DEPLOY_PATH }}/nginx ${{ secrets.DEPLOY_PATH }}/scripts"
+            ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} "rm -rf ${{ secrets.DEPLOY_PATH }}/nginx ${{ secrets.DEPLOY_PATH }}/scripts && mkdir -p ${{ secrets.DEPLOY_PATH }}/nginx ${{ secrets.DEPLOY_PATH }}/scripts"
 
           # 上传 docker-compose.prod.yml
           scp -o StrictHostKeyChecking=no -o ConnectTimeout=10 -i ~/.ssh/id_rsa -P $PORT \
