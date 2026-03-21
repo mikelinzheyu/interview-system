@@ -16,7 +16,6 @@ backend/clear-data.js
 backend/simple-server.js
 backend/data/abilityProfiles.js
 backend/routes/auth.js
-backend/services/userDbService.js
 backend/scripts/
 clear-data.js
 console-debug.js
