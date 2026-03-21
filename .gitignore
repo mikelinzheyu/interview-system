@@ -14,8 +14,6 @@ FULL_DIAGNOSTIC.js
 backend_logs.txt
 backend/clear-data.js
 backend/simple-server.js
-backend/data/abilityProfiles.js
-backend/routes/auth.js
 backend/scripts/
 clear-data.js
 console-debug.js
