@@ -64,3 +64,6 @@ Thumbs.db
 data/redis/
 logs/
 uploads/
+
+# SSL - ALLOW self-signed certificates for development
+# !nginx/ssl/
