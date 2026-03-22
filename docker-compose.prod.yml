@@ -60,24 +60,11 @@ services:
       NODE_ENV: production
       PORT: 3001
       TZ: ${TZ:-Asia/Shanghai}
-      # Dify AI 工作流配置
+      # ⚠️ 关键: Dify AI 三个工作流的 API 密钥 (后端代码期望这些变量名)
       DIFY_API_BASE_URL: ${DIFY_API_BASE_URL:-https://api.dify.ai/v1}
-      DIFY_WORKFLOW_API_KEY: ${DIFY_WORKFLOW_1_API_KEY}
-      DIFY_WORKFLOW_ID: ${DIFY_WORKFLOW_1_ID}
-      DIFY_WORKFLOW_URL: ${DIFY_WORKFLOW_URL:-https://api.dify.ai/v1/workflows/run}
-      # 工作流1: 模拟面试官
-      DIFY_WORKFLOW_1_ID: ${DIFY_WORKFLOW_1_ID}
-      DIFY_WORKFLOW_1_API_KEY: ${DIFY_WORKFLOW_1_API_KEY}
-      DIFY_WORKFLOW_1_URL: ${DIFY_WORKFLOW_1_URL}
-      # 工作流2: 面试裁决
-      DIFY_WORKFLOW_2_ID: ${DIFY_WORKFLOW_2_ID}
-      DIFY_WORKFLOW_2_API_KEY: ${DIFY_WORKFLOW_2_API_KEY}
-      DIFY_WORKFLOW_2_URL: ${DIFY_WORKFLOW_2_URL}
-      # 工作流3: 面试初始化
       DIFY_INTERVIEW_INIT_KEY: ${DIFY_INTERVIEW_INIT_KEY}
-      DIFY_WORKFLOW_3_ID: ${DIFY_WORKFLOW_3_ID}
-      DIFY_WORKFLOW_3_API_KEY: ${DIFY_WORKFLOW_3_API_KEY}
-      DIFY_WORKFLOW_3_URL: ${DIFY_WORKFLOW_3_URL}
+      DIFY_INTERVIEW_CHAT_KEY: ${DIFY_INTERVIEW_CHAT_KEY}
+      DIFY_INTERVIEW_VERDICT_KEY: ${DIFY_INTERVIEW_VERDICT_KEY}
       # Redis 配置
       REDIS_HOST: interview-redis
       REDIS_PORT: 6379
