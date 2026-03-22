@@ -81,7 +81,17 @@
       "Bash(cd D:/code7/interview-system/production && cp .env.production .env)",
       "Bash(powershell.exe -Command \"Stop-Process -Name 'Docker Desktop' -Force -ErrorAction SilentlyContinue; Start-Sleep -Seconds 5; Start-Process 'C:\\\\Program Files\\\\Docker\\\\Docker\\\\Docker Desktop.exe'\")",
       "Bash(tasklist | grep 30556)",
-      "Bash(powershell.exe -Command \"Stop-Process -Id 30556 -Force\")"
+      "Bash(powershell.exe -Command \"Stop-Process -Id 30556 -Force\")",
+      "Bash(git remote:*)",
+      "Bash(gh workflow:*)",
+      "Bash(bash D:\\\\\\\\code7\\\\\\\\interview-system\\\\\\\\push-to-github.sh)",
+      "Bash(bash push-to-github.sh)",
+      "Bash(mkdir -p D:/code7/interview-system/nginx/ssl)",
+      "Bash(openssl req:*)",
+      "Bash(mkdir:*)",
+      "Bash(bash quick-docker-test.sh 2>&1)",
+      "Bash(/tmp/test_summary.txt:*)",
+      "Read(//tmp/**)"
     ],
     "deny": [],
     "ask": []

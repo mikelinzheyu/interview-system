@@ -1,0 +1,66 @@
+From 4888a703fd2397a5ad839299c35a024e2eeabc48 Mon Sep 17 00:00:00 2001
+From: Mike <mikelinzheyu@gmail.com>
+Date: Fri, 20 Mar 2026 17:37:06 +0800
+Subject: [PATCH] fix: Replace docker-compose with docker compose and improve
+ security
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+修复部署命令兼容性和安全性问题：
+- 将所有 docker-compose 改为 docker compose（新版 Docker）
+- 改用 echo password | docker login --password-stdin 避免密码泄露警告
+- 添加 Docker 环境版本检查（docker --version, docker compose version）
+
+这解决了 'docker-compose: command not found' 错误
+
+Co-Authored-By: Claude Haiku 4.5 <noreply@anthropic.com>
+---
+ .github/workflows/build-deploy.yml | 14 +++++++++-----
+ 1 file changed, 9 insertions(+), 5 deletions(-)
+
+diff --git a/.github/workflows/build-deploy.yml b/.github/workflows/build-deploy.yml
+index fa8cf65..f336714 100644
+--- a/.github/workflows/build-deploy.yml
++++ b/.github/workflows/build-deploy.yml
+@@ -155,9 +155,13 @@ jobs:
+ 
+           echo "✅ 配置文件已从 GitHub Actions 上传完成"
+ 
+-          # 登录阿里云
++          echo "检查 Docker 环境..."
++          docker --version
++          docker compose version
++
++          # 登录阿里云（使用安全的 password-stdin 方式）
+           echo "正在登录阿里云仓库..."
+-          docker login -u ${{ secrets.ALIYUN_REGISTRY_USERNAME }} -p ${{ secrets.ALIYUN_REGISTRY_PASSWORD }} ${{ env.REGISTRY }}
++          echo "${{ secrets.ALIYUN_REGISTRY_PASSWORD }}" | docker login -u ${{ secrets.ALIYUN_REGISTRY_USERNAME }} --password-stdin ${{ env.REGISTRY }}
+ 
+           # 拉取最新镜像
+           echo "正在拉取最新镜像..."
+@@ -166,18 +170,18 @@ jobs:
+ 
+           # 停止旧容器并清理孤立容器
+           echo "正在停止旧容器并清理孤立容器..."
+-          docker-compose -f docker-compose.prod.yml down --remove-orphans || true
++          docker compose -f docker-compose.prod.yml down --remove-orphans || true
+ 
+           # 启动新容器
+           echo "正在启动新容器..."
+-          docker-compose -f docker-compose.prod.yml up -d
++          docker compose -f docker-compose.prod.yml up -d
+ 
+           # 等待服务启动
+           sleep 30
+ 
+           # 检查容器状态
+           echo "容器状态："
+-          docker-compose -f docker-compose.prod.yml ps
++          docker compose -f docker-compose.prod.yml ps
+ 
+           echo "========== 部署完成 =========="
+           EOF
+-- 
+2.51.0.windows.1
+

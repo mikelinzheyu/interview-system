@@ -60,6 +60,12 @@ services:
       NODE_ENV: production
       PORT: 3001
       TZ: ${TZ:-Asia/Shanghai}
+      # 数据库配置 (PostgreSQL)
+      DB_HOST: interview-db
+      DB_PORT: 5432
+      DB_NAME: ${DB_NAME:-interview_system}
+      DB_USER: ${DB_USER:-admin}
+      DB_PASSWORD: ${DB_PASSWORD:-SecurePassword123!}
       # ⚠️ 关键: Dify AI 三个工作流的 API 密钥 (后端代码期望这些变量名)
       DIFY_API_BASE_URL: ${DIFY_API_BASE_URL:-https://api.dify.ai/v1}
       DIFY_INTERVIEW_INIT_KEY: ${DIFY_INTERVIEW_INIT_KEY}
@@ -77,6 +83,8 @@ services:
     networks:
       - interview-network
     depends_on:
+      db:
+        condition: service_healthy
       redis:
         condition: service_healthy
 

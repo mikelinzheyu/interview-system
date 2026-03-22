@@ -9,12 +9,12 @@ const path = require('path')
 
 const sequelize = new Sequelize(
   process.env.DB_NAME || 'interview_system',
-  process.env.DB_USER || 'root',
-  process.env.DB_PASSWORD || 'root',
+  process.env.DB_USER || 'admin',
+  process.env.DB_PASSWORD || 'SecurePassword123!',
   {
-    host: process.env.DB_HOST || 'localhost',
-    port: process.env.DB_PORT || 3306,
-    dialect: 'mysql',
+    host: process.env.DB_HOST || 'interview-db',
+    port: process.env.DB_PORT || 5432,
+    dialect: 'postgres',
     pool: {
       max: 10,
       min: 2,
