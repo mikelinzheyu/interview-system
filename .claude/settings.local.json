@@ -91,7 +91,12 @@
       "Bash(mkdir:*)",
       "Bash(bash quick-docker-test.sh 2>&1)",
       "Bash(/tmp/test_summary.txt:*)",
-      "Read(//tmp/**)"
+      "Read(//tmp/**)",
+      "Bash(git -C /d/code7/interview-system push origin main)",
+      "Bash(npm uninstall:*)",
+      "Bash(npx vite:*)",
+      "Bash(npx --yes vite build)",
+      "Bash(grep -E \"\\\\.\\(js|ts\\)$\")"
     ],
     "deny": [],
     "ask": []

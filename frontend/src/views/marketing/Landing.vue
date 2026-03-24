@@ -22,6 +22,7 @@
       <FeatureStrip id="product" :section="featureSectionData" />
       <PricingSection id="pricing" :section="pricingSectionData" />
       <TestimonialBanner id="stats" :content="testimonialBannerData" />
+      <FAQSection id="faq" />
       <PartnerSection id="partners" :section="partnerSectionData" />
       <FooterCTA id="about" :content="footerCtaData" />
     </main>
@@ -47,6 +48,7 @@ import FeatureStrip from '@/components/marketing/FeatureStrip.vue'
 import PricingSection from '@/components/marketing/PricingSection.vue'
 import PartnerSection from '@/components/marketing/PartnerSection.vue'
 import TestimonialBanner from '@/components/marketing/TestimonialBanner.vue'
+import FAQSection from '@/components/marketing/FAQSection.vue'
 import FooterCTA from '@/components/marketing/FooterCTA.vue'
 import ContactRail from '@/components/marketing/ContactRail.vue'
 import {

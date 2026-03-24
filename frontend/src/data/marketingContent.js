@@ -1,8 +1,8 @@
 export const noticeBar = {
-  message: 'Pro 计划内测进行中，名额有限',
-  emphasis: '解锁求职路上的 AI 超能力',
+  message: '基于大模型的AI面试官',
+  emphasis: '模拟面试与求职训练平台，帮助求职者高效准备真实面试',
   cta: {
-    label: '了解 Pro 计划',
+    label: '了解详情',
     to: '/pricing'
   }
 }
@@ -12,53 +12,54 @@ export const navItems = [
   { label: '产品', hash: '#product' },
   { label: '应用', hash: '#stats' },
   { label: '价格', hash: '#pricing' },
+  { label: '常见问题', hash: '#faq' },
   { label: '招商', hash: '#partners' },
   { label: '关于', hash: '#about' }
 ]
 
 export const heroContent = {
-  badge: 'AI 面试官 · Pro 计划',
-  titleMain: '解锁求职路上的',
-  titleHighlight: 'AI 超能力',
+  badge: 'AI 面试官 · 基于大模型的求职面试训练平台',
+  titleMain: 'AI面试官',
+  titleHighlight: '基于大模型的模拟面试与求职面试训练平台',
   subtitle:
-    '不仅是模拟面试。提供 GPT-5 MAX 深度分析、实时真题库及全方位求职辅助手段，助你快速上岸。',
+    'AI面试官基于大模型能力，为求职者提供真实、连贯、可追问的模拟面试体验。支持岗位定制提问、实时问答、答案点评、面试复盘与能力评估，帮助你系统提升面试表现。',
   primaryCta: {
-    label: '免费注册',
+    label: '免费开始模拟面试',
     to: '/register'
   },
   secondaryCta: {
     label: '了解 Pro 计划',
     to: '/pricing'
   },
-  chips: ['关于首战首选', '性价之选', '灵活高效']
+  chips: ['岗位定制面试', '实时追问互动', '答案点评优化', '面试复盘报告', '能力评估']
 }
 
 export const featureSection = {
-  title: 'Pro 会员专属权益',
-  subtitle: '比免费版更透明、更专业的一站式求职助理。',
+  title: 'AI面试官核心功能',
+  subtitle: '提供完整的模拟面试与求职训练体验',
   items: [
     {
-      title: '优先接入 GPT-5 MAX / Claude 4.5',
+      title: '岗位定制模拟面试',
       description:
-        '使用更聪明的大模型，获得贴近真实面试官的高质量反馈，比免费版更聪明、更专业。',
+        '根据目标岗位与行业特点，生成高匹配度的面试题目，提供真实场景化的模拟面试体验，帮助求职者精准准备。',
       icon: 'Cpu'
     },
     {
-      title: '2024 / 2025 最新企业真题库',
+      title: '多轮追问与实时问答',
       description:
-        '实时更新大厂与热门岗位真题，拒绝过时题目和套路题，精准覆盖目标岗位。',
+        '支持对你的回答进行多轮追问，就像真实面试官一样，帮助你发现表达中的问题，提升临场应对能力。',
       icon: 'Collection'
     },
     {
-      title: '面试官视角深度心理侧写',
+      title: '答案点评与优化建议',
       description:
-        '从技术深度、表达、结构化程度等维度拆解你的优势与风险点，知己知彼。',
+        '从技术深度、表达清晰度、结构化程度等维度对你的答案进行深度点评，给出具体改进建议，帮助你提升面试表现。',
       icon: 'DataLine'
     },
     {
-      title: '简历 AI 润色（Pro 即将上线）',
+      title: '面试复盘与能力评估',
       description:
-        '针对目标岗位自动优化简历，提高简历通过率和面试邀约率。',
+        '完整的面试复盘报告，详细分析你的优势与不足，帮助你建立面试能力评估体系，持续改进与提升。',
       icon: 'EditPen'
     }
   ]
@@ -170,8 +171,8 @@ export const partnerSection = {
 }
 
 export const testimonialBanner = {
-  title: '超过 50,000 名用户正在使用 AI 面试官 Pro',
-  subtitle: '从在校生到职场 5 年+，都在用它做面试冲刺和长期能力提升。',
+  title: '超过 50,000 名求职者正在使用 AI面试官',
+  subtitle: '从在校生到职场 5 年+，都在用它进行模拟面试与面试训练。',
   stats: [
     { label: '活跃用户', value: '50K+' },
     { label: '累计面试次数', value: '100K+' },
@@ -182,12 +183,12 @@ export const testimonialBanner = {
     {
       company: '陈远 · 软件工程师',
       content:
-        '这个平台真的帮了我大忙！通过 Pro 计划的模拟面试，我成功拿到了心仪的 offer。'
+        'AI面试官的模拟面试体验真的很逼真！通过多轮追问和答案点评，我快速发现了自己表达中的问题，成功拿到了心仪的 offer。'
     },
     {
       company: '林晓 · 产品经理',
       content:
-        '深度能力分析功能太棒了，让我清楚地看到自己的强项和短板，面试更有底气。'
+        '面试复盘报告让我清楚地看到自己的强项和短板，针对性地改进后，面试通过率明显提高了。'
     }
   ]
 }
@@ -211,10 +212,10 @@ export const contactOptions = [
 ]
 
 export const footerCta = {
-  title: '现在就让 AI 面试官陪你刷题',
-  subtitle: '注册即可体验基础功能，随时升级 Pro 解锁更多 AI 超能力。',
+  title: '现在开始使用 AI面试官',
+  subtitle: '通过智能模拟面试与专业点评，帮助你系统提升面试表现，高效准备真实面试。',
   primaryCta: {
-    label: '免费注册',
+    label: '免费开始模拟面试',
     to: '/register'
   },
   secondaryCta: {
