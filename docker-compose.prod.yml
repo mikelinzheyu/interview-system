@@ -89,12 +89,10 @@ services:
         condition: service_healthy
 
   # ============================================
-  # Vue 前端服务 - 从源码构建
+  # Vue 前端服务 - 使用预构建镜像
   # ============================================
   frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile.prod
+    image: crpi-ez54q3vldx3th6xj.cn-hongkong.personal.cr.aliyuncs.com/ai_interview/ai_interview_frontend:latest
     container_name: interview-frontend
     restart: on-failure
     expose:
