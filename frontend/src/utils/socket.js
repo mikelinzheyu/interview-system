@@ -28,7 +28,10 @@ const DEFAULT_WS_URL = (() => {
   }
 
   // 兜底：直连本地后端 WebSocket 服�?
-  const fallback = 'ws://localhost:3001'
+  const fallback =
+    typeof window !== 'undefined'
+      ? `${window.location.protocol === 'https:' ? 'wss:' : 'ws:'}//${window.location.host}`
+      : 'ws://localhost:3001'
   console.log('[Socket] 使用兜底 WebSocket URL:', fallback)
   return fallback
 })()

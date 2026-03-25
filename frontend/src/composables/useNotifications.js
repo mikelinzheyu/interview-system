@@ -13,6 +13,7 @@
 
 import { ref, computed, reactive, watch, onMounted, onUnmounted } from 'vue'
 import communityAPI from '@/api/communityWithCache'
+import { getWebSocketBaseUrl } from '@/utils/networkConfig'
 
 export function useNotifications() {
   // 通知数据
@@ -187,8 +188,7 @@ export function useNotifications() {
       return
     }
 
-    const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
-    const wsUrl = `${wsProtocol}//localhost:3001/notifications`
+    const wsUrl = `${getWebSocketBaseUrl()}/notifications`
 
     try {
       webSocket = new WebSocket(wsUrl)

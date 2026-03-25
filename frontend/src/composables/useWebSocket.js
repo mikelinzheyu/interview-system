@@ -6,6 +6,7 @@ import { ref, onMounted, onUnmounted } from 'vue'
 import { io } from 'socket.io-client'
 import { useUserStore } from '@/stores/user'
 import { useMessagingStore } from '@/stores/messagingStore'
+import { getWebSocketBaseUrl } from '@/utils/networkConfig'
 
 let socket = null
 
@@ -42,10 +43,7 @@ export const useWebSocket = () => {
 
       // 使用环境变量中的 WebSocket 基础 URL（例如：http://localhost:3001）
       // 转换为 WebSocket URL (http -> ws, https -> wss)
-      const baseUrl = import.meta.env.VITE_WS_BASE_URL || 'http://localhost:3001'
-      const protocol = baseUrl.startsWith('https') ? 'wss:' : 'ws:'
-      const host = baseUrl.replace(/^https?:\/\//, '').replace(/\/$/, '')
-      const url = `${protocol}//${host}`
+      const url = getWebSocketBaseUrl()
 
       console.log('[WebSocket] Connecting to:', url)
 
@@ -274,4 +272,3 @@ export const useWebSocket = () => {
     markConversationAsRead
   }
 }
-

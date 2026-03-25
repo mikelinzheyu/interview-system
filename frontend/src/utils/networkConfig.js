@@ -18,6 +18,32 @@ const stripTrailingSlash = (value) => {
 }
 
 const isAbsoluteUrl = (value) => /^https?:\/\//i.test(value)
+const isAbsoluteWebSocketUrl = (value) => /^wss?:\/\//i.test(value)
+
+const isLoopbackHost = (hostname = '') => {
+  const normalized = hostname.trim().toLowerCase()
+  return normalized === 'localhost' || normalized === '127.0.0.1' || normalized === '::1'
+}
+
+const isDevelopmentMode = () => {
+  const env = import.meta?.env
+  const mode = env?.MODE || env?.VITE_APP_ENV
+  return mode === 'development' || mode === 'dev'
+}
+
+const getCurrentOrigin = () => {
+  if (typeof window === 'undefined') {
+    return ''
+  }
+  return window.location.origin
+}
+
+const getCurrentWebSocketOrigin = () => {
+  if (typeof window === 'undefined') {
+    return ''
+  }
+  return `${window.location.protocol === 'https:' ? 'wss:' : 'ws:'}//${window.location.host}`
+}
 
 const resolveApiBaseComponents = () => {
   const envValue = import.meta?.env?.VITE_API_BASE_URL?.trim()
@@ -28,6 +54,10 @@ const resolveApiBaseComponents = () => {
 
   if (isAbsoluteUrl(envValue)) {
     const url = new URL(envValue)
+    if (!isDevelopmentMode() && isLoopbackHost(url.hostname)) {
+      return { origin: '', basePath: DEFAULT_API_PREFIX }
+    }
+
     const pathname = stripTrailingSlash(url.pathname)
     return {
       origin: url.origin,
@@ -83,32 +113,42 @@ export const buildApiUrl = (path = '') => {
 
 export const getWebSocketBaseUrl = () => {
   const env = import.meta?.env
-
-  // 1) 如果显式配置了 WebSocket 地址且不为 auto，则优先使用
   const rawWsEnv = env?.VITE_WS_BASE_URL
   const envWsValue = rawWsEnv && rawWsEnv.trim()
+
   if (envWsValue && envWsValue !== 'auto') {
-    return stripTrailingSlash(envWsValue)
+    const explicitValue = stripTrailingSlash(envWsValue)
+
+    if (isAbsoluteWebSocketUrl(explicitValue)) {
+      const url = new URL(explicitValue)
+      if (!isDevelopmentMode() && isLoopbackHost(url.hostname)) {
+        return getCurrentWebSocketOrigin() || explicitValue
+      }
+      return explicitValue
+    }
+
+    if (isAbsoluteUrl(explicitValue)) {
+      const url = new URL(explicitValue)
+      if (!isDevelopmentMode() && isLoopbackHost(url.hostname)) {
+        return getCurrentWebSocketOrigin() || getCurrentOrigin() || 'ws://localhost:3001'
+      }
+      const protocol = url.protocol === 'https:' ? 'wss:' : 'ws:'
+      return `${protocol}//${url.host}`
+    }
+
+    return explicitValue
   }
 
-  // 2) 本地开发场景：优先使用当前前端页面所在的 host
-  //    这样 WebSocket 走 Vite 的 /socket.io 代理，避免直接连 3001 端口被防火墙/安全软件拦截
-  const mode = env?.MODE || env?.VITE_APP_ENV
-  if (typeof window !== 'undefined' && (mode === 'development' || mode === 'dev')) {
-    const isSecure = window.location.protocol === 'https:'
-    const protocol = isSecure ? 'wss:' : 'ws:'
-    return `${protocol}//${window.location.host}`
+  if (typeof window !== 'undefined') {
+    return getCurrentWebSocketOrigin()
   }
 
-  // 3) 其他环境：从 API_BASE_COMPONENTS 推导后端地址
   const { origin } = API_BASE_COMPONENTS
-
   if (origin) {
     const url = new URL(origin)
     const protocol = url.protocol === 'https:' ? 'wss:' : 'ws:'
     return `${protocol}//${url.host}`
   }
 
-  // 4) 最后兜底
   return 'ws://localhost:3001'
 }

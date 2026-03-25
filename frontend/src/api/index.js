@@ -1,9 +1,10 @@
 import axios from 'axios'
 import { ElMessage } from 'element-plus'
+import { getApiBaseUrl } from '@/utils/networkConfig'
 
 // 统一创建 axios 实例，支持通过 VITE_API_BASE_URL 配置后端地址
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || '/api',
+  baseURL: getApiBaseUrl() || '/api',
   timeout: 90000,
   headers: {
     'Content-Type': 'application/json'

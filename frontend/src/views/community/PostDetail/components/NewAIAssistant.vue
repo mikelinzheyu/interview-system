@@ -145,6 +145,7 @@ import QuickActions from './QuickActions.vue'
 import AIMessagePanel from './AIMessagePanel.vue'
 import AIChatInput from './AIChatInput.vue'
 import * as aiHistoryApi from '@/api/ai-history'
+import { buildApiUrl } from '@/utils/networkConfig'
 
 const props = defineProps({
   postId: {
@@ -232,8 +233,7 @@ const handleAIAnalysis = async () => {
   errorMessage.value = null
 
   try {
-    const backendUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001'
-    const res = await fetch(`${backendUrl}/api/ai/summary`, {
+    const res = await fetch(buildApiUrl('/ai/summary'), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -305,8 +305,7 @@ const handleSendMessage = async (messageText) => {
   let eventSource = null
 
   try {
-    const backendUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001'
-    const url = new URL('/api/ai/chat/stream', backendUrl)
+    const url = new URL(buildApiUrl('/ai/chat/stream'), window.location.origin)
 
     const params = {
       message: messageText,
@@ -1064,4 +1063,3 @@ defineExpose({
   flex-shrink: 0;
 }
 </style>
-
