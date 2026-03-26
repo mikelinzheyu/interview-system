@@ -23,6 +23,7 @@ const recommendationsRouter = require('./recommendations')
 const userSettingsRouter = require('./user-settings') // <-- ADDED
 const followRouter = require('./follow')
 const interviewAIRouter = require('./interviewAI')
+const interviewRouter = require('./interview')
 
 const hierarchicalDomains = require('../data/mock-domains-hierarchical.json')
 const contributionsData = require('../data/contributions-data.json')
@@ -1738,6 +1739,12 @@ router.use('/ai', aiRouter)
  * 提供面试初始化、流式对话、裁决功能
  */
 router.use('/interview-ai', interviewAIRouter)
+
+/**
+ * 挂载面试报告和错题复盘路由
+ * 提供面试报告保存、错题查询、复盘功能
+ */
+router.use('/interview', interviewRouter)
 
 /**
  * 挂载 AI 历史路由
