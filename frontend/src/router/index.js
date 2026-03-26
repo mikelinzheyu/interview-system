@@ -173,6 +173,12 @@ const routes = [
     meta: { requiresAuth: false }
   },
   {
+    path: '/interview/replay',
+    name: 'InterviewReplay',
+    component: () => import('@/views/wrong-answers/InterviewReplayView.vue'),
+    meta: { requiresAuth: true }
+  },
+  {
     path: '/test',
     name: 'ModuleTest',
     component: () => import('@/views/test/ModuleTestPage.vue'),

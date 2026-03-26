@@ -116,6 +116,7 @@
     <div class="action-bar no-print">
       <button class="action-btn secondary-btn" @click="goBack">返回首页</button>
       <button class="action-btn secondary-btn" @click="restartInterview">再次面试</button>
+      <button class="action-btn secondary-btn" @click="goToReplay">错题复盘</button>
       <button class="action-btn print-btn" @click="printReport">打印报告</button>
       <button class="action-btn primary-btn" :disabled="exporting" @click="exportPDF">
         {{ exporting ? '导出中...' : '导出 PDF' }}
@@ -199,6 +200,14 @@ const toggleExpand = (i) => {
 // ===================== 操作 =====================
 const goBack = () => router.push('/')
 const restartInterview = () => router.push('/interview/ai')
+const goToReplay = () => {
+  const recordId = history.state?.recordId || sessionStorage.getItem('interview_record_id')
+  if (recordId) {
+    router.push(`/interview/replay?recordId=${recordId}`)
+  } else {
+    alert('未找到面试记录，请先完成面试')
+  }
+}
 const printReport = () => window.print()
 
 const exportPDF = async () => {
@@ -274,10 +283,76 @@ const exportPDF = async () => {
   }
 }
 
-// 初始展开第一题
+// ===================== 保存报告到数据库 =====================
+/**
+ * 保存面试报告并创建错题复盘记录
+ * 在组件挂载时自动调用，如果本地有sessionStorage数据
+ */
+const saveReportToDatabase = async () => {
+  try {
+    console.log('[InterviewReportV2] 开始保存面试报告到数据库...')
+
+    // 获取用户ID（从sessionStorage或localStorage）
+    const userId = sessionStorage.getItem('user_id') || localStorage.getItem('user_id') || 1
+
+    const payload = {
+      userId: parseInt(userId),
+      jobTitle: report.jobTitle,
+      difficulty: report.difficulty,
+      duration: report.duration,
+      answers: report.answers.map((item, index) => ({
+        questionId: `q_${index}`,
+        question: item.question || `问题${index + 1}`,
+        answer: item.answer || '（未录入）',
+        score: item.score || 0
+      })),
+      overallScore: report.overallScore,
+      technicalScore: report.technicalScore,
+      communicationScore: report.communicationScore,
+      logicalScore: report.logicalScore,
+      summary: report.summary,
+      suggestions: report.suggestions
+    }
+
+    const response = await fetch('/api/interview/save-report', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${userId}`
+      },
+      body: JSON.stringify(payload)
+    })
+
+    if (!response.ok) {
+      const error = await response.json()
+      throw new Error(error.message || '保存失败')
+    }
+
+    const result = await response.json()
+    console.log('[InterviewReportV2] ✅ 报告已保存，recordId =', result.data?.recordId)
+
+    // 保存recordId到sessionStorage，供后续使用
+    if (result.data?.recordId) {
+      sessionStorage.setItem('interview_record_id', result.data.recordId)
+      history.state.recordId = result.data.recordId
+    }
+
+    return result.data?.recordId
+  } catch (error) {
+    console.error('[InterviewReportV2] 保存报告失败:', error.message)
+    // 不中断流程，仅记录日志
+  }
+}
+
+// 初始化：展开第一题 + 保存报告
 onMounted(() => {
   if (report.answers.length > 0) {
     expandedItems.add(0)
+  }
+
+  // 只有在有有效数据时才保存
+  if (report.overallScore > 0 && report.answers.length > 0) {
+    saveReportToDatabase()
   }
 })
 </script>
