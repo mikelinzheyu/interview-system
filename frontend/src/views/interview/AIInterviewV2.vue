@@ -344,6 +344,8 @@ const streamAIResponse = (initialContent, convId) => {
       messages.value.push(msg)
       isAiTyping.value = false
 
+      console.log('[AIInterviewV2] AI greeting message added:', msg)
+
       // 打字机效果
       let i = 0
       const interval = setInterval(() => {
@@ -353,6 +355,9 @@ const streamAIResponse = (initialContent, convId) => {
           scrollToBottom()
         } else {
           clearInterval(interval)
+          // 立即强制保存到 sessionStorage
+          sessionStorage.setItem('interview_messages', JSON.stringify(messages.value))
+          console.log('[AIInterviewV2] Messages saved to sessionStorage:', messages.value)
           ttsUtils.speak(msg.content)
           resolve()
         }
@@ -388,6 +393,9 @@ const streamAIResponse = (initialContent, convId) => {
       (newConvId) => {
         if (newConvId) conversationId.value = newConvId
         isAiTyping.value = false
+        // 立即强制保存到 sessionStorage
+        sessionStorage.setItem('interview_messages', JSON.stringify(messages.value))
+        console.log('[AIInterviewV2] Messages saved to sessionStorage:', messages.value)
         ttsUtils.speak(msg.content)
         scrollToBottom()
         resolve()
@@ -397,6 +405,8 @@ const streamAIResponse = (initialContent, convId) => {
         console.error('[AIInterviewV2] stream error:', err)
         isAiTyping.value = false
         msg.content = msg.content || '（AI 回复出错，请重试）'
+        // 立即强制保存到 sessionStorage
+        sessionStorage.setItem('interview_messages', JSON.stringify(messages.value))
         resolve()
       }
     )
@@ -421,6 +431,9 @@ const sendMessage = async () => {
     timestamp: Date.now(),
   }
   messages.value.push(userMsg)
+  // 立即保存用户消息
+  sessionStorage.setItem('interview_messages', JSON.stringify(messages.value))
+  console.log('[AIInterviewV2] User message saved:', userMsg)
   scrollToBottom()
 
   isAiTyping.value = true
@@ -608,6 +621,15 @@ onMounted(() => {
   const savedTimer = sessionStorage.getItem('interview_timer')
   const savedVerdicts = sessionStorage.getItem('interview_verdicts')
 
+  console.log('[AIInterviewV2] Checking sessionStorage:', {
+    savedStep,
+    savedMessagesLength: savedMessages ? JSON.parse(savedMessages).length : 0,
+    savedConfig: !!savedConfig,
+    savedConversationId,
+    savedTimer,
+    savedVerdictsLength: savedVerdicts ? JSON.parse(savedVerdicts).length : 0,
+  })
+
   if (savedStep === 'interview' && savedMessages && savedConfig) {
     try {
       // 恢复配置
@@ -617,7 +639,8 @@ onMounted(() => {
       config.resume = configData.resume
 
       // 恢复对话
-      messages.value = JSON.parse(savedMessages)
+      const restoredMessages = JSON.parse(savedMessages)
+      messages.value = restoredMessages
 
       // 恢复其他状态
       if (savedConversationId) conversationId.value = savedConversationId
@@ -634,13 +657,22 @@ onMounted(() => {
       // 滚动到底部
       scrollToBottom()
 
-      console.log('[AIInterviewV2] Session restored from sessionStorage')
+      console.log('[AIInterviewV2] ✅ Session restored successfully:', {
+        messagesCount: restoredMessages.length,
+        jobTitle: config.jobTitle,
+        timer: timer.value,
+      })
     } catch (e) {
-      console.warn('[AIInterviewV2] Failed to restore session:', e)
+      console.error('[AIInterviewV2] ❌ Failed to restore session:', e)
       sessionStorage.removeItem('interview_step')
       sessionStorage.removeItem('interview_messages')
       sessionStorage.removeItem('interview_config')
+      sessionStorage.removeItem('interview_conversationId')
+      sessionStorage.removeItem('interview_timer')
+      sessionStorage.removeItem('interview_verdicts')
     }
+  } else {
+    console.log('[AIInterviewV2] No interview session to restore')
   }
 
   // 每 3 秒保存 timer
