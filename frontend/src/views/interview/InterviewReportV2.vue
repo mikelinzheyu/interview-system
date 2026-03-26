@@ -85,7 +85,7 @@
               <span class="answer-question">{{ item.question }}</span>
             </div>
             <div class="answer-item-right">
-              <span v-if="item.score" class="score-badge" :style="{ '--sc': scoreColor(item.score) }">
+              <span v-if="item.score" class="score-badge" :style="getScoreBadgeStyle(item.score)">
                 {{ Math.round(item.score) }} 分
               </span>
               <span class="expand-icon">{{ expandedItems.has(i) ? '▲' : '▼' }}</span>
@@ -158,6 +158,21 @@ const scoreColor = (score) => {
   return '#ef4444'
 }
 
+// 计算分数徽章样式（用于 PDF 兼容性）
+const getScoreBadgeStyle = (score) => {
+  const color = scoreColor(score)
+  // 将 HEX 转为轻色背景（替代不兼容的 color-mix()）
+  const bgMap = {
+    '#22c55e': 'rgba(34, 197, 94, 0.1)',    // 绿色
+    '#f59e0b': 'rgba(245, 158, 11, 0.1)',   // 橙色
+    '#ef4444': 'rgba(239, 68, 68, 0.1)',    // 红色
+  }
+  return {
+    color,
+    background: bgMap[color] || 'rgba(229, 231, 235, 0.5)',
+  }
+}
+
 const formatTime = (s) => {
   if (!s) return '0分0秒'
   const m = Math.floor(s / 60)
@@ -214,14 +229,14 @@ const exportPDF = async () => {
         const allElements = clonedDocument.querySelectorAll('*')
         allElements.forEach((el) => {
           const style = window.getComputedStyle(el)
-          // 移除可能包含 color() 函数的样式
-          if (el.style.color && el.style.color.includes('color(')) {
+          // 移除可能包含 color() 或 color-mix() 函数的样式
+          if (el.style.color && (el.style.color.includes('color(') || el.style.color.includes('color-mix('))) {
             el.style.color = ''
           }
-          if (el.style.backgroundColor && el.style.backgroundColor.includes('color(')) {
+          if (el.style.backgroundColor && (el.style.backgroundColor.includes('color(') || el.style.backgroundColor.includes('color-mix('))) {
             el.style.backgroundColor = ''
           }
-          if (el.style.borderColor && el.style.borderColor.includes('color(')) {
+          if (el.style.borderColor && (el.style.borderColor.includes('color(') || el.style.borderColor.includes('color-mix('))) {
             el.style.borderColor = ''
           }
         })
@@ -483,8 +498,6 @@ onMounted(() => {
 }
 
 .score-badge {
-  background: color-mix(in srgb, var(--sc) 15%, white);
-  color: var(--sc);
   font-size: 12px;
   font-weight: 600;
   padding: 3px 10px;
