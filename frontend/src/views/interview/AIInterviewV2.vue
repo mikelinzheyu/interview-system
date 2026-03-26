@@ -213,7 +213,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, onBeforeUnmount, nextTick } from 'vue'
+import { ref, reactive, onMounted, onBeforeUnmount, nextTick, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import difyInterviewService from '@/services/difyInterviewService'
 import ttsUtils from '@/utils/ttsUtils'
@@ -299,6 +299,14 @@ const startInterview = async () => {
 
     sessionData.value = result.data || result
     step.value = 'interview'
+
+    // 保存初始状态到 sessionStorage
+    sessionStorage.setItem('interview_step', 'interview')
+    sessionStorage.setItem('interview_config', JSON.stringify({
+      jobTitle: config.jobTitle,
+      jobDescription: config.jobDescription,
+      resume: config.resume,
+    }))
 
     // 启动计时器
     timerInterval = setInterval(() => { timer.value++ }, 1000)
@@ -550,6 +558,14 @@ const confirmEndInterview = async () => {
     ],
   }
 
+  // 清空 sessionStorage
+  sessionStorage.removeItem('interview_step')
+  sessionStorage.removeItem('interview_messages')
+  sessionStorage.removeItem('interview_config')
+  sessionStorage.removeItem('interview_conversationId')
+  sessionStorage.removeItem('interview_timer')
+  sessionStorage.removeItem('interview_verdicts')
+
   router.push({ name: 'InterviewReportV2', state: reportState })
 }
 
@@ -563,8 +579,78 @@ const stopAll = () => {
 }
 
 // ===================== 生命周期 =====================
-onBeforeUnmount(() => {
-  stopAll()
+onMounted(() => {
+  // 尝试从 sessionStorage 恢复之前中断的面试
+  const savedStep = sessionStorage.getItem('interview_step')
+  const savedMessages = sessionStorage.getItem('interview_messages')
+  const savedConfig = sessionStorage.getItem('interview_config')
+  const savedConversationId = sessionStorage.getItem('interview_conversationId')
+  const savedTimer = sessionStorage.getItem('interview_timer')
+  const savedVerdicts = sessionStorage.getItem('interview_verdicts')
+
+  if (savedStep === 'interview' && savedMessages && savedConfig) {
+    try {
+      // 恢复配置
+      const configData = JSON.parse(savedConfig)
+      config.jobTitle = configData.jobTitle
+      config.jobDescription = configData.jobDescription
+      config.resume = configData.resume
+
+      // 恢复对话
+      messages.value = JSON.parse(savedMessages)
+
+      // 恢复其他状态
+      if (savedConversationId) conversationId.value = savedConversationId
+      if (savedTimer) timer.value = parseInt(savedTimer, 10)
+      if (savedVerdicts) verdicts.value = JSON.parse(savedVerdicts)
+
+      // 恢复步骤
+      step.value = 'interview'
+
+      // 重新启动计时器
+      if (timerInterval) clearInterval(timerInterval)
+      timerInterval = setInterval(() => { timer.value++ }, 1000)
+
+      console.log('[AIInterviewV2] Session restored from sessionStorage')
+    } catch (e) {
+      console.warn('[AIInterviewV2] Failed to restore session:', e)
+      sessionStorage.removeItem('interview_step')
+      sessionStorage.removeItem('interview_messages')
+      sessionStorage.removeItem('interview_config')
+    }
+  }
+
+  // 监听 messages 变化，自动保存
+  watch(messages, (newMessages) => {
+    if (step.value === 'interview') {
+      sessionStorage.setItem('interview_messages', JSON.stringify(newMessages))
+    }
+  }, { deep: true })
+
+  // 监听 conversationId 变化
+  watch(conversationId, (newConvId) => {
+    if (newConvId && step.value === 'interview') {
+      sessionStorage.setItem('interview_conversationId', newConvId)
+    }
+  })
+
+  // 监听 verdicts 变化
+  watch(verdicts, (newVerdicts) => {
+    if (step.value === 'interview') {
+      sessionStorage.setItem('interview_verdicts', JSON.stringify(newVerdicts))
+    }
+  }, { deep: true })
+
+  // 每秒保存 timer
+  const timerSaveInterval = setInterval(() => {
+    if (step.value === 'interview') {
+      sessionStorage.setItem('interview_timer', String(timer.value))
+    }
+  }, 3000)
+
+  onBeforeUnmount(() => {
+    clearInterval(timerSaveInterval)
+  })
 })
 </script>
 
