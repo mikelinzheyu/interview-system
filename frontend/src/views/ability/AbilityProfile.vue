@@ -1,478 +1,288 @@
 <template>
-  <div class="ability-profile-container">
-    <el-row :gutter="20">
-      <!-- T型指数卡片 -->
-      <el-col :span="8">
-        <el-card v-loading="abilityStore.profileLoading">
-          <template #header>
-            <h3>🎯 T型人才指数</h3>
-          </template>
-          <div v-if="profile" class="t-shape-card">
-            <div class="index-circle">
-              <div class="index-value">{{ (profile.tShapeAnalysis.index * 100).toFixed(1) }}</div>
-              <div class="index-label">T型指数</div>
+  <div class="growth-archive">
+    <div class="page-header">
+      <h2>📊 我的成长档案</h2>
+      <p class="subtitle">记录每一次面试，见证你的成长轨迹</p>
+    </div>
+
+    <div v-if="loading" class="loading-state">
+      <el-skeleton :rows="5" animated />
+    </div>
+
+    <div v-else-if="records.length === 0" class="empty-state">
+      <el-empty description="暂无面试记录，完成一次模拟面试后即可在此查看成长档案">
+        <el-button type="primary" @click="goToInterview">开始面试</el-button>
+      </el-empty>
+    </div>
+
+    <template v-else>
+      <div class="stats-bar">
+        <div class="stat-card">
+          <div class="stat-value">{{ stats.totalCount }}</div>
+          <div class="stat-label">面试次数</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" :class="getScoreClass(stats.avgScore)">{{ stats.avgScore }}</div>
+          <div class="stat-label">平均分</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value highlight">{{ stats.bestScore }}</div>
+          <div class="stat-label">最高分</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">{{ stats.totalHours }}</div>
+          <div class="stat-label">累计时长(小时)</div>
+        </div>
+      </div>
+
+      <div class="chart-section" v-if="records.length > 1">
+        <h3>📈 分数趋势</h3>
+        <div ref="chartRef" class="chart-container"></div>
+      </div>
+
+      <div class="records-section">
+        <h3>📋 面试记录</h3>
+        <div v-for="record in sortedRecords" :key="record.id" class="record-card">
+          <div class="record-header" @click="toggleExpand(record.id)">
+            <div class="record-meta">
+              <span class="record-date">{{ formatDate(record.createdAt) }}</span>
+              <span class="record-title">{{ record.jobTitle }}</span>
+              <el-tag :type="getDifficultyType(record.difficulty)" size="small">{{ record.difficulty }}</el-tag>
+              <span class="record-duration">{{ formatDuration(record.duration) }}</span>
             </div>
-            <el-progress
-              :percentage="profile.tShapeAnalysis.index * 100"
-              :color="getTShapeColor(profile.tShapeAnalysis.type)"
-              :stroke-width="10"
-            />
-            <div class="type-badge">
-              <el-tag
-                :type="getTShapeTagType(profile.tShapeAnalysis.type)"
-                size="large"
-              >
-                {{ getTShapeTypeName(profile.tShapeAnalysis.type) }}
-              </el-tag>
+            <div class="record-scores">
+              <span class="score-chip" :class="getScoreClass(record.overallScore)">综合 {{ record.overallScore }}</span>
+              <span class="score-chip">技术 {{ record.technicalScore }}</span>
+              <span class="score-chip">表达 {{ record.communicationScore }}</span>
+              <span class="score-chip">逻辑 {{ record.logicalScore }}</span>
             </div>
-            <div class="scores-info">
-              <div class="score-item">
-                <span>深度得分:</span>
-                <strong>{{ profile.tShapeAnalysis.depthScore }}</strong>
-              </div>
-              <div class="score-item">
-                <span>广度得分:</span>
-                <strong>{{ profile.tShapeAnalysis.breadthScore }}</strong>
-              </div>
-              <div class="score-item">
-                <span>平衡度:</span>
-                <strong>{{ (profile.tShapeAnalysis.balance * 100).toFixed(1) }}%</strong>
-              </div>
+            <el-icon class="expand-icon" :class="{ rotated: expandedIds.has(record.id) }"><ArrowDown /></el-icon>
+          </div>
+          <div v-if="expandedIds.has(record.id)" class="record-detail">
+            <div v-if="record.summary" class="detail-section">
+              <h4>面试总结</h4>
+              <p>{{ record.summary }}</p>
+            </div>
+            <div v-if="record.suggestions?.length" class="detail-section">
+              <h4>改进建议</h4>
+              <ul>
+                <li v-for="(s, i) in record.suggestions" :key="i">{{ s }}</li>
+              </ul>
+            </div>
+            <div class="detail-actions">
+              <el-button type="primary" size="small" @click.stop="goToReplay(record.id)">错题复盘</el-button>
             </div>
           </div>
-        </el-card>
-      </el-col>
-
-      <!-- 主攻领域卡片 -->
-      <el-col :span="16">
-        <el-card v-loading="abilityStore.profileLoading">
-          <template #header>
-            <h3>🎓 主攻领域</h3>
-          </template>
-          <div v-if="profile" class="primary-domain-card">
-            <div class="domain-header">
-              <h2>{{ profile.primaryDomain.domainName }}</h2>
-              <el-tag :type="getLevelType(profile.primaryDomain.level)" size="large">
-                {{ getLevelName(profile.primaryDomain.level) }}
-              </el-tag>
-            </div>
-            <div class="domain-stats">
-              <div class="domain-stat">
-                <div class="stat-label">得分</div>
-                <div class="stat-value">{{ profile.primaryDomain.score }}</div>
-              </div>
-              <div class="domain-stat">
-                <div class="stat-label">百分位</div>
-                <div class="stat-value">前 {{ (profile.primaryDomain.percentile * 100).toFixed(0) }}%</div>
-              </div>
-            </div>
-            <div class="strengths-weaknesses">
-              <div class="strength-section">
-                <h4>💪 优势领域</h4>
-                <el-tag
-                  v-for="strength in profile.tShapeAnalysis.strengths"
-                  :key="strength"
-                  type="success"
-                  class="tag-item"
-                >
-                  {{ strength }}
-                </el-tag>
-              </div>
-              <div class="weakness-section">
-                <h4>📈 提升空间</h4>
-                <el-tag
-                  v-for="weakness in profile.tShapeAnalysis.weaknesses"
-                  :key="weakness"
-                  type="warning"
-                  class="tag-item"
-                >
-                  {{ weakness }}
-                </el-tag>
-              </div>
-            </div>
-          </div>
-        </el-card>
-      </el-col>
-    </el-row>
-
-    <!-- 雷达图 -->
-    <el-row :gutter="20" class="mt-20">
-      <el-col :span="24">
-        <el-card v-loading="abilityStore.radarLoading">
-          <template #header>
-            <h3>📊 五维能力雷达图</h3>
-          </template>
-          <div ref="radarChartRef" style="width: 100%; height: 400px"></div>
-        </el-card>
-      </el-col>
-    </el-row>
-
-    <!-- 领域得分详情 -->
-    <el-row :gutter="20" class="mt-20">
-      <el-col :span="24">
-        <el-card>
-          <template #header>
-            <h3>📋 领域得分详情</h3>
-          </template>
-          <el-row :gutter="20">
-            <el-col
-              v-for="(domain, key) in profile?.domainScores"
-              :key="key"
-              :span="8"
-              class="mb-20"
-            >
-              <div class="domain-score-card">
-                <h4>{{ domain.domainName }}</h4>
-                <div class="domain-score">{{ domain.totalScore }}</div>
-                <el-progress
-                  :percentage="(domain.totalScore / 1000) * 100"
-                  :color="getScoreColor(domain.totalScore)"
-                />
-                <div class="domain-details">
-                  <div class="detail-item">
-                    <span>答题数:</span>
-                    <strong>{{ domain.questionsAttempted }}</strong>
-                  </div>
-                  <div class="detail-item">
-                    <span>正确数:</span>
-                    <strong>{{ domain.questionsCorrect }}</strong>
-                  </div>
-                  <div class="detail-item">
-                    <span>正确率:</span>
-                    <strong>{{ (domain.accuracy * 100).toFixed(1) }}%</strong>
-                  </div>
-                  <div class="detail-item">
-                    <span>等级:</span>
-                    <el-tag :type="getLevelType(domain.level)" size="small">
-                      {{ getLevelName(domain.level) }}
-                    </el-tag>
-                  </div>
-                </div>
-              </div>
-            </el-col>
-          </el-row>
-        </el-card>
-      </el-col>
-    </el-row>
-
-    <!-- 推荐 -->
-    <el-row :gutter="20" class="mt-20">
-      <el-col :span="24">
-        <el-card v-loading="abilityStore.recommendationsLoading">
-          <template #header>
-            <h3>💡 个性化推荐</h3>
-          </template>
-          <div v-if="recommendations">
-            <div
-              v-for="(rec, index) in recommendations.recommendations"
-              :key="index"
-              class="recommendation-item"
-            >
-              <div class="rec-header">
-                <el-tag :type="getRecType(rec.type)">
-                  {{ getRecTypeName(rec.type) }}
-                </el-tag>
-                <el-tag type="info" size="small">{{ rec.priority }}</el-tag>
-              </div>
-              <p class="rec-suggestion">{{ rec.suggestion }}</p>
-              <div v-if="rec.learningPaths.length > 0" class="rec-paths">
-                <span>推荐学习路径:</span>
-                <el-link
-                  v-for="pathId in rec.learningPaths"
-                  :key="pathId"
-                  type="primary"
-                  @click="goToPath(pathId)"
-                >
-                  学习路径 {{ pathId }}
-                </el-link>
-              </div>
-            </div>
-          </div>
-        </el-card>
-      </el-col>
-    </el-row>
+        </div>
+      </div>
+    </template>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch, nextTick } from 'vue'
+import { ref, computed, onMounted, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
-import { useAbilityStore } from '@/stores/ability'
-import { useUserStore } from '@/stores/user'
 import * as echarts from 'echarts'
+import { ArrowDown } from '@element-plus/icons-vue'
 
 const router = useRouter()
-const abilityStore = useAbilityStore()
-const userStore = useUserStore()
+const chartRef = ref(null)
+let chart = null
 
-const radarChartRef = ref(null)
-let radarChart = null
+const loading = ref(true)
+const records = ref([])
+const expandedIds = ref(new Set())
 
-const profile = computed(() => abilityStore.abilityProfile)
-const radarData = computed(() => abilityStore.radarData)
-const recommendations = computed(() => abilityStore.recommendations)
+const sortedRecords = computed(() =>
+  [...records.value].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+)
+
+const stats = computed(() => {
+  if (!records.value.length) return { totalCount: 0, avgScore: 0, bestScore: 0, totalHours: 0 }
+  const total = records.value.length
+  const avg = Math.round(records.value.reduce((s, r) => s + r.overallScore, 0) / total)
+  const best = Math.max(...records.value.map(r => r.overallScore))
+  const hours = (records.value.reduce((s, r) => s + r.duration, 0) / 3600).toFixed(1)
+  return { totalCount: total, avgScore: avg, bestScore: best, totalHours: hours }
+})
 
 onMounted(async () => {
-  const userId = userStore.user?.id || 1
-  await Promise.all([
-    abilityStore.fetchAbilityProfile(userId),
-    abilityStore.fetchRadarData(userId),
-    abilityStore.fetchRecommendations(userId)
-  ])
-
-  await nextTick()
-  initRadarChart()
+  await fetchRecords()
+  if (records.value.length > 1) {
+    await nextTick()
+    initChart()
+  }
 })
 
-watch(radarData, () => {
-  updateRadarChart()
-})
-
-function initRadarChart() {
-  if (!radarChartRef.value) return
-  radarChart = echarts.init(radarChartRef.value)
-  updateRadarChart()
-}
-
-function updateRadarChart() {
-  if (!radarChart || !radarData.value) return
-
-  const option = {
-    radar: {
-      indicator: radarData.value.domains.map((name, index) => ({
-        name,
-        max: radarData.value.maxScore
-      })),
-      radius: '60%'
-    },
-    series: [{
-      type: 'radar',
-      data: [{
-        value: radarData.value.scores,
-        name: '我的能力',
-        areaStyle: {
-          color: 'rgba(64, 158, 255, 0.3)'
-        }
-      }]
-    }]
+async function fetchRecords() {
+  const userId = sessionStorage.getItem('user_id') || localStorage.getItem('user_id') || 1
+  try {
+    const res = await fetch('/api/interview/records?limit=50&offset=0', {
+      headers: { 'Authorization': `Bearer ${userId}` }
+    })
+    const data = await res.json()
+    records.value = data.data?.items || data.data || []
+  } catch (e) {
+    console.error('Failed to fetch records:', e)
+  } finally {
+    loading.value = false
   }
-
-  radarChart.setOption(option)
 }
 
-function getTShapeColor(type) {
-  return type === 'T-shaped' ? '#67c23a' : type === 'I-shaped' ? '#e6a23c' : '#909399'
+function initChart() {
+  if (!chartRef.value) return
+  chart = echarts.init(chartRef.value)
+  const sorted = [...records.value].sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))
+  const dates = sorted.map(r => formatDate(r.createdAt))
+  chart.setOption({
+    tooltip: { trigger: 'axis' },
+    legend: { data: ['综合', '技术', '表达', '逻辑'] },
+    grid: { left: '3%', right: '4%', bottom: '3%', containLabel: true },
+    xAxis: { type: 'category', data: dates },
+    yAxis: { type: 'value', min: 0, max: 100 },
+    series: [
+      { name: '综合', type: 'line', smooth: true, data: sorted.map(r => r.overallScore) },
+      { name: '技术', type: 'line', smooth: true, data: sorted.map(r => r.technicalScore) },
+      { name: '表达', type: 'line', smooth: true, data: sorted.map(r => r.communicationScore) },
+      { name: '逻辑', type: 'line', smooth: true, data: sorted.map(r => r.logicalScore) }
+    ]
+  })
 }
 
-function getTShapeTagType(type) {
-  return type === 'T-shaped' ? 'success' : type === 'I-shaped' ? 'warning' : 'info'
+function toggleExpand(id) {
+  const s = new Set(expandedIds.value)
+  s.has(id) ? s.delete(id) : s.add(id)
+  expandedIds.value = s
 }
 
-function getTShapeTypeName(type) {
-  const map = {
-    'T-shaped': 'T型人才',
-    'I-shaped': 'I型人才',
-    '破折号-shaped': '破折号型人才'
-  }
-  return map[type] || type
+function goToReplay(recordId) {
+  router.push(`/interview/replay?recordId=${recordId}`)
 }
 
-function getLevelType(level) {
-  const map = {
-    beginner: 'info',
-    intermediate: 'primary',
-    advanced: 'warning',
-    expert: 'success'
-  }
-  return map[level] || 'info'
+function goToInterview() {
+  router.push('/interview/ai')
 }
 
-function getLevelName(level) {
-  const map = {
-    beginner: '初学者',
-    intermediate: '中级',
-    advanced: '高级',
-    expert: '专家'
-  }
-  return map[level] || level
+function formatDate(dateStr) {
+  return new Date(dateStr).toLocaleDateString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit' })
 }
 
-function getScoreColor(score) {
-  if (score >= 800) return '#67c23a'
-  if (score >= 600) return '#e6a23c'
-  if (score >= 400) return '#f56c6c'
-  return '#909399'
+function formatDuration(seconds) {
+  const m = Math.floor(seconds / 60)
+  return m >= 60 ? `${Math.floor(m / 60)}小时${m % 60}分钟` : `${m}分钟`
 }
 
-function getRecType(type) {
-  return type === 'strengthen_depth' ? 'primary' : 'success'
+function getScoreClass(score) {
+  if (score >= 80) return 'score-green'
+  if (score >= 60) return 'score-orange'
+  return 'score-red'
 }
 
-function getRecTypeName(type) {
-  const map = {
-    strengthen_depth: '深化专业',
-    expand_breadth: '拓展广度'
-  }
-  return map[type] || type
-}
-
-function goToPath(pathId) {
-  router.push(`/learning-paths/${pathId}`)
+function getDifficultyType(d) {
+  return d === '高级' ? 'danger' : d === '中级' ? 'warning' : 'success'
 }
 </script>
 
 <style scoped>
-.ability-profile-container {
-  padding: 20px;
+.growth-archive {
+  padding: 24px;
+  max-width: 900px;
+  margin: 0 auto;
 }
 
-.mt-20 {
-  margin-top: 20px;
-}
+.page-header { margin-bottom: 24px; }
+.page-header h2 { font-size: 24px; font-weight: 700; margin: 0 0 6px; color: #1a1a2e; }
+.subtitle { color: #888; margin: 0; font-size: 14px; }
 
-.mb-20 {
-  margin-bottom: 20px;
-}
-
-.t-shape-card {
-  text-align: center;
-}
-
-.index-circle {
-  margin-bottom: 20px;
-}
-
-.index-value {
-  font-size: 48px;
-  font-weight: bold;
-  color: #303133;
-}
-
-.index-label {
-  font-size: 14px;
-  color: #666;
-  margin-top: 5px;
-}
-
-.type-badge {
-  margin-top: 20px;
-}
-
-.scores-info {
-  margin-top: 20px;
-  text-align: left;
-}
-
-.score-item {
-  display: flex;
-  justify-content: space-between;
-  padding: 10px 0;
-  border-bottom: 1px solid #f0f0f0;
-}
-
-.primary-domain-card {
-  padding: 10px;
-}
-
-.domain-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-}
-
-.domain-header h2 {
-  margin: 0;
-}
-
-.domain-stats {
-  display: flex;
-  gap: 40px;
-  margin-bottom: 20px;
-}
-
-.domain-stat {
-  text-align: center;
-}
-
-.stat-label {
-  font-size: 14px;
-  color: #666;
-  margin-bottom: 5px;
-}
-
-.stat-value {
-  font-size: 32px;
-  font-weight: bold;
-  color: #303133;
-}
-
-.strengths-weaknesses {
+.stats-bar {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
 }
 
-.strength-section h4,
-.weakness-section h4 {
-  margin: 0 0 10px 0;
-}
-
-.tag-item {
-  margin: 0 5px 5px 0;
-}
-
-.domain-score-card {
+.stat-card {
+  background: #fff;
+  border: 1px solid #eee;
+  border-radius: 12px;
   padding: 20px;
-  background: #f5f7fa;
-  border-radius: 8px;
   text-align: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
 }
 
-.domain-score-card h4 {
-  margin: 0 0 10px 0;
+.stat-value { font-size: 32px; font-weight: 700; color: #303133; line-height: 1; margin-bottom: 8px; }
+.stat-value.highlight { color: #409eff; }
+.stat-value.score-green { color: #67c23a; }
+.stat-value.score-orange { color: #e6a23c; }
+.stat-value.score-red { color: #f56c6c; }
+.stat-label { font-size: 13px; color: #999; }
+
+.chart-section, .records-section {
+  background: #fff;
+  border: 1px solid #eee;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
 }
 
-.domain-score {
-  font-size: 36px;
-  font-weight: bold;
-  color: #303133;
-  margin-bottom: 10px;
-}
+.chart-section h3, .records-section h3 { margin: 0 0 16px; font-size: 16px; font-weight: 600; color: #303133; }
+.chart-container { width: 100%; height: 300px; }
 
-.domain-details {
-  margin-top: 15px;
-  text-align: left;
+.record-card {
+  border: 1px solid #f0f0f0;
+  border-radius: 10px;
+  margin-bottom: 12px;
+  overflow: hidden;
+  transition: box-shadow 0.2s;
 }
+.record-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
 
-.detail-item {
-  display: flex;
-  justify-content: space-between;
-  padding: 5px 0;
-}
-
-.recommendation-item {
-  padding: 15px;
-  margin-bottom: 15px;
-  background: #f5f7fa;
-  border-radius: 8px;
-}
-
-.rec-header {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 10px;
-}
-
-.rec-suggestion {
-  margin: 10px 0;
-  line-height: 1.6;
-}
-
-.rec-paths {
+.record-header {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
+  padding: 14px 16px;
+  cursor: pointer;
+  background: #fafafa;
   flex-wrap: wrap;
+}
+
+.record-meta { display: flex; align-items: center; gap: 10px; flex: 1; flex-wrap: wrap; }
+.record-date { font-size: 13px; color: #999; white-space: nowrap; }
+.record-title { font-weight: 600; color: #303133; font-size: 15px; }
+.record-duration { font-size: 13px; color: #aaa; }
+
+.record-scores { display: flex; gap: 8px; flex-wrap: wrap; }
+
+.score-chip {
+  font-size: 13px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  background: #f0f2f5;
+  color: #606266;
+  font-weight: 500;
+}
+.score-chip.score-green { background: #f0f9eb; color: #67c23a; }
+.score-chip.score-orange { background: #fdf6ec; color: #e6a23c; }
+.score-chip.score-red { background: #fef0f0; color: #f56c6c; }
+
+.expand-icon { color: #aaa; transition: transform 0.2s; flex-shrink: 0; }
+.expand-icon.rotated { transform: rotate(180deg); }
+
+.record-detail { padding: 16px; border-top: 1px solid #f0f0f0; background: #fff; }
+
+.detail-section { margin-bottom: 14px; }
+.detail-section h4 { font-size: 14px; font-weight: 600; color: #606266; margin: 0 0 8px; }
+.detail-section p { font-size: 14px; color: #303133; line-height: 1.7; margin: 0; }
+.detail-section ul { margin: 0; padding-left: 20px; }
+.detail-section li { font-size: 14px; color: #303133; line-height: 1.8; }
+
+.detail-actions { margin-top: 12px; }
+.loading-state, .empty-state { padding: 40px 0; }
+
+@media (max-width: 600px) {
+  .stats-bar { grid-template-columns: repeat(2, 1fr); }
+  .record-header { flex-direction: column; align-items: flex-start; }
 }
 </style>
