@@ -579,6 +579,26 @@ const stopAll = () => {
 }
 
 // ===================== 生命周期 =====================
+
+// 在 setup 顶层注册 watch，确保初始化时就被监听
+watch(messages, (newMessages) => {
+  if (step.value === 'interview') {
+    sessionStorage.setItem('interview_messages', JSON.stringify(newMessages))
+  }
+}, { deep: true })
+
+watch(conversationId, (newConvId) => {
+  if (newConvId && step.value === 'interview') {
+    sessionStorage.setItem('interview_conversationId', newConvId)
+  }
+})
+
+watch(verdicts, (newVerdicts) => {
+  if (step.value === 'interview') {
+    sessionStorage.setItem('interview_verdicts', JSON.stringify(newVerdicts))
+  }
+}, { deep: true })
+
 onMounted(() => {
   // 尝试从 sessionStorage 恢复之前中断的面试
   const savedStep = sessionStorage.getItem('interview_step')
@@ -611,6 +631,9 @@ onMounted(() => {
       if (timerInterval) clearInterval(timerInterval)
       timerInterval = setInterval(() => { timer.value++ }, 1000)
 
+      // 滚动到底部
+      scrollToBottom()
+
       console.log('[AIInterviewV2] Session restored from sessionStorage')
     } catch (e) {
       console.warn('[AIInterviewV2] Failed to restore session:', e)
@@ -620,28 +643,7 @@ onMounted(() => {
     }
   }
 
-  // 监听 messages 变化，自动保存
-  watch(messages, (newMessages) => {
-    if (step.value === 'interview') {
-      sessionStorage.setItem('interview_messages', JSON.stringify(newMessages))
-    }
-  }, { deep: true })
-
-  // 监听 conversationId 变化
-  watch(conversationId, (newConvId) => {
-    if (newConvId && step.value === 'interview') {
-      sessionStorage.setItem('interview_conversationId', newConvId)
-    }
-  })
-
-  // 监听 verdicts 变化
-  watch(verdicts, (newVerdicts) => {
-    if (step.value === 'interview') {
-      sessionStorage.setItem('interview_verdicts', JSON.stringify(newVerdicts))
-    }
-  }, { deep: true })
-
-  // 每秒保存 timer
+  // 每 3 秒保存 timer
   const timerSaveInterval = setInterval(() => {
     if (step.value === 'interview') {
       sessionStorage.setItem('interview_timer', String(timer.value))
