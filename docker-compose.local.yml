@@ -1,0 +1,138 @@
+# AI面试系统 - 本地 Docker 生产环境配置
+# ================================================
+# 本地构建和部署
+# 命令: docker-compose -f docker-compose.local.yml up -d
+
+services:
+  # ============================================
+  # PostgreSQL 数据库服务
+  # ============================================
+  db:
+    image: postgres:15-alpine
+    container_name: interview-db
+    restart: always
+    environment:
+      POSTGRES_DB: ${DB_NAME:-interview_system}
+      POSTGRES_USER: ${DB_USER:-admin}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-SecurePassword123!}
+      TZ: ${TZ:-Asia/Shanghai}
+    volumes:
+      - db_data:/var/lib/postgresql/data
+      - ./logs/db:/var/log/postgresql
+      - ./settings_migration.sql:/docker-entrypoint-initdb.d/01-settings_migration.sql
+    ports:
+      - "5432:5432"
+    networks:
+      - interview-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-admin}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ============================================
+  # Redis 缓存服务
+  # ============================================
+  redis:
+    image: redis:7-alpine
+    container_name: interview-redis
+    restart: always
+    environment:
+      TZ: ${TZ:-Asia/Shanghai}
+    command: redis-server --maxmemory 512mb --maxmemory-policy allkeys-lru
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - interview-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ============================================
+  # Node.js 后端API服务 - 本地构建
+  # ============================================
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.prod
+    image: ai_interview_backend:local
+    container_name: interview-backend
+    restart: always
+    environment:
+      NODE_ENV: production
+      PORT: 3001
+      TZ: ${TZ:-Asia/Shanghai}
+      # 数据库配置
+      DB_HOST: interview-db
+      DB_PORT: 5432
+      DB_NAME: ${DB_NAME:-interview_system}
+      DB_USER: ${DB_USER:-admin}
+      DB_PASSWORD: ${DB_PASSWORD:-SecurePassword123!}
+      # Dify AI 工作流配置
+      DIFY_API_BASE_URL: ${DIFY_API_BASE_URL:-https://api.dify.ai/v1}
+      DIFY_INTERVIEW_INIT_KEY: ${DIFY_INTERVIEW_INIT_KEY:-app-tbxpV6bDyAYab4qqRYSavxH3}
+      DIFY_INTERVIEW_CHAT_KEY: ${DIFY_INTERVIEW_CHAT_KEY:-app-4wtUAIUlZDoohTFfjN2T6WNk}
+      DIFY_INTERVIEW_VERDICT_KEY: ${DIFY_INTERVIEW_VERDICT_KEY:-app-7g0QiWpxu9ASO2f7U3VccK16}
+      # Redis 配置
+      REDIS_HOST: interview-redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-RedisPassword123!}
+      REDIS_DB: 0
+      # JWT 配置
+      JWT_SECRET: ${JWT_SECRET:-interview-system-jwt-secret-key}
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./backend/logs:/app/logs
+      - ./backend/uploads:/app/uploads
+    networks:
+      - interview-network
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 40s
+
+  # ============================================
+  # Vue 前端服务 - 本地构建
+  # ============================================
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.prod
+      args:
+        VITE_API_BASE_URL: /api
+        VITE_STORAGE_API_BASE_URL: http://localhost:8081/api
+    image: ai_interview_frontend:local
+    container_name: interview-frontend
+    restart: on-failure
+    ports:
+      - "8080:80"
+    networks:
+      - interview-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 20s
+    depends_on:
+      - backend
+
+networks:
+  interview-network:
+    driver: bridge
+
+volumes:
+  db_data:
+  redis_data:

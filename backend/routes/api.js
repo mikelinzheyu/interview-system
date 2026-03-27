@@ -1802,6 +1802,20 @@ router.put('/users/profile', auth, async (req, res) => {
       if (updatedUser.avatar !== undefined) mockUser.avatar = updatedUser.avatar
       if (updatedUser.bio !== undefined) mockUser.bio = updatedUser.bio
       if (updatedUser.phone !== undefined) mockUser.phone = updatedUser.phone
+      if (updatedUser.nickname !== undefined) mockUser.nickname = updatedUser.nickname
+      if (updatedUser.gender !== undefined) mockUser.gender = updatedUser.gender
+      if (updatedUser.birthday !== undefined) mockUser.birthday = updatedUser.birthday
+    } else {
+      // DB 不可用时，直接更新内存数据
+      if (profile.username !== undefined) mockUser.username = profile.username
+      if (profile.real_name !== undefined) mockUser.realName = profile.real_name
+      if (profile.realName !== undefined) mockUser.realName = profile.realName
+      if (profile.avatar !== undefined) mockUser.avatar = profile.avatar
+      if (profile.bio !== undefined) mockUser.bio = profile.bio
+      if (profile.phone !== undefined) mockUser.phone = profile.phone
+      if (profile.nickname !== undefined) mockUser.nickname = profile.nickname
+      if (profile.gender !== undefined) mockUser.gender = profile.gender
+      if (profile.birthday !== undefined) mockUser.birthday = profile.birthday
     }
 
     res.json({

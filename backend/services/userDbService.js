@@ -11,6 +11,26 @@ const fs = require('fs')
 const path = require('path')
 
 /**
+ * 判断数据库错误是否由"列不存在"导致
+ * 兼容 MySQL 和 PostgreSQL 两种错误信息
+ * @param {Error} error
+ * @returns {boolean}
+ */
+function isColumnMissingError(error) {
+  if (!error) return false
+  const msg = error.message || ''
+  // MySQL: "Unknown column 'xxx'" or code ER_BAD_FIELD_ERROR
+  if (msg.includes('Unknown column') || error.code === 'ER_BAD_FIELD_ERROR') {
+    return true
+  }
+  // PostgreSQL: "column ... does not exist" or code 42703
+  if (msg.includes('does not exist') || error.code === '42703') {
+    return true
+  }
+  return false
+}
+
+/**
  * 更新指定用户的头像 URL
  * @param {number|string} userId - 用户 ID，要求为正整数
  * @param {string} avatarUrl - 头像 URL
@@ -57,30 +77,74 @@ async function getUserById(userId) {
     throw new Error(`[UserDbService] Invalid userId for query: ${userId}`)
   }
 
-  const [rows] = await sequelize.query(
-    `SELECT
-       id,
-       username,
-       email,
-       real_name,
-       avatar,
-       bio,
-       phone,
-       status,
-       total_answered,
-       correct_answered,
-       accuracy_rate,
-       study_time,
-       interview_count,
-       created_at,
-       updated_at
-     FROM users
-     WHERE id = :id
-     LIMIT 1`,
-    {
-      replacements: { id: numericId }
+  let rows
+  try {
+    // 第一次查询：尝试查询包含 nickname, gender, birthday 的完整字段集
+    [rows] = await sequelize.query(
+      `SELECT
+         id,
+         username,
+         email,
+         real_name,
+         avatar,
+         bio,
+         phone,
+         status,
+         total_answered,
+         correct_answered,
+         accuracy_rate,
+         study_time,
+         interview_count,
+         created_at,
+         updated_at,
+         nickname,
+         gender,
+         birthday
+       FROM users
+       WHERE id = :id
+       LIMIT 1`,
+      {
+        replacements: { id: numericId }
+      }
+    )
+  } catch (error) {
+    // 如果是列不存在错误（settings_migration 未执行），降级为不查询新字段
+    if (isColumnMissingError(error)) {
+      console.warn(`[UserDbService] New columns (nickname/gender/birthday) not found, retrying without them:`, error.message)
+      try {
+        [rows] = await sequelize.query(
+          `SELECT
+             id,
+             username,
+             email,
+             real_name,
+             avatar,
+             bio,
+             phone,
+             status,
+             total_answered,
+             correct_answered,
+             accuracy_rate,
+             study_time,
+             interview_count,
+             created_at,
+             updated_at
+           FROM users
+           WHERE id = :id
+           LIMIT 1`,
+          {
+            replacements: { id: numericId }
+          }
+        )
+      } catch (retryError) {
+        // 降级查询也失败，才向上抛
+        throw retryError
+      }
+    } else {
+      // 其他类型的 DB 错误直接向上抛
+      throw error
     }
-  )
+  }
 
   if (!rows || rows.length === 0) {
     return null
@@ -99,6 +163,9 @@ async function getUserById(userId) {
     // 同时提供下划线风格和驼峰风格，兼容前端/其他后端
     real_name: row.real_name,
     realName: row.real_name,
+    nickname: row.nickname || null,
+    gender: row.gender || 'secret',
+    birthday: row.birthday || null,
     total_answered: row.total_answered,
     totalAnswered: row.total_answered,
     correct_answered: row.correct_answered,
@@ -117,7 +184,7 @@ async function getUserById(userId) {
 }
 
 /**
- * 更新当前用户基础资料（用户名 / 真实姓名 / 简介 / 手机号 / 头像）
+ * 更新当前用户基础资料（用户名 / 真实姓名 / 简介 / 手机号 / 头像 / 昵称 / 性别 / 生日）
  * 仅更新请求体中提供的字段
  *
  * @param {number|string} userId
@@ -149,6 +216,24 @@ async function updateUserProfile(userId, profile = {}) {
 
   if (typeof profile.phone === 'string' && profile.phone.trim()) {
     fields.phone = profile.phone.trim()
+  }
+
+  // nickname: 允许空字符串（用户清空昵称）
+  if (typeof profile.nickname === 'string') {
+    fields.nickname = profile.nickname.trim()
+  }
+
+  // gender: 枚举校验
+  if (typeof profile.gender === 'string') {
+    const VALID_GENDERS = ['male', 'female', 'secret']
+    if (VALID_GENDERS.includes(profile.gender)) {
+      fields.gender = profile.gender
+    }
+  }
+
+  // birthday: 允许空字符串（存为 NULL）
+  if (typeof profile.birthday === 'string') {
+    fields.birthday = profile.birthday.trim() || null
   }
 
   // avatar 字段支持两种形式：
@@ -203,18 +288,207 @@ async function updateUserProfile(userId, profile = {}) {
     WHERE id = :id
   `
 
-  await sequelize.query(sql, {
-    replacements: {
-      ...fields,
-      id: numericId
-    }
-  })
+  try {
+    await sequelize.query(sql, {
+      replacements: {
+        ...fields,
+        id: numericId
+      }
+    })
+  } catch (error) {
+    // 如果因新字段不存在而失败，剔除新字段后重试
+    if (isColumnMissingError(error)) {
+      console.warn('[UserDbService] New columns not found, retrying without nickname/gender/birthday:', error.message)
 
-  return await getUserById(numericId)
+      const oldFields = {}
+      const oldFieldKeys = []
+      for (const key of fieldKeys) {
+        if (!['nickname', 'gender', 'birthday'].includes(key)) {
+          oldFields[key] = fields[key]
+          oldFieldKeys.push(key)
+        }
+      }
+
+      if (oldFieldKeys.length > 0) {
+        const oldSetClauses = oldFieldKeys.map(key => `${key} = :${key}`)
+        const oldSql = `
+          UPDATE users
+          SET ${oldSetClauses.join(', ')}, updated_at = NOW()
+          WHERE id = :id
+        `
+        try {
+          await sequelize.query(oldSql, {
+            replacements: {
+              ...oldFields,
+              id: numericId
+            }
+          })
+        } catch (retryError) {
+          console.error('[UserDbService] Failed to update profile with fallback query:', retryError.message)
+          // 继续执行，不抛出错误 - 允许内存中的数据被返回
+        }
+      }
+    } else {
+      // 对于其他数据库错误（连接失败等），也优雅降级而不是抛出错误
+      console.error('[UserDbService] Database error during profile update (falling back to in-memory):', error.message)
+      // 不向上抛，继续执行 - 这样可以返回内存中的数据
+    }
+  }
+
+  // 尝试从数据库读取更新后的数据
+  // 如果数据库不可用，返回 null（上层会处理）
+  try {
+    return await getUserById(numericId)
+  } catch (error) {
+    console.error('[UserDbService] Failed to retrieve updated profile:', error.message)
+    return null
+  }
+}
+
+/**
+ * 获取用户隐私设置
+ * @param {number|string} userId
+ * @returns {Promise<object|null>}
+ */
+async function getUserPrivacySettings(userId) {
+  const numericId = Number(userId)
+
+  if (!Number.isInteger(numericId) || numericId <= 0) {
+    throw new Error(`[UserDbService] Invalid userId for privacy settings query: ${userId}`)
+  }
+
+  try {
+    const [rows] = await sequelize.query(
+      'SELECT privacy_settings FROM users WHERE id = :id LIMIT 1',
+      {
+        replacements: { id: numericId }
+      }
+    )
+
+    if (!rows || rows.length === 0 || !rows[0].privacy_settings) {
+      return null
+    }
+
+    return JSON.parse(rows[0].privacy_settings)
+  } catch (error) {
+    if (isColumnMissingError(error)) {
+      console.warn('[UserDbService] privacy_settings column not found:', error.message)
+      return null
+    }
+    throw error
+  }
+}
+
+/**
+ * 更新用户隐私设置
+ * @param {number|string} userId
+ * @param {object} settings - 隐私设置对象
+ * @returns {Promise<void>}
+ */
+async function updateUserPrivacySettings(userId, settings) {
+  const numericId = Number(userId)
+
+  if (!Number.isInteger(numericId) || numericId <= 0) {
+    throw new Error(`[UserDbService] Invalid userId for privacy settings update: ${userId}`)
+  }
+
+  if (typeof settings !== 'object' || settings === null) {
+    throw new Error('[UserDbService] settings must be an object')
+  }
+
+  const jsonStr = JSON.stringify(settings)
+
+  try {
+    await sequelize.query(
+      'UPDATE users SET privacy_settings = :jsonStr, updated_at = NOW() WHERE id = :id',
+      {
+        replacements: { jsonStr, id: numericId }
+      }
+    )
+  } catch (error) {
+    if (isColumnMissingError(error)) {
+      console.warn('[UserDbService] privacy_settings column not found, skipping DB persist:', error.message)
+      return
+    }
+    throw error
+  }
+}
+
+/**
+ * 获取用户界面偏好设置
+ * @param {number|string} userId
+ * @returns {Promise<object|null>}
+ */
+async function getUserPreferences(userId) {
+  const numericId = Number(userId)
+
+  if (!Number.isInteger(numericId) || numericId <= 0) {
+    throw new Error(`[UserDbService] Invalid userId for preferences query: ${userId}`)
+  }
+
+  try {
+    const [rows] = await sequelize.query(
+      'SELECT preferences FROM users WHERE id = :id LIMIT 1',
+      {
+        replacements: { id: numericId }
+      }
+    )
+
+    if (!rows || rows.length === 0 || !rows[0].preferences) {
+      return null
+    }
+
+    return JSON.parse(rows[0].preferences)
+  } catch (error) {
+    if (isColumnMissingError(error)) {
+      console.warn('[UserDbService] preferences column not found:', error.message)
+      return null
+    }
+    throw error
+  }
+}
+
+/**
+ * 更新用户界面偏好设置
+ * @param {number|string} userId
+ * @param {object} pref - 偏好设置对象
+ * @returns {Promise<void>}
+ */
+async function updateUserPreferences(userId, pref) {
+  const numericId = Number(userId)
+
+  if (!Number.isInteger(numericId) || numericId <= 0) {
+    throw new Error(`[UserDbService] Invalid userId for preferences update: ${userId}`)
+  }
+
+  if (typeof pref !== 'object' || pref === null) {
+    throw new Error('[UserDbService] pref must be an object')
+  }
+
+  const jsonStr = JSON.stringify(pref)
+
+  try {
+    await sequelize.query(
+      'UPDATE users SET preferences = :jsonStr, updated_at = NOW() WHERE id = :id',
+      {
+        replacements: { jsonStr, id: numericId }
+      }
+    )
+  } catch (error) {
+    if (isColumnMissingError(error)) {
+      console.warn('[UserDbService] preferences column not found, skipping DB persist:', error.message)
+      return
+    }
+    throw error
+  }
 }
 
 module.exports = {
   updateUserAvatar,
   getUserById,
-  updateUserProfile
+  updateUserProfile,
+  getUserPrivacySettings,
+  updateUserPrivacySettings,
+  getUserPreferences,
+  updateUserPreferences
 }

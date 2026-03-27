@@ -1,7 +1,13 @@
 const express = require('express')
 const router = express.Router()
 const { getControllers } = require('../services/dataService')
-const { updateUserProfile } = require('../services/userDbService')
+const {
+  updateUserProfile,
+  getUserPrivacySettings,
+  updateUserPrivacySettings,
+  getUserPreferences,
+  updateUserPreferences
+} = require('../services/userDbService')
 
 // Middleware to get user ID (assuming auth middleware runs before this)
 // In api.js: router.use('/users', userSettingsRouter)
@@ -187,28 +193,52 @@ router.post('/account/delete', (req, res) => {
 // ==================== Settings & Preferences ====================
 
 // GET /users/privacy
-router.get('/privacy', (req, res) => {
-  const controllers = getControllers()
-  const user = controllers.user.getUser(req.user.id)
-  
-  // Return defaults if not set
-  const privacy = user?.privacySettings || {
+router.get('/privacy', async (req, res) => {
+  const DEFAULT_PRIVACY = {
     onlineStatus: true,
     allowMessages: true,
     shareLocation: false,
     profileVisibility: 'public'
   }
-  
+
+  let privacy = null
+
+  // 1. 尝试从 DB 读取
+  try {
+    privacy = await getUserPrivacySettings(req.user.id)
+  } catch (dbError) {
+    console.warn('[GET /privacy] DB error:', dbError.message)
+  }
+
+  // 2. DB 返回 null（字段不存在或记录为空），降级到内存
+  if (!privacy) {
+    const controllers = getControllers()
+    const user = controllers.user.getUser(req.user.id)
+    privacy = user?.privacySettings || DEFAULT_PRIVACY
+  }
+
   res.json({ code: 200, data: privacy })
 })
 
 // PUT /users/privacy
-router.put('/privacy', (req, res) => {
+router.put('/privacy', async (req, res) => {
   const controllers = getControllers()
   const user = controllers.user.getUser(req.user.id)
+
+  // 1. 合并到内存（保留原有行为）
   if (user) {
     user.privacySettings = { ...user.privacySettings, ...req.body }
   }
+
+  // 2. 持久化到 DB（失败不影响响应）
+  try {
+    const settingsToSave = user?.privacySettings || req.body
+    await updateUserPrivacySettings(req.user.id, settingsToSave)
+  } catch (dbError) {
+    console.error('[PUT /privacy] DB persist error:', dbError.message)
+    // 降级：仅内存生效，不向客户端报错
+  }
+
   res.json({ code: 200, message: 'Privacy settings updated' })
 })
 
@@ -240,26 +270,51 @@ router.put('/notification', (req, res) => {
 })
 
 // GET /users/preferences
-router.get('/preferences', (req, res) => {
-  const controllers = getControllers()
-  const user = controllers.user.getUser(req.user.id)
-  
-  const preferences = user?.preferences || {
+router.get('/preferences', async (req, res) => {
+  const DEFAULT_PREFERENCES = {
     theme: 'light',
     accentColor: 'blue',
-    fontSize: 'medium'
+    fontSize: 'base'
   }
-  
+
+  let preferences = null
+
+  // 1. 尝试从 DB 读取
+  try {
+    preferences = await getUserPreferences(req.user.id)
+  } catch (dbError) {
+    console.warn('[GET /preferences] DB error:', dbError.message)
+  }
+
+  // 2. DB 返回 null（字段不存在或记录为空），降级到内存
+  if (!preferences) {
+    const controllers = getControllers()
+    const user = controllers.user.getUser(req.user.id)
+    preferences = user?.preferences || DEFAULT_PREFERENCES
+  }
+
   res.json({ code: 200, data: preferences })
 })
 
 // PUT /users/preferences
-router.put('/preferences', (req, res) => {
+router.put('/preferences', async (req, res) => {
   const controllers = getControllers()
   const user = controllers.user.getUser(req.user.id)
+
+  // 1. 合并到内存（保留原有行为）
   if (user) {
     user.preferences = { ...user.preferences, ...req.body }
   }
+
+  // 2. 持久化到 DB（失败不影响响应）
+  try {
+    const prefToSave = user?.preferences || req.body
+    await updateUserPreferences(req.user.id, prefToSave)
+  } catch (dbError) {
+    console.error('[PUT /preferences] DB persist error:', dbError.message)
+    // 降级：仅内存生效，不向客户端报错
+  }
+
   res.json({ code: 200, message: 'Preferences updated' })
 })
 

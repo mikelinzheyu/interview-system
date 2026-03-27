@@ -96,7 +96,21 @@
       "Bash(npm uninstall:*)",
       "Bash(npx vite:*)",
       "Bash(npx --yes vite build)",
-      "Bash(grep -E \"\\\\.\\(js|ts\\)$\")"
+      "Bash(grep -E \"\\\\.\\(js|ts\\)$\")",
+      "Bash(find /d/code7/interview-system/frontend/src -type f \\\\\\(-name *.js -o -name *.vue \\\\\\))",
+      "Bash(grep -E \"\\\\.\\(vue|js\\)$\")",
+      "Bash(grep -n \"wrongAnswersStore\\\\|fetchWrongAnswers\" /d/code7/interview-system/frontend/src/stores/*.js)",
+      "Bash(bash test-wrong-answers-api.sh)",
+      "Bash(bash verify-implementation.sh)",
+      "Bash(TEST_EXECUTION_SUMMARY.md:*)",
+      "Bash(bash diagnose-issue.sh)",
+      "Bash(/tmp/check-prod-backend.sh:*)",
+      "Read(//d D:/code7/**)",
+      "Bash(npm run:*)",
+      "Bash(psql -U admin -d interview_system -h localhost -p 5432 -c \"\\\\dt users\")",
+      "Bash(/c/Program Files/nodejs/node test-settings.js)",
+      "Bash(wsl docker:*)",
+      "Bash(DEPLOYMENT_READY.md:*)"
     ],
     "deny": [],
     "ask": []

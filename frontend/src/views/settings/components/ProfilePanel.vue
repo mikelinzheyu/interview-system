@@ -50,15 +50,28 @@
           </div>
         </div>
 
+        <!-- Real Name -->
+        <div class="form-row">
+          <label class="form-label">真实姓名</label>
+          <div class="form-content">
+            <input
+              type="text"
+              v-model="form.realName"
+              placeholder="请输入您的真实姓名"
+              class="form-input"
+            />
+          </div>
+        </div>
+
         <!-- Nickname -->
         <div class="form-row">
           <label class="form-label">昵称</label>
           <div class="form-content">
-            <input 
-              type="text" 
-              v-model="form.nickname" 
-              placeholder="请输入您的昵称" 
-              class="form-input" 
+            <input
+              type="text"
+              v-model="form.nickname"
+              placeholder="请输入您的昵称"
+              class="form-input"
             />
           </div>
         </div>
@@ -105,25 +118,13 @@
 
         <!-- Bio -->
         <div class="form-row items-start">
-          <div class="form-label-col">
-            <label class="form-label">个性签名</label>
-            <!-- AI Button (Desktop) -->
-            <button 
-              type="button"
-              @click="generateBio" 
-              :disabled="isGenerating"
-              class="ai-btn-desktop"
-            >
-              <Sparkles :size="12" />
-              <span>AI 生成</span>
-            </button>
-          </div>
+          <label class="form-label">个性签名</label>
           <div class="form-content relative">
-            <textarea 
-              v-model="form.bio" 
-              rows="4" 
+            <textarea
+              v-model="form.bio"
+              rows="4"
               maxlength="100"
-              placeholder="介绍一下自己，或者写一句喜欢的格言..." 
+              placeholder="介绍一下自己，或者写一句喜欢的格言..."
               class="form-textarea"
             ></textarea>
             <div class="char-count" :class="{ 'limit-near': form.bio.length > 90 }">
@@ -155,7 +156,7 @@
 <script setup>
 import { reactive, ref, onMounted, watch } from 'vue';
 import SettingsCard from './SettingsCard.vue';
-import { User, Camera, Sparkles, Loader2, Save } from 'lucide-vue-next';
+import { User, Camera, Loader2, Save } from 'lucide-vue-next';
 import { useUserStore } from '@/stores/user';
 import { storeToRefs } from 'pinia';
 import { userAPI } from '@/api/user';
@@ -165,11 +166,11 @@ const userStore = useUserStore();
 const { user } = storeToRefs(userStore);
 
 const isSaving = ref(false);
-const isGenerating = ref(false);
 
 const form = reactive({
   avatarUrl: '',
   username: '',
+  realName: '',
   nickname: '',
   gender: 'secret',
   birthday: '',
@@ -198,6 +199,7 @@ watch(user, (newVal) => {
 function syncForm(data) {
   form.avatarUrl = data.avatar || '';
   form.username = data.username || '';
+  form.realName = data.real_name || data.realName || '';
   form.nickname = data.nickname || '';
   form.gender = data.gender || 'secret';
   form.birthday = data.birthday ? data.birthday.split('T')[0] : '';
@@ -208,6 +210,8 @@ const saveProfile = async () => {
   isSaving.value = true;
   try {
     await userStore.updateUserInfo({
+      username: form.username,
+      real_name: form.realName,
       nickname: form.nickname,
       gender: form.gender,
       birthday: form.birthday,
@@ -246,25 +250,6 @@ const handleAvatarUpload = async (event) => {
   }
 };
 
-const generateBio = () => {
-  if (!form.nickname) {
-    ElMessage.warning('请输入昵称以便生成个性签名');
-    return;
-  }
-  isGenerating.value = true;
-  // Mock AI generation
-  setTimeout(() => {
-    const bios = [
-      "热爱生活，拥抱未来。",
-      "代码如诗，人生如歌。",
-      "探索未知的世界，记录美好的瞬间。",
-      "保持好奇，保持热爱。"
-    ];
-    form.bio = bios[Math.floor(Math.random() * bios.length)];
-    isGenerating.value = false;
-    ElMessage.success('个性签名生成成功');
-  }, 1500);
-};
 </script>
 
 <style scoped lang="scss">
@@ -399,14 +384,6 @@ const generateBio = () => {
   }
 }
 
-.form-label-col {
-  grid-column: span 3 / span 3;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  padding-top: 0.5rem;
-}
-
 .form-label {
   grid-column: span 3 / span 3;
   font-size: 0.875rem;
@@ -507,31 +484,6 @@ const generateBio = () => {
   
   &.active {
     color: var(--color-blue-600);
-  }
-}
-
-/* Bio */
-.ai-btn-desktop {
-  display: flex;
-  align-items: center;
-  gap: 0.375rem;
-  font-size: 0.75rem;
-  font-weight: 500;
-  color: var(--color-blue-600);
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 0;
-  width: fit-content;
-  transition: color 0.2s;
-  
-  &:hover {
-    color: var(--color-blue-700);
-  }
-  
-  &:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
   }
 }
 
